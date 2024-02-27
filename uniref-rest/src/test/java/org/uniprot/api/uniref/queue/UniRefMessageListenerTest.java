@@ -131,7 +131,7 @@ class UniRefMessageListenerTest {
         this.uniRefMessageListener.onMessage(message);
 
         // verify the ids file and clean up
-        verifyCleanUpBeforeRetry(jobId);
+        verifyCleanFilesAndResetCounts(jobId);
         Path idsFilePath = Path.of("target/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
@@ -145,7 +145,7 @@ class UniRefMessageListenerTest {
         verify(heartBeatProducer).stop(jobId);
     }
 
-    private void verifyCleanUpBeforeRetry(String jobId) {
+    private void verifyCleanFilesAndResetCounts(String jobId) {
         verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
         verify(jobRepository)
                 .update(
@@ -207,7 +207,7 @@ class UniRefMessageListenerTest {
         Message message = builder.setHeader("jobId", jobId).build();
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniRefMessageListener.onMessage(message));
-        verifyCleanUpBeforeRetry(jobId);
+        verifyCleanFilesAndResetCounts(jobId);
     }
 
     @Test

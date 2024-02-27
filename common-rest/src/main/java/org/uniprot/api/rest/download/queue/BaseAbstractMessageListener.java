@@ -71,7 +71,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         "Message with job id {} discarded after max retry {}",
                         jobId,
                         getMaxRetryCount());
-                cleanBeforeRetry(jobId);
+                cleanFilesAndResetCounts(jobId);
                 return;
             }
 
@@ -80,7 +80,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
 
             if (downloadJob.getRetried() > 0) {
-                cleanBeforeRetry(jobId);
+                cleanFilesAndResetCounts(jobId);
             }
 
             processMessage(message, downloadJob);
@@ -107,15 +107,6 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         ex);
             }
         }
-    }
-
-    private void cleanBeforeRetry(String jobId) {
-        jobRepository.update(jobId, Map.of(
-                UPDATE_COUNT, 0,
-                UPDATED, LocalDateTime.now(),
-                PROCESSED_ENTRIES, 0)
-        );
-        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     public Message addAdditionalHeaders(Message message, Exception ex) {
@@ -206,6 +197,16 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     protected void logMessage(Exception ex, String jobId) {
         log.warn("Unable to write file due to error for job id {}", jobId);
         log.warn(ex.getMessage());
+    }
+
+    private void cleanFilesAndResetCounts(String jobId) {
+        jobRepository.update(
+                jobId,
+                Map.of(
+                        UPDATE_COUNT, 0,
+                        UPDATED, LocalDateTime.now(),
+                        PROCESSED_ENTRIES, 0));
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     private boolean isMaxRetriedReached(Message message) {
