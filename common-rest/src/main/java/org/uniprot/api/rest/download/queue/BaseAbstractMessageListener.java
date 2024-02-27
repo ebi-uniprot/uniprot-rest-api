@@ -71,7 +71,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         "Message with job id {} discarded after max retry {}",
                         jobId,
                         getMaxRetryCount());
-                asyncDownloadFileHandler.deleteAllFiles(jobId);
+                cleanBeforeRetry(jobId);
                 return;
             }
 

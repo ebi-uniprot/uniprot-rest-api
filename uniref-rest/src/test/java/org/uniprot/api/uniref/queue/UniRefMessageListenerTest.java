@@ -131,14 +131,7 @@ class UniRefMessageListenerTest {
         this.uniRefMessageListener.onMessage(message);
 
         // verify the ids file and clean up
-        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
-        verify(jobRepository)
-                .update(
-                        eq(jobId),
-                        argThat(
-                                map ->
-                                        Objects.equals(0, map.get(UPDATE_COUNT))
-                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
+        verifyCleanUpBeforeRetry(jobId);
         Path idsFilePath = Path.of("target/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
@@ -150,6 +143,17 @@ class UniRefMessageListenerTest {
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
         verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
+    }
+
+    private void verifyCleanUpBeforeRetry(String jobId) {
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verify(jobRepository)
+                .update(
+                        eq(jobId),
+                        argThat(
+                                map ->
+                                        Objects.equals(0, map.get(UPDATE_COUNT))
+                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -203,7 +207,7 @@ class UniRefMessageListenerTest {
         Message message = builder.setHeader("jobId", jobId).build();
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniRefMessageListener.onMessage(message));
-        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verifyCleanUpBeforeRetry(jobId);
     }
 
     @Test
