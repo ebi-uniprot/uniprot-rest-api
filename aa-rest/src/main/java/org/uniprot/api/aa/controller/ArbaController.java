@@ -1,6 +1,7 @@
 package org.uniprot.api.aa.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
@@ -47,10 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 19/07/2021
  */
-@Tag(
-        name = "arba",
-        description =
-                "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ")
+@Tag(name = TAG_ARBA, description = TAG_ARBA_DESC)
 @RestController
 @Validated
 @RequestMapping("/arba")
@@ -79,7 +77,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/{arbaId}",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get a rule by ARBA id.",
+            summary = ID_ARBA_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -90,13 +88,14 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByArbaId(
-            @PathVariable("arbaId")
+            @Parameter(description = ID_ARBA_DESCRIPTION, example = ID_ARBA_EXAMPLE)
+                    @PathVariable("arbaId")
                     @Pattern(
                             regexp = ARBA_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.arba.invalid.id}")
                     String arbaId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_ARBA_DESCRIPTION, example = FIELDS_ARBA_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
                     String fields,
@@ -109,7 +108,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/search",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Search for a ARBA entry (or entries) by a Lucene query.",
+            summary = SEARCH_ARBA_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -140,7 +139,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Stream a ARBA entry (or entries) by a Lucene query.",
+            summary = STREAM_ARBA_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

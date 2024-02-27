@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 
@@ -29,14 +30,12 @@ import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -49,6 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 24 Apr 2019
  */
+@Tag(name = TAG_PROTEOME, description = TAG_PROTEOME_DESC)
 @RestController
 @Validated
 @RequestMapping("/proteomes")
@@ -73,12 +73,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         this.queryService = queryService;
     }
 
-    @Tag(
-            name = "proteome",
-            description =
-                    "The Proteomes service provides access to UniProtKB proteomes with"
-                            + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
-                            + " proteome identifiers, species names or taxonomy identifiers")
     @GetMapping(
             value = "/search",
             produces = {
@@ -89,7 +83,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for Proteomes.",
+            summary = SEARCH_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -125,7 +119,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "proteome")
     @GetMapping(
             value = "/{upid}",
             produces = {
@@ -136,7 +129,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve an Proteome entry by upid.",
+            summary = ID_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -152,20 +145,17 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
-            @Parameter(description = "Unique identifier for the Proteome entry")
+            @Parameter(description = UPID_PROTEOME_DESCRIPTION, example = UPID_PROTEOME_EXAMPLE)
                     @PathVariable("upid")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "proteome-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
                     @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
+                            description = FIELDS_PROTEOME_DESCRIPTION,
+                            example = FIELDS_PROTEOME_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -173,7 +163,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getEntityResponse(entry, fields, request);
     }
 
-    @Tag(name = "proteome")
     @GetMapping(
             value = "/stream",
             produces = {
@@ -184,7 +173,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream proteomes entry (or entries) via search.",
+            summary = STREAM_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -211,7 +200,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
             @Valid @ModelAttribute ProteomeStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         return super.stream(

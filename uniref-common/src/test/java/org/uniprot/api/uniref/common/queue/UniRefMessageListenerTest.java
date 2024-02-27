@@ -42,7 +42,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
-class UniRefMessageListenerTest {
+public class UniRefMessageListenerTest {
     @Mock private MessageConverter converter;
     @Mock private UniRefEntryLightService service;
     @Mock DownloadConfigProperties downloadConfigProperties;

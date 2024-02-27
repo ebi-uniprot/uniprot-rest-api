@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
@@ -30,14 +31,12 @@ import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -50,6 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 30 Apr 2019
  */
+@Tag(name = TAG_GENECENTRIC, description = TAG_GENECENTRIC_DESC)
 @RestController
 @Validated
 @RequestMapping("/genecentric")
@@ -78,9 +78,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();
     }
 
-    @Tag(name = "genecentric", description = "gene centric service")
     @Operation(
-            summary = "Search for gene centric data set.",
+            summary = SEARCH_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -122,7 +121,6 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "genecentric")
     @GetMapping(
             value = "/upid/{upid}",
             produces = {
@@ -132,7 +130,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Fetch all proteins of Proteome id.",
+            summary = UPID_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -167,9 +165,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "genecentric")
     @Operation(
-            summary = "Download Gene Centric data retrieved by search.",
+            summary = STREAM_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -213,9 +210,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 request);
     }
 
-    @Tag(name = "genecentric")
     @Operation(
-            summary = "Retrieve an gene centric entry by uniprot accession.",
+            summary = ID_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -238,17 +234,19 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByAccession(
-            @Parameter(description = "UnirotKB accession")
+            @Parameter(
+                            description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                            example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "genecentric-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
+                    @Parameter(
+                            description = FIELDS_GENECENTRIC_DESCRIPTION,
+                            example = FIELDS_GENECENTRIC_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

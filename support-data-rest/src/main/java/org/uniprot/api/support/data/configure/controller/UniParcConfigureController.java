@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
@@ -24,9 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 20 Jun 2019
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/uniparc")
 public class UniParcConfigureController {
@@ -37,7 +36,8 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the UniParc services.",
+            hidden = true,
+            summary = CONFIG_UNIPARC_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -58,7 +58,8 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the UniParc services.",
+            hidden = true,
+            summary = CONFIG_UNIPARC_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -79,7 +80,8 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of database details available for UniParc entry page.",
+            hidden = true,
+            summary = CONFIG_UNIPARC_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -100,7 +102,8 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in a UniParc entry.",
+            hidden = true,
+            summary = CONFIG_UNIPARC_ENTRY_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

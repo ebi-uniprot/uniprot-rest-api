@@ -1,5 +1,6 @@
 package org.uniprot.api.uniref.common.service.member.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
@@ -9,6 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -22,9 +24,10 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 05/01/2021
  */
 @Data
+@ParameterObject
 public class UniRefMemberRequest {
 
-    @Parameter(description = "Unique identifier for the UniRef cluster")
+    @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)
     @Pattern(
             regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -32,11 +35,11 @@ public class UniRefMemberRequest {
     @NotNull(message = "{search.required}")
     private String id;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRefEntryFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Facet filter query for UniRef Cluster Members")
+    @Parameter(description = FACET_FILTER_UNIREF_DESCRIPTION, example = FACET_FILTER_UNIREF_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = UniRefEntryFacetConfig.class)
     private String facetFilter;
@@ -44,7 +47,7 @@ public class UniRefMemberRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

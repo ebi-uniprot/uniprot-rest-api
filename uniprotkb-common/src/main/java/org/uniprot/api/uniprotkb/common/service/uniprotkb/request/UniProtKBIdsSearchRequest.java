@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -7,45 +9,44 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.*;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
+@ParameterObject
 @ValidGetByIdsRequest
 public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of accessions")
+    @Parameter(
+            description = ACCESSIONS_UNIPROTKB_DESCRIPTION,
+            example = ACCESSIONS_UNIPROTKB_EXAMPLE)
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String accessions;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(description = QUERY_UNIPROTKB_ID_DESCRIPTION, example = QUERY_UNIPROTKB_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,
             messagePrefix = "search.uniprot")
     private String query;
 
-    @Parameter(
-            description =
-                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -55,13 +56,12 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @Parameter(description = SIZE_UNIPROTKB_ID_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = SearchRequest.MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIPROTKB_ID_DESCRIPTION, example = SORT_UNIPROTKB_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 

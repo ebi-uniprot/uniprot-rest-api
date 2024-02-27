@@ -1,5 +1,6 @@
 package org.uniprot.api.support.data.configure.response;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -17,8 +18,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 class AdvancedSearchTermIT {
     private static final String CONTEXT_PATH = "/uniprot/api";
