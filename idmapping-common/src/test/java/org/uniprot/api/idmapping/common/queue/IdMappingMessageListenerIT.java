@@ -139,6 +139,16 @@ class IdMappingMessageListenerIT {
 
         this.idMappingMessageListener.onMessage(message);
 
+        verifyCleanUpBeforeRetry(jobId);
+        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        assertNotNull(downloadJobResultOpt);
+        assertTrue(downloadJobResultOpt.isPresent());
+        DownloadJob downloadJobResult = downloadJobResultOpt.get();
+        assertEquals(JobStatus.FINISHED, downloadJobResult.getStatus());
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
+    }
+
+    private void verifyCleanUpBeforeRetry(String jobId) {
         verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
         verify(jobRepository)
                 .update(
@@ -147,12 +157,6 @@ class IdMappingMessageListenerIT {
                                 map ->
                                         Objects.equals(0, map.get(UPDATE_COUNT))
                                                 && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
-        assertNotNull(downloadJobResultOpt);
-        assertTrue(downloadJobResultOpt.isPresent());
-        DownloadJob downloadJobResult = downloadJobResultOpt.get();
-        assertEquals(JobStatus.FINISHED, downloadJobResult.getStatus());
-        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -229,7 +233,7 @@ class IdMappingMessageListenerIT {
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
         Mockito.verify(this.rabbitTemplate, atMostOnce())
                 .convertAndSend(eq(rejectedQueueName), any(Message.class));
-        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verifyCleanUpBeforeRetry(jobId);
     }
 
     @Test
