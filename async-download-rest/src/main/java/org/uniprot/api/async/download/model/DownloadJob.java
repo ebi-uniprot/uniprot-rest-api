@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.download.model;
+package org.uniprot.api.async.download.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -8,6 +8,7 @@ import lombok.Data;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

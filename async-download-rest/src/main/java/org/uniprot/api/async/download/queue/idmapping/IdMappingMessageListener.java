@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.queue.common.HeartBeatProducer;
@@ -23,7 +24,6 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -42,7 +42,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
     private final IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties;
 
     public IdMappingMessageListener(
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties idMappingDownloadConfigProperties,
             IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             @Qualifier("idMappingRabbitTemplate") RabbitTemplate rabbitTemplate,
@@ -50,10 +50,10 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
             HeartBeatProducer heartBeatProducer) {
-        super(downloadConfigProperties, jobRepository, rabbitTemplate, heartBeatProducer);
+        super(idMappingDownloadConfigProperties, jobRepository, rabbitTemplate, heartBeatProducer);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
-        this.downloadConfigProperties = downloadConfigProperties;
+        this.downloadConfigProperties = idMappingDownloadConfigProperties;
         this.writerFactory = writerFactory;
         this.queueConfigProperties = queueConfigProperties;
     }

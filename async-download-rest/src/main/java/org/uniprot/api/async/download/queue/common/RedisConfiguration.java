@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadJob;
 
 /**
  * @author sahmad

@@ -17,8 +17,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 

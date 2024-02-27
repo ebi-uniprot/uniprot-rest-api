@@ -36,7 +36,7 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties uniProtKBDownloadConfigProperties,
             TaxonomyLineageService lineageService,
             RdfStreamer uniProtRdfStreamer,
             HeartBeatProducer heartBeatProducer) {
@@ -44,7 +44,7 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
-                downloadConfigProperties,
+                uniProtKBDownloadConfigProperties,
                 uniProtRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIPROTKB,
                 heartBeatProducer);

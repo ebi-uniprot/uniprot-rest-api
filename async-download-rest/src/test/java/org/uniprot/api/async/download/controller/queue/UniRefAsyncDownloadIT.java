@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,6 +38,7 @@ import org.uniprot.api.async.download.queue.uniref.UniRefMessageListener;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 import org.uniprot.api.uniref.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
@@ -61,6 +63,10 @@ import org.uniprot.store.search.SolrCollection;
 @WebMvcTest({UniRefDownloadController.class})
 @AutoConfigureWebClient
 public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
+    @Autowired private HashGenerator<DownloadRequest> uniRefHashGenerator;
+
+    @Value("${async.download.uniref.retryMaxCount}")
+    private int maxRetry;
 
     @Qualifier("uniRefTupleStreamTemplate")
     @Autowired
@@ -174,6 +180,16 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected ProducerMessageService getProducerMessageService() {
         return this.messageService;
+    }
+
+    @Override
+    protected int getMaxRetry() {
+        return this.maxRetry;
+    }
+
+    @Override
+    protected HashGenerator<DownloadRequest> getHashGenerator() {
+        return this.uniRefHashGenerator;
     }
 
     @Override

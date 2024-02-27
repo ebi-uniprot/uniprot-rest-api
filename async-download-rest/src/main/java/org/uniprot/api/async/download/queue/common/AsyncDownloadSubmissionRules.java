@@ -4,25 +4,18 @@ import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 
-@Component
-@Profile({"asyncDownload"})
-public class AsyncDownloadSubmissionRules {
+public abstract class AsyncDownloadSubmissionRules {
     private final int maxRetryCount;
     private final int maxWaitingTime;
     private final DownloadJobRepository downloadJobRepository;
 
     public AsyncDownloadSubmissionRules(
-            @Value("${async.download.retryMaxCount}") int maxRetryCount,
-            @Value("${async.download.waitingMaxTime}") int maxWaitingTime,
-            DownloadJobRepository downloadJobRepository) {
+            int maxRetryCount, int maxWaitingTime, DownloadJobRepository downloadJobRepository) {
         this.maxRetryCount = maxRetryCount;
         this.maxWaitingTime = maxWaitingTime;
         this.downloadJobRepository = downloadJobRepository;

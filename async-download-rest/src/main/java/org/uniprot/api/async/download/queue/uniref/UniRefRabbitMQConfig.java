@@ -1,9 +1,13 @@
 package org.uniprot.api.async.download.queue.uniref;
 
 import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.uniprot.api.async.download.queue.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * Initialisation code for Rabbit MQ to be used by both producer and consumer
@@ -80,5 +84,11 @@ public class UniRefRabbitMQConfig {
         return BindingBuilder.bind(uniRefUndeliveredQueue)
                 .to((DirectExchange) uniRefDownloadExchange)
                 .with(uniRefUndeliveredQueue.getName());
+    }
+
+    @Bean
+    public HashGenerator<DownloadRequest> uniRefHashGenerator(
+            @Value("${async.download.uniref.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
     }
 }

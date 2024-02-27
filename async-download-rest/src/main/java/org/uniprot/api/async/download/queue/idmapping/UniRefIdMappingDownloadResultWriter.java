@@ -35,14 +35,14 @@ public class UniRefIdMappingDownloadResultWriter
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties idMappingDownloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
             HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
-                downloadConfigProperties,
+                idMappingDownloadConfigProperties,
                 idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIREF,
                 heartBeatProducer);

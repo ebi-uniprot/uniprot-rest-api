@@ -35,14 +35,14 @@ public class UniParcIdMappingDownloadResultWriter
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
             StoreStreamerConfig<UniParcEntry> storeStreamerConfig,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties idMappingDownloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
             HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
-                downloadConfigProperties,
+                idMappingDownloadConfigProperties,
                 idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIPARC,
                 heartBeatProducer);

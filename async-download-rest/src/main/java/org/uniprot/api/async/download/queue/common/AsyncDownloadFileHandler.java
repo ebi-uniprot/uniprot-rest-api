@@ -7,14 +7,10 @@ import java.nio.file.Paths;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.output.context.FileType;
 
-@Component
-@Profile({"asyncDownload"})
 @Slf4j
-public class AsyncDownloadFileHandler {
+public abstract class AsyncDownloadFileHandler {
     private final DownloadConfigProperties downloadConfigProperties;
 
     public AsyncDownloadFileHandler(DownloadConfigProperties downloadConfigProperties) {

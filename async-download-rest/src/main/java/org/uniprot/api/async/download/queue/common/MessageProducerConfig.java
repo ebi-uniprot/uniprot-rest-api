@@ -4,15 +4,12 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.async.download.queue.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.queue.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.queue.uniref.UniRefAsyncDownloadQueueConfigProperties;
-import org.uniprot.api.rest.request.DownloadRequest;
-import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * @author sahmad
@@ -21,9 +18,6 @@ import org.uniprot.api.rest.request.HashGenerator;
 @Configuration
 @Profile({"asyncDownload"})
 public class MessageProducerConfig {
-
-    @Value("${async.download.hash.salt}")
-    private String hashSalt;
 
     @Bean("uniProtKBRabbitTemplate")
     public RabbitTemplate uniProtKBRabbitTemplate(
@@ -66,10 +60,5 @@ public class MessageProducerConfig {
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
         converter.setCreateMessageIds(true);
         return converter;
-    }
-
-    @Bean
-    public HashGenerator<DownloadRequest> hashGenerator() {
-        return new HashGenerator<>(new DownloadRequestToArrayConverter(), this.hashSalt);
     }
 }

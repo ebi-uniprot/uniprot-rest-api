@@ -25,14 +25,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.MessageListenerException;
 import org.uniprot.api.async.download.queue.common.ProducerMessageService;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -42,12 +41,7 @@ import com.jayway.jsonpath.JsonPath;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
-
-    @Value("${async.download.retryMaxCount}")
-    protected int maxRetry;
-
     @Autowired protected AmqpAdmin amqpAdmin;
-    @Autowired protected HashGenerator<DownloadRequest> hashGenerator;
 
     @SpyBean protected DownloadJobRepository downloadJobRepository;
 
@@ -130,14 +124,14 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
-        await().until(jobRetriedMaximumTimes(downloadJobRepository, jobId, maxRetry));
+        await().until(jobRetriedMaximumTimes(downloadJobRepository, jobId, getMaxRetry()));
         // verify  redis
-        verifyRedisEntry(query, jobId, JobStatus.ERROR, this.maxRetry, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, getMaxRetry(), true, 0);
         // after certain delay the job should be reprocessed
         await().until(
                         verifyMessageCountIsThanOrEqualToRejectedCount(
                                 amqpAdmin, getRejectedQueue(), rejectedMsgCount));
-        verifyRedisEntry(query, jobId, JobStatus.ERROR, this.maxRetry, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, getMaxRetry(), true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
@@ -147,7 +141,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = getMessageWithUnhandledExceptionQuery();
         DownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.hashGenerator.generateHash(request);
+        String jobId = getHashGenerator().generateHash(request);
         IllegalArgumentException ile =
                 new IllegalArgumentException(
                         "Forced exception in streamIds to test max retry with unhandled exception");
@@ -238,4 +232,8 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     }
 
     protected abstract ProducerMessageService getProducerMessageService();
+
+    protected abstract int getMaxRetry();
+
+    protected abstract HashGenerator<DownloadRequest> getHashGenerator();
 }

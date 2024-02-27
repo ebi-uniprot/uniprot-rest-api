@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.request.DownloadRequest;
 
 public interface DownloadResultWriter {

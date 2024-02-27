@@ -29,15 +29,15 @@ public class UniRefRabbitProducerMessageService extends RabbitProducerMessageSer
             MessageConverter converter,
             @Qualifier("uniRefRabbitTemplate") RabbitTemplate rabbitTemplate,
             DownloadJobRepository downloadJobRepository,
-            HashGenerator<DownloadRequest> hashGenerator,
-            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules,
-            AsyncDownloadFileHandler asyncDownloadFileHandler) {
+            HashGenerator<DownloadRequest> uniRefHashGenerator,
+            AsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules,
+            AsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
         super(
                 converter,
                 rabbitTemplate,
                 downloadJobRepository,
-                hashGenerator,
-                asyncDownloadSubmissionRules,
-                asyncDownloadFileHandler);
+                uniRefHashGenerator,
+                uniRefAsyncDownloadSubmissionRules,
+                uniRefAsyncDownloadFileHandler);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.queue.common.AbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.queue.common.DownloadResultWriter;
@@ -23,7 +24,6 @@ import org.uniprot.api.async.download.queue.embeddings.EmbeddingsQueueConfigProp
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -50,7 +50,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties uniProtKBDownloadConfigProperties,
             UniProtKBAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             @Qualifier("uniProtKBDownloadResultWriter") DownloadResultWriter downloadResultWriter,
@@ -59,7 +59,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             HeartBeatProducer heartBeatProducer) {
         super(
                 converter,
-                downloadConfigProperties,
+                uniProtKBDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
                 rabbitTemplate,

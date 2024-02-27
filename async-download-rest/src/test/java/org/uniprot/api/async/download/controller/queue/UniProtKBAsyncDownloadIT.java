@@ -48,6 +48,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtStoreConfig;
@@ -74,11 +75,15 @@ import org.uniprot.store.search.SolrCollection;
 @WebMvcTest({UniProtKBDownloadController.class})
 @AutoConfigureWebClient
 public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
+    @Autowired private HashGenerator<DownloadRequest> uniProtKBHashGenerator;
 
-    @Value("${download.idFilesFolder}")
+    @Value("${async.download.uniprotkb.retryMaxCount}")
+    private int maxRetry;
+
+    @Value("${async.download.uniprotkb.result.idFilesFolder}")
     protected String idsFolder;
 
-    @Value("${download.resultFilesFolder}")
+    @Value("${async.download.uniprotkb.result.resultFilesFolder}")
     protected String resultFolder;
 
     @Value("${async.download.uniprotkb.queueName}")
@@ -233,6 +238,16 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected ProducerMessageService getProducerMessageService() {
         return this.messageService;
+    }
+
+    @Override
+    protected int getMaxRetry() {
+        return this.maxRetry;
+    }
+
+    @Override
+    protected HashGenerator<DownloadRequest> getHashGenerator() {
+        return this.uniProtKBHashGenerator;
     }
 
     @Override

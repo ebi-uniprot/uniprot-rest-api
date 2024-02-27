@@ -33,14 +33,14 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties uniRefDownloadConfigProperties,
             RdfStreamer uniRefRdfStreamer,
             HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
-                downloadConfigProperties,
+                uniRefDownloadConfigProperties,
                 uniRefRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIREF,
                 heartBeatProducer);

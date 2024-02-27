@@ -14,9 +14,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
 
 @ExtendWith(MockitoExtension.class)
 class HeartBeatProducerTest {

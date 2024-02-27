@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.async.download.queue.common.AbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.queue.common.DownloadResultWriter;
@@ -20,7 +21,6 @@ import org.uniprot.api.async.download.queue.common.HeartBeatProducer;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -42,7 +42,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
 
     public UniRefMessageListener(
             MessageConverter converter,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties uniRefDownloadConfigProperties,
             UniRefAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             @Qualifier("uniRefDownloadResultWriter") DownloadResultWriter downloadResultWriter,
@@ -51,7 +51,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             HeartBeatProducer heartBeatProducer) {
         super(
                 converter,
-                downloadConfigProperties,
+                uniRefDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
                 rabbitTemplate,

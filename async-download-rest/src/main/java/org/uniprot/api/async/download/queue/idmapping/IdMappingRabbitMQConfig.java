@@ -1,9 +1,13 @@
 package org.uniprot.api.async.download.queue.idmapping;
 
 import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.common.service.config.IdMappingDownloadRequestToArrayConverter;
+import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * Initialisation code for Rabbit MQ to be used by both producer and consumer
@@ -82,5 +86,12 @@ public class IdMappingRabbitMQConfig {
         return BindingBuilder.bind(idMappingUndeliveredQueue)
                 .to((DirectExchange) idMappingDownloadExchange)
                 .with(idMappingUndeliveredQueue.getName());
+    }
+
+    @Bean
+    @Profile("asyncDownload")
+    public HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator(
+            @Value("${async.download.idmapping.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new IdMappingDownloadRequestToArrayConverter(), hashSalt);
     }
 }

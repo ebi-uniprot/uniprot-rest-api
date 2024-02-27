@@ -1,14 +1,14 @@
-package org.uniprot.api.rest.controller;
+package org.uniprot.api.async.download.controller;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.async.download.model.DownloadJob;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;

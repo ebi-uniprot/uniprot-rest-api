@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.RedisKeyValueTemplate;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadJob;
 
 @Component
 @Profile({"asyncDownload"})

@@ -45,7 +45,7 @@ public class UniProtKBIdMappingDownloadResultWriter
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
-            DownloadConfigProperties downloadConfigProperties,
+            DownloadConfigProperties idMappingDownloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
             TaxonomyLineageService taxonomyLineageService,
             UniprotKBMappingRepository uniprotKBMappingRepository,
@@ -54,7 +54,7 @@ public class UniProtKBIdMappingDownloadResultWriter
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
-                downloadConfigProperties,
+                idMappingDownloadConfigProperties,
                 idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIPROTKB,
                 heartBeatProducer);
