@@ -202,9 +202,9 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
         jobRepository.update(
                 jobId,
                 Map.of(
-                        UPDATE_COUNT, 0,
+                        UPDATE_COUNT, 0L,
                         UPDATED, LocalDateTime.now(),
-                        PROCESSED_ENTRIES, 0));
+                        PROCESSED_ENTRIES, 0L));
         asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
