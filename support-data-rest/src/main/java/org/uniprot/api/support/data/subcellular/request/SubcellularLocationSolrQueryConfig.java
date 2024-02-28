@@ -37,11 +37,9 @@ public class SubcellularLocationSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.SUBCELLLOCATION.toString().toLowerCase(),
                                 new HashMap<>());
-        Set<String> searchFields = subcellSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig))
                 .whiteListFields(subcellWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(subcellSearchFieldConfig)
                 .build();
     }

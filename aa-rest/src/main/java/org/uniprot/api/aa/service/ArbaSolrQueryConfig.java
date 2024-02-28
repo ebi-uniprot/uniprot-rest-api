@@ -39,11 +39,9 @@ public class ArbaSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.ARBA.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = arbaSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
                 .whiteListFields(uniRuleWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(arbaSearchFieldConfig)
                 .build();
     }

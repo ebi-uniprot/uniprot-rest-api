@@ -35,11 +35,9 @@ public class KeywordSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.KEYWORD.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = keywordSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(keywordSearchFieldConfig))
                 .whiteListFields(keywordWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(keywordSearchFieldConfig)
                 .build();
     }

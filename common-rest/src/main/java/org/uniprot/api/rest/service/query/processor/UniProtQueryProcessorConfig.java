@@ -25,7 +25,6 @@ public class UniProtQueryProcessorConfig {
     private final List<SearchFieldItem> optimisableFields;
     private final Map<String, String> whiteListFields;
     private final Set<String> stopwords;
-    private final Set<String> searchFieldsNames;
     private final Set<String> leadingWildcardFields; // fields which support leading wildcard
     private final SearchFieldConfig searchFieldConfig;
 

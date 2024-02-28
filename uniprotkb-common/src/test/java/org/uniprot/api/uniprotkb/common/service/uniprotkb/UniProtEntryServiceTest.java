@@ -424,7 +424,7 @@ class UniProtEntryServiceTest {
 
         when(uniProtKBQueryProcessorConfig.getOptimisableFields())
                 .thenReturn(List.of(accessionSearchField));
-        when(uniProtKBQueryProcessorConfig.getSearchFieldsNames()).thenReturn(EMPTY_SET);
+        when(uniProtKBQueryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
         when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields()).thenReturn(EMPTY_SET);
         when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"))
                 .thenReturn(accessionIdSearchField);

@@ -31,7 +31,6 @@ public class PublicationSolrQueryConfig {
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(emptyList())
                 .whiteListFields(emptyMap())
-                .searchFieldsNames(emptySet())
                 .searchFieldConfig(publicationSearchFieldConfig)
                 .build();
     }

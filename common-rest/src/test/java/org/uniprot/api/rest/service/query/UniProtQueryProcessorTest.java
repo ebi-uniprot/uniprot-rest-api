@@ -62,7 +62,6 @@ class UniProtQueryProcessorTest {
                                 singletonList(
                                         searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
-                        .searchFieldsNames(Set.of("field"))
                         .searchFieldConfig(searchFieldConfig)
                         .leadingWildcardFields(Set.of("gene", "protein_name"))
                         .build();
@@ -224,6 +223,7 @@ class UniProtQueryProcessorTest {
     @Test
     void handleUpperCaseFieldSearch() {
         String query = "FIELD:thing";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:thing"));
     }
@@ -231,6 +231,7 @@ class UniProtQueryProcessorTest {
     @Test
     void handleCamelCaseFieldSearch() {
         String query = "Field:thing_value";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:thing_value"));
     }

@@ -45,11 +45,9 @@ public class UniProtSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.UNIPROTKB.toString().toLowerCase(),
                                 new HashMap<>());
-        Set<String> searchFields = uniProtKBSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniProtKBSearchFieldConfig))
                 .whiteListFields(uniprotWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .leadingWildcardFields(uniProtKBSolrQueryConf.getLeadingWildcardFields())
                 .searchFieldConfig(uniProtKBSearchFieldConfig)
                 .build();

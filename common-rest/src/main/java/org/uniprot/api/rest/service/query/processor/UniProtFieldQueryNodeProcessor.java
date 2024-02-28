@@ -72,9 +72,9 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         public UniProtFieldQueryNode(FieldQueryNode node, UniProtQueryProcessorConfig conf) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
             this.whiteListFields = conf.getWhiteListFields();
-            this.searchFields = conf.getSearchFieldsNames();
             this.leadingWildcardFields = conf.getLeadingWildcardFields();
             this.searchFieldConfig = conf.getSearchFieldConfig();
+            this.searchFields = conf.getSearchFieldConfig().getSearchFieldNames();
         }
 
         @Override

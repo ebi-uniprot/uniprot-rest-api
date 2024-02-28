@@ -36,11 +36,9 @@ public class TaxonomySolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.TAXONOMY.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = taxonomySearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(taxonomySearchFieldConfig))
                 .whiteListFields(taxonomyWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(taxonomySearchFieldConfig)
                 .build();
     }

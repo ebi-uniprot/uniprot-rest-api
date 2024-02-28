@@ -39,11 +39,9 @@ public class UniRuleSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIRULE.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = uniRuleSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniRuleSearchFieldConfig))
                 .whiteListFields(uniRuleWhiteListFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(uniRuleSearchFieldConfig)
                 .build();
     }

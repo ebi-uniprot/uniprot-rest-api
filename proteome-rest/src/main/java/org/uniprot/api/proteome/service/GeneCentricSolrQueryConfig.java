@@ -37,12 +37,10 @@ public class GeneCentricSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.GENECENTRIC.toString().toLowerCase(),
                                 new HashMap<>());
-        Set<String> searchFields = geneCentricSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(
                         getDefaultSearchOptimisedFieldItems(geneCentricSearchFieldConfig))
                 .whiteListFields(geneCentricWhitelistFields)
-                .searchFieldsNames(searchFields)
                 .searchFieldConfig(geneCentricSearchFieldConfig)
                 .build();
     }

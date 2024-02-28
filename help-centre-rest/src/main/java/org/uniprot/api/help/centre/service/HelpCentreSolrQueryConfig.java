@@ -45,7 +45,6 @@ public class HelpCentreSolrQueryConfig {
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(Collections.emptyList())
                 .whiteListFields(helpCentreWhiteListFields)
-                .searchFieldsNames(Collections.emptySet())
                 .searchFieldConfig(helpCentreSearchFieldConfig)
                 .build();
     }
