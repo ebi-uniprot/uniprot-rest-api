@@ -3,12 +3,11 @@ package org.uniprot.api.idmapping.common.request.uniref;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -17,11 +16,11 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniRefIdMappingSearchRequest extends UniRefIdMappingBasicRequest
         implements SearchRequest {
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     private String facets;
 

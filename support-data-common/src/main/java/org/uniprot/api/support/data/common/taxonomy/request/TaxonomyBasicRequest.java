@@ -1,19 +1,17 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -22,8 +20,8 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class TaxonomyBasicRequest {
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "taxonomy-search-fields.json")
-    @Parameter(description = "Criteria to search taxonomies. It can take any valid Lucene query.")
+
+    @Parameter(description = QUERY_TAX_DESCRIPTION, example = QUERY_TAX_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -31,13 +29,11 @@ public class TaxonomyBasicRequest {
             messagePrefix = "search.taxonomy")
     private String query;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "taxonomy-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_TAX_DESCRIPTION, example = SORT_TAX_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String sort;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_TAX_DESCRIPTION, example = FIELDS_TAX_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 

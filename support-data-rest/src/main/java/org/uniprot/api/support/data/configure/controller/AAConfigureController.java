@@ -1,6 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG_DESC;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
@@ -23,9 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/07/2021
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure")
 public class AAConfigureController {
@@ -36,7 +37,8 @@ public class AAConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the UniRule services.",
+            hidden = true,
+            summary = CONFIG_UNIRULE_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +59,8 @@ public class AAConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the UniRule services.",
+            hidden = true,
+            summary = CONFIG_UNIRULE_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -78,7 +81,8 @@ public class AAConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the Arba services.",
+            hidden = true,
+            summary = CONFIG_ARBA_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -99,7 +103,8 @@ public class AAConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the Arba services.",
+            hidden = true,
+            summary = CONFIG_ARBA_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

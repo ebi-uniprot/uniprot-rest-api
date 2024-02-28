@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.UNIPROTKB_ID_MAPPING_PATH;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
@@ -40,6 +41,7 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -50,7 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 17/02/2021
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @Slf4j
 @RestController
 @RequestMapping(value = IDMAPPING_PATH + "/" + UNIPROTKB_ID_MAPPING_PATH)
@@ -90,8 +92,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            summary = IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -121,7 +122,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
-            @PathVariable String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -157,7 +158,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            summary = IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -189,10 +190,10 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntryPair>>>
             streamMappedEntries(
-                    @PathVariable String jobId,
+                    @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
+                            String jobId,
                     @Valid @ModelAttribute UniProtKBIdMappingStreamRequest streamRequest,
-                    HttpServletRequest request,
-                    HttpServletResponse response) {
+                    HttpServletRequest request) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);
 

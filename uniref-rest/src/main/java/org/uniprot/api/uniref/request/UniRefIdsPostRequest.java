@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.IdsDownloadRequest;
 import org.uniprot.api.rest.validation.ValidPostByIdsRequest;
 import org.uniprot.store.config.UniProtDataType;
@@ -15,6 +16,7 @@ import org.uniprot.store.config.UniProtDataType;
  */
 @Data
 @ValidPostByIdsRequest(accessions = "ids", uniProtDataType = UniProtDataType.UNIREF)
+@ParameterObject
 public class UniRefIdsPostRequest extends IdsDownloadRequest {
     private String ids;
     private String fields;

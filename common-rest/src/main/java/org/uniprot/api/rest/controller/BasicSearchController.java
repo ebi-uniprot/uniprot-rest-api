@@ -25,6 +25,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
+import org.uniprot.api.common.exception.TooManyRequestsException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -253,7 +254,11 @@ public abstract class BasicSearchController<T> {
 
         DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult =
                 new DeferredResult<>();
-        deferredResult.onTimeout(() -> setTooManyRequestsResponse(deferredResult));
+        deferredResult.onTimeout(
+                () -> {
+                    throw new TooManyRequestsException(
+                            "Timeout waiting to enter in the stream queue");
+                });
 
         // create the deferred result on a thread pool to prevent blocking client
         try {
@@ -275,10 +280,12 @@ public abstract class BasicSearchController<T> {
                         }
                     });
         } catch (TaskRejectedException ex) {
-            log.info(
-                    "Task executor rejected stream request (space inside={})",
-                    downloadGatekeeper.getSpaceInside());
-            setTooManyRequestsResponse(deferredResult);
+            String errorMessage =
+                    String.format(
+                            "Task executor rejected stream request (space inside=%d)",
+                            downloadGatekeeper.getSpaceInside());
+            log.info(errorMessage);
+            throw new TooManyRequestsException(errorMessage);
         }
 
         return deferredResult;
@@ -350,7 +357,7 @@ public abstract class BasicSearchController<T> {
      * @param request the request
      * @param deferredResult the deferred result whose contents should be set
      */
-    private void runRequestIfNotBusy(
+    protected void runRequestIfNotBusy(
             Supplier<MessageConverterContext<T>> contextSupplier,
             HttpServletRequest request,
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
@@ -366,16 +373,13 @@ public abstract class BasicSearchController<T> {
             log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
             deferredResult.setResult(okayResponse);
         } else {
-            log.info(
-                    "Gatekeeper did NOT let me in (space inside={})",
-                    downloadGatekeeper.getSpaceInside());
-            setTooManyRequestsResponse(deferredResult);
+            String errorMessage =
+                    String.format(
+                            "Gatekeeper did NOT let me in (space inside=%d)",
+                            downloadGatekeeper.getSpaceInside());
+            log.info(errorMessage);
+            throw new TooManyRequestsException(errorMessage);
         }
-    }
-
-    private void setTooManyRequestsResponse(
-            DeferredResult<ResponseEntity<MessageConverterContext<T>>> result) {
-        result.setResult(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build());
     }
 
     private boolean isGatekeeperNeeded(String userAgent) {

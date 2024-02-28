@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.Optional;
@@ -23,9 +25,11 @@ import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author sahmad
@@ -33,6 +37,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
+@Tag(name = TAG_UNIPROTKB_JOB, description = TAG_UNIPROTKB_JOB_DESC)
 public class UniProtKBDownloadController extends BasicDownloadController {
     static final String DOWNLOAD_RESOURCE = UniProtKBController.UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
@@ -48,6 +53,16 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     }
 
     @PostMapping(value = "/run", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = JOB_RUN_UNIPROTKB_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = JobSubmitResponse.class))
+                        })
+            })
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Validated(CustomConstraintGroupSequence.class) @ModelAttribute
                     UniProtKBDownloadRequest request) {
@@ -59,7 +74,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the status of a job.",
+            summary = JOB_STATUS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -68,7 +83,8 @@ public class UniProtKBDownloadController extends BasicDownloadController {
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+    public ResponseEntity<JobStatusResponse> getJobStatus(
+            @Parameter(description = JOB_ID_DESCRIPTION) @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -77,8 +93,22 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     @GetMapping(
             value = "/details/{jobId}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = JOB_DETAILS_UNIPROTKB_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            DownloadJobDetailResponse.class))
+                        })
+            })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = JOB_ID_DESCRIPTION) @PathVariable String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

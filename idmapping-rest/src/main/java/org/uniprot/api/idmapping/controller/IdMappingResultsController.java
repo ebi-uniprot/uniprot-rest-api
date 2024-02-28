@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
@@ -41,6 +42,7 @@ import org.uniprot.core.util.Utils;
 import com.google.common.base.Stopwatch;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,12 +54,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @Validated
 @Slf4j
 @RequestMapping(value = IDMAPPING_PATH)
 public class IdMappingResultsController extends BasicSearchController<IdMappingStringPair> {
+
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 
@@ -86,7 +89,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             value = "/results/{jobId}",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
-            summary = "Search result by a submitted job id.",
+            summary = ID_MAPPING_RESULT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -105,7 +108,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         })
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
-            @PathVariable String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -135,7 +138,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream result by a submitted job id.",
+            summary = ID_MAPPING_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -155,10 +158,10 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<IdMappingStringPair>>>
             streamResults(
-                    @PathVariable String jobId,
+                    @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
+                            String jobId,
                     @Valid @ModelAttribute IdMappingStreamRequest streamRequest,
-                    HttpServletRequest request,
-                    HttpServletResponse response) {
+                    HttpServletRequest request) {
 
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
         // validate the mapped ids size

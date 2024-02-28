@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,15 +13,14 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -27,37 +28,33 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 17/09/2020
  */
 @Data
+@ParameterObject
 public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(hidden = true)
     private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of taxonIds")
+    @Parameter(description = IDS_TAX_DESCRIPTION, example = IDS_TAX_EXAMPLE)
     @Pattern(regexp = TAXONOMY_ID_LIST_REGEX, message = "{search.taxonomy.invalid.list.id}")
     @ValidCommaSeparatedItemsLength(maxLength = 1000)
     private String taxonIds;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_TAX_DESCRIPTION, example = FIELDS_TAX_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(
-            description =
-                    "Criteria to filter by facet value. It can any supported valid Lucene query.")
+    @Parameter(description = FACET_FILTER_TAX_DESCRIPTION, example = FACET_FILTER_TAX_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
     @ValidSolrQueryFacetFields(facetConfig = TaxonomyFacetConfig.class)
     private String facetFilter;
 
-    @Parameter(
-            description =
-                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             regexp = "^true$|^false$",
@@ -66,7 +63,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    @Parameter(description = "Size of the result. Defaults to number of ids passed.")
+    @Parameter(description = IDS_SIZE_TAX_DESCRIPTION)
     private Integer size;
 
     @Parameter(hidden = true)

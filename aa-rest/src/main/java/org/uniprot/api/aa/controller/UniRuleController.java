@@ -1,6 +1,7 @@
 package org.uniprot.api.aa.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
 
@@ -43,10 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 11/11/2020
  */
-@Tag(
-        name = "unirule",
-        description =
-                "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ")
+@Tag(name = TAG_UNIRULE, description = TAG_UNIRULE_DESC)
 @RestController
 @Validated
 @RequestMapping("/unirule")
@@ -85,7 +83,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get a UniRule by id.",
+            summary = ID_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -98,13 +96,14 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
-            @PathVariable("uniruleid")
+            @Parameter(description = ID_UNIRULE_DESCRIPTION, example = ID_UNIRULE_EXAMPLE)
+                    @PathVariable("uniruleid")
                     @Pattern(
                             regexp = UNIRULE_ALL_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_UNIRULE_DESCRIPTION, example = FIELDS_UNIRULE_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
                     String fields,
@@ -122,7 +121,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniRule entry (or entries) by a Lucene query.",
+            summary = SEARCH_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -160,7 +159,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniRule entry (or entries) by a Lucene query.",
+            summary = STREAM_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
