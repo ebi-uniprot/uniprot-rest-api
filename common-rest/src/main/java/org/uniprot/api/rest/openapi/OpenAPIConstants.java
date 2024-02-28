@@ -121,11 +121,11 @@ public class OpenAPIConstants {
             "Unique identifier for ID Mapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "ID Mapping async download";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC =
-                "ID Mapping asynchronous download jobs are different from synchronous downloads offered via stream API. "
-                        + "First, a job must be submitted for download. "
-                        + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
-                        + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-                        + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+            "ID Mapping asynchronous download jobs are different from synchronous downloads offered via stream API. "
+                    + "First, a job must be submitted for download. "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String TAG_IDMAPPING_RESULT = "ID Mapping results";
     public static final String TAG_IDMAPPING_RESULT_DESC =
             "API calls to retrieve the results of a submitted ID Mapping job.";
@@ -686,7 +686,8 @@ public class OpenAPIConstants {
             "Get entry information based on a single accession.";
     public static final String DIFF_UNISAVE_OPERATION =
             "Get the differences between the contents of two versions of an entry.";
-    public static final String STATUS_UNISAVE_OPERATION = "Get status information a single accession.";
+    public static final String STATUS_UNISAVE_OPERATION =
+            "Get status information a single accession.";
     public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION =
             "Whether or not to include the entry content (true|false).";
     public static final String VERSIONS_UNISAVE_DESCRIPTION =

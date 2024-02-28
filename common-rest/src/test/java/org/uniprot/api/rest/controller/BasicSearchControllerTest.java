@@ -80,8 +80,7 @@ class BasicSearchControllerTest {
     }
 
     @Test
-    void creatingDeferredResultWhenThrowsRuntimeException()
-            throws InterruptedException {
+    void creatingDeferredResultWhenThrowsRuntimeException() throws InterruptedException {
         setUp(true);
 
         RuntimeException errorResult = new RuntimeException("MOCK EXCEPTION");
