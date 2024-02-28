@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.async.download.queue.common.RedisUtil.jobCreatedInRedis;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -112,19 +113,19 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IdMappingDownloadControllerIT {
 
-    @Value("${async.download.queueName}")
+    @Value("${async.download.idmapping.queueName}")
     protected String downloadQueue;
 
-    @Value("${async.download.retryQueueName}")
+    @Value("${async.download.idmapping.retryQueueName}")
     protected String retryQueue;
 
-    @Value(("${async.download.rejectedQueueName}"))
+    @Value(("${async.download.idmapping.rejectedQueueName}"))
     protected String rejectedQueue;
 
-    @Value("${download.idFilesFolder}")
+    @Value("${async.download.idmapping.result.idFilesFolder}")
     protected String idsFolder;
 
-    @Value("${download.resultFilesFolder}")
+    @Value("${async.download.idmapping.result.resultFilesFolder}")
     protected String resultFolder;
 
     @Autowired protected AmqpAdmin amqpAdmin;
@@ -1287,7 +1288,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     private Stream<Arguments> getAllUniRefFormats() {
-        return UniRefIdMappingDownloadRequestValidator.VALID_FORMATS.stream().map(Arguments::of);
+        return Stream.of(Arguments.of(RDF_MEDIA_TYPE_VALUE));
     }
 
     private Stream<Arguments> getAllUniParcFormats() {

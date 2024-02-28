@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -70,16 +71,32 @@ import com.jayway.jsonpath.JsonPath;
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
+    @Value("${async.download.uniref.result.idFilesFolder}")
+    private String idsFolder;
+
+    @Value("${async.download.uniref.result.resultFilesFolder}")
+    private String resultFolder;
+
+    @Value("${async.download.uniref.queueName}")
+    private String downloadQueue;
+
+    @Value("${async.download.uniref.retryQueueName}")
+    private String retryQueue;
+
+    @Value(("${async.download.uniref.rejectedQueueName}"))
+    private String rejectedQueue;
+    @Qualifier("uniRefFacetTupleStreamTemplate") @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     @Autowired
-    @Qualifier("uniProtKBTupleStream")
+    @Qualifier("uniRefTupleStreamTemplate")
     private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private DownloadJobRepository downloadJobRepository;
-    @Autowired private UniRefQueryRepository unirefQueryRepository;
+    @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private SolrClient solrClient;
 
+    @Qualifier("uniRefLightStoreClient")
     @Autowired
     private UniProtStoreClient<UniRefEntryLight> storeClient; // in memory voldemort store client
 
@@ -92,7 +109,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                unirefQueryRepository, cloudSolrClient, solrClient, storeClient);
+                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient);
     }
 
     @BeforeEach
@@ -314,26 +331,26 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected String getIdsFolder() {
-        return null;
+        return this.idsFolder;
     }
 
     @Override
     protected String getResultFolder() {
-        return null;
+        return this.resultFolder;
     }
 
     @Override
     protected String getDownloadQueue() {
-        return null;
+        return this.downloadQueue;
     }
 
     @Override
     protected String getRejectedQueue() {
-        return null;
+        return this.rejectedQueue;
     }
 
     @Override
     protected String getRetryQueue() {
-        return null;
+        return this.retryQueue;
     }
 }

@@ -80,11 +80,27 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Value("${async.download.uniprotkb.result.idFilesFolder}")
+    private String idsFolder;
+
+    @Value("${async.download.uniprotkb.result.resultFilesFolder}")
+    private String resultFolder;
+
+    @Value("${async.download.uniprotkb.queueName}")
+    private String downloadQueue;
+
+    @Value("${async.download.uniprotkb.retryQueueName}")
+    private String retryQueue;
+
+    @Value(("${async.download.uniprotkb.rejectedQueueName}"))
+    private String rejectedQueue;
+
+    @Qualifier("uniProtKBFacetTupleStreamTemplate") @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Qualifier("uniProtKBTupleStream") @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private DownloadJobRepository downloadJobRepository;
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private TaxonomyLineageRepository taxRepository;
+    @Qualifier("uniProtStoreClient")
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private MockMvc mockMvc;
 
@@ -503,26 +519,26 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected String getIdsFolder() {
-        return null;
+        return this.idsFolder;
     }
 
     @Override
     protected String getResultFolder() {
-        return null;
+        return this.resultFolder;
     }
 
     @Override
     protected String getDownloadQueue() {
-        return null;
+        return this.downloadQueue;
     }
 
     @Override
     protected String getRejectedQueue() {
-        return null;
+        return this.rejectedQueue;
     }
 
     @Override
     protected String getRetryQueue() {
-        return null;
+        return this.retryQueue;
     }
 }

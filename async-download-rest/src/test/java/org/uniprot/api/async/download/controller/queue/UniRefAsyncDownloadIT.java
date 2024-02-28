@@ -68,6 +68,22 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Value("${async.download.uniref.retryMaxCount}")
     private int maxRetry;
 
+    @Value("${async.download.uniref.result.idFilesFolder}")
+    protected String idsFolder;
+
+    @Value("${async.download.uniref.result.resultFilesFolder}")
+    protected String resultFolder;
+
+    @Value("${async.download.uniref.queueName}")
+    private String downloadQueue;
+
+    @Value("${async.download.uniref.retryQueueName}")
+    private String retryQueue;
+
+    @Value(("${async.download.uniref.rejectedQueueName}"))
+    private String rejectedQueue;
+
+
     @Qualifier("uniRefTupleStreamTemplate")
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
@@ -194,26 +210,26 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Override
     protected String getIdsFolder() {
-        return null;
+        return this.idsFolder;
     }
 
     @Override
     protected String getResultFolder() {
-        return null;
+        return this.resultFolder;
     }
 
     @Override
     protected String getDownloadQueue() {
-        return null;
+        return this.downloadQueue;
     }
 
     @Override
     protected String getRejectedQueue() {
-        return null;
+        return this.rejectedQueue;
     }
 
     @Override
     protected String getRetryQueue() {
-        return null;
+        return this.retryQueue;
     }
 }
