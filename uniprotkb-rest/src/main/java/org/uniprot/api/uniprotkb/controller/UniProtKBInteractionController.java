@@ -1,5 +1,9 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +26,11 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryInteract
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -34,7 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb")
-@Tag(name = "Miscellaneous")
+@Tag(name = TAG_UNIPROTKB, description = TAG_UNIPROTKB_DESC)
 public class UniProtKBInteractionController extends BasicSearchController<InteractionEntry> {
 
     private final UniProtKBEntryInteractionService interactionService;
@@ -66,9 +75,23 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
 
     @GetMapping(
             value = "/{accession}/interactions",
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
+    @Operation(
+            hidden = true,
+            summary = INTERACTION_UNIPROTKB_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = InteractionEntry.class))
+                        })
+            })
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
-            @PathVariable("accession")
+            @Parameter(
+                            description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                            example = ACCESSION_UNIPROTKB_EXAMPLE)
+                    @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

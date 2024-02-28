@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
 
 import javax.validation.constraints.Pattern;
@@ -22,7 +23,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
@@ -37,20 +37,17 @@ public class GroupByKeywordController extends GroupByController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Tag(name = "uniprotkbgroup")
-    @Operation(summary = "List of groups with respect to to the given query and parent")
+    @Operation(hidden = true, summary = GROUP_KEYWORD_DESCRIPTION)
     @ApiResponse(
             content =
                     @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = GroupByResult.class)))
     public ResponseEntity<GroupByResult> getGroups(
-            @Parameter(
-                            description =
-                                    "Criteria to search the groups. It can take any valid solr query.")
+            @Parameter(description = QUERY_UNIPROTKB_KEYWORD_DESCRIPTION)
                     @RequestParam(value = "query")
                     String query,
-            @Parameter(description = "Name of the parent")
+            @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(
                             regexp = FieldRegexConstants.KEYWORD_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

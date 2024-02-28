@@ -2065,6 +2065,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 case "uniparc":
                     value = "UPI0000000001";
                     break;
+                case "existence":
+                    value = "1";
+                    break;
                 case "date_modified":
                 case "date_created":
                 case "date_sequence_modified":
@@ -2395,7 +2398,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
                                             + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"
                                             + "OR uniparc:invalid OR uniref_cluster_50:invalid OR uniref_cluster_90:invalid "
-                                            + "OR uniref_cluster_100:invalid OR fragment:INVALID OR precursor:INVALID"))
+                                            + "OR uniref_cluster_100:invalid OR fragment:INVALID OR precursor:INVALID"
+                                            + "OR existence:6"))
                     .resultMatcher(
                             MockMvcResultMatchers.jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
@@ -2417,7 +2421,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             "The 'uniparc' filter value has invalid format. It should be a valid UniParc UPI.",
                                             "The 'uniref_cluster_50' filter value has invalid format. It should be a valid UniRef50 cluster ID.",
                                             "The 'uniref_cluster_90' filter value has invalid format. It should be a valid UniRef90 cluster ID.",
-                                            "The 'uniref_cluster_100' filter value has invalid format. It should be a valid UniRef100 cluster ID.")))
+                                            "The 'uniref_cluster_100' filter value has invalid format. It should be a valid UniRef100 cluster ID.",
+                                            "The 'existence' filter value should be a number from 1 to 5")))
                     .build();
         }
 

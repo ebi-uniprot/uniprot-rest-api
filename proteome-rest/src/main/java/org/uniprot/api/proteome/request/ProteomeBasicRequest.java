@@ -1,19 +1,17 @@
 package org.uniprot.api.proteome.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -23,8 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class ProteomeBasicRequest {
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "proteome-search-fields.json")
-    @Parameter(description = "Criteria to search the proteome. It can take any valid solr query.")
+    @Parameter(description = QUERY_PROTEOME_DESCRIPTION, example = QUERY_PROTEOME_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -32,13 +29,11 @@ public class ProteomeBasicRequest {
             messagePrefix = "search.proteome")
     private String query;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "proteome-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_PROTEOME_DESCRIPTION, example = SORT_PROTEOME_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String sort;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "proteome-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_PROTEOME_DESCRIPTION, example = FIELDS_PROTEOME_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
 

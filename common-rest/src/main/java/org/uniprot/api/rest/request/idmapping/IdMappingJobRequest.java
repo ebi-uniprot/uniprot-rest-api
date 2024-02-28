@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.request.idmapping;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
@@ -22,20 +24,22 @@ public class IdMappingJobRequest implements Serializable {
     private static final long serialVersionUID = 3950807397142678483L;
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Name of the from type")
+    @Parameter(description = FROM_IDMAPPING_JOB_DESCRIPTION, example = FROM_IDMAPPING_JOB_EXAMPLE)
     @ValidIdType(message = "{idmapping.invalid.from}")
     private String from;
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Name of the to type")
+    @Parameter(description = TO_IDMAPPING_JOB_DESCRIPTION, example = TO_IDMAPPING_JOB_EXAMPLE)
     @ValidIdType(message = "{idmapping.invalid.to}")
     private String to;
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of ids")
+    @Parameter(description = IDS_IDMAPPING_JOB_DESCRIPTION, example = IDS_IDMAPPING_JOB_EXAMPLE)
     @ValidCommaSeparatedItemsLength
     private String ids;
 
-    @Parameter(description = "Value of the taxon Id")
+    @Parameter(
+            description = TAX_ID_IDMAPPING_JOB_DESCRIPTION,
+            example = TAX_ID_IDMAPPING_JOB_EXAMPLE)
     private String taxId;
 }

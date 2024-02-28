@@ -13,6 +13,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -33,13 +34,15 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
-            HeartBeatProducer heartBeatProducer) {
+            HeartBeatProducer heartBeatProducer,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 rabbitTemplate,
-                heartBeatProducer);
+                heartBeatProducer,
+                asyncDownloadFileHandler);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }
@@ -76,7 +79,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
                     request, downloadJob, idsFile, contentType, storeRequest, getDataType());
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
+            logMessage(ex, jobId);
             throw new MessageListenerException(ex);
         }
     }

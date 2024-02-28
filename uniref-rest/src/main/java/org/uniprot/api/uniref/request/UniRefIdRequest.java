@@ -1,15 +1,16 @@
 package org.uniprot.api.uniref.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -17,17 +18,17 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 21/07/2020
  */
 @Data
+@ParameterObject
 public class UniRefIdRequest {
 
-    @Parameter(description = "Unique identifier for the UniRef cluster")
+    @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)
     @Pattern(
             regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.invalid.id.value}")
     private String id;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
     private String fields;
 }

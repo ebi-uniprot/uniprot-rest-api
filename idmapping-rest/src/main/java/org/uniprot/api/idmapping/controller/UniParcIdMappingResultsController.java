@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.UNIPARC_ID_MAPPING_PATH;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
@@ -37,6 +38,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -47,7 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 25/02/2021
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @RequestMapping(value = IDMAPPING_PATH + "/" + UNIPARC_ID_MAPPING_PATH)
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
@@ -84,7 +86,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search result of UniParc sequence entry (or entries) by a submitted job id.",
+            summary = IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -112,7 +114,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
-            @PathVariable String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -141,7 +143,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
+            summary = IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -171,7 +173,8 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryPair>>>
             streamMappedEntries(
-                    @PathVariable String jobId,
+                    @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
+                            String jobId,
                     @Valid @ModelAttribute UniParcIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
                     HttpServletResponse response) {

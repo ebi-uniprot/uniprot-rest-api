@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.disease.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.Optional;
@@ -41,11 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/diseases")
 @Validated
-@Tag(
-        name = "Disease",
-        description =
-                "The human diseases in which proteins are involved are "
-                        + "described in UniProtKB entries with a controlled vocabulary.")
+@Tag(name = TAG_DISEASE, description = TAG_DISEASE_DESC)
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     private static final String DATA_TYPE = "diseases";
     @Autowired private DiseaseService diseaseService;
@@ -66,7 +63,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Operation(
-            summary = "Get diseases by id.",
+            summary = ID_DISEASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -93,14 +90,14 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
-            @Parameter(description = "disease id to find")
+            @Parameter(description = ID_DISEASE_DESCRIPTION, example = ID_DISEASE_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
                             regexp = ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.disease.invalid.id}")
                     String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_DISEASE_DESCRIPTION, example = FIELDS_DISEASE_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -117,7 +114,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Operation(
-            summary = "Search disease by given Lucene search query.",
+            summary = SEARCH_DISEASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -153,7 +150,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Operation(
-            summary = "Download disease by given Lucene search query.",
+            summary = STREAM_DISEASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -186,7 +183,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

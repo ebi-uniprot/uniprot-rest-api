@@ -1,5 +1,7 @@
 package org.uniprot.api.help.centre.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.Max;
@@ -9,17 +11,13 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -37,8 +35,7 @@ public class HelpCentreSearchRequest implements SearchRequest {
                     .filter(fieldName -> !fieldName.equals("content"))
                     .collect(Collectors.joining(","));
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "help-search-fields.json")
-    @Parameter(description = "Criteria to search help centre. It can take any valid Lucene query.")
+    @Parameter(description = QUERY_DESCRIPTION)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -46,21 +43,19 @@ public class HelpCentreSearchRequest implements SearchRequest {
             messagePrefix = "search.helpcentre")
     private String query;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "help-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_DESCRIPTION)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.HELP)
     private String sort;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "help-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_DESCRIPTION)
     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
     private String fields;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = HelpCentreFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

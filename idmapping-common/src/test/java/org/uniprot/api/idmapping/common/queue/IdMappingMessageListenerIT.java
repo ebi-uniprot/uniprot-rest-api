@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
@@ -41,21 +43,25 @@ import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 @ExtendWith({MockitoExtension.class})
 class IdMappingMessageListenerIT {
 
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
     @Mock private MessageConverter converter;
 
-    @Mock DownloadConfigProperties downloadConfigProperties;
+    @Mock private DownloadConfigProperties downloadConfigProperties;
 
-    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
+    @Mock private AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock DownloadJobRepository jobRepository;
+    @Mock private DownloadJobRepository jobRepository;
 
     @Mock private RabbitTemplate rabbitTemplate;
 
-    @Mock IdMappingDownloadResultWriterFactory writerFactory;
+    @Mock private IdMappingDownloadResultWriterFactory writerFactory;
 
     @Mock private IdMappingJobCacheService idMappingJobCacheService;
 
-    @Mock UniProtKBIdMappingDownloadResultWriter uniProtKBIdMappingDownloadResultWriter;
+    @Mock private UniProtKBIdMappingDownloadResultWriter uniProtKBIdMappingDownloadResultWriter;
+
+    @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     @InjectMocks private IdMappingMessageListener idMappingMessageListener;
 
@@ -97,6 +103,60 @@ class IdMappingMessageListenerIT {
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
         assertEquals(JobStatus.FINISHED, downloadJobResult.getStatus());
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
+    }
+
+    @Test
+    void testOnMessageWhenRetry() throws IOException {
+        String jobId = UUID.randomUUID().toString();
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
+        Message message = builder.setHeader("jobId", jobId).build();
+        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        downloadJob.setRetried(1);
+
+        // stub
+        when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
+        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
+                        .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
+                        .build();
+        String to = "UniProtKB";
+        IdMappingJob idMappingJob = getIdMappingJob(to);
+        when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
+                .thenReturn(idMappingJob);
+        Mockito.verify(this.uniProtKBIdMappingDownloadResultWriter, atMostOnce())
+                .writeResult(
+                        downloadRequest, idMappingResult, downloadJob, MediaType.APPLICATION_JSON);
+        when(this.writerFactory.getResultWriter(to))
+                .thenReturn(
+                        (AbstractIdMappingDownloadResultWriter)
+                                this.uniProtKBIdMappingDownloadResultWriter);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
+        ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
+
+        this.idMappingMessageListener.onMessage(message);
+
+        verifyCleanFilesAndResetCounts(jobId);
+        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        assertNotNull(downloadJobResultOpt);
+        assertTrue(downloadJobResultOpt.isPresent());
+        DownloadJob downloadJobResult = downloadJobResultOpt.get();
+        assertEquals(JobStatus.FINISHED, downloadJobResult.getStatus());
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
+    }
+
+    private void verifyCleanFilesAndResetCounts(String jobId) {
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verify(jobRepository)
+                .update(
+                        eq(jobId),
+                        argThat(
+                                map ->
+                                        Objects.equals(0, map.get(UPDATE_COUNT))
+                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -173,6 +233,7 @@ class IdMappingMessageListenerIT {
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
         Mockito.verify(this.rabbitTemplate, atMostOnce())
                 .convertAndSend(eq(rejectedQueueName), any(Message.class));
+        verifyCleanFilesAndResetCounts(jobId);
     }
 
     @Test

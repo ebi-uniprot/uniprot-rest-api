@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.suggester.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
-@Tag(
-        name = "Suggester",
-        description =
-                "This service provides configuration data used in UniProt website for suggester (auto-complete) data")
+@Tag(name = TAG_SUGGESTER, description = TAG_SUGGESTER_DESC)
 @RestController
 public class SuggesterController {
     private final SuggesterService suggesterService;
@@ -40,8 +38,8 @@ public class SuggesterController {
     }
 
     @Operation(
-            summary =
-                    "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).",
+            hidden = true,
+            summary = SUGGESTER_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -60,11 +58,26 @@ public class SuggesterController {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<Suggestions> suggester(
             @Parameter(
-                            description =
-                                    "Suggest dictionary. The list of valid dictionaries is: KEYWORD, SUBCELL, MAIN, TAXONOMY, GO, EC, CATALYTIC_ACTIVITY, ORGANISM, HOST or CHEBI")
+                            description = DICT_SUGGESTER_DESCRIPTION,
+                            schema =
+                                    @Schema(
+                                            type = "type",
+                                            allowableValues = {
+                                                "KEYWORD",
+                                                "SUBCELL",
+                                                "MAIN",
+                                                "TAXONOMY",
+                                                "GO",
+                                                "EC",
+                                                "CATALYTIC_ACTIVITY",
+                                                "ORGANISM",
+                                                "HOST",
+                                                "CHEBI"
+                                            }),
+                            example = DICT_SUGGESTER_EXAMPLE)
                     @RequestParam(value = "dict", required = true)
                     String dict,
-            @Parameter(description = "Text to look up for auto-complete. For example: huma")
+            @Parameter(description = QUERY_SUGGESTER_DESCRIPTION, example = QUERY_SUGGESTER_EXAMPLE)
                     @RequestParam(value = "query", required = true)
                     String query) {
 

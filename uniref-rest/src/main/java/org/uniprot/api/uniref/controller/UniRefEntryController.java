@@ -2,6 +2,7 @@ package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -37,6 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 22 Aug 2019
  */
+@Tag(name = TAG_UNIREF, description = TAG_UNIREF_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniref")
@@ -54,10 +56,6 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
         this.entryService = entryService;
     }
 
-    @Tag(
-            name = "uniref",
-            description =
-                    "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
     @GetMapping(
             value = "/{id}",
             produces = {
@@ -72,7 +70,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve an UniRef cluster by id.",
+            summary = ID_UNIREF_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

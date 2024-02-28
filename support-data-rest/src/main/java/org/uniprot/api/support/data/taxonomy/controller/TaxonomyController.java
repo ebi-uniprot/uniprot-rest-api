@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.TAXONOMY;
 
@@ -41,10 +42,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(
-        name = "Taxonomy",
-        description =
-                "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.")
+@Tag(name = TAG_TAXONOMY, description = TAG_TAXONOMY_DESC)
 @RestController
 @RequestMapping("/taxonomy")
 @Validated
@@ -71,7 +69,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Get taxonomy by id.",
+            summary = ID_TAX_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -96,14 +94,14 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(
-            @Parameter(description = "Taxon id to find")
+            @Parameter(description = ID_TAX_DESCRIPTION, example = ID_TAX_EXAMPLE)
                     @PathVariable("taxonId")
                     @Pattern(
                             regexp = TAXONOMY_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.taxonomy.invalid.id}")
                     String taxonId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_TAX_DESCRIPTION, example = FIELDS_TAX_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -120,7 +118,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Get taxonomy by comma separated taxon ids.",
+            hidden = true,
+            summary = IDS_TAX_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -159,7 +158,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Search taxonomies by given Lucene search query.",
+            summary = SEARCH_TAX_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -193,7 +192,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
-            summary = "Download taxonomies by given Lucene search query.",
+            summary = STREAM_TAX_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -224,7 +223,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
