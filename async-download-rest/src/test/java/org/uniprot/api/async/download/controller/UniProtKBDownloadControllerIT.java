@@ -95,13 +95,22 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Value(("${async.download.uniprotkb.rejectedQueueName}"))
     private String rejectedQueue;
 
-    @Qualifier("uniProtKBFacetTupleStreamTemplate") @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Qualifier("uniProtKBTupleStream") @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Qualifier("uniProtKBFacetTupleStreamTemplate")
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
+    @Qualifier("uniProtKBTupleStream")
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
     @Autowired private DownloadJobRepository downloadJobRepository;
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private TaxonomyLineageRepository taxRepository;
+
     @Qualifier("uniProtStoreClient")
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired
+    private UniProtStoreClient<UniProtKBEntry> storeClient;
+
     @Autowired private MockMvc mockMvc;
 
     @Value("${async.download.embeddings.maxEntryCount}")
@@ -111,7 +120,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
 
-    @MockBean(name = "uniProtRdfRestTemplate")
+    @MockBean(name = "asyncRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @BeforeAll

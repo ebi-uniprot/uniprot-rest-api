@@ -65,7 +65,7 @@ public class UniRefEntryLightService
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
             RdfStreamer uniRefRdfStreamer,
-            @Qualifier("uniParcFacetTupleStreamTemplate")
+            @Qualifier("uniRefFacetTupleStreamTemplate")
                     FacetTupleStreamTemplate facetTupleStreamTemplate,
             @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream solrIdStreamer) {
         super(

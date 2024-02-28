@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.async.download.queue.common.RedisUtil.jobCreatedInRedis;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class IdMappingDownloadControllerIT {
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "asyncRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
 
     @Qualifier("uniRefLightStoreClient")
@@ -1288,7 +1288,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     private Stream<Arguments> getAllUniRefFormats() {
-        return Stream.of(Arguments.of(RDF_MEDIA_TYPE_VALUE));
+        return UniRefIdMappingDownloadRequestValidator.VALID_FORMATS.stream().map(Arguments::of);
     }
 
     private Stream<Arguments> getAllUniParcFormats() {
@@ -1302,7 +1302,7 @@ public class IdMappingDownloadControllerIT {
                 assertTrue(text.contains("<SAMPLE> rdf:type up:Protein ;"));
                 break;
             case UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE:
-                assertTrue(text.contains("SAMPLE_N_TRIPLES"));
+                assertTrue(text.contains(SAMPLE_N_TRIPLES));
                 break;
             case UniProtMediaType.RDF_MEDIA_TYPE_VALUE:
                 assertTrue(text.contains("<rdf:RDF"));

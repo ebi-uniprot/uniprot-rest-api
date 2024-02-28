@@ -46,7 +46,8 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
                             IdMappingRdfStreamerConfig.class,
                             UniParcIdService.class,
                             UniProtKBIdService.class,
-                            UniRefIdService.class
+                            UniRefIdService.class,
+                            IdMappingConfig.class
                         }))
 public class AsyncDownloadRestApp {
     public static void main(String[] args) {

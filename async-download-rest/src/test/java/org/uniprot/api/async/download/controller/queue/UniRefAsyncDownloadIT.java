@@ -83,7 +83,6 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Value(("${async.download.uniref.rejectedQueueName}"))
     private String rejectedQueue;
 
-
     @Qualifier("uniRefTupleStreamTemplate")
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;

@@ -99,7 +99,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
 
-    @MockBean(name = "uniparcRdfRestTemplate")
+    @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;

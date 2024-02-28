@@ -86,7 +86,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Value(("${async.download.uniref.rejectedQueueName}"))
     private String rejectedQueue;
-    @Qualifier("uniRefFacetTupleStreamTemplate") @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
+    @Qualifier("uniRefFacetTupleStreamTemplate")
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     @Autowired
     @Qualifier("uniRefTupleStreamTemplate")
@@ -100,7 +103,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired
     private UniProtStoreClient<UniRefEntryLight> storeClient; // in memory voldemort store client
 
-    @MockBean(name = "unirefRdfRestTemplate")
+    @MockBean(name = "asyncRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Autowired private MockMvc mockMvc;

@@ -52,7 +52,7 @@ import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
-    @MockBean(name = "uniparcRdfRestTemplate")
+    @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override
