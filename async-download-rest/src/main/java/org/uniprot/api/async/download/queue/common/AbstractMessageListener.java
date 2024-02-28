@@ -12,11 +12,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadRequest;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.request.DownloadRequest;
 
 @Slf4j
 public abstract class AbstractMessageListener extends BaseAbstractMessageListener {

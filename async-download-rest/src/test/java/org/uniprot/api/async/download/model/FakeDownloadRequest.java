@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.request;
+package org.uniprot.api.async.download.model;
 
 import lombok.Data;
 

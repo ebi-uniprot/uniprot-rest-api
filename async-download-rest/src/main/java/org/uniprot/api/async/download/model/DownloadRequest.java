@@ -1,4 +1,6 @@
-package org.uniprot.api.rest.request;
+package org.uniprot.api.async.download.model;
+
+import org.uniprot.api.rest.request.StreamRequest;
 
 public interface DownloadRequest extends StreamRequest {
     String getFormat();

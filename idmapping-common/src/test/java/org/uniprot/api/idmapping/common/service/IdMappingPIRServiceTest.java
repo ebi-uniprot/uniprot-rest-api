@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 class IdMappingPIRServiceTest {
     private static FakeIdMappingPIRService pirService;

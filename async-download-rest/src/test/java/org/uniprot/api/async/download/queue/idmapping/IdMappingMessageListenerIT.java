@@ -31,11 +31,11 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 @ExtendWith({MockitoExtension.class})
 class IdMappingMessageListenerIT {

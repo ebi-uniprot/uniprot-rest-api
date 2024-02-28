@@ -28,13 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadRequest;
 import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.MessageListenerException;
 import org.uniprot.api.async.download.queue.common.ProducerMessageService;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 import com.jayway.jsonpath.JsonPath;

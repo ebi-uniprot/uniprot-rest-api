@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 /**
  * @author sahmad

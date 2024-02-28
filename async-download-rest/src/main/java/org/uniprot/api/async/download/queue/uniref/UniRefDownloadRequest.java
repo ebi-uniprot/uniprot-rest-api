@@ -6,7 +6,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.async.download.model.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;

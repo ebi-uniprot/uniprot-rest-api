@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadJobDetailResponse;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
-import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
 public abstract class BasicDownloadController {

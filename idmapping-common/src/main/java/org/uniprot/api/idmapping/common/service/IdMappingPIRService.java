@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 /**
  * Created 17/02/2021

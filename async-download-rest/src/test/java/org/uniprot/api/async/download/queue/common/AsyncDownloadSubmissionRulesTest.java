@@ -12,10 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.queue.uniprotkb.UniProtKBAsyncDownloadSubmissionRules;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 
 @ExtendWith(MockitoExtension.class)
 class AsyncDownloadSubmissionRulesTest {

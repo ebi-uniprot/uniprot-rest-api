@@ -1,10 +1,9 @@
-package org.uniprot.api.rest.validation;
+package org.uniprot.api.async.download.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.rest.request.FakeDownloadRequest;
 
 class ValidDownloadRequestTest {
 

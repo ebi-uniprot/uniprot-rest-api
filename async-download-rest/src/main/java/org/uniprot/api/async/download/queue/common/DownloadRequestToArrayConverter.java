@@ -3,7 +3,7 @@ package org.uniprot.api.async.download.queue.common;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.async.download.model.DownloadRequest;
 
 public class DownloadRequestToArrayConverter implements Function<DownloadRequest, char[]> {
     @Override

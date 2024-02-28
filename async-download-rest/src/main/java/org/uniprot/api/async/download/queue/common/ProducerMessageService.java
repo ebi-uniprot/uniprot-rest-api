@@ -1,6 +1,6 @@
 package org.uniprot.api.async.download.queue.common;
 
-import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.async.download.model.DownloadRequest;
 
 /**
  * @author sahmad

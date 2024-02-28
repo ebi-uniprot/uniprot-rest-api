@@ -16,12 +16,12 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadRequest;
+import org.uniprot.api.async.download.model.FakeDownloadRequest;
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.queue.uniprotkb.UniProtKBRabbitProducerMessageService;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.job.JobSubmitFeedback;
-import org.uniprot.api.rest.request.DownloadRequest;
-import org.uniprot.api.rest.request.FakeDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)

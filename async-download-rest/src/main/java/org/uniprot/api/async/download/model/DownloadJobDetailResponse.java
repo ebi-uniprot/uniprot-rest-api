@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.output.job;
+package org.uniprot.api.async.download.model;
 
 import java.util.List;
 

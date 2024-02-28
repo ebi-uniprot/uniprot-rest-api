@@ -4,12 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.model.DownloadRequest;
+import org.uniprot.api.async.download.model.ValidDownloadRequest;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
-import org.uniprot.api.rest.validation.ValidDownloadRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 
 @Data

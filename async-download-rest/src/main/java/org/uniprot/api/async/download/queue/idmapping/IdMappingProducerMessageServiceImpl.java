@@ -15,13 +15,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.queue.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.queue.common.AsyncDownloadSubmissionRules;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
-import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @Service

@@ -16,6 +16,7 @@ import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfig
 import org.uniprot.api.async.download.controller.validator.IdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.IdMappingDownloadRequestValidatorFactory;
 import org.uniprot.api.async.download.model.DownloadJob;
+import org.uniprot.api.async.download.model.DownloadJobDetailResponse;
 import org.uniprot.api.async.download.queue.idmapping.IdMappingProducerMessageService;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -26,7 +27,6 @@ import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
-import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 

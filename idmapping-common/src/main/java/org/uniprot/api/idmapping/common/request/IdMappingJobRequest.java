@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.request.idmapping;
+package org.uniprot.api.idmapping.common.request;
 
 import java.io.Serializable;
 

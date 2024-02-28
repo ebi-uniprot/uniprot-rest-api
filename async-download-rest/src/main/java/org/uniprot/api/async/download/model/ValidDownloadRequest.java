@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.validation;
+package org.uniprot.api.async.download.model;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -22,7 +22,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.core.util.Utils;
 
 @Constraint(validatedBy = ValidDownloadRequest.DownloadRequestValidator.class)
