@@ -155,8 +155,8 @@ class IdMappingMessageListenerIT {
                         eq(jobId),
                         argThat(
                                 map ->
-                                        Objects.equals(0, map.get(UPDATE_COUNT))
-                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
+                                        Objects.equals(0L, map.get(UPDATE_COUNT))
+                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0L)));
     }
 
     private void verifyLoggingTotalNoOfEntries(

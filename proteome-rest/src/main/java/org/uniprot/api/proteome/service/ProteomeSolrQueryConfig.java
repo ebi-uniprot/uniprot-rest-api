@@ -36,11 +36,10 @@ public class ProteomeSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.PROTEOME.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = proteomeSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(proteomeSearchFieldConfig))
                 .whiteListFields(proteomeWhiteListFields)
-                .searchFieldsNames(searchFields)
+                .searchFieldConfig(proteomeSearchFieldConfig)
                 .build();
     }
 

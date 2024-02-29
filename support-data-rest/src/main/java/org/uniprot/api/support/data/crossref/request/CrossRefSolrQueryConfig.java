@@ -37,11 +37,10 @@ public class CrossRefSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.CROSSREF.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = crossRefSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig))
                 .whiteListFields(crossRefWhiteListFields)
-                .searchFieldsNames(searchFields)
+                .searchFieldConfig(crossRefSearchFieldConfig)
                 .build();
     }
 
