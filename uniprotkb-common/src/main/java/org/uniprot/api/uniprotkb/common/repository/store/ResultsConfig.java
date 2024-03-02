@@ -101,7 +101,8 @@ public class ResultsConfig {
     @Bean(name = "uniProtKBStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.uniprot")
     public StreamerConfigProperties resultsConfigProperties() {
-        return new StreamerConfigProperties();
+        StreamerConfigProperties b = new StreamerConfigProperties();
+        return b;
     }
 
     @Bean("uniProtKBTupleStreamDocumentIdStream")

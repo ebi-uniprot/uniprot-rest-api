@@ -44,7 +44,7 @@ public class UniRefStreamConfig {
     }
 
     @Bean
-    public StoreStreamer<UniRefEntryLight> unirefEntryStoreStreamer(
+    public StoreStreamer<UniRefEntryLight> uniRefEntryStoreStreamer(
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig) {
         return new StoreStreamer<>(storeStreamerConfig);
     }

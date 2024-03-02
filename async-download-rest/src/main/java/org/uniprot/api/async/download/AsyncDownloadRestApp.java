@@ -14,7 +14,14 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.uniparc.common.repository.rdf.UniParcRdfStreamerConfig;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtRdfStreamerConfig;
+import org.uniprot.api.uniprotkb.common.service.ec.ECService;
+import org.uniprot.api.uniprotkb.common.service.go.GOService;
+import org.uniprot.api.uniprotkb.common.service.go.client.GOClientImpl;
+import org.uniprot.api.uniprotkb.common.service.groupby.GroupByECService;
+import org.uniprot.api.uniprotkb.common.service.groupby.GroupByGOService;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryVersionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
 import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
 
 @SpringBootApplication
@@ -33,7 +40,8 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
             "org.uniprot.api.support.data.common.keyword",
             "org.uniprot.api.support.data.common.taxonomy"
         },
-        excludeFilters =
+        excludeFilters ={
+                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.groupby\\.*"),
                 @ComponentScan.Filter(
                         type = FilterType.ASSIGNABLE_TYPE,
                         classes = {
@@ -47,8 +55,17 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
                             UniParcIdService.class,
                             UniProtKBIdService.class,
                             UniRefIdService.class,
-                            IdMappingConfig.class
-                        }))
+                                UniProtKBEntryVersionService.class,
+                                UniSaveClient.class,
+                                ECService.class,
+                                GOService.class,
+                                GOClientImpl.class,
+                                GroupByECService.class,
+                                GroupByGOService.class,
+                                GroupByServiceConfig.class
+                        })
+        }
+)
 public class AsyncDownloadRestApp {
     public static void main(String[] args) {
         SpringApplication.run(AsyncDownloadRestApp.class, args);
