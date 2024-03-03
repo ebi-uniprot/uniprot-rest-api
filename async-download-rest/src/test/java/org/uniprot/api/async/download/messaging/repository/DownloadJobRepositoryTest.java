@@ -1,6 +1,6 @@
 package org.uniprot.api.async.download.messaging.repository;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 

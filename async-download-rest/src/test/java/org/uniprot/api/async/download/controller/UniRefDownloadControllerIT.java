@@ -37,6 +37,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.common.AsyncDownloadTestConfig;
+import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -46,7 +47,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
-import org.uniprot.api.uniref.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntryLight;

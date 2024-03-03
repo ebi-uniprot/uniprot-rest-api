@@ -1,6 +1,5 @@
 package org.uniprot.api.async.download.model.common;
 
-
 import java.util.Objects;
 import java.util.function.Function;
 
