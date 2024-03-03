@@ -40,32 +40,33 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
             "org.uniprot.api.support.data.common.keyword",
             "org.uniprot.api.support.data.common.taxonomy"
         },
-        excludeFilters ={
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.groupby\\.*"),
-                @ComponentScan.Filter(
-                        type = FilterType.ASSIGNABLE_TYPE,
-                        classes = {
-                            UniProtKBIdMappingResultsConfig.class,
-                            UniRefIdMappingResultsConfig.class,
-                            UniParcIdMappingResultsConfig.class,
-                            UniParcRdfStreamerConfig.class,
-                            UniProtRdfStreamerConfig.class,
-                            UniRefRdfStreamerConfig.class,
-                            IdMappingRdfStreamerConfig.class,
-                            UniParcIdService.class,
-                            UniProtKBIdService.class,
-                            UniRefIdService.class,
-                                UniProtKBEntryVersionService.class,
-                                UniSaveClient.class,
-                                ECService.class,
-                                GOService.class,
-                                GOClientImpl.class,
-                                GroupByECService.class,
-                                GroupByGOService.class,
-                                GroupByServiceConfig.class
-                        })
-        }
-)
+        excludeFilters = {
+            @ComponentScan.Filter(
+                    type = FilterType.REGEX,
+                    pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.groupby\\.*"),
+            @ComponentScan.Filter(
+                    type = FilterType.ASSIGNABLE_TYPE,
+                    classes = {
+                        UniProtKBIdMappingResultsConfig.class,
+                        UniRefIdMappingResultsConfig.class,
+                        UniParcIdMappingResultsConfig.class,
+                        UniParcRdfStreamerConfig.class,
+                        UniProtRdfStreamerConfig.class,
+                        UniRefRdfStreamerConfig.class,
+                        IdMappingRdfStreamerConfig.class,
+                        UniParcIdService.class,
+                        UniProtKBIdService.class,
+                        UniRefIdService.class,
+                        UniProtKBEntryVersionService.class,
+                        UniSaveClient.class,
+                        ECService.class,
+                        GOService.class,
+                        GOClientImpl.class,
+                        GroupByECService.class,
+                        GroupByGOService.class,
+                        GroupByServiceConfig.class
+                    })
+        })
 public class AsyncDownloadRestApp {
     public static void main(String[] args) {
         SpringApplication.run(AsyncDownloadRestApp.class, args);

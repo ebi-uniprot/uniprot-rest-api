@@ -11,12 +11,12 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.async.download.model.DownloadJob;
-import org.uniprot.api.async.download.model.DownloadJobDetailResponse;
-import org.uniprot.api.async.download.queue.common.ProducerMessageService;
-import org.uniprot.api.async.download.queue.uniref.UniRefDownloadRequest;
-import org.uniprot.api.async.download.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
+import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
+import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -42,8 +42,8 @@ public class UniRefDownloadController extends BasicDownloadController {
     public UniRefDownloadController(
             @Qualifier("uniRef") ProducerMessageService messageService,
             DownloadJobRepository jobRepository,
-            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
-        super(asyncDownloadHeartBeatConfiguration);
+            HeartbeatConfig heartbeatConfig) {
+        super(heartbeatConfig);
         this.messageService = messageService;
         this.jobRepository = jobRepository;
     }

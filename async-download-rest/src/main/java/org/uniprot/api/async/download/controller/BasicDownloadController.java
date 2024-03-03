@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.async.download.model.DownloadJob;
-import org.uniprot.api.async.download.model.DownloadJobDetailResponse;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -15,11 +15,10 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
 public abstract class BasicDownloadController {
-    private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
+    private final HeartbeatConfig heartbeatConfig;
 
-    protected BasicDownloadController(
-            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
-        this.asyncDownloadHeartBeatConfiguration = asyncDownloadHeartBeatConfiguration;
+    protected BasicDownloadController(HeartbeatConfig heartbeatConfig) {
+        this.heartbeatConfig = heartbeatConfig;
     }
 
     protected ResponseEntity<JobStatusResponse> getAsyncDownloadStatus(DownloadJob job) {
@@ -82,7 +81,7 @@ public abstract class BasicDownloadController {
     }
 
     private Long getProcessedEntries(DownloadJob job) {
-        return asyncDownloadHeartBeatConfiguration.isEnabled() ? job.getProcessedEntries() : null;
+        return heartbeatConfig.isEnabled() ? job.getProcessedEntries() : null;
     }
 
     protected String constructDownloadRedirectUrl(String resultFile, String url) {

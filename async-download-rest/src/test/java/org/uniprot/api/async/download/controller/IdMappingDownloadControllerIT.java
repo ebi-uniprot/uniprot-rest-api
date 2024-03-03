@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.queue.common.RedisUtil.jobCreatedInRedis;
+import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
@@ -73,8 +73,8 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.controller.validator.UniParcIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
-import org.uniprot.api.async.download.model.DownloadJob;
-import org.uniprot.api.async.download.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;

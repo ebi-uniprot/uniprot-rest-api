@@ -12,18 +12,18 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.async.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.async.download.controller.validator.IdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.IdMappingDownloadRequestValidatorFactory;
-import org.uniprot.api.async.download.model.DownloadJob;
-import org.uniprot.api.async.download.model.DownloadJobDetailResponse;
-import org.uniprot.api.async.download.queue.idmapping.IdMappingProducerMessageService;
-import org.uniprot.api.async.download.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
+import org.uniprot.api.async.download.messaging.producer.idmapping.IdMappingProducerMessageService;
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestImpl;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
-import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
@@ -50,8 +50,8 @@ public class IdMappingDownloadController extends BasicDownloadController {
             IdMappingProducerMessageService messageService,
             IdMappingJobCacheService idMappingJobCacheService,
             DownloadJobRepository jobRepository,
-            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
-        super(asyncDownloadHeartBeatConfiguration);
+            HeartbeatConfig heartbeatConfig) {
+        super(heartbeatConfig);
         this.messageService = messageService;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.jobRepository = jobRepository;

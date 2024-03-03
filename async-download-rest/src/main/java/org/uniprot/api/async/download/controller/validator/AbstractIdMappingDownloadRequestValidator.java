@@ -3,8 +3,8 @@ package org.uniprot.api.async.download.controller.validator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 
 public abstract class AbstractIdMappingDownloadRequestValidator
