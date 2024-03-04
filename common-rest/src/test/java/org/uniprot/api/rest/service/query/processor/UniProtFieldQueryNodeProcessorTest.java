@@ -1,10 +1,13 @@
 package org.uniprot.api.rest.service.query.processor;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -12,19 +15,33 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
+@ExtendWith(MockitoExtension.class)
 class UniProtFieldQueryNodeProcessorTest {
+    @Mock private SearchFieldConfig searchFieldConfig;
+
+    @Before
+    public void setUp() throws Exception {
+        when(searchFieldConfig.findSearchFieldItemByAlias(anyString()))
+                .thenReturn(Optional.empty());
+    }
 
     @Test
     void processInvalidFieldNameUpperCaseThenDoNothing() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("OTHER", "value", 1, 2);
@@ -37,7 +54,8 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void processValidFieldNameUpperCaseThenChangeItToLowerCase() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("FIELD", "value", 1, 2);
@@ -50,7 +68,8 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void processValidFieldNameMultipleCaseThenChangeItToLowerCase() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("Field", "value", 1, 2);
@@ -61,10 +80,31 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
+    void toQueryString_validAlias_returnsFieldName() throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("otherField"));
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+        SearchFieldItem searchFieldItem = new SearchFieldItem();
+        String fieldName = "field";
+        searchFieldItem.setFieldName(fieldName);
+        String alias = "alias";
+        when(searchFieldConfig.findSearchFieldItemByAlias(alias))
+                .thenReturn(Optional.of(searchFieldItem));
+
+        FieldQueryNode node = new FieldQueryNode(alias, "value", 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals("field:value", result);
+    }
+
+    @Test
     void processDefaultSearchWithUnderScoreThenRemoveUnderScoreAndDoubleQuote()
             throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "VAR_99999", 1, 2);
@@ -78,7 +118,8 @@ class UniProtFieldQueryNodeProcessorTest {
     void processDefaultSearchWithUnderScoreThenRemoveUnderScoreAndDoubleQuoteWithVSF()
             throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "VSF_99999", 1, 2);
@@ -91,7 +132,8 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void processDefaultSearchWithUnderScoreInvalidPrefix() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "99999_9999", 1, 2);
@@ -104,7 +146,8 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void processDefaultSearchWithUnderScoreInvalidSufix() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "VAR_VAR", 1, 2);
@@ -121,9 +164,10 @@ class UniProtFieldQueryNodeProcessorTest {
         optimisableField.setValidRegex("^[0-9]*");
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .optimisableFields(List.of(optimisableField))
                         .build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "letter", 1, 2);
@@ -136,7 +180,8 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void processAccessionThenUpperCaseValue() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("accession", "p21802", 1, 2);
@@ -150,9 +195,10 @@ class UniProtFieldQueryNodeProcessorTest {
     void processWhiteListInvalidValue() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
                         .build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("SLP", "1234", 1, 2);
@@ -166,9 +212,10 @@ class UniProtFieldQueryNodeProcessorTest {
     void processWhiteListThenScapeColon() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
                         .build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("SLP", "123", 1, 2);
@@ -183,7 +230,8 @@ class UniProtFieldQueryNodeProcessorTest {
     void processDefaultSearchWithLeadingWildcard(String inputQuery, String expectedQuery)
             throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, inputQuery, 1, 2);
@@ -209,9 +257,10 @@ class UniProtFieldQueryNodeProcessorTest {
             String fieldName, String inputQuery, String expectedQuery) throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
                         .build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(fieldName, inputQuery, 1, 2);
@@ -239,9 +288,10 @@ class UniProtFieldQueryNodeProcessorTest {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
                         .leadingWildcardFields(Set.of("gene", "protein_name"))
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
                         .build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(fieldName, inputQuery, 1, 2);

@@ -1,6 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG_DESC;
 
 import javax.validation.constraints.NotNull;
 
@@ -21,9 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(
-        name = "Configuration",
-        description = "This service provides Utility endpoints for UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/util")
 @Validated
@@ -35,8 +36,8 @@ public class UtilController {
     }
 
     @Operation(
-            summary =
-                    "Utility service that parse a query string into a Structured response object.",
+            hidden = true,
+            summary = CONFIG_UTIL_QUERY_PARSER_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -53,8 +54,8 @@ public class UtilController {
     @GetMapping("/queryParser")
     public SolrJsonQuery parseSolrQuery(
             @Parameter(
-                            description =
-                                    "Query string to be parsed. For example: (gene:cdc7) AND (organism_id:9606)")
+                            description = CONFIG_UTIL_QUERY_DESCRIPTION,
+                            example = CONFIG_UTIL_QUERY_EXAMPLE)
                     @NotNull(message = "{query.parameter.required}")
                     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
                     @RequestParam(name = "query")

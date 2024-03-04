@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,9 +18,9 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -29,23 +28,29 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     public static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     public static final String JOB_ID_HEADER = "jobId";
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String UPDATED = "updated";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
 
     protected final DownloadConfigProperties downloadConfigProperties;
 
     private final DownloadJobRepository jobRepository;
 
     protected final RabbitTemplate rabbitTemplate;
-    private final HeartbeatProducer heartBeatProducer;
+    private final HeartbeatProducer heartbeatProducer;
+    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
             RabbitTemplate rabbitTemplate,
-            HeartbeatProducer heartBeatProducer) {
+            HeartbeatProducer heartbeatProducer,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
-        this.heartBeatProducer = heartBeatProducer;
+        this.heartbeatProducer = heartbeatProducer;
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
     }
 
     @Override
@@ -61,12 +66,17 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         "Message with job id {} discarded after max retry {}",
                         jobId,
                         getMaxRetryCount());
+                cleanFilesAndResetCounts(jobId);
                 return;
             }
 
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
+
+            if (downloadJob.getRetried() > 0) {
+                cleanFilesAndResetCounts(jobId);
+            }
 
             processMessage(message, downloadJob);
             // get the fresh object from redis
@@ -134,10 +144,10 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             for (String id : iterator) {
                 writer.append(id);
                 writer.newLine();
-                heartBeatProducer.createForIds(downloadJob);
+                heartbeatProducer.createForIds(downloadJob);
             }
         } finally {
-            heartBeatProducer.stop(downloadJob.getId());
+            heartbeatProducer.stop(downloadJob.getId());
         }
     }
 
@@ -179,27 +189,19 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
         }
     }
 
-    protected void logMessageAndDeleteFile(Exception ex, String jobId) {
+    protected void logMessage(Exception ex, String jobId) {
         log.warn("Unable to write file due to error for job id {}", jobId);
         log.warn(ex.getMessage());
-        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        deleteFile(idsFile, jobId);
-        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
-        Path resultFile =
-                Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
-        deleteFile(resultFile, jobId);
     }
 
-    protected static void deleteFile(Path file, String jobId) {
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            log.warn(
-                    "Unable to delete file {} during IOException failure for job id {}",
-                    file.toFile().getName(),
-                    jobId);
-            throw new MessageListenerException(e);
-        }
+    private void cleanFilesAndResetCounts(String jobId) {
+        jobRepository.update(
+                jobId,
+                Map.of(
+                        UPDATE_COUNT, 0L,
+                        UPDATED, LocalDateTime.now(),
+                        PROCESSED_ENTRIES, 0L));
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     private boolean isMaxRetriedReached(Message message) {

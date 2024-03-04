@@ -18,6 +18,7 @@ import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloa
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
@@ -50,14 +51,16 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             @Qualifier("uniRefDownloadResultWriter") DownloadResultWriter downloadResultWriter,
             @Qualifier("uniRefRabbitTemplate") RabbitTemplate rabbitTemplate,
             UniRefEntryLightService service,
-            HeartbeatProducer heartBeatProducer) {
+            HeartbeatProducer heartbeatProducer,
+            AsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
         super(
                 converter,
                 uniRefDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
                 rabbitTemplate,
-                heartBeatProducer);
+                heartbeatProducer,
+                uniRefAsyncDownloadFileHandler);
         this.service = service;
         this.queueConfigProperties = queueConfigProperties;
     }

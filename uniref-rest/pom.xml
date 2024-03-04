@@ -15,20 +15,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>openapi-maven-plugin</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.xml.bind</groupId>
-					<artifactId>jaxb-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -62,7 +48,11 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -111,6 +101,12 @@
 			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -157,47 +153,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>openapi</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.ac.ebi.uniprot</groupId>
-						<artifactId>openapi-maven-plugin</artifactId>
-						<version>${openapi-maven-plugin.version}</version>
-						<configuration>
-							<packageLocations>
-								<packageLocation>org.uniprot.api.uniref.controller</packageLocation>
-							</packageLocations>
-							<openApiDirectory>target/generatedsources/swagger/</openApiDirectory>
-							<openApiFileName>uniref-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
-						</configuration>
-						<dependencies>
-							<dependency>
-								<groupId>org.uniprot</groupId>
-								<artifactId>uniprot-config</artifactId>
-								<version>${uniprot-store.version}</version>
-								<exclusions>
-									<exclusion>
-										<groupId>com.fasterxml.jackson.core</groupId>
-										<artifactId>*</artifactId>
-									</exclusion>
-								</exclusions>
-							</dependency>
-						</dependencies>
-						<executions>
-							<execution>
-								<phase>compile</phase>
-								<goals>
-									<goal>oas-generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

@@ -21,6 +21,7 @@ import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageL
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
@@ -58,14 +59,16 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             @Qualifier("uniProtKBDownloadResultWriter") DownloadResultWriter downloadResultWriter,
             @Qualifier("uniProtKBRabbitTemplate") RabbitTemplate rabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
-            HeartbeatProducer heartBeatProducer) {
+            HeartbeatProducer heartbeatProducer,
+            AsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
         super(
                 converter,
                 uniProtKBDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
                 rabbitTemplate,
-                heartBeatProducer);
+                heartbeatProducer,
+                uniProtKBAsyncDownloadFileHandler);
         this.service = service;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
         this.queueConfigProperties = queueConfigProperties;
@@ -111,7 +114,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                         null);
             }
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
+            logMessage(ex, jobId);
             throw new MessageListenerException(ex);
         }
     }

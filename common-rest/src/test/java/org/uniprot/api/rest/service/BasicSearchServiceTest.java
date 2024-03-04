@@ -59,7 +59,6 @@ class BasicSearchServiceTest {
                         return UniProtQueryProcessorConfig.builder()
                                 .optimisableFields(emptyList())
                                 .whiteListFields(emptyMap())
-                                .searchFieldsNames(emptySet())
                                 .build();
                     }
                 };

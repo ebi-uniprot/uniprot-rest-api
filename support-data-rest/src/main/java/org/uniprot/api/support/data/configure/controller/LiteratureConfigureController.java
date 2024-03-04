@@ -1,6 +1,8 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG_DESC;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
@@ -23,12 +25,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 11/04/2021
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/citations")
 public class LiteratureConfigureController {
+    public static final String CONFIG_LITERATURE_FIELDS_OPERATION =
+            "List of return fields available in the citations services.";
+    public static final String CONFIG_LITERATURE_SEARCH_OPERATION =
+            "List of search fields available in the citations services.";
     private final LiteratureConfigureService service;
 
     public LiteratureConfigureController(LiteratureConfigureService service) {
@@ -36,7 +40,8 @@ public class LiteratureConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the citations services.",
+            hidden = true,
+            summary = CONFIG_LITERATURE_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +62,8 @@ public class LiteratureConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the citations services.",
+            hidden = true,
+            summary = CONFIG_LITERATURE_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

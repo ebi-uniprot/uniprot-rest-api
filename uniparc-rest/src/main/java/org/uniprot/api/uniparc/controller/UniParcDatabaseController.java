@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
@@ -43,10 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/03/2021
  */
-@Tag(
-        name = "uniparc",
-        description =
-                "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).")
+@Tag(name = TAG_UNIPARC, description = TAG_UNIPARC_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniparc")
@@ -68,7 +66,8 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             value = "/{upi}/databases",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
-            summary = "Retrieve UniParc databases by a upi.",
+            hidden = true,
+            summary = DATABASES_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -86,7 +85,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upi.value}")
                     @NotNull(message = "{search.required}")
-                    @Parameter(description = "UniParc ID (UPI)")
+                    @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
                     String upi,
             @Valid @ModelAttribute UniParcDatabasesRequest databasesRequest,
             HttpServletRequest request,

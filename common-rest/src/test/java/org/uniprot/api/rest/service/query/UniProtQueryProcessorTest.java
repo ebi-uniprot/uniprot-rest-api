@@ -7,13 +7,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +25,15 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
@@ -45,10 +45,12 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  *
  * @author Edd
  */
+@ExtendWith(MockitoExtension.class)
 class UniProtQueryProcessorTest {
     private static final String FIELD_NAME = "accession";
     private UniProtQueryProcessor processor;
     private UniProtQueryProcessorConfig config;
+    @Mock private SearchFieldConfig searchFieldConfig;
 
     @BeforeEach
     void setUp() {
@@ -60,7 +62,7 @@ class UniProtQueryProcessorTest {
                                 singletonList(
                                         searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
-                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .leadingWildcardFields(Set.of("gene", "protein_name"))
                         .build();
         processor = UniProtQueryProcessor.newInstance(config);
@@ -221,6 +223,7 @@ class UniProtQueryProcessorTest {
     @Test
     void handleUpperCaseFieldSearch() {
         String query = "FIELD:thing";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:thing"));
     }
@@ -228,6 +231,7 @@ class UniProtQueryProcessorTest {
     @Test
     void handleCamelCaseFieldSearch() {
         String query = "Field:thing_value";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:thing_value"));
     }
@@ -469,6 +473,30 @@ class UniProtQueryProcessorTest {
     void testWithLeadingWildcard(String inputQuery, String expectedQuery) {
         String processedQuery = processor.processQuery(inputQuery);
         assertThat(processedQuery, is(expectedQuery));
+    }
+
+    @Test
+    void queryWithGreaterThanCharActualUserQuery() {
+        String processedQuery = processor.processQuery("3'->5' exoribonuclease");
+        assertThat(processedQuery, is("3'->5' AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithGreaterThanChar() {
+        String processedQuery = processor.processQuery("name>aaa exoribonuclease");
+        assertThat(processedQuery, is("name>aaa AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithLessThanChar() {
+        String processedQuery = processor.processQuery("name<zzz exoribonuclease");
+        assertThat(processedQuery, is("name<zzz AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithGreaterThanCharInQuotedString() {
+        String processedQuery = processor.processQuery("\"name>aaa exoribonuclease\"");
+        assertThat(processedQuery, is("\"name>aaa exoribonuclease\""));
     }
 
     private static Stream<Arguments> getQueryWithSupportedLeadingWildcard() {

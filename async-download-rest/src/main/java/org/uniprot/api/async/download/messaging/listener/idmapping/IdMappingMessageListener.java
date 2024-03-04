@@ -20,6 +20,7 @@ import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMess
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.AbstractIdMappingDownloadResultWriter;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingDownloadResultWriterFactory;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -52,8 +53,14 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
-            HeartbeatProducer heartBeatProducer) {
-        super(idMappingDownloadConfigProperties, jobRepository, rabbitTemplate, heartBeatProducer);
+            HeartbeatProducer heartBeatProducer,
+            AsyncDownloadFileHandler idMappingAsyncDownloadFileHandler) {
+        super(
+                idMappingDownloadConfigProperties,
+                jobRepository,
+                rabbitTemplate,
+                heartBeatProducer,
+                idMappingAsyncDownloadFileHandler);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.downloadConfigProperties = idMappingDownloadConfigProperties;
@@ -119,7 +126,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
                     request, idMappingJob.getIdMappingResult(), downloadJob, contentType);
             log.info("Voldemort results saved for job {}", downloadJob.getId());
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, downloadJob.getId());
+            logMessage(ex, downloadJob.getId());
             throw new MessageListenerException(ex);
         }
     }

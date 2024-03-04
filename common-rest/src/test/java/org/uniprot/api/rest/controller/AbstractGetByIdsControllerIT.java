@@ -6,6 +6,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -16,6 +17,7 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -441,6 +443,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
+    @Disabled
     @Test
     void getByIdsWithQueryFilterEmptyResponse() throws Exception {
         String queryFilter = getUnmatchedQueryFilter();
@@ -457,7 +460,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))

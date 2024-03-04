@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.request;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.IdsDownloadRequest;
 import org.uniprot.api.rest.validation.ValidPostByIdsRequest;
 import org.uniprot.store.config.UniProtDataType;
@@ -12,6 +13,7 @@ import org.uniprot.store.config.UniProtDataType;
  */
 @Data
 @ValidPostByIdsRequest(accessions = "upis", uniProtDataType = UniProtDataType.UNIPARC)
+@ParameterObject
 public class UniParcIdsPostRequest extends IdsDownloadRequest {
     private String upis;
     private String fields;

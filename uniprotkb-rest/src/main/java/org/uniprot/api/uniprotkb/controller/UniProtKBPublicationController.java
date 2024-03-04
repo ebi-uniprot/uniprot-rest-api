@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +30,11 @@ import org.uniprot.api.uniprotkb.common.service.publication.PublicationService;
 import org.uniprot.api.uniprotkb.common.service.publication.request.PublicationRequest;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -36,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb")
-@Tag(name = "Miscellaneous")
+@Tag(name = TAG_UNIPROTKB, description = TAG_UNIPROTKB_DESC)
 public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;
 
@@ -68,9 +76,24 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
     @GetMapping(
             value = "/{accession}/publications",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(
+            hidden = true,
+            summary = PUBLICATION_UNIPROTKB_OPERATION,
+            description = PUBLICATION_UNIPROTKB_OPERATION_DESC,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = PublicationEntry.class))
+                        })
+            })
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
-                    @PathVariable("accession")
+                    @Parameter(
+                                    description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                                    example = ACCESSION_UNIPROTKB_EXAMPLE)
+                            @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                                     flags = {Pattern.Flag.CASE_INSENSITIVE},

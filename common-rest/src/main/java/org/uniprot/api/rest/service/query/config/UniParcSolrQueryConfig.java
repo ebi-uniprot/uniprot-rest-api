@@ -37,11 +37,10 @@ public class UniParcSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIPARC.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields = uniParcSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniParcSearchFieldConfig))
                 .whiteListFields(uniParcWhiteListFields)
-                .searchFieldsNames(searchFields)
+                .searchFieldConfig(uniParcSearchFieldConfig)
                 .build();
     }
 

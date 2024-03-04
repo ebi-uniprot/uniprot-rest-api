@@ -1,17 +1,15 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -21,8 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniProtKBBasicRequest {
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(description = QUERY_UNIPROTKB_SEARCH_DESCRIPTION, example = QUERY_UNIPROTKB_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -30,18 +27,16 @@ public class UniProtKBBasicRequest {
             messagePrefix = "search.uniprot")
     private String query;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIPROTKB_DESCRIPTION, example = SORT_UNIPROTKB_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 
-    @Parameter(description = "Flag to include Isoform or not")
+    @Parameter(description = INCLUDE_ISOFORM_DESCRIPTION)
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

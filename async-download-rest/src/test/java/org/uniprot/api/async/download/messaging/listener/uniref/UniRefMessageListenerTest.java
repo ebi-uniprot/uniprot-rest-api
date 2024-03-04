@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +33,7 @@ import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMess
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
@@ -44,20 +46,24 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UniRefMessageListenerTest {
+
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
     @Mock private MessageConverter converter;
     @Mock private UniRefEntryLightService service;
-    @Mock DownloadConfigProperties downloadConfigProperties;
+    @Mock private DownloadConfigProperties downloadConfigProperties;
 
     @Mock UniRefAsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock DownloadJobRepository jobRepository;
+    @Mock private DownloadJobRepository jobRepository;
 
     @Mock private DownloadResultWriter downloadResultWriter;
 
-    @InjectMocks private UniRefMessageListener uniRefMessageListener;
+    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private HeartbeatProducer heartbeatProducer;
+    @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 
-    @Mock RabbitTemplate rabbitTemplate;
-    @Mock HeartbeatProducer heartBeatProducer;
+    @InjectMocks private UniRefMessageListener uniRefMessageListener;
 
     @Test
     void testOnMessage() throws IOException {
@@ -94,8 +100,60 @@ class UniRefMessageListenerTest {
         Files.delete(idsFilePath);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
-        verify(heartBeatProducer).stop(jobId);
+        verify(heartbeatProducer, atLeastOnce()).createForIds(same(downloadJob));
+        verify(heartbeatProducer).stop(jobId);
+    }
+
+    @Test
+    void testOnMessageWhenRetry() throws IOException {
+        UniRefDownloadRequest downloadRequest = new UniRefDownloadRequest();
+        downloadRequest.setQuery("field:value");
+        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
+        String jobId = UUID.randomUUID().toString();
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
+        Message message = builder.setHeader("jobId", jobId).build();
+        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        downloadJob.setRetried(1);
+        // stub
+        List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
+        when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
+        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.search(any(SearchRequest.class)))
+                .thenReturn(
+                        QueryResult.<UniRefEntryLight>builder()
+                                .page(CursorPage.of("", 10, 2))
+                                .build());
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
+
+        this.uniRefMessageListener.onMessage(message);
+
+        // verify the ids file and clean up
+        verifyCleanFilesAndResetCounts(jobId);
+        Path idsFilePath = Path.of("target/" + jobId);
+        Assertions.assertTrue(Files.exists(idsFilePath));
+        List<String> ids = Files.readAllLines(idsFilePath);
+        Assertions.assertNotNull(ids);
+        Assertions.assertEquals(accessions.size(), ids.size());
+        Assertions.assertEquals(accessions, ids);
+        Files.delete(idsFilePath);
+        Assertions.assertTrue(Files.notExists(idsFilePath));
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
+        verify(heartbeatProducer, atLeastOnce()).createForIds(same(downloadJob));
+        verify(heartbeatProducer).stop(jobId);
+    }
+
+    private void verifyCleanFilesAndResetCounts(String jobId) {
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verify(jobRepository)
+                .update(
+                        eq(jobId),
+                        argThat(
+                                map ->
+                                        Objects.equals(0L, map.get(UPDATE_COUNT))
+                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0L)));
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -134,14 +192,9 @@ class UniRefMessageListenerTest {
 
         this.uniRefMessageListener.onMessage(message);
 
-        // verify the ids file is cleaned up during IOException
-        Path idsFilePath = Path.of("target/" + jobId);
-        Assertions.assertTrue(Files.notExists(idsFilePath));
-        Path resultFilePath = Path.of("target/" + jobId + ".json");
-        Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
-        verify(heartBeatProducer).stop(jobId);
+        verify(heartbeatProducer, atLeastOnce()).createForIds(same(downloadJob));
+        verify(heartbeatProducer).stop(jobId);
     }
 
     @Test
@@ -154,6 +207,7 @@ class UniRefMessageListenerTest {
         Message message = builder.setHeader("jobId", jobId).build();
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniRefMessageListener.onMessage(message));
+        verifyCleanFilesAndResetCounts(jobId);
     }
 
     @Test

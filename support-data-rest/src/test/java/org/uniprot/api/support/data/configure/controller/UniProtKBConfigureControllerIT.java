@@ -41,12 +41,10 @@ class UniProtKBConfigureControllerIT {
     @ParameterizedTest(name = "/configure/uniprotkb{0}")
     @ValueSource(
             strings = {
-                "/search_terms",
                 "/annotation_evidences",
                 "/go_evidences",
                 "/databases",
                 "/evidenceDatabases",
-                "/resultfields",
                 "/result-fields"
             })
     void canGetResponse(String path) throws Exception {

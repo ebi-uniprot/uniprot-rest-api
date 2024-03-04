@@ -3,7 +3,10 @@ package org.uniprot.api.rest.service.query.processor;
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FuzzyQueryNode;
@@ -11,6 +14,8 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 
 /**
@@ -62,12 +67,14 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         private final Map<String, String> whiteListFields;
         private final Set<String> searchFields;
         private final Set<String> leadingWildcardFields;
+        private final SearchFieldConfig searchFieldConfig;
 
         public UniProtFieldQueryNode(FieldQueryNode node, UniProtQueryProcessorConfig conf) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
             this.whiteListFields = conf.getWhiteListFields();
-            this.searchFields = conf.getSearchFieldsNames();
             this.leadingWildcardFields = conf.getLeadingWildcardFields();
+            this.searchFieldConfig = conf.getSearchFieldConfig();
+            this.searchFields = conf.getSearchFieldConfig().getSearchFieldNames();
         }
 
         @Override
@@ -84,8 +91,16 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             } else if (validFieldIgnoreCase(field)) {
                 return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
             } else {
-                return super.toQueryString(escaper);
+                // is an alias => return the field itself
+                Optional<SearchFieldItem> searchFieldItemByAlias =
+                        searchFieldConfig.findSearchFieldItemByAlias(field);
+                if (searchFieldItemByAlias.isPresent()) {
+                    return searchFieldItemByAlias.get().getFieldName()
+                            + SOLR_FIELD_SEPARATOR
+                            + text;
+                }
             }
+            return super.toQueryString(escaper);
         }
 
         private String stripLeadingWildcardIfNeeded(String field, String text) {

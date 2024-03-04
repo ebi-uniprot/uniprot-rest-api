@@ -26,11 +26,12 @@ public class PublicationSolrQueryConfig {
     }
 
     @Bean
-    public UniProtQueryProcessorConfig publicationQueryProcessorConfig() {
+    public UniProtQueryProcessorConfig publicationQueryProcessorConfig(
+            SearchFieldConfig publicationSearchFieldConfig) {
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(emptyList())
                 .whiteListFields(emptyMap())
-                .searchFieldsNames(emptySet())
+                .searchFieldConfig(publicationSearchFieldConfig)
                 .build();
     }
 }

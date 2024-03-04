@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.async.download.controller.IdMappingDownloadController.ID_MAPPING_DOWNLOAD_RESOURCE;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +32,13 @@ import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "downloadJob", description = "APIs related to idMapping download job")
+@Tag(name = TAG_IDMAPPING_DOWNLOAD_JOB, description = TAG_IDMAPPING_DOWNLOAD_JOB_DESC)
 @RestController
 @RequestMapping(value = ID_MAPPING_DOWNLOAD_RESOURCE)
 public class IdMappingDownloadController extends BasicDownloadController {
@@ -59,7 +61,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Submit a idmapping download job.",
+            summary = RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -82,7 +84,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the status of a idmapping download job.",
+            summary = STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -91,7 +93,8 @@ public class IdMappingDownloadController extends BasicDownloadController {
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+    public ResponseEntity<JobStatusResponse> getJobStatus(
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -100,8 +103,22 @@ public class IdMappingDownloadController extends BasicDownloadController {
     @GetMapping(
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            DownloadJobDetailResponse.class))
+                        })
+            })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
@@ -23,9 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 11/03/2021
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/keywords")
 public class KeywordConfigureController {
@@ -36,7 +35,8 @@ public class KeywordConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the keyword services.",
+            hidden = true,
+            summary = CONFIG_KEYWORD_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,8 @@ public class KeywordConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the keyword services.",
+            hidden = true,
+            summary = CONFIG_KEYWORD_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

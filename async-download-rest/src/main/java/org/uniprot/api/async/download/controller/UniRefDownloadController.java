@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import java.util.Optional;
 
@@ -22,14 +23,17 @@ import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author tibrahim
  * @created 14/08/2023
  */
+@Tag(name = TAG_UNIREF_JOB, description = TAG_UNIREF_JOB_DESC)
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniRefDownloadController extends BasicDownloadController {
@@ -49,6 +53,16 @@ public class UniRefDownloadController extends BasicDownloadController {
     }
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = JOB_RUN_UNIREF_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = JobSubmitResponse.class))
+                        })
+            })
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Valid @ModelAttribute UniRefDownloadRequest request) {
         String jobId = this.messageService.sendMessage(request);
@@ -59,7 +73,7 @@ public class UniRefDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the status of a job.",
+            summary = JOB_STATUS_UNIREF_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -68,7 +82,8 @@ public class UniRefDownloadController extends BasicDownloadController {
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+    public ResponseEntity<JobStatusResponse> getJobStatus(
+            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -77,8 +92,22 @@ public class UniRefDownloadController extends BasicDownloadController {
     @GetMapping(
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = JOB_DETAILS_UNIREF_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            DownloadJobDetailResponse.class))
+                        })
+            })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

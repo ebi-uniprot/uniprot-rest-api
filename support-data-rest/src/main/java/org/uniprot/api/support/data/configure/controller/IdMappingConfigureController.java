@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 15/03/2021
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/idmapping")
 public class IdMappingConfigureController {
@@ -32,7 +31,8 @@ public class IdMappingConfigureController {
     }
 
     @Operation(
-            summary = "List of fields available to use in IdMapping from and to dropdown lists.",
+            hidden = true,
+            summary = CONFIG_IDMAPPING_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

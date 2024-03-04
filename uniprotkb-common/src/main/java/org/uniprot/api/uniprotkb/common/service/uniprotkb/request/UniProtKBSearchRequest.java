@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -31,6 +34,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements SearchRequest {
     @Parameter(hidden = true)
     public static final String DEFAULT_FIELDS =
@@ -39,17 +43,17 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Used to return matched fields ")
+    @Parameter(hidden = true)
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
