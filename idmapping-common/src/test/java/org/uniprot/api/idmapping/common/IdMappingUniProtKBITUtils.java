@@ -106,6 +106,9 @@ public class IdMappingUniProtKBITUtils {
                 case "uniparc":
                     value = "UPI0000000001";
                     break;
+                case "existence":
+                    value = "1";
+                    break;
             }
         }
         return value;
