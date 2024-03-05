@@ -585,7 +585,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected String getUnmatchedQueryFilter() {
-        return "existence:randomvalue";
+        return "existence:2";
     }
 
     @Override
