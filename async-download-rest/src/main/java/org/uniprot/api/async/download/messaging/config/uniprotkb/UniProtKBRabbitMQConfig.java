@@ -20,12 +20,6 @@ import org.uniprot.api.rest.request.HashGenerator;
 public class UniProtKBRabbitMQConfig {
 
     @Bean
-    public UniProtKBAsyncDownloadQueueConfigProperties
-            uniProtKBAsyncDownloadQueueConfigProperties() {
-        return new UniProtKBAsyncDownloadQueueConfigProperties();
-    }
-
-    @Bean
     public Exchange uniProtKBDownloadExchange(
             UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return ExchangeBuilder.directExchange(asyncDownloadQConfigProps.getExchangeName())

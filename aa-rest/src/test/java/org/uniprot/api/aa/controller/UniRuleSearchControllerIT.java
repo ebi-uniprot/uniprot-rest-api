@@ -53,7 +53,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
  * @author sahmaad
  * @since 2020-11-19
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, AARestApplication.class})
+@ContextConfiguration(classes = {AARestApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(

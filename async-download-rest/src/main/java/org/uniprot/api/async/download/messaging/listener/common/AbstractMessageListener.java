@@ -11,6 +11,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
@@ -34,13 +35,15 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
             HeartbeatProducer heartBeatProducer,
-            AsyncDownloadFileHandler asyncDownloadFileHandler) {
+            AsyncDownloadFileHandler asyncDownloadFileHandler,
+            AsyncDownloadQueueConfigProperties queueConfigProperties) {
         super(
                 downloadConfigProperties,
                 jobRepository,
                 rabbitTemplate,
                 heartBeatProducer,
-                asyncDownloadFileHandler);
+                asyncDownloadFileHandler,
+                queueConfigProperties);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }

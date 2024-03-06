@@ -18,10 +18,6 @@ import org.uniprot.api.rest.request.HashGenerator;
 @Configuration
 @Profile({"asyncDownload"})
 public class UniRefRabbitMQConfig {
-    @Bean
-    public UniRefAsyncDownloadQueueConfigProperties uniRefAsyncDownloadQueueConfigProperties() {
-        return new UniRefAsyncDownloadQueueConfigProperties();
-    }
 
     @Bean
     public Exchange uniRefDownloadExchange(

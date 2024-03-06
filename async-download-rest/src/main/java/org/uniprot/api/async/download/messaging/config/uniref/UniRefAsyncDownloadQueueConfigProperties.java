@@ -3,31 +3,10 @@ package org.uniprot.api.async.download.messaging.config.uniref;
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
 
+@Component
 @Data
 @ConfigurationProperties(prefix = "async.download.uniref")
-public class UniRefAsyncDownloadQueueConfigProperties {
-    private String exchangeName;
-
-    private String queueName;
-
-    private String routingKey;
-
-    private boolean durable;
-
-    private int concurrentConsumers;
-
-    private boolean defaultRequeueRejected;
-
-    private int retryDelayInMillis;
-
-    private int retryMaxCount;
-
-    private String retryQueueName;
-
-    private String rejectedQueueName;
-
-    private int ttlInMillis;
-
-    private int prefetchCount;
-}
+public class UniRefAsyncDownloadQueueConfigProperties extends AsyncDownloadQueueConfigProperties {}

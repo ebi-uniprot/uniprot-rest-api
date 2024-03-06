@@ -43,8 +43,6 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
     private final DownloadConfigProperties downloadConfigProperties;
     private final IdMappingDownloadResultWriterFactory writerFactory;
 
-    private final IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties;
-
     public IdMappingMessageListener(
             DownloadConfigProperties idMappingDownloadConfigProperties,
             IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties,
@@ -60,12 +58,12 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
                 jobRepository,
                 rabbitTemplate,
                 heartBeatProducer,
-                idMappingAsyncDownloadFileHandler);
+                idMappingAsyncDownloadFileHandler,
+                queueConfigProperties);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.downloadConfigProperties = idMappingDownloadConfigProperties;
         this.writerFactory = writerFactory;
-        this.queueConfigProperties = queueConfigProperties;
     }
 
     @Override
@@ -97,21 +95,6 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             writeResult(request, idMappingJob, downloadJob, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, asyncDownloadJobId);
         }
-    }
-
-    @Override
-    protected int getMaxRetryCount() {
-        return this.queueConfigProperties.getRetryMaxCount();
-    }
-
-    @Override
-    protected String getRejectedQueueName() {
-        return this.queueConfigProperties.getRejectedQueueName();
-    }
-
-    @Override
-    protected String getRetryQueueName() {
-        return this.queueConfigProperties.getRetryQueueName();
     }
 
     private void writeResult(

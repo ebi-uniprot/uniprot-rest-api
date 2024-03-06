@@ -19,12 +19,6 @@ import org.uniprot.api.rest.request.HashGenerator;
 @Profile({"asyncDownload"})
 public class IdMappingRabbitMQConfig {
     @Bean
-    public IdMappingAsyncDownloadQueueConfigProperties
-            idMappingAsyncDownloadQueueConfigProperties() {
-        return new IdMappingAsyncDownloadQueueConfigProperties();
-    }
-
-    @Bean
     public Exchange idMappingDownloadExchange(
             IdMappingAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return ExchangeBuilder.directExchange(asyncDownloadQConfigProps.getExchangeName())

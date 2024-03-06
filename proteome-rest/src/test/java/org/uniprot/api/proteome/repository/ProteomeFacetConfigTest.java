@@ -15,10 +15,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.api.proteome.controller.DataStoreTestConfig;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class})
+@SpringBootTest
 @ActiveProfiles(profiles = "offline")
 @Import(ProteomeFacetConfig.class)
 class ProteomeFacetConfigTest {

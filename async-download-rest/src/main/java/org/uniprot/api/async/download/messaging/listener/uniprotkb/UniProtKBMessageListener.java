@@ -48,8 +48,6 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     private final UniProtEntryService service;
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProps;
 
-    private final UniProtKBAsyncDownloadQueueConfigProperties queueConfigProperties;
-
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
@@ -68,10 +66,10 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                 downloadResultWriter,
                 rabbitTemplate,
                 heartbeatProducer,
-                uniProtKBAsyncDownloadFileHandler);
+                uniProtKBAsyncDownloadFileHandler,
+                queueConfigProperties);
         this.service = service;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
-        this.queueConfigProperties = queueConfigProperties;
     }
 
     @Override
@@ -158,20 +156,5 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                 "Message with jobId {} sent to embeddings queue {}",
                 jobId,
                 this.embeddingsQueueConfigProps.getQueueName());
-    }
-
-    @Override
-    protected int getMaxRetryCount() {
-        return this.queueConfigProperties.getRetryMaxCount();
-    }
-
-    @Override
-    protected String getRejectedQueueName() {
-        return this.queueConfigProperties.getRejectedQueueName();
-    }
-
-    @Override
-    protected String getRetryQueueName() {
-        return this.queueConfigProperties.getRetryQueueName();
     }
 }

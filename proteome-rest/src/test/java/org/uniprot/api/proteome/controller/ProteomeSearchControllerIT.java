@@ -59,12 +59,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
  * @author jluo
  * @date: 13 Jun 2019
  */
-@ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            ProteomeRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(

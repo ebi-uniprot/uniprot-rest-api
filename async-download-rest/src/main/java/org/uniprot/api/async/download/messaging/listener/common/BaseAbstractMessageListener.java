@@ -16,6 +16,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
@@ -39,18 +40,21 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     protected final RabbitTemplate rabbitTemplate;
     private final HeartbeatProducer heartbeatProducer;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
+    private final AsyncDownloadQueueConfigProperties queueConfigProperties;
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
             RabbitTemplate rabbitTemplate,
             HeartbeatProducer heartbeatProducer,
-            AsyncDownloadFileHandler asyncDownloadFileHandler) {
+            AsyncDownloadFileHandler asyncDownloadFileHandler,
+            AsyncDownloadQueueConfigProperties queueConfigProperties) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.heartbeatProducer = heartbeatProducer;
         this.asyncDownloadFileHandler = asyncDownloadFileHandler;
+        this.queueConfigProperties = queueConfigProperties;
     }
 
     @Override
@@ -208,11 +212,17 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
         return getRetryCount(message) >= getMaxRetryCount();
     }
 
-    protected abstract int getMaxRetryCount();
+    protected int getMaxRetryCount() {
+        return this.queueConfigProperties.getRetryMaxCount();
+    }
 
-    protected abstract String getRejectedQueueName();
+    protected String getRejectedQueueName() {
+        return this.queueConfigProperties.getRejectedQueueName();
+    }
 
-    protected abstract String getRetryQueueName();
+    protected String getRetryQueueName() {
+        return this.queueConfigProperties.getRetryQueueName();
+    }
 
     private int getRetryCount(Message message) {
         Integer retryCountHandledError =

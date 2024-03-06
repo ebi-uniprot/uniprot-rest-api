@@ -41,7 +41,6 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 public class UniRefMessageListener extends AbstractMessageListener implements MessageListener {
     private static final String UNIREF_DATA_TYPE = "uniref";
     private final UniRefEntryLightService service;
-    private final UniRefAsyncDownloadQueueConfigProperties queueConfigProperties;
 
     public UniRefMessageListener(
             MessageConverter converter,
@@ -60,9 +59,9 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
                 downloadResultWriter,
                 rabbitTemplate,
                 heartbeatProducer,
-                uniRefAsyncDownloadFileHandler);
+                uniRefAsyncDownloadFileHandler,
+                queueConfigProperties);
         this.service = service;
-        this.queueConfigProperties = queueConfigProperties;
     }
 
     @Override
@@ -98,20 +97,5 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
     @Override
     protected String getDataType() {
         return UNIREF_DATA_TYPE;
-    }
-
-    @Override
-    protected int getMaxRetryCount() {
-        return this.queueConfigProperties.getRetryMaxCount();
-    }
-
-    @Override
-    protected String getRejectedQueueName() {
-        return this.queueConfigProperties.getRejectedQueueName();
-    }
-
-    @Override
-    protected String getRetryQueueName() {
-        return this.queueConfigProperties.getRetryQueueName();
     }
 }

@@ -44,12 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author jluo
  * @date: 14 Jun 2019
  */
-@ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            ProteomeRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(GeneCentricController.class)
 @ExtendWith(

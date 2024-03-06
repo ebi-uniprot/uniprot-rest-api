@@ -42,12 +42,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
  * @author lgonzales
  * @since 23/11/2020
  */
-@ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            ProteomeRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class})
