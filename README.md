@@ -1,2 +1,2 @@
 # UniProt RestFul API
-UniProt Website development for Back end services
+UniProt Website development for backend services
