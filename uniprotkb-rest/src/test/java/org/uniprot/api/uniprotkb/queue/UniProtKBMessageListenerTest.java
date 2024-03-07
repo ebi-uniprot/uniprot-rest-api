@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,7 +43,6 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import java.util.Objects;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -61,8 +61,7 @@ class UniProtKBMessageListenerTest {
     @Mock private DownloadResultWriter downloadResultWriter;
     @Mock private RabbitTemplate rabbitTemplate;
     @Mock private HeartBeatProducer heartBeatProducer;
-    @Mock
-    private AsyncDownloadFileHandler asyncDownloadFileHandler;
+    @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     @InjectMocks private UniProtKBMessageListener uniProtKBMessageListener;
 

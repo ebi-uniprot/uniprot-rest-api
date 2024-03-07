@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -20,8 +21,6 @@ import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import java.nio.file.Paths;
-
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -143,8 +142,8 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     protected void writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
             throws IOException {
         try (BufferedWriter writer =
-                     Files.newBufferedWriter(
-                             filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                Files.newBufferedWriter(
+                        filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             Iterable<String> iterator = ids::iterator;
             for (String id : iterator) {
                 writer.append(id);
