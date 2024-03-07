@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,6 +8,8 @@ import java.util.Map;
 import java.util.function.LongConsumer;
 
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -27,6 +30,11 @@ public class HeartBeatProducer {
     private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
+    private final RetryPolicy<Object> retryPolicy =
+            new RetryPolicy<>()
+                    .handle(Exception.class)
+                    .withDelay(Duration.ofMillis(60000))
+                    .withMaxRetries(3);
 
     public HeartBeatProducer(
             AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration,
@@ -44,9 +52,16 @@ public class HeartBeatProducer {
                     pe -> {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
-                        jobRepository.update(
-                                downloadJob.getId(),
-                                Map.of(UPDATE_COUNT, newUpdateCount, UPDATED, LocalDateTime.now()));
+                        Failsafe.with(retryPolicy)
+                                .run(
+                                        () ->
+                                                jobRepository.update(
+                                                        downloadJob.getId(),
+                                                        Map.of(
+                                                                UPDATE_COUNT,
+                                                                newUpdateCount,
+                                                                UPDATED,
+                                                                LocalDateTime.now())));
                     });
             log.debug(
                     String.format(
@@ -102,12 +117,15 @@ public class HeartBeatProducer {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
                         downloadJob.setProcessedEntries(pe);
-                        jobRepository.update(
-                                downloadJob.getId(),
-                                Map.of(
-                                        UPDATE_COUNT, newUpdateCount,
-                                        UPDATED, LocalDateTime.now(),
-                                        PROCESSED_ENTRIES, pe));
+                        Failsafe.with(retryPolicy)
+                                .run(
+                                        () ->
+                                                jobRepository.update(
+                                                        downloadJob.getId(),
+                                                        Map.of(
+                                                                UPDATE_COUNT, newUpdateCount,
+                                                                UPDATED, LocalDateTime.now(),
+                                                                PROCESSED_ENTRIES, pe)));
                     });
             log.debug(
                     String.format(
