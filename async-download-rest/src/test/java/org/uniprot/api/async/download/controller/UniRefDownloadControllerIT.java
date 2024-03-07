@@ -1,29 +1,13 @@
 package org.uniprot.api.async.download.controller;
 
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -53,7 +37,20 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
@@ -72,20 +69,7 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
-    @Value("${async.download.uniref.result.idFilesFolder}")
-    private String idsFolder;
-
-    @Value("${async.download.uniref.result.resultFilesFolder}")
-    private String resultFolder;
-
-    @Value("${async.download.uniref.queueName}")
-    private String downloadQueue;
-
-    @Value("${async.download.uniref.retryQueueName}")
-    private String retryQueue;
-
-    @Value(("${async.download.uniref.rejectedQueueName}"))
-    private String rejectedQueue;
+    @Autowired private UniRefAsyncConfig uniRefAsyncConfig;
 
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired
@@ -334,26 +318,26 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected String getIdsFolder() {
-        return this.idsFolder;
+        return uniRefAsyncConfig.idsFolder;
     }
 
     @Override
     protected String getResultFolder() {
-        return this.resultFolder;
+        return uniRefAsyncConfig.resultFolder;
     }
 
     @Override
     protected String getDownloadQueue() {
-        return this.downloadQueue;
+        return uniRefAsyncConfig.downloadQueue;
     }
 
     @Override
     protected String getRejectedQueue() {
-        return this.rejectedQueue;
+        return uniRefAsyncConfig.rejectedQueue;
     }
 
     @Override
     protected String getRetryQueue() {
-        return this.retryQueue;
+        return uniRefAsyncConfig.retryQueue;
     }
 }

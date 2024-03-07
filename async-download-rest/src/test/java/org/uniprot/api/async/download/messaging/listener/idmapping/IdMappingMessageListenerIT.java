@@ -1,17 +1,5 @@
 package org.uniprot.api.async.download.messaging.listener.idmapping;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,12 +9,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.AbstractIdMappingDownloadResultWriter;
@@ -43,6 +31,18 @@ import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith({MockitoExtension.class})
 class IdMappingMessageListenerIT {
 
@@ -56,7 +56,7 @@ class IdMappingMessageListenerIT {
 
     @Mock private DownloadJobRepository jobRepository;
 
-    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private IdMappingRabbitTemplate idMappingRabbitTemplate;
 
     @Mock private IdMappingDownloadResultWriterFactory writerFactory;
 
@@ -217,7 +217,8 @@ class IdMappingMessageListenerIT {
                         .contains(
                                 "IdMappingMessageListener.writeResult(IdMappingMessageListener.java"));
 
-        verify(this.rabbitTemplate, atLeast(1)).convertAndSend(eq(retryQueue), any(Message.class));
+        verify(this.idMappingRabbitTemplate, atLeast(1))
+                .convertAndSend(eq(retryQueue), any(Message.class));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
     }
 
@@ -234,7 +235,7 @@ class IdMappingMessageListenerIT {
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
-        Mockito.verify(this.rabbitTemplate, atMostOnce())
+        Mockito.verify(this.idMappingRabbitTemplate, atMostOnce())
                 .convertAndSend(eq(rejectedQueueName), any(Message.class));
         verifyCleanFilesAndResetCounts(jobId);
     }
@@ -325,7 +326,7 @@ class IdMappingMessageListenerIT {
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
         assertEquals(JobStatus.ERROR, downloadJobResult.getStatus());
         assertEquals(1, downloadJobResult.getRetried());
-        Mockito.verify(this.rabbitTemplate, atMostOnce())
+        Mockito.verify(this.idMappingRabbitTemplate, atMostOnce())
                 .convertAndSend(eq(retryQueueName), any(Message.class));
     }
 

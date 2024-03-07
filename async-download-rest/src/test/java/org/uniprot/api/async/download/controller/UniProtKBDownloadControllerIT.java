@@ -1,18 +1,7 @@
 package org.uniprot.api.async.download.controller;
 
-import static org.hamcrest.Matchers.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Stream;
-
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
@@ -62,7 +51,16 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
@@ -80,20 +78,7 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
-    @Value("${async.download.uniprotkb.result.idFilesFolder}")
-    private String idsFolder;
-
-    @Value("${async.download.uniprotkb.result.resultFilesFolder}")
-    private String resultFolder;
-
-    @Value("${async.download.uniprotkb.queueName}")
-    private String downloadQueue;
-
-    @Value("${async.download.uniprotkb.retryQueueName}")
-    private String retryQueue;
-
-    @Value(("${async.download.uniprotkb.rejectedQueueName}"))
-    private String rejectedQueue;
+    @Autowired private UniProtKBAsyncConfig uniProtKBAsyncConfig;
 
     @Qualifier("uniProtKBFacetTupleStreamTemplate")
     @Autowired
@@ -528,26 +513,26 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected String getIdsFolder() {
-        return this.idsFolder;
+        return uniProtKBAsyncConfig.idsFolder;
     }
 
     @Override
     protected String getResultFolder() {
-        return this.resultFolder;
+        return uniProtKBAsyncConfig.resultFolder;
     }
 
     @Override
     protected String getDownloadQueue() {
-        return this.downloadQueue;
+        return uniProtKBAsyncConfig.downloadQueue;
     }
 
     @Override
     protected String getRejectedQueue() {
-        return this.rejectedQueue;
+        return uniProtKBAsyncConfig.rejectedQueue;
     }
 
     @Override
     protected String getRetryQueue() {
-        return this.retryQueue;
+        return uniProtKBAsyncConfig.retryQueue;
     }
 }

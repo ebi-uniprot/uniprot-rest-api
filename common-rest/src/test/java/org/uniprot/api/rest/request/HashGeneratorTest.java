@@ -1,13 +1,11 @@
 package org.uniprot.api.rest.request;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.function.Function;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import java.util.function.Function;
 
 /**
  * @author sahmad
@@ -24,7 +22,7 @@ class HashGeneratorTest {
     }
 
     @Test
-    void testTwoHashesOfTwoRequests() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    void testTwoHashesOfTwoRequests() {
         String req1 = "this is a request";
         String req1Hash = generator.generateHash(req1);
         Assertions.assertNotNull(req1Hash);
@@ -35,8 +33,7 @@ class HashGeneratorTest {
     }
 
     @Test
-    void testTwoHashesOfTwoRequestsWithIdsInDifferentOrder()
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+    void testTwoHashesOfTwoRequestsWithIdsInDifferentOrder() {
         String req1 = "4,2,1,3";
         String req1Hash = generator.generateHash(req1);
         Assertions.assertNotNull(req1Hash);
@@ -47,8 +44,7 @@ class HashGeneratorTest {
     }
 
     @Test
-    void testTwoHashesOfTwoRequestsWithIdsOfSameCharacters()
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+    void testTwoHashesOfTwoRequestsWithIdsOfSameCharacters() {
         String req1 = "4,2,1,3";
         String req1Hash = generator.generateHash(req1);
         Assertions.assertNotNull(req1Hash);

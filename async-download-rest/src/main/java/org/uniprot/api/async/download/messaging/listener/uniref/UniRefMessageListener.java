@@ -1,13 +1,8 @@
 package org.uniprot.api.async.download.messaging.listener.uniref;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -15,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
@@ -31,12 +27,15 @@ import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 /**
  * @author tibrahim
  * @created 16/08/2023
  */
 @Profile({"live", "asyncDownload"})
-@Service("UniRefDownloadListener")
+@Service
 @Slf4j
 public class UniRefMessageListener extends AbstractMessageListener implements MessageListener {
     private static final String UNIREF_DATA_TYPE = "uniref";
@@ -48,7 +47,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             UniRefAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             @Qualifier("uniRefDownloadResultWriter") DownloadResultWriter downloadResultWriter,
-            @Qualifier("uniRefRabbitTemplate") RabbitTemplate rabbitTemplate,
+            UniRefRabbitTemplate uniRefRabbitTemplate,
             UniRefEntryLightService service,
             HeartbeatProducer heartbeatProducer,
             AsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
@@ -57,7 +56,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
                 uniRefDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate,
+                uniRefRabbitTemplate,
                 heartbeatProducer,
                 uniRefAsyncDownloadFileHandler,
                 queueConfigProperties);

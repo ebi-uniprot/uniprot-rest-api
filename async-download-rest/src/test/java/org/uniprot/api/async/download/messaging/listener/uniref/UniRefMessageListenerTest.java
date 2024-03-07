@@ -1,18 +1,5 @@
 package org.uniprot.api.async.download.messaging.listener.uniref;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,11 +11,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
@@ -42,6 +29,19 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
 import org.uniprot.core.uniref.UniRefEntryLight;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -59,7 +59,7 @@ class UniRefMessageListenerTest {
 
     @Mock private DownloadResultWriter downloadResultWriter;
 
-    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private UniRefRabbitTemplate uniRefRabbitTemplate;
     @Mock private HeartbeatProducer heartbeatProducer;
     @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 

@@ -1,13 +1,5 @@
 package org.uniprot.api.help.centre.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,16 +22,19 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.help.HelpDocument;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 /**
  * @author lgonzales
  * @since 08/07/2021
  */
-@ContextConfiguration(
-        classes = {
-            HelpCentreStoreTestConfig.class,
-            HelpCentreRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {HelpCentreRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(HelpCentreController.class)
 @ExtendWith(

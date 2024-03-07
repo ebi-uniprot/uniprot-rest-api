@@ -1,21 +1,15 @@
 package org.uniprot.api.async.download.messaging.listener.idmapping;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
@@ -32,9 +26,13 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Slf4j
 @Profile({"live", "asyncDownload"})
-@Service("IdMappingDownloadListener")
+@Service
 public class IdMappingMessageListener extends BaseAbstractMessageListener
         implements MessageListener {
 
@@ -47,7 +45,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             DownloadConfigProperties idMappingDownloadConfigProperties,
             IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
-            @Qualifier("idMappingRabbitTemplate") RabbitTemplate rabbitTemplate,
+            IdMappingRabbitTemplate idMappingRabbitTemplate,
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
@@ -56,7 +54,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
         super(
                 idMappingDownloadConfigProperties,
                 jobRepository,
-                rabbitTemplate,
+                idMappingRabbitTemplate,
                 heartBeatProducer,
                 idMappingAsyncDownloadFileHandler,
                 queueConfigProperties);

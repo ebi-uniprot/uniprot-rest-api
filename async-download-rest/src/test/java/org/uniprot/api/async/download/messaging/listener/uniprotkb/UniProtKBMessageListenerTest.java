@@ -1,20 +1,5 @@
 package org.uniprot.api.async.download.messaging.listener.uniprotkb;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +11,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
@@ -43,6 +28,21 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -59,7 +59,7 @@ class UniProtKBMessageListenerTest {
     @Mock private DownloadJobRepository jobRepository;
 
     @Mock private DownloadResultWriter downloadResultWriter;
-    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private UniProtKBRabbitTemplate uniProtKBRabbitTemplate;
     @Mock HeartbeatProducer heartBeatProducer;
     @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 

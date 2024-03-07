@@ -1,14 +1,9 @@
 package org.uniprot.api.async.download.messaging.listener.uniprotkb;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -16,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
@@ -34,12 +30,15 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 /**
  * @author sahmad
  * @created 22/11/2022
  */
 @Profile({"live", "asyncDownload"})
-@Service("UniProtKBDownloadListener")
+@Service
 @Slf4j
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
     public static final String H5_LIMIT_EXCEED_MSG =
@@ -55,7 +54,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             UniProtKBAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             @Qualifier("uniProtKBDownloadResultWriter") DownloadResultWriter downloadResultWriter,
-            @Qualifier("uniProtKBRabbitTemplate") RabbitTemplate rabbitTemplate,
+            UniProtKBRabbitTemplate uniProtKBRabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
             HeartbeatProducer heartbeatProducer,
             AsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
@@ -64,7 +63,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                 uniProtKBDownloadConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate,
+                uniProtKBRabbitTemplate,
                 heartbeatProducer,
                 uniProtKBAsyncDownloadFileHandler,
                 queueConfigProperties);
