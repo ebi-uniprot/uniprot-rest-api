@@ -58,8 +58,9 @@ public class HeartBeatProducer {
                                         throwable ->
                                                 log.warn(
                                                         MessageFormat.format(
-                                                                "Job {0} was failed to update in solr phase {1}",
+                                                                "Job {0} was failed to update the processed count to {1} in solr phase due to {2}",
                                                                 downloadJob.getId(),
+                                                                newUpdateCount,
                                                                 throwable.getFailure())))
                                 .run(
                                         () ->
@@ -130,8 +131,9 @@ public class HeartBeatProducer {
                                         throwable ->
                                                 log.warn(
                                                         MessageFormat.format(
-                                                                "Job {0} was failed to update in writing phase {1}",
+                                                                "Job {0} was failed to update the processed count to {1} in writing phase due to {2}",
                                                                 downloadJob.getId(),
+                                                                newUpdateCount,
                                                                 throwable.getFailure())))
                                 .run(
                                         () ->
