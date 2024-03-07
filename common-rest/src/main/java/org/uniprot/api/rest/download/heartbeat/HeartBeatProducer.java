@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +34,7 @@ public class HeartBeatProducer {
     private final RetryPolicy<Object> retryPolicy =
             new RetryPolicy<>()
                     .handle(Exception.class)
-                    .withDelay(Duration.ofMillis(60000))
+                    .withDelay(Duration.ofMillis(10000))
                     .withMaxRetries(3);
 
     public HeartBeatProducer(
@@ -53,6 +54,13 @@ public class HeartBeatProducer {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
                         Failsafe.with(retryPolicy)
+                                .onFailure(
+                                        throwable ->
+                                                log.warn(
+                                                        MessageFormat.format(
+                                                                "Job {0} was failed to update in solr phase {1}",
+                                                                downloadJob.getId(),
+                                                                throwable.getFailure())))
                                 .run(
                                         () ->
                                                 jobRepository.update(
@@ -118,6 +126,13 @@ public class HeartBeatProducer {
                         downloadJob.setUpdateCount(newUpdateCount);
                         downloadJob.setProcessedEntries(pe);
                         Failsafe.with(retryPolicy)
+                                .onFailure(
+                                        throwable ->
+                                                log.warn(
+                                                        MessageFormat.format(
+                                                                "Job {0} was failed to update in writing phase {1}",
+                                                                downloadJob.getId(),
+                                                                throwable.getFailure())))
                                 .run(
                                         () ->
                                                 jobRepository.update(
