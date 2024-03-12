@@ -1,15 +1,17 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.setUp;
+import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,6 +19,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,6 +39,7 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageR
 import org.uniprot.api.rest.controller.AbstractAsyncDownloadIT;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
+import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.BaseAbstractMessageListener;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -49,7 +53,10 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
@@ -76,6 +83,8 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
 
+    @RegisterExtension private static DataStoreManager storeManager = new DataStoreManager();
+
     @Autowired
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
@@ -90,14 +99,44 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
+        initStoreManager();
         prepareDownloadFolders();
         saveEntriesInSolrAndStore(
                 uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
+        saveInactiveEntries(storeManager);
+    }
+
+    private static void initStoreManager() {
+        storeManager.addDocConverter(
+                DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(new HashMap<>()));
+        storeManager.addDocConverter(
+                DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
+        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        storeManager.addSolrClient(
+                DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
         setUp(restTemplate);
+    }
+
+    @Test
+    void startQuery_doesntProcessInactiveEntries() throws IOException {
+        String query = "*";
+        MediaType format = MediaType.APPLICATION_JSON;
+        DownloadRequest request = createDownloadRequest(query, format);
+        String jobId = this.messageService.sendMessage(request);
+        // Producer
+        verify(this.messageService, never()).alreadyProcessed(jobId);
+        // redis entry created
+        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
+        verifyMessageListener(1, 0, 1);
+        verifyRedisEntry(query, jobId, JobStatus.FINISHED, 0, false, 12);
+        DownloadJob downloadJob = this.downloadJobRepository.findById(jobId).get();
+        assertEquals(8, downloadJob.getUpdateCount());
+        verifyIdsAndResultFiles(jobId);
     }
 
     @Disabled

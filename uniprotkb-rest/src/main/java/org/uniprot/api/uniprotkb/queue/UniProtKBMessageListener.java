@@ -132,7 +132,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
 
     @Override
     protected Stream<String> streamIds(DownloadRequest request) {
-        return service.streamIds(request);
+        return service.streamIdsForDownload(request);
     }
 
     @Override
