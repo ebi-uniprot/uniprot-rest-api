@@ -89,8 +89,7 @@ public class UniProtEntryService
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyLineageService taxService,
-            @Qualifier("uniProtKBFacetTupleStreamTemplate")
-                    FacetTupleStreamTemplate facetTupleStreamTemplate,
+            FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             @Qualifier("uniProtKBTupleStreamDocumentIdStream")
@@ -102,7 +101,7 @@ public class UniProtEntryService
                 uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
                 uniProtKBSolrQueryConf,
-                facetTupleStreamTemplate,
+                uniProtKBFacetTupleStreamTemplate,
                 solrIdStreamer);
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;

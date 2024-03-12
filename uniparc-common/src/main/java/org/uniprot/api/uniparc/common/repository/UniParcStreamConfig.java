@@ -8,7 +8,6 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,13 +34,13 @@ import org.uniprot.store.search.SolrCollection;
 @Slf4j
 public class UniParcStreamConfig {
 
-    @Bean("uniParcTupleStreamTemplate")
-    public TupleStreamTemplate tupleStreamTemplate(
-            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties configProperties,
+    @Bean
+    public TupleStreamTemplate uniParcTupleStreamTemplate(
+            StreamerConfigProperties uniParcStreamerConfigProperties,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
-                .streamConfig(configProperties)
+                .streamConfig(uniParcStreamerConfigProperties)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -56,34 +55,34 @@ public class UniParcStreamConfig {
     @Bean
     public StoreStreamerConfig<UniParcEntry> storeStreamerConfig(
             UniParcStoreClient uniParcClient,
-            @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
-            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
-            @Qualifier("uniParcTupleStreamDocumentIdStream")
-                    TupleStreamDocumentIdStream documentIdStream) {
+            TupleStreamTemplate uniParcTupleStreamTemplate,
+            StreamerConfigProperties uniParcStreamerConfigProperties,
+            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
-        StoreStreamerConfig<UniParcEntry> storeStreamerConfig =
-                StoreStreamerConfig.<UniParcEntry>builder()
-                        .storeClient(uniParcClient)
-                        .streamConfig(streamConfig)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(storeRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
-        return storeStreamerConfig;
+                        .withDelay(
+                                Duration.ofMillis(
+                                        uniParcStreamerConfigProperties
+                                                .getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(uniParcStreamerConfigProperties.getStoreFetchMaxRetries());
+        return StoreStreamerConfig.<UniParcEntry>builder()
+                .storeClient(uniParcClient)
+                .streamConfig(uniParcStreamerConfigProperties)
+                .tupleStreamTemplate(uniParcTupleStreamTemplate)
+                .storeFetchRetryPolicy(storeRetryPolicy)
+                .documentIdStream(uniParcTupleStreamDocumentIdStream)
+                .build();
     }
 
-    @Bean("uniParcStreamerConfigProperties")
+    @Bean
     @ConfigurationProperties(prefix = "streamer.uniparc")
-    public StreamerConfigProperties resultsConfigProperties() {
+    public StreamerConfigProperties uniParcStreamerConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean("uniParcFacetTupleStreamTemplate")
-    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+    @Bean
+    public FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate(
             RepositoryConfigProperties configProperties, HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
@@ -91,13 +90,13 @@ public class UniParcStreamConfig {
                 .build();
     }
 
-    @Bean("uniParcTupleStreamDocumentIdStream")
-    public TupleStreamDocumentIdStream documentIdStream(
-            @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
-            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig) {
+    @Bean
+    public TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream(
+            TupleStreamTemplate uniParcTupleStreamTemplate,
+            StreamerConfigProperties uniParcStreamerConfigProperties) {
         return TupleStreamDocumentIdStream.builder()
-                .tupleStreamTemplate(tupleStreamTemplate)
-                .streamConfig(streamConfig)
+                .tupleStreamTemplate(uniParcTupleStreamTemplate)
+                .streamConfig(uniParcStreamerConfigProperties)
                 .build();
     }
 }

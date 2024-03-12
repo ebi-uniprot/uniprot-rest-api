@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
@@ -27,14 +26,14 @@ public class UniRefRabbitProducerMessageService extends RabbitProducerMessageSer
 
     public UniRefRabbitProducerMessageService(
             MessageConverter converter,
-            @Qualifier("uniRefRabbitTemplate") RabbitTemplate rabbitTemplate,
+            RabbitTemplate uniRefRabbitTemplate,
             DownloadJobRepository downloadJobRepository,
             HashGenerator<DownloadRequest> uniRefHashGenerator,
             AsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules,
             AsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
         super(
                 converter,
-                rabbitTemplate,
+                uniRefRabbitTemplate,
                 downloadJobRepository,
                 uniRefHashGenerator,
                 uniRefAsyncDownloadSubmissionRules,

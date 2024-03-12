@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
+import org.uniprot.api.async.download.controller.TestAsyncConfig;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 
@@ -65,8 +66,8 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     }
 
     protected void prepareDownloadFolders() throws IOException {
-        Files.createDirectories(Path.of(this.getIdsFolder()));
-        Files.createDirectories(Path.of(this.getResultFolder()));
+        Files.createDirectories(Path.of(getTestAsyncConfig().getIdsFolder()));
+        Files.createDirectories(Path.of(getTestAsyncConfig().getResultFolder()));
     }
 
     protected void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
@@ -97,23 +98,15 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @AfterAll
     public void cleanUpData() throws Exception {
-        cleanUpFolder(this.getIdsFolder());
-        cleanUpFolder(this.getResultFolder());
+        cleanUpFolder(getTestAsyncConfig().getIdsFolder());
+        cleanUpFolder(getTestAsyncConfig().getResultFolder());
         getDownloadJobRepository().deleteAll();
-        this.amqpAdmin.purgeQueue(getRejectedQueue(), true);
-        this.amqpAdmin.purgeQueue(getDownloadQueue(), true);
-        this.amqpAdmin.purgeQueue(getRetryQueue(), true);
+        this.amqpAdmin.purgeQueue(getTestAsyncConfig().getRejectedQueue(), true);
+        this.amqpAdmin.purgeQueue(getTestAsyncConfig().getDownloadQueue(), true);
+        this.amqpAdmin.purgeQueue(getTestAsyncConfig().getRetryQueue(), true);
         rabbitMQContainer.stop();
         redisContainer.stop();
     }
 
-    protected abstract String getIdsFolder();
-
-    protected abstract String getResultFolder();
-
-    protected abstract String getDownloadQueue();
-
-    protected abstract String getRejectedQueue();
-
-    protected abstract String getRetryQueue();
+    protected abstract TestAsyncConfig getTestAsyncConfig();
 }

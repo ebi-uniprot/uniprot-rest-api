@@ -35,7 +35,7 @@ public class UniProtStoreConfig {
         return new UniProtKBStoreClient(client);
     }
 
-    @Bean("uniProtKBFacetTupleStreamTemplate")
+    @Bean
     public FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate(
             RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()

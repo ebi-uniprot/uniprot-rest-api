@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -87,8 +88,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                //                .andExpect(header().string(HttpHeaders.CACHE_CONTROL,
-                // NO_CACHE_VALUE)) TODO
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
                                         HttpHeaders.VARY,
@@ -131,7 +131,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         await().until(isJobFinished(jobId));
         // then
         // verify the ids file
-        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         List<String> returnIds = submitJobWithSortResultIds();
@@ -139,9 +139,13 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         assertTrue(ids.containsAll(returnIds));
         // verify result file
         Path resultFilePath =
-                Path.of(this.getResultFolder() + "/" + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        getTestAsyncConfig().getResultFolder()
+                                + "/"
+                                + jobId
+                                + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         String resultsJson = Files.readString(unzippedFile);
         List<String> primaryAccessions = JsonPath.read(resultsJson, getResultIdStringToMatch());
@@ -387,16 +391,20 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andExpect(jsonPath("$.processedEntries", equalTo(0)));
 
         // verify the ids file
-        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
         Assertions.assertTrue(ids.isEmpty());
         // verify result file
         Path resultFilePath =
-                Path.of(this.getResultFolder() + "/" + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        getTestAsyncConfig().getResultFolder()
+                                + "/"
+                                + jobId
+                                + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFilePath = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFilePath);
         String resultsJson = Files.readString(unzippedFilePath);
         List<String> results = JsonPath.read(resultsJson, "$.results");
@@ -414,10 +422,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         await().until(isJobFinished(jobId));
         getAndVerifyDetails(jobId);
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String tsvString = Files.readString(unzippedFile);

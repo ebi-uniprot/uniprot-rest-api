@@ -1,10 +1,39 @@
 package org.uniprot.api.async.download.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.jayway.jsonpath.JsonPath;
+import static java.util.function.Predicate.isEqual;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,39 +97,11 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.function.Predicate.isEqual;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @ContextConfiguration(classes = {AsyncDownloadRestApp.class})
@@ -172,8 +173,8 @@ public class IdMappingDownloadControllerIT {
         Duration asyncDuration = Duration.ofMillis(500);
         Awaitility.setDefaultPollDelay(asyncDuration);
         Awaitility.setDefaultPollInterval(asyncDuration);
-        Files.createDirectories(Path.of(idMappingAsyncConfig.idsFolder));
-        Files.createDirectories(Path.of(idMappingAsyncConfig.resultFolder));
+        Files.createDirectories(Path.of(idMappingAsyncConfig.getIdsFolder()));
+        Files.createDirectories(Path.of(idMappingAsyncConfig.getResultFolder()));
 
         for (int i = 1; i <= 10; i++) {
             saveUniParc(i);
@@ -316,12 +317,12 @@ public class IdMappingDownloadControllerIT {
 
     @AfterAll
     public void cleanUpData() throws Exception {
-        cleanUpFolder(idMappingAsyncConfig.idsFolder);
-        cleanUpFolder(idMappingAsyncConfig.resultFolder);
+        cleanUpFolder(idMappingAsyncConfig.getIdsFolder());
+        cleanUpFolder(idMappingAsyncConfig.getResultFolder());
         downloadJobRepository.deleteAll();
-        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.rejectedQueue, true);
-        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.downloadQueue, true);
-        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.retryQueue, true);
+        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRejectedQueue(), true);
+        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getDownloadQueue(), true);
+        this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRetryQueue(), true);
         rabbitMQContainer.stop();
         redisContainer.stop();
     }
@@ -742,7 +743,7 @@ public class IdMappingDownloadControllerIT {
         await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
@@ -802,7 +803,7 @@ public class IdMappingDownloadControllerIT {
                 .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
@@ -966,7 +967,7 @@ public class IdMappingDownloadControllerIT {
         await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
@@ -1026,7 +1027,7 @@ public class IdMappingDownloadControllerIT {
                 .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
@@ -1190,7 +1191,7 @@ public class IdMappingDownloadControllerIT {
         await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
@@ -1250,7 +1251,7 @@ public class IdMappingDownloadControllerIT {
                 .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
-                        idMappingAsyncConfig.resultFolder
+                        idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());

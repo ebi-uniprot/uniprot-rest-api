@@ -4,19 +4,52 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 
 @TestConfiguration
-public class UniProtKBAsyncConfig {
+public class UniProtKBAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.uniprotkb.result.idFilesFolder}")
-    String idsFolder;
+    private String idsFolder;
 
     @Value("${async.download.uniprotkb.result.resultFilesFolder}")
-    String resultFolder;
+    private String resultFolder;
 
     @Value("${async.download.uniprotkb.queueName}")
-    String downloadQueue;
+    private String downloadQueue;
 
     @Value("${async.download.uniprotkb.retryQueueName}")
-    String retryQueue;
+    private String retryQueue;
 
     @Value(("${async.download.uniprotkb.rejectedQueueName}"))
-    String rejectedQueue;
+    private String rejectedQueue;
+
+    @Value("${async.download.uniprotkb.retryMaxCount}")
+    private int maxRetry;
+
+    @Override
+    public String getIdsFolder() {
+        return idsFolder;
+    }
+
+    @Override
+    public String getResultFolder() {
+        return resultFolder;
+    }
+
+    @Override
+    public String getDownloadQueue() {
+        return downloadQueue;
+    }
+
+    @Override
+    public String getRetryQueue() {
+        return retryQueue;
+    }
+
+    @Override
+    public String getRejectedQueue() {
+        return rejectedQueue;
+    }
+
+    @Override
+    public int getMaxRetry() {
+        return maxRetry;
+    }
 }

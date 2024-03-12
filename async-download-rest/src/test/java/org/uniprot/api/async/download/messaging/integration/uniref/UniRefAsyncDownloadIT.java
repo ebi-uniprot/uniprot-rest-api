@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,6 +28,8 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.common.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
+import org.uniprot.api.async.download.controller.TestAsyncConfig;
+import org.uniprot.api.async.download.controller.UniRefAsyncConfig;
 import org.uniprot.api.async.download.controller.UniRefDownloadController;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.integration.common.AbstractAsyncDownloadIT;
@@ -65,23 +66,7 @@ import org.uniprot.store.search.SolrCollection;
 public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Autowired private HashGenerator<DownloadRequest> uniRefHashGenerator;
 
-    @Value("${async.download.uniref.retryMaxCount}")
-    private int maxRetry;
-
-    @Value("${async.download.uniref.result.idFilesFolder}")
-    protected String idsFolder;
-
-    @Value("${async.download.uniref.result.resultFilesFolder}")
-    protected String resultFolder;
-
-    @Value("${async.download.uniref.queueName}")
-    private String downloadQueue;
-
-    @Value("${async.download.uniref.retryQueueName}")
-    private String retryQueue;
-
-    @Value(("${async.download.uniref.rejectedQueueName}"))
-    private String rejectedQueue;
+    @Autowired private UniRefAsyncConfig uniRefAsyncConfig;
 
     @Qualifier("uniRefTupleStreamTemplate")
     @Autowired
@@ -198,37 +183,12 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     }
 
     @Override
-    protected int getMaxRetry() {
-        return this.maxRetry;
-    }
-
-    @Override
     protected HashGenerator<DownloadRequest> getHashGenerator() {
         return this.uniRefHashGenerator;
     }
 
     @Override
-    protected String getIdsFolder() {
-        return this.idsFolder;
-    }
-
-    @Override
-    protected String getResultFolder() {
-        return this.resultFolder;
-    }
-
-    @Override
-    protected String getDownloadQueue() {
-        return this.downloadQueue;
-    }
-
-    @Override
-    protected String getRejectedQueue() {
-        return this.rejectedQueue;
-    }
-
-    @Override
-    protected String getRetryQueue() {
-        return this.retryQueue;
+    protected TestAsyncConfig getTestAsyncConfig() {
+        return uniRefAsyncConfig;
     }
 }

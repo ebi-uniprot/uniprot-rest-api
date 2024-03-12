@@ -1,7 +1,18 @@
 package org.uniprot.api.async.download.controller;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.hamcrest.Matchers.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
@@ -51,16 +62,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
+import com.jayway.jsonpath.JsonPath;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
@@ -131,10 +133,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         Awaitility.await().until(isJobFinished(jobId));
         getAndVerifyDetails(jobId);
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -243,9 +245,13 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         getAndVerifyDetails(jobId);
         // verify result file
         Path resultFilePath =
-                Path.of(this.getResultFolder() + "/" + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        getTestAsyncConfig().getResultFolder()
+                                + "/"
+                                + jobId
+                                + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -268,9 +274,13 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         getAndVerifyDetails(jobId);
         // verify result file
         Path resultFilePath =
-                Path.of(this.getResultFolder() + "/" + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        getTestAsyncConfig().getResultFolder()
+                                + "/"
+                                + jobId
+                                + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -312,7 +322,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         verifyIdsFile(jobId);
         // result file should not exist yet
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertFalse(Files.exists(resultFilePath));
     }
 
@@ -324,7 +334,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
         Awaitility.await().until(isJobAborted(jobId));
         // id file should not exist yet
-        Path resultFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertFalse(Files.exists(resultFilePath));
     }
 
@@ -336,7 +346,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
         Awaitility.await().until(isJobAborted(jobId));
         // id file should not exist yet
-        Path resultFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertFalse(Files.exists(resultFilePath));
     }
 
@@ -382,10 +392,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         verifyIdsFile(jobId);
         // verify result file
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -400,7 +410,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected void verifyIdsFile(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
@@ -512,27 +522,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected String getIdsFolder() {
-        return uniProtKBAsyncConfig.idsFolder;
-    }
-
-    @Override
-    protected String getResultFolder() {
-        return uniProtKBAsyncConfig.resultFolder;
-    }
-
-    @Override
-    protected String getDownloadQueue() {
-        return uniProtKBAsyncConfig.downloadQueue;
-    }
-
-    @Override
-    protected String getRejectedQueue() {
-        return uniProtKBAsyncConfig.rejectedQueue;
-    }
-
-    @Override
-    protected String getRetryQueue() {
-        return uniProtKBAsyncConfig.retryQueue;
+    protected TestAsyncConfig getTestAsyncConfig() {
+        return uniProtKBAsyncConfig;
     }
 }

@@ -1,6 +1,10 @@
 package org.uniprot.api.async.download.messaging.listener.uniref;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -26,9 +30,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
-
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * @author tibrahim

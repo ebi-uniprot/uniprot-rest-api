@@ -1,6 +1,10 @@
 package org.uniprot.api.async.download.messaging.listener.uniprotkb;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -29,9 +33,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad

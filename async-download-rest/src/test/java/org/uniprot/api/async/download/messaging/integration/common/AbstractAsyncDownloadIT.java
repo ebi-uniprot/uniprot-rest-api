@@ -125,14 +125,20 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
-        await().until(jobRetriedMaximumTimes(downloadJobRepository, jobId, getMaxRetry()));
+        await().until(
+                        jobRetriedMaximumTimes(
+                                downloadJobRepository, jobId, getTestAsyncConfig().getMaxRetry()));
         // verify  redis
-        verifyRedisEntry(query, jobId, JobStatus.ERROR, getMaxRetry(), true, 0);
+        verifyRedisEntry(
+                query, jobId, JobStatus.ERROR, getTestAsyncConfig().getMaxRetry(), true, 0);
         // after certain delay the job should be reprocessed
         await().until(
                         verifyMessageCountIsThanOrEqualToRejectedCount(
-                                amqpAdmin, getRejectedQueue(), rejectedMsgCount));
-        verifyRedisEntry(query, jobId, JobStatus.ERROR, getMaxRetry(), true, 0);
+                                amqpAdmin,
+                                getTestAsyncConfig().getRejectedQueue(),
+                                rejectedMsgCount));
+        verifyRedisEntry(
+                query, jobId, JobStatus.ERROR, getTestAsyncConfig().getMaxRetry(), true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
@@ -155,7 +161,9 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         await().until(verifyJobRetriedCountIsEqualToGivenCount(downloadJobRepository, jobId, 2));
-        await().until(getMessageCountInQueue(amqpAdmin, this.getRejectedQueue()), equalTo(1));
+        await().until(
+                        getMessageCountInQueue(amqpAdmin, getTestAsyncConfig().getRejectedQueue()),
+                        equalTo(1));
         verifyRedisEntry(query, jobId, JobStatus.ERROR, 2, true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
@@ -199,10 +207,10 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         verifyIdsFile(jobId);
         // verify result file
         String fileName = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileName);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileName);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -212,7 +220,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     }
 
     protected void verifyIdsFile(String jobId) throws IOException {
-        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
@@ -220,10 +228,10 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
 
     protected void verifyIdsAndResultFilesDoNotExist(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Paths.get(this.getIdsFolder(), jobId);
+        Path idsFilePath = Paths.get(getTestAsyncConfig().getIdsFolder(), jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         // verify result file
-        Path resultFilePath = Paths.get(this.getResultFolder(), jobId);
+        Path resultFilePath = Paths.get(getTestAsyncConfig().getResultFolder(), jobId);
         Assertions.assertTrue(Files.notExists(resultFilePath));
     }
 
@@ -233,8 +241,6 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     }
 
     protected abstract ProducerMessageService getProducerMessageService();
-
-    protected abstract int getMaxRetry();
 
     protected abstract HashGenerator<DownloadRequest> getHashGenerator();
 }

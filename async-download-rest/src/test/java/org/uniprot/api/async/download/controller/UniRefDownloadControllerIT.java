@@ -1,7 +1,22 @@
 package org.uniprot.api.async.download.controller;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,20 +52,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import com.jayway.jsonpath.JsonPath;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
@@ -115,10 +117,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -160,10 +162,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         verifyIdsFile(jobId);
         // verify result file
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -188,7 +190,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected void verifyIdsFile(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
+        Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
@@ -317,27 +319,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected String getIdsFolder() {
-        return uniRefAsyncConfig.idsFolder;
-    }
-
-    @Override
-    protected String getResultFolder() {
-        return uniRefAsyncConfig.resultFolder;
-    }
-
-    @Override
-    protected String getDownloadQueue() {
-        return uniRefAsyncConfig.downloadQueue;
-    }
-
-    @Override
-    protected String getRejectedQueue() {
-        return uniRefAsyncConfig.rejectedQueue;
-    }
-
-    @Override
-    protected String getRetryQueue() {
-        return uniRefAsyncConfig.retryQueue;
+    protected TestAsyncConfig getTestAsyncConfig() {
+        return uniRefAsyncConfig;
     }
 }
