@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.config;
+package org.uniprot.api.support.data.common.rdf;
 
 import java.util.Collections;
 
@@ -15,12 +15,12 @@ import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 @Configuration
-public class AsyncRdfStreamerConfig {
+public class SupportDataRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
     private final RdfEntryCountProvider rdfEntryCountProvider;
 
-    public AsyncRdfStreamerConfig(
+    public SupportDataRdfStreamerConfig(
             PrologProvider prologProvider,
             TagPositionProvider tagPositionProvider,
             RdfEntryCountProvider rdfEntryCountProvider) {
@@ -30,38 +30,39 @@ public class AsyncRdfStreamerConfig {
     }
 
     @Bean
-    public RdfStreamer asyncRdfStreamer(
-            RdfStreamerConfigProperties asyncRdfStreamerConfigProperties,
-            RdfServiceFactory asyncRdfServiceFactory) {
+    public RdfStreamer supportDataRdfStreamer(
+            RdfStreamerConfigProperties supportDataRdfStreamerConfigProperties,
+            RdfServiceFactory supportDataRdfServiceFactory) {
         return new RdfStreamer(
-                asyncRdfStreamerConfigProperties.getBatchSize(),
+                supportDataRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                asyncRdfServiceFactory,
-                RdfStreamConfig.rdfRetryPolicy(asyncRdfStreamerConfigProperties),
+                supportDataRdfServiceFactory,
+                RdfStreamConfig.rdfRetryPolicy(supportDataRdfStreamerConfigProperties),
                 rdfEntryCountProvider);
     }
 
     @Bean
-    public RdfServiceFactory asyncRdfServiceFactory(RestTemplate asyncRdfRestTemplate) {
-        return new RdfServiceFactory(asyncRdfRestTemplate, tagPositionProvider);
+    public RdfServiceFactory supportDataRdfServiceFactory(RestTemplate supportDataRdfRestTemplate) {
+        return new RdfServiceFactory(supportDataRdfRestTemplate, tagPositionProvider);
     }
 
     @Bean
-    public RestTemplate asyncRdfRestTemplate(
-            RdfStreamerConfigProperties asyncRdfStreamerConfigProperties) {
+    public RestTemplate supportDataRdfRestTemplate(
+            RdfStreamerConfigProperties supportDataRdfStreamerConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(asyncRdfStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(
+                        supportDataRdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "async.rdf.streamer")
-    public RdfStreamerConfigProperties asyncRdfStreamerConfigProperties() {
+    @ConfigurationProperties(prefix = "support.data.rdf.streamer")
+    public RdfStreamerConfigProperties supportDataRdfStreamerConfigProperties() {
         return new RdfStreamerConfigProperties();
     }
 }

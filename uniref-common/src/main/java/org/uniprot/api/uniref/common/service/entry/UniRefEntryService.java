@@ -23,9 +23,9 @@ public class UniRefEntryService {
     @Autowired
     public UniRefEntryService(
             UniRefEntryStoreRepository entryStoreRepository,
-            RdfServiceFactory unirefRdfServiceFactory) {
+            RdfServiceFactory uniRefRdfServiceFactory) {
         this.entryStoreRepository = entryStoreRepository;
-        this.rdfServiceFactory = unirefRdfServiceFactory;
+        this.rdfServiceFactory = uniRefRdfServiceFactory;
     }
 
     public UniRefEntry getEntity(String clusterId) {

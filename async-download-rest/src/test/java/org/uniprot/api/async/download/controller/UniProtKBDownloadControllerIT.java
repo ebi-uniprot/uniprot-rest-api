@@ -107,7 +107,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
 
-    @MockBean(name = "asyncRdfRestTemplate")
+    @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @BeforeAll

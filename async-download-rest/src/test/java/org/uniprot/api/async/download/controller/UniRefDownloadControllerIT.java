@@ -89,7 +89,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired
     private UniProtStoreClient<UniRefEntryLight> storeClient; // in memory voldemort store client
 
-    @MockBean(name = "asyncRdfRestTemplate")
+    @MockBean(name = "uniRefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Autowired private MockMvc mockMvc;

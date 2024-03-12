@@ -126,7 +126,7 @@ public class IdMappingDownloadControllerIT {
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
-    @MockBean(name = "asyncRdfRestTemplate")
+    @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
 
     @Qualifier("uniRefLightStoreClient")

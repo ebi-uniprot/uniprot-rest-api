@@ -6,7 +6,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.uniprot.api.idmapping.common.service.config.IdMappingRdfStreamerConfig;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniRefIdMappingResultsConfig;
@@ -15,8 +14,6 @@ import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniparc.common.repository.rdf.UniParcRdfStreamerConfig;
-import org.uniprot.api.uniprotkb.common.repository.store.UniProtRdfStreamerConfig;
 import org.uniprot.api.uniprotkb.common.service.ec.ECService;
 import org.uniprot.api.uniprotkb.common.service.go.GOService;
 import org.uniprot.api.uniprotkb.common.service.go.client.GOClientImpl;
@@ -25,7 +22,6 @@ import org.uniprot.api.uniprotkb.common.service.groupby.GroupByGOService;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryVersionService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
-import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
 
 @SpringBootApplication
 @EnableCaching
@@ -40,8 +36,7 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
             "org.uniprot.api.idmapping.common",
             "org.uniprot.api.common.repository.stream.store.uniprotkb",
             "org.uniprot.api.common.repository.stream.rdf",
-            "org.uniprot.api.support.data.common.keyword",
-            "org.uniprot.api.support.data.common.taxonomy"
+            "org.uniprot.api.support.data.common"
         },
         excludeFilters = {
             @ComponentScan.Filter(
@@ -53,10 +48,6 @@ import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
                         UniProtKBIdMappingResultsConfig.class,
                         UniRefIdMappingResultsConfig.class,
                         UniParcIdMappingResultsConfig.class,
-                        UniParcRdfStreamerConfig.class,
-                        UniProtRdfStreamerConfig.class,
-                        UniRefRdfStreamerConfig.class,
-                        IdMappingRdfStreamerConfig.class,
                         UniParcIdService.class,
                         UniProtKBIdService.class,
                         UniRefIdService.class,
