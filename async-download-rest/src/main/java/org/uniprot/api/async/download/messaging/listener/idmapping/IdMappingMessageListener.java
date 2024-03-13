@@ -14,13 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.AbstractIdMappingDownloadResultWriter;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingDownloadResultWriterFactory;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
@@ -43,7 +44,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
     private final IdMappingDownloadResultWriterFactory writerFactory;
 
     public IdMappingMessageListener(
-            DownloadConfigProperties idMappingDownloadConfigProperties,
+            IdMappingDownloadConfigProperties idMappingDownloadConfigProperties,
             IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
             IdMappingRabbitTemplate idMappingRabbitTemplate,
@@ -51,7 +52,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
             HeartbeatProducer heartBeatProducer,
-            AsyncDownloadFileHandler idMappingAsyncDownloadFileHandler) {
+            IdMappingAsyncDownloadFileHandler idMappingAsyncDownloadFileHandler) {
         super(
                 idMappingDownloadConfigProperties,
                 jobRepository,

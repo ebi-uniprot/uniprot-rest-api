@@ -8,18 +8,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
@@ -44,19 +43,19 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
 
     public UniRefMessageListener(
             MessageConverter converter,
-            DownloadConfigProperties uniRefDownloadConfigProperties,
+            UniRefDownloadConfigProperties uniRefDownloadConfigProperties,
             UniRefAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
-            @Qualifier("uniRefDownloadResultWriter") DownloadResultWriter downloadResultWriter,
+            UniRefDownloadResultWriter uniRefDownloadResultWriter,
             UniRefRabbitTemplate uniRefRabbitTemplate,
             UniRefEntryLightService service,
             HeartbeatProducer heartbeatProducer,
-            AsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
+            UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
         super(
                 converter,
                 uniRefDownloadConfigProperties,
                 jobRepository,
-                downloadResultWriter,
+                uniRefDownloadResultWriter,
                 uniRefRabbitTemplate,
                 heartbeatProducer,
                 uniRefAsyncDownloadFileHandler,

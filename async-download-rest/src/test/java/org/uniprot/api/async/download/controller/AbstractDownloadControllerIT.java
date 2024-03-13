@@ -62,8 +62,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                //                .andExpect(header().string(HttpHeaders.CACHE_CONTROL,
-                // NO_CACHE_VALUE)) TODO uncomment
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
                                         HttpHeaders.VARY,

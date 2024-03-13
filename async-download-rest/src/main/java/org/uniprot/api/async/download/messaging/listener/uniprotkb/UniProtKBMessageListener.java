@@ -9,12 +9,11 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
@@ -22,7 +21,7 @@ import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProduce
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
@@ -51,10 +50,10 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
-            DownloadConfigProperties uniProtKBDownloadConfigProperties,
+            UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties,
             UniProtKBAsyncDownloadQueueConfigProperties queueConfigProperties,
             DownloadJobRepository jobRepository,
-            @Qualifier("uniProtKBDownloadResultWriter") DownloadResultWriter downloadResultWriter,
+            UniProtKBDownloadResultWriter uniProtKBDownloadResultWriter,
             UniProtKBRabbitTemplate uniProtKBRabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
             HeartbeatProducer heartbeatProducer,
@@ -63,7 +62,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                 converter,
                 uniProtKBDownloadConfigProperties,
                 jobRepository,
-                downloadResultWriter,
+                uniProtKBDownloadResultWriter,
                 uniProtKBRabbitTemplate,
                 heartbeatProducer,
                 uniProtKBAsyncDownloadFileHandler,

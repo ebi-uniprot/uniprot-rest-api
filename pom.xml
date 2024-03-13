@@ -73,6 +73,7 @@
 		<module>uniref-common</module>
 		<module>uniref-rest</module>
 		<module>support-data-common</module>
+		<module>async-download-rest</module>
 		<module>support-data-rest</module>
 		<module>proteome-rest</module>
 		<module>unisave-rest</module>
@@ -80,7 +81,6 @@
 		<module>help-centre-rest</module>
 		<module>benchmark-rest</module>
 		<module>jacoco-aggregate-report</module>
-		<module>async-download-rest</module>
 	</modules>
 
 	<dependencyManagement>

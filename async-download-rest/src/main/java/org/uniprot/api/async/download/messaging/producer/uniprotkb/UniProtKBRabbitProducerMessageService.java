@@ -2,14 +2,13 @@ package org.uniprot.api.async.download.messaging.producer.uniprotkb;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
+import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.producer.common.RabbitProducerMessageService;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -26,11 +25,11 @@ public class UniProtKBRabbitProducerMessageService extends RabbitProducerMessage
 
     public UniProtKBRabbitProducerMessageService(
             MessageConverter converter,
-            RabbitTemplate uniProtKBRabbitTemplate,
+            UniProtKBRabbitTemplate uniProtKBRabbitTemplate,
             DownloadJobRepository downloadJobRepository,
             HashGenerator<DownloadRequest> uniProtKBHashGenerator,
-            AsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules,
-            AsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
+            UniProtKBAsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules,
+            UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
         super(
                 converter,
                 uniProtKBRabbitTemplate,

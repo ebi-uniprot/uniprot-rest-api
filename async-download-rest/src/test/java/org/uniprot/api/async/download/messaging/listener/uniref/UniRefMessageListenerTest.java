@@ -26,15 +26,15 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.common.DownloadResultWriter;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -51,17 +51,17 @@ class UniRefMessageListenerTest {
     private static final String PROCESSED_ENTRIES = "processedEntries";
     @Mock private MessageConverter converter;
     @Mock private UniRefEntryLightService service;
-    @Mock private DownloadConfigProperties downloadConfigProperties;
+    @Mock private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
 
     @Mock UniRefAsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
     @Mock private DownloadJobRepository jobRepository;
 
-    @Mock private DownloadResultWriter downloadResultWriter;
+    @Mock private UniRefDownloadResultWriter uniRefDownloadResultWriter;
 
     @Mock private UniRefRabbitTemplate uniRefRabbitTemplate;
     @Mock private HeartbeatProducer heartbeatProducer;
-    @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
+    @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
 
     @InjectMocks private UniRefMessageListener uniRefMessageListener;
 
@@ -78,8 +78,8 @@ class UniRefMessageListenerTest {
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
-        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
@@ -118,8 +118,8 @@ class UniRefMessageListenerTest {
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
-        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
@@ -146,7 +146,7 @@ class UniRefMessageListenerTest {
     }
 
     private void verifyCleanFilesAndResetCounts(String jobId) {
-        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verify(uniRefAsyncDownloadFileHandler).deleteAllFiles(jobId);
         verify(jobRepository)
                 .update(
                         eq(jobId),
@@ -177,8 +177,8 @@ class UniRefMessageListenerTest {
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
-        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
@@ -186,7 +186,7 @@ class UniRefMessageListenerTest {
                                 .page(CursorPage.of("", 10, 2))
                                 .build());
         Mockito.doThrow(new IOException("Forced IO Exception"))
-                .when(this.downloadResultWriter)
+                .when(this.uniRefDownloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any(), any());
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
