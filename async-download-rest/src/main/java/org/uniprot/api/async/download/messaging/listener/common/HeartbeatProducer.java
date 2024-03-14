@@ -8,14 +8,12 @@ import java.util.function.LongConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 
 @Component
 @Slf4j
-@Profile({"asyncDownload"})
 public class HeartbeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";

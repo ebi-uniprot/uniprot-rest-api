@@ -22,7 +22,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 
 @TestConfiguration
 @Slf4j
-@Profile("asyncDownload & offline & integration")
+@Profile("offline & integration")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EmbeddingsTestConsumer {
     @Bean(name = "embeddingsMessageListener")

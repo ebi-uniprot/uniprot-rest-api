@@ -5,7 +5,6 @@ import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -15,7 +14,6 @@ import org.uniprot.api.async.download.model.common.DownloadJob;
  * @created 22/12/2022
  */
 @Configuration
-@Profile({"asyncDownload"})
 @EnableRedisRepositories(basePackages = "org.uniprot.api.async.download.messaging.repository")
 public class RedisConfiguration {
 

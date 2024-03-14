@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -33,7 +32,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
-@Profile({"live", "asyncDownload"})
 @Service
 public class IdMappingMessageListener extends BaseAbstractMessageListener
         implements MessageListener {

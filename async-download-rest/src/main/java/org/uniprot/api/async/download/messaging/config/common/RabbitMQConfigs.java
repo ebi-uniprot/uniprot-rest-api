@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 /**
  * Initialisation code for Rabbit MQ to be used by both producer and consumer
@@ -15,7 +14,6 @@ import org.springframework.context.annotation.Profile;
  * @created 23/11/2022
  */
 @Configuration
-@Profile({"asyncDownload"})
 public class RabbitMQConfigs {
 
     @Bean

@@ -1,13 +1,11 @@
 package org.uniprot.api.async.download.messaging.result.idmapping;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 @Component
-@Profile({"live", "asyncDownload"})
 public class IdMappingDownloadResultWriterFactory {
 
     private final UniParcIdMappingDownloadResultWriter uniParcIdMappingDownloadResultWriter;

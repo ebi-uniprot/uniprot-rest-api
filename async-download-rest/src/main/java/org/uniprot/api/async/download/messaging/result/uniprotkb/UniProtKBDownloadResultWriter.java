@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -24,7 +23,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @Component("uniProtKBDownloadResultWriter")
 @Slf4j
-@Profile({"live", "asyncDownload"})
 public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<UniProtKBEntry> {
 
     protected final TaxonomyLineageService lineageService;

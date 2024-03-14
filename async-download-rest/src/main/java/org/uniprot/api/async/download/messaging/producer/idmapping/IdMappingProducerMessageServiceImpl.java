@@ -11,7 +11,6 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
@@ -26,7 +25,6 @@ import org.uniprot.api.rest.request.HashGenerator;
 
 @Service
 @Slf4j
-@Profile({"asyncDownload"})
 public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMessageService {
 
     private final RabbitTemplate rabbitTemplate;

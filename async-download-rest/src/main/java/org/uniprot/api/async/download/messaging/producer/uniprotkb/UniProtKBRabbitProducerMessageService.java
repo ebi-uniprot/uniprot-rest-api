@@ -3,7 +3,6 @@ package org.uniprot.api.async.download.messaging.producer.uniprotkb;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.producer.common.RabbitProducerMessageService;
@@ -18,9 +17,8 @@ import org.uniprot.api.rest.request.HashGenerator;
  * @author sahmad
  * @created 22/11/2022
  */
-@Service("uniProtKB")
+@Service
 @Slf4j
-@Profile({"asyncDownload"})
 public class UniProtKBRabbitProducerMessageService extends RabbitProducerMessageService {
 
     public UniProtKBRabbitProducerMessageService(

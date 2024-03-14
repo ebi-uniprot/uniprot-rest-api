@@ -9,7 +9,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
@@ -20,7 +19,7 @@ import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageL
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
@@ -37,7 +36,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
  * @author sahmad
  * @created 22/11/2022
  */
-@Profile({"live", "asyncDownload"})
 @Service
 @Slf4j
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
@@ -57,7 +55,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             UniProtKBRabbitTemplate uniProtKBRabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
             HeartbeatProducer heartbeatProducer,
-            AsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
+            UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
         super(
                 converter,
                 uniProtKBDownloadConfigProperties,

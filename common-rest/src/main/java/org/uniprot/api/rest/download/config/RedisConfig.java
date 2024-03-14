@@ -18,7 +18,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class RedisConfig {
     @Bean(destroyMethod = "shutdown")
-    @Profile("asyncDownload & live")
+    @Profile("redis & live")
     public RedissonClient redisson(@Value("${download.redis.config.file}") Resource configFile)
             throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());

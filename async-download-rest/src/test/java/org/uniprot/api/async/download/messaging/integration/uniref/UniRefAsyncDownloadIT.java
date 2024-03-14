@@ -26,7 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
-import org.uniprot.api.async.download.common.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.controller.TestAsyncConfig;
 import org.uniprot.api.async.download.controller.UniRefAsyncConfig;
@@ -36,6 +35,7 @@ import org.uniprot.api.async.download.messaging.integration.common.AbstractAsync
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageListener;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
+import org.uniprot.api.async.download.messaging.producer.uniref.UniRefRabbitProducerMessageService;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -48,7 +48,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-@ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
+@ActiveProfiles(profiles = {"offline", "idmapping", "integration"})
 @EnableConfigurationProperties
 @PropertySource("classpath:application.properties")
 @ContextConfiguration(
@@ -56,7 +56,6 @@ import org.uniprot.store.search.SolrCollection;
             UniRefDataStoreTestConfig.class,
             AsyncDownloadRestApp.class,
             UniRefStoreConfig.class,
-            AsyncDownloadTestConfig.class,
             RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
@@ -74,9 +73,7 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private FacetTupleStreamTemplate uniRefFacetTupleStreamTemplate;
 
-    @Qualifier("uniRef")
-    @SpyBean
-    private ProducerMessageService messageService;
+    @SpyBean private UniRefRabbitProducerMessageService uniRefRabbitProducerMessageService;
 
     @SpyBean private UniRefMessageListener uniRefMessageListener;
 
@@ -179,7 +176,7 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Override
     protected ProducerMessageService getProducerMessageService() {
-        return this.messageService;
+        return this.uniRefRabbitProducerMessageService;
     }
 
     @Override

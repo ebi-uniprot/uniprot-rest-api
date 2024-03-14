@@ -62,7 +62,7 @@ public class TestConfig {
     }
 
     @Bean
-    @Profile("idmapping | asyncDownload")
+    @Profile("idmapping")
     public IdMappingJobCacheService idMappingJobCacheService(RedissonClient redissonClient) {
         Map<String, CacheConfig> config = new HashMap<>();
         config.put("testMap", null);

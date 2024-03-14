@@ -49,12 +49,12 @@ public class IdMappingDownloadController extends BasicDownloadController {
     private final DownloadJobRepository jobRepository;
 
     protected IdMappingDownloadController(
-            IdMappingProducerMessageService messageService,
+            IdMappingProducerMessageService idMappingProducerMessageService,
             IdMappingJobCacheService idMappingJobCacheService,
             DownloadJobRepository jobRepository,
             HeartbeatConfig heartbeatConfig) {
         super(heartbeatConfig);
-        this.messageService = messageService;
+        this.messageService = idMappingProducerMessageService;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.jobRepository = jobRepository;
     }

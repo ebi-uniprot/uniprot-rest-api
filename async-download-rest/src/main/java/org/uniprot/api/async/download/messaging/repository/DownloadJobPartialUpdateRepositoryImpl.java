@@ -2,14 +2,12 @@ package org.uniprot.api.async.download.messaging.repository;
 
 import java.util.Map;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.RedisKeyValueTemplate;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 
 @Component
-@Profile({"asyncDownload"})
 public class DownloadJobPartialUpdateRepositoryImpl implements DownloadJobPartialUpdateRepository {
     private final RedisKeyValueTemplate redisKeyValueTemplate;
 

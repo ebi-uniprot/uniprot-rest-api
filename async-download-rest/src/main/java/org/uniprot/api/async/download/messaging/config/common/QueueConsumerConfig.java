@@ -6,7 +6,6 @@ import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
@@ -19,7 +18,6 @@ import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageLis
  * @created 22/11/2022
  */
 @Configuration
-@Profile({"asyncDownload"})
 public class QueueConsumerConfig {
 
     @Bean

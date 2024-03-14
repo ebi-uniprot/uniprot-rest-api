@@ -30,7 +30,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
-import org.uniprot.api.async.download.common.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.controller.TestAsyncConfig;
 import org.uniprot.api.async.download.controller.UniProtKBAsyncConfig;
 import org.uniprot.api.async.download.controller.UniProtKBDownloadController;
@@ -40,6 +39,7 @@ import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMess
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.embeddings.EmbeddingsTestConsumer;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
+import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBRabbitProducerMessageService;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -59,7 +59,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-@ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
+@ActiveProfiles(profiles = {"offline", "idmapping", "integration"})
 @EnableConfigurationProperties
 @PropertySource("classpath:application.properties")
 @ContextConfiguration(
@@ -68,7 +68,6 @@ import org.uniprot.store.search.SolrCollection;
             UniProtKBDataStoreTestConfig.class,
             AsyncDownloadRestApp.class,
             UniProtStoreConfig.class,
-            AsyncDownloadTestConfig.class,
             RedisConfiguration.class,
             EmbeddingsTestConsumer.class
         })
@@ -87,9 +86,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate;
 
-    @Qualifier("uniProtKB")
-    @SpyBean
-    private ProducerMessageService messageService;
+    @SpyBean private UniProtKBRabbitProducerMessageService uniProtKBRabbitProducerMessageService;
 
     @Value("${async.download.embeddings.maxEntryCount}")
     protected long maxEntryCount;
@@ -111,7 +108,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
 
-    @Autowired protected IdMappingJobCacheService cacheService;
+    @Autowired protected IdMappingJobCacheService idMappingJobCacheService;
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
@@ -134,9 +131,9 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         String query = getMessageSuccessAfterRetryQuery();
         MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
         DownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.messageService.sendMessage(request);
+        String jobId = this.uniProtKBRabbitProducerMessageService.sendMessage(request);
         // Producer
-        verify(this.messageService, never()).alreadyProcessed(jobId);
+        verify(this.uniProtKBRabbitProducerMessageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         // verify  redis
@@ -223,7 +220,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Override
     protected ProducerMessageService getProducerMessageService() {
-        return this.messageService;
+        return this.uniProtKBRabbitProducerMessageService;
     }
 
     @Override

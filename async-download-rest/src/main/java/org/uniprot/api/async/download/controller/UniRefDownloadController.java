@@ -9,11 +9,11 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
+import org.uniprot.api.async.download.messaging.producer.uniref.UniRefRabbitProducerMessageService;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
@@ -44,11 +44,11 @@ public class UniRefDownloadController extends BasicDownloadController {
     private final DownloadJobRepository jobRepository;
 
     public UniRefDownloadController(
-            @Qualifier("uniRef") ProducerMessageService messageService,
+            UniRefRabbitProducerMessageService uniRefRabbitProducerMessageService,
             DownloadJobRepository jobRepository,
             HeartbeatConfig heartbeatConfig) {
         super(heartbeatConfig);
-        this.messageService = messageService;
+        this.messageService = uniRefRabbitProducerMessageService;
         this.jobRepository = jobRepository;
     }
 

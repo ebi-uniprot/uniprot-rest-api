@@ -35,12 +35,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
-import org.uniprot.api.async.download.common.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.idmapping.common.service.TestConfig;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -55,15 +55,15 @@ import org.uniprot.store.search.SolrCollection;
 import com.jayway.jsonpath.JsonPath;
 
 @Slf4j
-@ActiveProfiles(profiles = {"offline", "asyncDownload"})
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @WebMvcTest({UniRefDownloadController.class})
 @ContextConfiguration(
         classes = {
+            TestConfig.class,
             UniRefDataStoreTestConfig.class,
             UniProtKBDataStoreTestConfig.class,
             AsyncDownloadRestApp.class,
             ErrorHandlerConfig.class,
-            AsyncDownloadTestConfig.class,
             RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)

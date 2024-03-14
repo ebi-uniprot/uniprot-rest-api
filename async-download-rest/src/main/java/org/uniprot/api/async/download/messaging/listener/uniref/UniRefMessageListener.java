@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloadQueueConfigProperties;
@@ -34,7 +33,6 @@ import org.uniprot.core.uniref.UniRefEntryLight;
  * @author tibrahim
  * @created 16/08/2023
  */
-@Profile({"live", "asyncDownload"})
 @Service
 @Slf4j
 public class UniRefMessageListener extends AbstractMessageListener implements MessageListener {

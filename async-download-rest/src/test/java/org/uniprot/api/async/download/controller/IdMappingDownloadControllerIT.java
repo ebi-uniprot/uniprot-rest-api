@@ -80,6 +80,7 @@ import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingJobService;
+import org.uniprot.api.idmapping.common.service.TestConfig;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -103,8 +104,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.jayway.jsonpath.JsonPath;
 
-@ActiveProfiles(profiles = {"offline", "asyncDownload"})
-@ContextConfiguration(classes = {AsyncDownloadRestApp.class})
+@ActiveProfiles(profiles = {"offline", "idmapping"})
+@ContextConfiguration(classes = {TestConfig.class, AsyncDownloadRestApp.class})
 @WebMvcTest(IdMappingDownloadController.class)
 @ExtendWith(value = {SpringExtension.class})
 @AutoConfigureWebClient

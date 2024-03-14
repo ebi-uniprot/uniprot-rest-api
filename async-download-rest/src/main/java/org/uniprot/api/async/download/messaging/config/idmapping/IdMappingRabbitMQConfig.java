@@ -4,7 +4,6 @@ import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestToArrayConverter;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -16,7 +15,6 @@ import org.uniprot.api.rest.request.HashGenerator;
  * @created 23/11/2022
  */
 @Configuration
-@Profile({"asyncDownload"})
 public class IdMappingRabbitMQConfig {
     @Bean
     public Exchange idMappingDownloadExchange(
@@ -83,7 +81,6 @@ public class IdMappingRabbitMQConfig {
     }
 
     @Bean
-    @Profile("asyncDownload")
     public HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator(
             @Value("${async.download.idmapping.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new IdMappingDownloadRequestToArrayConverter(), hashSalt);
