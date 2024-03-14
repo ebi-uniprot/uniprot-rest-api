@@ -138,6 +138,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>spark-indexer</artifactId>
+			<version>${uniprot-store.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

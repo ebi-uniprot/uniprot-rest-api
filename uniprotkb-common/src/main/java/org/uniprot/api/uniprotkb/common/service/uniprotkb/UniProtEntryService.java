@@ -39,6 +39,7 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBBasicRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -64,6 +65,7 @@ public class UniProtEntryService
     public static final String ACCESSION = "accession";
     public static final String PROTEIN_ID = "id";
     public static final String IS_ISOFORM = "is_isoform";
+    public static final String ACTIVE = "active";
     public static final String CANONICAL_ISOFORM = "-1";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final SolrQueryConfig solrQueryConfig;
@@ -285,11 +287,14 @@ public class UniProtEntryService
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
                         getQueryFieldName(ACCESSION_ID),
-                        getQueryFieldName("is_isoform"),
+                        getQueryFieldName(IS_ISOFORM),
                         uniProtRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
         if (filterIsoform) {
             addIsoformFilter(solrRequest);
+        }
+        if (isSearchAll(uniProtRequest)) {
+            solrRequest.setQuery(getQueryFieldName(ACTIVE) + ":" + true);
         }
         solrRequest.setLargeSolrStreamRestricted(uniProtRequest.isLargeSolrStreamRestricted());
         return solrRequest;
@@ -328,10 +333,10 @@ public class UniProtEntryService
         String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
 
         if (isSearchAll(uniProtRequest)) {
-            uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
+            uniProtRequest.setQuery(getQueryFieldName(ACTIVE) + ":" + true);
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
-                    uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
+                    uniProtRequest.getQuery() + " AND " + getQueryFieldName(ACTIVE) + ":" + true);
         } else if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
             uniProtRequest.setQuery(cleanQuery.toUpperCase());
         }
@@ -344,7 +349,7 @@ public class UniProtEntryService
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
                         getQueryFieldName(ACCESSION_ID),
-                        getQueryFieldName("is_isoform"),
+                        getQueryFieldName(IS_ISOFORM),
                         solrRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
         if (filterIsoform) {
@@ -379,7 +384,7 @@ public class UniProtEntryService
 
     private void addIsoformFilter(SolrRequest solrRequest) {
         List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
-        queries.add(getQueryFieldName("is_isoform") + ":" + false);
+        queries.add(getQueryFieldName(IS_ISOFORM) + ":" + false);
         solrRequest.setFilterQueries(queries);
     }
 
@@ -393,7 +398,7 @@ public class UniProtEntryService
         return storeRequest.build();
     }
 
-    private boolean isSearchAll(UniProtKBSearchRequest uniProtRequest) {
+    private boolean isSearchAll(UniProtKBBasicRequest uniProtRequest) {
         return "*".equals(uniProtRequest.getQuery().strip())
                 || "(*)".equals(uniProtRequest.getQuery().strip())
                 || "*:*".equals(uniProtRequest.getQuery().strip())

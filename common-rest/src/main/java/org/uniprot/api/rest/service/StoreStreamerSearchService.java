@@ -92,7 +92,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         }
     }
 
-    public Stream<String> streamIds(StreamRequest request) {
+    public Stream<String> streamIdsForDownload(StreamRequest request) {
         SolrRequest solrRequest = createDownloadSolrRequest(request);
         return this.storeStreamer.idsStream(solrRequest);
     }

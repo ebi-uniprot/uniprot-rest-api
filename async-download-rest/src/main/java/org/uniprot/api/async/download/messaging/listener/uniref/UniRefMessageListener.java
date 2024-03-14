@@ -88,7 +88,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
 
     @Override
     public Stream<String> streamIds(DownloadRequest request) {
-        return service.streamIds(request);
+        return service.streamIdsForDownload(request);
     }
 
     @Override
