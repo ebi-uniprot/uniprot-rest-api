@@ -64,8 +64,8 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
-import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 @ActiveProfiles(profiles = {"offline", "idmapping", "integration"})
 @EnableConfigurationProperties
@@ -103,8 +103,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
 
-    @RegisterExtension
-    private static final DataStoreManager storeManager = new DataStoreManager();
+    @RegisterExtension private static final DataStoreManager storeManager = new DataStoreManager();
 
     @Autowired
     @Qualifier("uniProtKBSolrClient")
