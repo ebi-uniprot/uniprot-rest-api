@@ -13,5 +13,5 @@ public class HeartbeatConfig {
     private long resultsInterval = 0;
     private long idsInterval = 0;
     private int retryCount = 0;
-    private int retryDelay = 0;
+    private int retryDelayInMillis = 0;
 }

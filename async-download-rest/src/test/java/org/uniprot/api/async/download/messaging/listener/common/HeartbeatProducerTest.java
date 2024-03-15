@@ -32,7 +32,7 @@ class HeartbeatProducerTest {
     @BeforeEach
     void setUp() {
         when(heartbeatConfig.getRetryCount()).thenReturn(3);
-        when(heartbeatConfig.getRetryDelay()).thenReturn(100);
+        when(heartbeatConfig.getRetryDelayInMillis()).thenReturn(100);
         heartBeatProducer = new HeartbeatProducer(heartbeatConfig, jobRepository);
     }
 

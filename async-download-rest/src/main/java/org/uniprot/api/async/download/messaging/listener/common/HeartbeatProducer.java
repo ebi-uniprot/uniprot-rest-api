@@ -37,7 +37,7 @@ public class HeartbeatProducer {
                 new RetryPolicy<>()
                         .handle(Exception.class)
                         .withMaxRetries(heartbeatConfig.getRetryCount())
-                        .withDelay(Duration.ofMillis(heartbeatConfig.getRetryDelay()));
+                        .withDelay(Duration.ofMillis(heartbeatConfig.getRetryDelayInMillis()));
     }
 
     public void createForIds(DownloadJob downloadJob) {
