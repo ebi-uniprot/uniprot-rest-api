@@ -1,18 +1,18 @@
 package org.uniprot.api.uniprotkb.common.response.converter;
 
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.uniprot.api.uniprotkb.common.response.converter.UniProtKBGffMessageConverter.GFF_HEADER;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.uniprot.api.uniprotkb.common.response.converter.UniProtKBGffMessageConverter.GFF_HEADER;
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 class UniProtKBGffMessageConverterTest {
     private final UniProtKBGffMessageConverter uniProtKBEntryUniProtKBGffMessageConverter =
@@ -40,7 +40,10 @@ class UniProtKBGffMessageConverterTest {
                         .fields("accession,ft_site,cc_function,cc_similarity")
                         .build();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        List<UniProtKBEntry> entities = List.of(UniProtKBEntryIT.getCompleteColumnsUniProtEntry(), UniProtKBEntryIT.getCompleteColumnsUniProtEntry());
+        List<UniProtKBEntry> entities =
+                List.of(
+                        UniProtKBEntryIT.getCompleteColumnsUniProtEntry(),
+                        UniProtKBEntryIT.getCompleteColumnsUniProtEntry());
 
         uniProtKBEntryUniProtKBGffMessageConverter.before(messageContext, outputStream);
         for (UniProtKBEntry entity : entities) {
@@ -53,7 +56,9 @@ class UniProtKBGffMessageConverterTest {
         assertEquals(0, StringUtils.countMatches(result, "sequence-region"));
         String[] split = result.split("\n");
         assertEquals(GFF_HEADER, split[0].strip());
-        assertEquals("P00001\tUniProtKB\tInitiator methionine\t2\t8\t.\t.\t.\tNote=Description value 123;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11389730;Dbxref=PMID:11389730\t", split[1]);
+        assertEquals(
+                "P00001\tUniProtKB\tInitiator methionine\t2\t8\t.\t.\t.\tNote=Description value 123;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11389730;Dbxref=PMID:11389730\t",
+                split[1]);
     }
 
     @Test
