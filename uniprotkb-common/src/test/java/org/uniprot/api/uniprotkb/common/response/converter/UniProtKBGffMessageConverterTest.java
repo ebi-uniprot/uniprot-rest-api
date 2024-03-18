@@ -50,6 +50,7 @@ class UniProtKBGffMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
         assertEquals(1, StringUtils.countMatches(result, GFF_HEADER));
+        assertEquals(0, StringUtils.countMatches(result, "sequence-region"));
         String[] split = result.split("\n");
         assertEquals(GFF_HEADER, split[0].strip());
         assertEquals("P00001\tUniProtKB\tInitiator methionine\t2\t8\t.\t.\t.\tNote=Description value 123;Ontology_term=ECO:0000269;evidence=ECO:0000269|PubMed:11389730;Dbxref=PMID:11389730\t", split[1]);
@@ -72,7 +73,7 @@ class UniProtKBGffMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
         String[] split = result.split("\n");
-        assertEquals(GFF_HEADER, split[0].strip());
         assertEquals(1, split.length);
+        assertEquals(GFF_HEADER, split[0].strip());
     }
 }
