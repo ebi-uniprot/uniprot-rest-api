@@ -42,6 +42,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>failsafe</artifactId>
+			<version>${failsafe.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<scope>runtime</scope>
@@ -132,6 +137,12 @@
 					<artifactId>android-json</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>spark-indexer</artifactId>
+			<version>${uniprot-store.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

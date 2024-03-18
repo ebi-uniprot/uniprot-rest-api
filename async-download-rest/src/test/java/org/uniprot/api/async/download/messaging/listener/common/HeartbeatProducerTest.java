@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
@@ -27,7 +27,14 @@ class HeartbeatProducerTest {
     @Mock private HeartbeatConfig heartbeatConfig;
     @Mock private DownloadJobRepository jobRepository;
     @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
-    @InjectMocks private HeartbeatProducer heartBeatProducer;
+    private HeartbeatProducer heartBeatProducer;
+
+    @BeforeEach
+    void setUp() {
+        when(heartbeatConfig.getRetryCount()).thenReturn(3);
+        when(heartbeatConfig.getRetryDelayInMillis()).thenReturn(100);
+        heartBeatProducer = new HeartbeatProducer(heartbeatConfig, jobRepository);
+    }
 
     @Test
     void createForResults_whenHeartBeatEnabledAndIntervalIsBiggerThanBatchSize() {

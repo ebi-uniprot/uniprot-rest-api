@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.listener.common;
 
+import java.text.MessageFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,6 +9,8 @@ import java.util.Map;
 import java.util.function.LongConsumer;
 
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
@@ -18,6 +22,7 @@ public class HeartbeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";
     private static final String PROCESSED_ENTRIES = "processedEntries";
+    private final RetryPolicy<Object> retryPolicy;
     // number processed entries so far for a given job id
     private final Map<String, Long> processedEntries = new HashMap<>();
     // number processed entries for a given job id, at the time it was last updated in the cache
@@ -28,6 +33,11 @@ public class HeartbeatProducer {
     public HeartbeatProducer(HeartbeatConfig heartbeatConfig, DownloadJobRepository jobRepository) {
         this.heartbeatConfig = heartbeatConfig;
         this.jobRepository = jobRepository;
+        this.retryPolicy =
+                new RetryPolicy<>()
+                        .handle(Exception.class)
+                        .withMaxRetries(heartbeatConfig.getRetryCount())
+                        .withDelay(Duration.ofMillis(heartbeatConfig.getRetryDelayInMillis()));
     }
 
     public void createForIds(DownloadJob downloadJob) {
@@ -39,9 +49,24 @@ public class HeartbeatProducer {
                     pe -> {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
-                        jobRepository.update(
-                                downloadJob.getId(),
-                                Map.of(UPDATE_COUNT, newUpdateCount, UPDATED, LocalDateTime.now()));
+                        Failsafe.with(retryPolicy)
+                                .onFailure(
+                                        throwable ->
+                                                log.warn(
+                                                        MessageFormat.format(
+                                                                "Job {0} was failed to update the processed count to {1} in solr phase due to {2}",
+                                                                downloadJob.getId(),
+                                                                newUpdateCount,
+                                                                throwable.getFailure())))
+                                .run(
+                                        () ->
+                                                jobRepository.update(
+                                                        downloadJob.getId(),
+                                                        Map.of(
+                                                                UPDATE_COUNT,
+                                                                newUpdateCount,
+                                                                UPDATED,
+                                                                LocalDateTime.now())));
                     });
             log.info(
                     String.format(
@@ -97,12 +122,23 @@ public class HeartbeatProducer {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
                         downloadJob.setProcessedEntries(pe);
-                        jobRepository.update(
-                                downloadJob.getId(),
-                                Map.of(
-                                        UPDATE_COUNT, newUpdateCount,
-                                        UPDATED, LocalDateTime.now(),
-                                        PROCESSED_ENTRIES, pe));
+                        Failsafe.with(retryPolicy)
+                                .onFailure(
+                                        throwable ->
+                                                log.warn(
+                                                        MessageFormat.format(
+                                                                "Job {0} was failed to update the processed count to {1} in writing phase due to {2}",
+                                                                downloadJob.getId(),
+                                                                newUpdateCount,
+                                                                throwable.getFailure())))
+                                .run(
+                                        () ->
+                                                jobRepository.update(
+                                                        downloadJob.getId(),
+                                                        Map.of(
+                                                                UPDATE_COUNT, newUpdateCount,
+                                                                UPDATED, LocalDateTime.now(),
+                                                                PROCESSED_ENTRIES, pe)));
                     });
             log.info(
                     String.format(

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +34,8 @@ import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
@@ -108,6 +111,15 @@ public class UniProtKBAsyncDownloadUtils {
             UniProtStoreClient<UniProtKBEntry> storeClient)
             throws Exception {
         saveEntry(cloudSolrClient, i, isoFormString, true, storeClient);
+    }
+
+    public static void saveInactiveEntries(DataStoreManager storeManager) {
+        for (int i = 0; i < 2; i++) {
+            InactiveUniProtEntry inactiveEntry =
+                    InactiveUniProtEntry.from("I8FBX" + i, "INACTIVE_DROME", DELETED, null);
+            storeManager.saveEntriesInSolr(
+                    DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
+        }
     }
 
     public static void saveEntry(

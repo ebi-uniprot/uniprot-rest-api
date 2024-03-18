@@ -80,7 +80,7 @@ class UniRefMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIdsForDownload(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
                         QueryResult.<UniRefEntryLight>builder()
@@ -120,7 +120,7 @@ class UniRefMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIdsForDownload(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
                         QueryResult.<UniRefEntryLight>builder()
@@ -179,7 +179,7 @@ class UniRefMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.uniRefDownloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.uniRefDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIdsForDownload(downloadRequest)).thenReturn(accessions.stream());
         when(this.service.search(any(SearchRequest.class)))
                 .thenReturn(
                         QueryResult.<UniRefEntryLight>builder()

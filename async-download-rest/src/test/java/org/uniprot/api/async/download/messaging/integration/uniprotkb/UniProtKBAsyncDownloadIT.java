@@ -1,19 +1,23 @@
 package org.uniprot.api.async.download.messaging.integration.uniprotkb;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.async.download.common.RedisUtil.*;
+import static org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils.saveInactiveEntries;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,6 +44,7 @@ import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMess
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.embeddings.EmbeddingsTestConsumer;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBRabbitProducerMessageService;
+import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -57,7 +62,10 @@ import org.uniprot.api.uniprotkb.common.repository.store.UniProtStoreConfig;
 import org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 @ActiveProfiles(profiles = {"offline", "idmapping", "integration"})
 @EnableConfigurationProperties
@@ -95,6 +103,8 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
 
+    @RegisterExtension private static final DataStoreManager storeManager = new DataStoreManager();
+
     @Autowired
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
@@ -112,9 +122,21 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
+        initStoreManager();
         prepareDownloadFolders();
         UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
+        saveInactiveEntries(storeManager);
+    }
+
+    private static void initStoreManager() {
+        storeManager.addDocConverter(
+                DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(new HashMap<>()));
+        storeManager.addDocConverter(
+                DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
+        storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        storeManager.addSolrClient(
+                DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
     }
 
     @BeforeEach
@@ -151,6 +173,24 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         String fileName = jobId + FileType.GZIP.getExtension();
         Path resultFilePath = Path.of(uniProtKBAsyncConfig.getResultFolder() + "/" + fileName);
         Assertions.assertFalse(Files.exists(resultFilePath));
+    }
+
+    @Test
+    void startQuery_doesntProcessInactiveEntries() throws IOException {
+        String query = "*";
+        MediaType format = MediaType.APPLICATION_JSON;
+        DownloadRequest request = createDownloadRequest(query, format);
+        String jobId = this.uniProtKBRabbitProducerMessageService.sendMessage(request);
+        // Producer
+        verify(this.uniProtKBRabbitProducerMessageService, never()).alreadyProcessed(jobId);
+        // redis entry created
+        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
+        verifyMessageListener(1, 0, 1);
+        verifyRedisEntry(query, jobId, JobStatus.FINISHED, 0, false, 12);
+        DownloadJob downloadJob = this.downloadJobRepository.findById(jobId).get();
+        assertEquals(8, downloadJob.getUpdateCount());
+        verifyIdsAndResultFiles(jobId);
     }
 
     @Override
