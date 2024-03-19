@@ -100,6 +100,26 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
+    void toQueryString_accessionAsAlias_returnsValueUpperCase() throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("otherField"));
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+        SearchFieldItem searchFieldItem = new SearchFieldItem();
+        String fieldName = "field";
+        searchFieldItem.setFieldName(fieldName);
+        String alias = "accession";
+        when(searchFieldConfig.findSearchFieldItemByAlias(alias))
+                .thenReturn(Optional.of(searchFieldItem));
+
+        FieldQueryNode node = new FieldQueryNode(alias, "value", 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals("field:VALUE", result);
+    }
+
+    @Test
     void processDefaultSearchWithUnderScoreThenRemoveUnderScoreAndDoubleQuote()
             throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
@@ -181,7 +201,7 @@ class UniProtFieldQueryNodeProcessorTest {
     void processAccessionThenUpperCaseValue() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).build();
-        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("accession"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("accession", "p21802", 1, 2);
@@ -260,7 +280,7 @@ class UniProtFieldQueryNodeProcessorTest {
                         .searchFieldConfig(searchFieldConfig)
                         .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
                         .build();
-        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field", "accession"));
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode(fieldName, inputQuery, 1, 2);
