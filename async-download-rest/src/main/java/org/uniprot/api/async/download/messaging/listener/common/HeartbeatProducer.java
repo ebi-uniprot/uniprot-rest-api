@@ -67,11 +67,11 @@ public class HeartbeatProducer {
                                                                 newUpdateCount,
                                                                 UPDATED,
                                                                 LocalDateTime.now())));
+                        log.info(
+                                String.format(
+                                        "%s: Download Job ID: %s was updated in Solr phase",
+                                        downloadJob.getUpdateCount(), downloadJob.getId()));
                     });
-            log.info(
-                    String.format(
-                            "%s: Download Job ID: %s was updated in Solr phase",
-                            downloadJob.getUpdateCount(), downloadJob.getId()));
 
         } catch (Exception e) {
             log.warn(
@@ -139,13 +139,13 @@ public class HeartbeatProducer {
                                                                 UPDATE_COUNT, newUpdateCount,
                                                                 UPDATED, LocalDateTime.now(),
                                                                 PROCESSED_ENTRIES, pe)));
+                        log.info(
+                                String.format(
+                                        "%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
+                                        downloadJob.getUpdateCount(),
+                                        downloadJob.getId(),
+                                        downloadJob.getProcessedEntries()));
                     });
-            log.info(
-                    String.format(
-                            "%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
-                            downloadJob.getUpdateCount(),
-                            downloadJob.getId(),
-                            downloadJob.getProcessedEntries()));
         } catch (Exception e) {
             log.warn(
                     String.format(
