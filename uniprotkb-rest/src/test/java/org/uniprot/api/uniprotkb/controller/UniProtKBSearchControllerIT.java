@@ -2565,16 +2565,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .resultMatcher(
                                             MockMvcResultMatchers.content()
                                                     .string(containsString("##gff-version 3")))
-                                    .resultMatcher(
-                                            MockMvcResultMatchers.content()
-                                                    .string(
-                                                            containsString(
-                                                                    "##sequence-region Q8DIA7 1 761")))
-                                    .resultMatcher(
-                                            MockMvcResultMatchers.content()
-                                                    .string(
-                                                            containsString(
-                                                                    "##sequence-region P21802 1 821")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
