@@ -2565,6 +2565,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .resultMatcher(
                                             MockMvcResultMatchers.content()
                                                     .string(containsString("##gff-version 3")))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(
+                                                            containsString(
+                                                                    "P21802\tUniProtKB\tSignal peptide\t1\t21\t.\t.\t.\tOntology_term=ECO:0000255;evidence=ECO:0000255")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
