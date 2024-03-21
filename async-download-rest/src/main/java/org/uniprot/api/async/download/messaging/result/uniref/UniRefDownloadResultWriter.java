@@ -9,7 +9,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.messaging.listener.uniref.UniRefHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.common.AbstractDownloadResultWriter;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
@@ -33,7 +33,7 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             UniRefDownloadConfigProperties uniRefDownloadConfigProperties,
             RdfStreamer uniRefRdfStreamer,
-            HeartbeatProducer heartBeatProducer) {
+            UniRefHeartbeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,

@@ -16,8 +16,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @TestConfiguration
@@ -26,13 +26,14 @@ import org.uniprot.api.rest.download.model.JobStatus;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EmbeddingsTestConsumer {
     @Bean(name = "embeddingsMessageListener")
-    public MessageListener embeddingsMessageListener(DownloadJobRepository downloadJobRepository) {
+    public MessageListener embeddingsMessageListener(
+            UniProtKBDownloadJobRepository downloadJobRepository) {
         return message -> {
             String jobId = message.getMessageProperties().getHeader("jobId");
-            Optional<DownloadJob> optAsyncJob = downloadJobRepository.findById(jobId);
+            Optional<UniProtKBDownloadJob> optAsyncJob = downloadJobRepository.findById(jobId);
             if (optAsyncJob.isPresent()) {
                 log.info("Processing of embedding job " + jobId);
-                DownloadJob asyncJob = optAsyncJob.get();
+                UniProtKBDownloadJob asyncJob = optAsyncJob.get();
                 asyncJob.setStatus(JobStatus.PROCESSING);
                 asyncJob.setUpdated(LocalDateTime.now());
                 try {

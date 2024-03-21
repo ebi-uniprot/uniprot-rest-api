@@ -3,11 +3,10 @@ package org.uniprot.api.async.download.model.common;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -21,9 +20,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
  *     redis-cli 2. to get the data for a hash run hgetall
  *     <prefix>:1e8e33be0c54af8ba15db116e2e6c63b26acd7cd
  */
-@RedisHash("#{@redisConfiguration.getRedisHashPrefix()}")
 @Data
-@Builder
+@AllArgsConstructor
 public class DownloadJob implements Serializable {
     private static final long serialVersionUID = 4548782902533470468L;
     @Id private String id;

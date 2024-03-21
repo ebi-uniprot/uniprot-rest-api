@@ -31,12 +31,13 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -56,11 +57,11 @@ class UniProtKBMessageListenerTest {
 
     @Mock UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock private DownloadJobRepository jobRepository;
+    @Mock private UniProtKBDownloadJobRepository jobRepository;
 
     @Mock private UniProtKBDownloadResultWriter uniProtKBDownloadResultWriter;
     @Mock private UniProtKBRabbitTemplate uniProtKBRabbitTemplate;
-    @Mock HeartbeatProducer heartBeatProducer;
+    @Mock UniProtKBHeartbeatProducer heartBeatProducer;
     @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
 
     @InjectMocks private UniProtKBMessageListener uniProtKBMessageListener;
@@ -73,7 +74,7 @@ class UniProtKBMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniProtKBDownloadJob downloadJob = UniProtKBDownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
@@ -112,7 +113,7 @@ class UniProtKBMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniProtKBDownloadJob downloadJob = UniProtKBDownloadJob.builder().id(jobId).build();
         downloadJob.setRetried(1);
         // stub
         List<String> accessions = List.of("P12345", "P05067");
@@ -172,7 +173,7 @@ class UniProtKBMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniProtKBDownloadJob downloadJob = UniProtKBDownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));

@@ -44,8 +44,10 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.ValidDownloadRequest;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -90,7 +92,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired private DownloadJobRepository downloadJobRepository;
+    @Autowired private UniProtKBDownloadJobRepository downloadJobRepository;
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private TaxonomyLineageRepository taxRepository;
 
@@ -123,7 +125,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Test
-    protected void runJobWithFieldsJsonAndVerify() throws Exception {
+    void runJobWithFieldsJsonAndVerify() throws Exception {
         // when
         String query = getQueryForJSONAndTSVRunJobWithFields();
         String fields = getQueryFieldsForJSONAndTSVRunJobWithFields();
@@ -155,7 +157,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Test
     void getDetailsWithAbortedForH5Job() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
+        UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
                         UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
@@ -195,9 +197,9 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Test
-    protected void getStatusReturnsAborted() throws Exception {
+    void getStatusReturnsAborted() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
+        UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
                         UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
@@ -517,7 +519,29 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         return "$.results.*.primaryAccession";
     }
 
-    protected DownloadJobRepository getDownloadJobRepository() {
+    @Override
+    protected DownloadJob getDownloadJob(
+            String jobId,
+            String errMsg,
+            String query,
+            String sort,
+            String fields,
+            JobStatus jobStatus,
+            String format) {
+        UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
+        UniProtKBDownloadJob job =
+                builder.id(jobId)
+                        .status(jobStatus)
+                        .error(errMsg)
+                        .format(format)
+                        .query(query)
+                        .sort(sort)
+                        .fields(fields)
+                        .build();
+        return job;
+    }
+
+    protected UniProtKBDownloadJobRepository getDownloadJobRepository() {
         return this.downloadJobRepository;
     }
 

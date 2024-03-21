@@ -36,6 +36,8 @@ import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMess
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageListener;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.uniref.UniRefRabbitProducerMessageService;
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -63,6 +65,7 @@ import org.uniprot.store.search.SolrCollection;
 @WebMvcTest({UniRefDownloadController.class})
 @AutoConfigureWebClient
 public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
+    @SpyBean protected UniRefDownloadJobRepository downloadJobRepository;
     @Autowired private HashGenerator<DownloadRequest> uniRefHashGenerator;
 
     @Autowired private UniRefAsyncConfig uniRefAsyncConfig;
@@ -182,6 +185,11 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected HashGenerator<DownloadRequest> getHashGenerator() {
         return this.uniRefHashGenerator;
+    }
+
+    @Override
+    protected DownloadJobRepository getDownloadJobRepository() {
+        return downloadJobRepository;
     }
 
     @Override

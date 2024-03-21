@@ -16,9 +16,8 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -50,11 +49,11 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             UniProtEntryService service,
             UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties,
             UniProtKBAsyncDownloadQueueConfigProperties queueConfigProperties,
-            DownloadJobRepository jobRepository,
+            UniProtKBDownloadJobRepository jobRepository,
             UniProtKBDownloadResultWriter uniProtKBDownloadResultWriter,
             UniProtKBRabbitTemplate uniProtKBRabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
-            HeartbeatProducer heartbeatProducer,
+            UniProtKBHeartbeatProducer heartbeatProducer,
             UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler) {
         super(
                 converter,

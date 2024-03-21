@@ -12,9 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBAsyncDownloadSubmissionRules;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,8 +22,8 @@ class AsyncDownloadSubmissionRulesTest {
     private static final int MAX_RETRY_COUNT = 3;
     private static final int MAX_WAITING_TIME = 10;
     public static final String JOB_ID = "jobId";
-    @Mock private DownloadJobRepository downloadJobRepository;
-    @Mock private DownloadJob downloadJob;
+    @Mock private UniProtKBDownloadJobRepository downloadJobRepository;
+    @Mock private UniProtKBDownloadJob downloadJob;
     private AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
 
     @BeforeEach

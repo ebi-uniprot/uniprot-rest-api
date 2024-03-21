@@ -16,9 +16,8 @@ import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncD
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.idmapping.AbstractIdMappingDownloadResultWriter;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingDownloadResultWriterFactory;
@@ -44,12 +43,12 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
     public IdMappingMessageListener(
             IdMappingDownloadConfigProperties idMappingDownloadConfigProperties,
             IdMappingAsyncDownloadQueueConfigProperties queueConfigProperties,
-            DownloadJobRepository jobRepository,
+            IdMappingDownloadJobRepository jobRepository,
             IdMappingRabbitTemplate idMappingRabbitTemplate,
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
-            HeartbeatProducer heartBeatProducer,
+            IdMappingHeartbeatProducer heartBeatProducer,
             IdMappingAsyncDownloadFileHandler idMappingAsyncDownloadFileHandler) {
         super(
                 idMappingDownloadConfigProperties,

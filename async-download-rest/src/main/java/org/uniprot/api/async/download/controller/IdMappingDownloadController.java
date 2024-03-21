@@ -18,6 +18,7 @@ import org.uniprot.api.async.download.controller.validator.IdMappingDownloadRequ
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.producer.idmapping.IdMappingProducerMessageService;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
@@ -51,7 +52,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
     protected IdMappingDownloadController(
             IdMappingProducerMessageService idMappingProducerMessageService,
             IdMappingJobCacheService idMappingJobCacheService,
-            DownloadJobRepository jobRepository,
+            IdMappingDownloadJobRepository jobRepository,
             HeartbeatConfig heartbeatConfig) {
         super(heartbeatConfig);
         this.messageService = idMappingProducerMessageService;

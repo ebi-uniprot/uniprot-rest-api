@@ -2,7 +2,6 @@ package org.uniprot.api.async.download.messaging.producer.common;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +13,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
-import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -108,17 +105,5 @@ public abstract class RabbitProducerMessageService implements ProducerMessageSer
         }
     }
 
-    private void createDownloadJob(String jobId, DownloadRequest downloadRequest) {
-        DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
-        LocalDateTime now = LocalDateTime.now();
-        jobBuilder.id(jobId).status(JobStatus.NEW);
-        jobBuilder
-                .query(downloadRequest.getQuery())
-                .fields(downloadRequest.getFields())
-                .sort(downloadRequest.getSort())
-                .format(downloadRequest.getFormat())
-                .created(now)
-                .updated(now);
-        this.jobRepository.save(jobBuilder.build());
-    }
+    protected abstract void createDownloadJob(String jobId, DownloadRequest downloadRequest);
 }

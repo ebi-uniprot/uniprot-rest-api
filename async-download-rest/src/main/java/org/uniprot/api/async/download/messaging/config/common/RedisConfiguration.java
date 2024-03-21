@@ -2,7 +2,6 @@ package org.uniprot.api.async.download.messaging.config.common;
 
 import org.redisson.api.RedissonClient;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,13 +15,6 @@ import org.uniprot.api.async.download.model.common.DownloadJob;
 @Configuration
 @EnableRedisRepositories(basePackages = "org.uniprot.api.async.download.messaging.repository")
 public class RedisConfiguration {
-
-    @Value("${redis.hash.prefix}")
-    private String redisHashPrefix;
-
-    public String getRedisHashPrefix() {
-        return redisHashPrefix;
-    }
 
     @Bean
     public RedissonConnectionFactory redissonConnectionFactory(RedissonClient redisson) {

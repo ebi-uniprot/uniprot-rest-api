@@ -28,11 +28,13 @@ import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncD
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.idmapping.AbstractIdMappingDownloadResultWriter;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingDownloadResultWriterFactory;
 import org.uniprot.api.async.download.messaging.result.idmapping.UniProtKBIdMappingDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestImpl;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
@@ -54,7 +56,7 @@ class IdMappingMessageListenerIT {
 
     @Mock IdMappingAsyncDownloadQueueConfigProperties idMappingAsyncDownloadQueueConfigProperties;
 
-    @Mock private DownloadJobRepository jobRepository;
+    @Mock private IdMappingDownloadJobRepository jobRepository;
 
     @Mock private IdMappingRabbitTemplate idMappingRabbitTemplate;
 
@@ -74,7 +76,7 @@ class IdMappingMessageListenerIT {
         IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        IdMappingDownloadJob downloadJob = IdMappingDownloadJob.builder().id(jobId).build();
         // stub
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
@@ -100,7 +102,7 @@ class IdMappingMessageListenerIT {
 
         this.idMappingMessageListener.onMessage(message);
 
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
@@ -114,7 +116,7 @@ class IdMappingMessageListenerIT {
         IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        IdMappingDownloadJob downloadJob = IdMappingDownloadJob.builder().id(jobId).build();
         downloadJob.setRetried(1);
 
         // stub
@@ -143,7 +145,7 @@ class IdMappingMessageListenerIT {
         this.idMappingMessageListener.onMessage(message);
 
         verifyCleanFilesAndResetCounts(jobId);
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
@@ -177,7 +179,7 @@ class IdMappingMessageListenerIT {
         IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        IdMappingDownloadJob downloadJob = IdMappingDownloadJob.builder().id(jobId).build();
         // stub
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
@@ -204,7 +206,7 @@ class IdMappingMessageListenerIT {
 
         this.idMappingMessageListener.onMessage(message);
 
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
@@ -256,7 +258,7 @@ class IdMappingMessageListenerIT {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.idMappingDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
 
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        IdMappingDownloadJob downloadJob = IdMappingDownloadJob.builder().id(jobId).build();
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
 
         Files.createFile(Path.of("target/" + jobId + FileType.GZIP.getExtension()));
@@ -265,7 +267,7 @@ class IdMappingMessageListenerIT {
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
 
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
@@ -286,7 +288,8 @@ class IdMappingMessageListenerIT {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.idMappingDownloadConfigProperties.getResultFilesFolder()).thenReturn("target");
 
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).status(JobStatus.RUNNING).build();
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder().id(jobId).status(JobStatus.RUNNING).build();
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
 
         Files.createFile(Path.of("target/" + jobId + FileType.GZIP.getExtension()));
@@ -295,7 +298,7 @@ class IdMappingMessageListenerIT {
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
 
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
@@ -315,14 +318,14 @@ class IdMappingMessageListenerIT {
         when(idMappingAsyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
         when(idMappingAsyncDownloadQueueConfigProperties.getRetryQueueName())
                 .thenReturn(retryQueueName);
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        IdMappingDownloadJob downloadJob = IdMappingDownloadJob.builder().id(jobId).build();
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenThrow(new ResourceNotFoundException("Cache not found"));
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
 
-        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        Optional<IdMappingDownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();

@@ -14,8 +14,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 
 @ExtendWith(MockitoExtension.class)
 class HeartbeatProducerTest {
@@ -23,17 +24,18 @@ class HeartbeatProducerTest {
     public static final String UPDATE_COUNT = "updateCount";
     public static final String PROCESSED_ENTRIES = "processedEntries";
     public static final String UPDATED = "updated";
-    private final DownloadJob downloadJob = DownloadJob.builder().id(JOB_ID).build();
+    private final UniProtKBDownloadJob downloadJob =
+            UniProtKBDownloadJob.builder().id(JOB_ID).build();
     @Mock private HeartbeatConfig heartbeatConfig;
-    @Mock private DownloadJobRepository jobRepository;
+    @Mock private UniProtKBDownloadJobRepository jobRepository;
     @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
-    private HeartbeatProducer heartBeatProducer;
+    private UniProtKBHeartbeatProducer heartBeatProducer;
 
     @BeforeEach
     void setUp() {
         when(heartbeatConfig.getRetryCount()).thenReturn(3);
         when(heartbeatConfig.getRetryDelayInMillis()).thenReturn(100);
-        heartBeatProducer = new HeartbeatProducer(heartbeatConfig, jobRepository);
+        heartBeatProducer = new UniProtKBHeartbeatProducer(heartbeatConfig, jobRepository);
     }
 
     @Test

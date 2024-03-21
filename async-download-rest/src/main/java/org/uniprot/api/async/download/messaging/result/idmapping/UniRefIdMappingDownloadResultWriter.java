@@ -9,7 +9,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.messaging.listener.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
@@ -35,7 +35,7 @@ public class UniRefIdMappingDownloadResultWriter
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties idMappingDownloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
-            HeartbeatProducer heartBeatProducer) {
+            IdMappingHeartbeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,

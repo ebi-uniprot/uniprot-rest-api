@@ -44,8 +44,9 @@ import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMess
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.embeddings.EmbeddingsTestConsumer;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBRabbitProducerMessageService;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -84,6 +85,7 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @WebMvcTest({UniProtKBDownloadController.class})
 @AutoConfigureWebClient
 public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
+    @SpyBean protected UniProtKBDownloadJobRepository downloadJobRepository;
     @Autowired private HashGenerator<DownloadRequest> uniProtKBHashGenerator;
 
     @Autowired private UniProtKBAsyncConfig uniProtKBAsyncConfig;
@@ -188,7 +190,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, JobStatus.FINISHED, 0, false, 12);
-        DownloadJob downloadJob = this.downloadJobRepository.findById(jobId).get();
+        UniProtKBDownloadJob downloadJob = this.downloadJobRepository.findById(jobId).get();
         assertEquals(8, downloadJob.getUpdateCount());
         verifyIdsAndResultFiles(jobId);
     }
@@ -276,6 +278,11 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.uniProtKBFacetTupleStreamTemplate;
+    }
+
+    @Override
+    protected UniProtKBDownloadJobRepository getDownloadJobRepository() {
+        return downloadJobRepository;
     }
 
     @Override

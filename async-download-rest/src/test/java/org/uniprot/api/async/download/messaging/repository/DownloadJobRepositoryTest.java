@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
@@ -19,15 +20,16 @@ import org.uniprot.api.rest.download.model.JobStatus;
 @ExtendWith(SpringExtension.class)
 class DownloadJobRepositoryTest {
 
-    @MockBean private DownloadJobRepository jobRepository;
+    @MockBean private UniProtKBDownloadJobRepository jobRepository;
 
     @Test
     void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
         String jobId = "123456789";
-        DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
+        UniProtKBDownloadJob.UniProtKBDownloadJobBuilder jobBuilder =
+                UniProtKBDownloadJob.builder();
         jobBuilder.id(jobId).query("test query").fields("field1,field2,field3");
         jobBuilder.retried(1).status(JobStatus.NEW);
-        DownloadJob job = jobBuilder.build();
+        UniProtKBDownloadJob job = jobBuilder.build();
         when(jobRepository.save(job)).thenReturn(job);
         when(jobRepository.findById(jobId)).thenReturn(Optional.of(job));
         DownloadJob savedJob = jobRepository.save(job);

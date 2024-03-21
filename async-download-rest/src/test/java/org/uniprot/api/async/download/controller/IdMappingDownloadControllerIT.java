@@ -72,8 +72,8 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.controller.validator.UniParcIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
@@ -117,7 +117,7 @@ public class IdMappingDownloadControllerIT {
 
     @Autowired protected AmqpAdmin amqpAdmin;
 
-    @Autowired protected DownloadJobRepository downloadJobRepository;
+    @Autowired protected IdMappingDownloadJobRepository downloadJobRepository;
 
     @Autowired protected MockMvc mockMvc;
 
@@ -468,8 +468,8 @@ public class IdMappingDownloadControllerIT {
         String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder()
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder()
                         .id(asyncJobId)
                         .status(JobStatus.ERROR)
                         .error("Error message")
@@ -509,8 +509,8 @@ public class IdMappingDownloadControllerIT {
         String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =
@@ -535,8 +535,12 @@ public class IdMappingDownloadControllerIT {
         String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder().id(asyncJobId).retried(3).status(JobStatus.ERROR).build();
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder()
+                        .id(asyncJobId)
+                        .retried(3)
+                        .status(JobStatus.ERROR)
+                        .build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =
@@ -561,8 +565,12 @@ public class IdMappingDownloadControllerIT {
         String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder().id(asyncJobId).retried(1).status(JobStatus.ERROR).build();
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder()
+                        .id(asyncJobId)
+                        .retried(1)
+                        .status(JobStatus.ERROR)
+                        .build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =

@@ -15,6 +15,7 @@ import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBRabbitProducerMessageService;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadRequest;
@@ -44,7 +45,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     public UniProtKBDownloadController(
             UniProtKBRabbitProducerMessageService uniProtKBRabbitProducerMessageService,
-            DownloadJobRepository jobRepository,
+            UniProtKBDownloadJobRepository jobRepository,
             HeartbeatConfig heartbeatConfig) {
         super(heartbeatConfig);
         this.messageService = uniProtKBRabbitProducerMessageService;

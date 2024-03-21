@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +32,6 @@ import org.uniprot.api.async.download.common.AbstractDownloadIT;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -43,8 +43,6 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     @Autowired protected AmqpAdmin amqpAdmin;
-
-    @SpyBean protected DownloadJobRepository downloadJobRepository;
 
     @SpyBean protected MessageConverter messageConverter;
 
@@ -74,12 +72,13 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         String query = getMessageSuccessQuery();
         MediaType format = MediaType.APPLICATION_JSON;
         DownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.getProducerMessageService().sendMessage(request);
+        String jobId = getProducerMessageService().sendMessage(request);
         // Producer
-        verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
+        verify(getProducerMessageService(), never()).alreadyProcessed(jobId);
         // redis entry created
-        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
-        await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
+        await().until(jobCreatedInRedis(getDownloadJobRepository(), jobId));
+        await().atMost(Duration.ofSeconds(20))
+                .until(jobFinished(getDownloadJobRepository(), jobId));
         verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, JobStatus.FINISHED, 0, false, 12);
         verifyIdsAndResultFiles(jobId);
@@ -97,12 +96,13 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         String jobId = this.getProducerMessageService().sendMessage(request);
         // Producer
         verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
-        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
-        await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
+        await().until(jobCreatedInRedis(getDownloadJobRepository(), jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(getDownloadJobRepository(), jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, JobStatus.ERROR, 1, true, 0);
         // after certain delay the job should be reprocessed
-        await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20))
+                .until(jobFinished(getDownloadJobRepository(), jobId));
         verifyMessageListener(2, 1, 1);
         verifyRedisEntry(
                 query, jobId, JobStatus.FINISHED, 1, true, getMessageSuccessAfterRetryCount());
@@ -123,11 +123,13 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         String jobId = this.getProducerMessageService().sendMessage(request);
         // Producer
         verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
-        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
-        await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
+        await().until(jobCreatedInRedis(getDownloadJobRepository(), jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(getDownloadJobRepository(), jobId));
         await().until(
                         jobRetriedMaximumTimes(
-                                downloadJobRepository, jobId, getTestAsyncConfig().getMaxRetry()));
+                                getDownloadJobRepository(),
+                                jobId,
+                                getTestAsyncConfig().getMaxRetry()));
         // verify  redis
         verifyRedisEntry(
                 query, jobId, JobStatus.ERROR, getTestAsyncConfig().getMaxRetry(), true, 0);
@@ -158,9 +160,11 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
                 .dummyMethodForTesting(jobId, JobStatus.ERROR);
         this.getProducerMessageService().sendMessage(request);
         verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
-        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
-        await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
-        await().until(verifyJobRetriedCountIsEqualToGivenCount(downloadJobRepository, jobId, 2));
+        await().until(jobCreatedInRedis(getDownloadJobRepository(), jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(getDownloadJobRepository(), jobId));
+        await().until(
+                        verifyJobRetriedCountIsEqualToGivenCount(
+                                getDownloadJobRepository(), jobId, 2));
         await().until(
                         getMessageCountInQueue(amqpAdmin, getTestAsyncConfig().getRejectedQueue()),
                         equalTo(1));
@@ -175,13 +179,12 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
             int retryCount,
             boolean isError,
             int entryCount) {
-        DownloadJob downloadJob =
-                this.downloadJobRepository
-                        .findById(jobId)
-                        .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                String.format("No job found with id %s", jobId)));
+        Optional<DownloadJob> optDownloadJob = getDownloadJobRepository().findById(jobId);
+        if (optDownloadJob.isEmpty()) {
+            throw new RuntimeException(String.format("No job found with id %s", jobId));
+        }
+        DownloadJob downloadJob = optDownloadJob.get();
+
         assertEquals(jobId, downloadJob.getId());
         assertEquals(query, downloadJob.getQuery());
         assertAll(
@@ -233,11 +236,6 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         // verify result file
         Path resultFilePath = Paths.get(getTestAsyncConfig().getResultFolder(), jobId);
         Assertions.assertTrue(Files.notExists(resultFilePath));
-    }
-
-    @Override
-    protected DownloadJobRepository getDownloadJobRepository() {
-        return this.downloadJobRepository;
     }
 
     protected abstract ProducerMessageService getProducerMessageService();

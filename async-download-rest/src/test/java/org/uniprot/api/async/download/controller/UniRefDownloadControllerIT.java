@@ -38,6 +38,9 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.common.service.TestConfig;
@@ -81,7 +84,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Qualifier("uniRefTupleStreamTemplate")
     private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired private DownloadJobRepository downloadJobRepository;
+    @Autowired private UniRefDownloadJobRepository downloadJobRepository;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private SolrClient solrClient;
 
@@ -312,6 +315,28 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected String getResultIdStringToMatch() {
         return "$.results.*.id";
+    }
+
+    @Override
+    protected DownloadJob getDownloadJob(
+            String jobId,
+            String errMsg,
+            String query,
+            String sort,
+            String fields,
+            JobStatus jobStatus,
+            String format) {
+        UniRefDownloadJob.UniRefDownloadJobBuilder builder = UniRefDownloadJob.builder();
+        UniRefDownloadJob job =
+                builder.id(jobId)
+                        .status(jobStatus)
+                        .error(errMsg)
+                        .format(format)
+                        .query(query)
+                        .sort(sort)
+                        .fields(fields)
+                        .build();
+        return job;
     }
 
     protected DownloadJobRepository getDownloadJobRepository() {

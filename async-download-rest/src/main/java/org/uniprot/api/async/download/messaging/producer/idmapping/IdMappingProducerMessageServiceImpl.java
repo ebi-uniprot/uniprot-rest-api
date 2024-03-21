@@ -14,10 +14,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
+import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
@@ -29,7 +29,7 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
 
     private final RabbitTemplate rabbitTemplate;
     private final MessageConverter converter;
-    private final DownloadJobRepository jobRepository;
+    private final IdMappingDownloadJobRepository jobRepository;
     private final HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator;
     private final AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
@@ -38,7 +38,7 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
     public IdMappingProducerMessageServiceImpl(
             MessageConverter converter,
             @Qualifier("idMappingRabbitTemplate") RabbitTemplate rabbitTemplate,
-            DownloadJobRepository downloadJobRepository,
+            IdMappingDownloadJobRepository downloadJobRepository,
             HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator,
             AsyncDownloadSubmissionRules idMappingAsyncDownloadSubmissionRules,
             AsyncDownloadFileHandler idMappingAsyncDownloadFileHandler) {
@@ -106,7 +106,8 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
 
     private void createDownloadJob(
             IdMappingDownloadRequest downloadRequest, String asyncDownloadJobId) {
-        DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
+        IdMappingDownloadJob.IdMappingDownloadJobBuilder jobBuilder =
+                IdMappingDownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(asyncDownloadJobId).status(JobStatus.NEW);
         jobBuilder

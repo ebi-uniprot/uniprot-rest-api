@@ -247,9 +247,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     @Test
     protected void getStatusReturnsError() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
         String errMsg = "this is a friendly error message";
-        DownloadJob job = builder.id(jobId).status(JobStatus.ERROR).error(errMsg).build();
+        DownloadJob job = getDownloadJob(jobId, errMsg, null, null, null, JobStatus.ERROR, null);
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -272,8 +271,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     @Test
     protected void getStatusReturnsNew() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        DownloadJob job = builder.id(jobId).status(JobStatus.NEW).build();
+        DownloadJob job = getDownloadJob(jobId, null, null, null, null, JobStatus.NEW, null);
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -304,9 +302,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     @Test
     protected void getDetailsForRunningJob() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
         String query = "my:query";
-        DownloadJob job = builder.id(jobId).status(JobStatus.RUNNING).query(query).build();
+        DownloadJob job = getDownloadJob(jobId, null, query, null, null, JobStatus.RUNNING, null);
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -335,20 +332,19 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     @Test
     protected void getDetailsWithErroredJob() throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
         String errMsg = "this is a friendly error message";
         String query = "sample:query";
         String fields = "sample,fields";
         String sort = "sample sort";
         DownloadJob job =
-                builder.id(jobId)
-                        .query(query)
-                        .sort(sort)
-                        .fields(fields)
-                        .status(JobStatus.ERROR)
-                        .error(errMsg)
-                        .format(APPLICATION_JSON_VALUE)
-                        .build();
+                getDownloadJob(
+                        jobId,
+                        errMsg,
+                        query,
+                        sort,
+                        fields,
+                        JobStatus.ERROR,
+                        APPLICATION_JSON_VALUE);
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -473,8 +469,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
             names = {"PROCESSING", "UNFINISHED"})
     void statusInProcessingOrUnFinishedReturnsRunning(JobStatus status) throws Exception {
         String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        DownloadJob job = builder.id(jobId).status(status).build();
+        DownloadJob job = getDownloadJob(jobId, null, null, null, null, status, null);
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -597,4 +592,13 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected abstract String getRunJobHeaderWithFieldsTSV();
 
     protected abstract String getResultIdStringToMatch();
+
+    protected abstract DownloadJob getDownloadJob(
+            String jobId,
+            String errMsg,
+            String query,
+            String sort,
+            String fields,
+            JobStatus jobStatus,
+            String format);
 }

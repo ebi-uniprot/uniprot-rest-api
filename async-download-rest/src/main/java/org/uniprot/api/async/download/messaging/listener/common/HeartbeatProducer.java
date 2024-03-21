@@ -12,11 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 
-@Component
 @Slf4j
 public class HeartbeatProducer {
     private static final String UPDATE_COUNT = "updateCount";

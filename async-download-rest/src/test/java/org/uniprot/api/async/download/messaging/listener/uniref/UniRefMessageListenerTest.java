@@ -30,12 +30,13 @@ import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloa
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -55,12 +56,12 @@ class UniRefMessageListenerTest {
 
     @Mock UniRefAsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock private DownloadJobRepository jobRepository;
+    @Mock private UniRefDownloadJobRepository jobRepository;
 
     @Mock private UniRefDownloadResultWriter uniRefDownloadResultWriter;
 
     @Mock private UniRefRabbitTemplate uniRefRabbitTemplate;
-    @Mock private HeartbeatProducer heartbeatProducer;
+    @Mock private UniRefHeartbeatProducer heartbeatProducer;
     @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
 
     @InjectMocks private UniRefMessageListener uniRefMessageListener;
@@ -73,7 +74,7 @@ class UniRefMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniRefDownloadJob downloadJob = UniRefDownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
@@ -112,7 +113,7 @@ class UniRefMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniRefDownloadJob downloadJob = UniRefDownloadJob.builder().id(jobId).build();
         downloadJob.setRetried(1);
         // stub
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
@@ -172,7 +173,7 @@ class UniRefMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        UniRefDownloadJob downloadJob = UniRefDownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("UniRef90_P03904", "UniRef90_P03903");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));

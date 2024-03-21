@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.messaging.listener.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestImpl;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
@@ -53,12 +53,12 @@ class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
     public static final long PROCESSED_ENTRIES = 39L;
     private DownloadJob downloadJob;
-    private HeartbeatProducer heartBeatProducer;
+    private IdMappingHeartbeatProducer heartBeatProducer;
 
     @BeforeEach
     void setUp() {
         downloadJob = mock(DownloadJob.class);
-        heartBeatProducer = mock(HeartbeatProducer.class);
+        heartBeatProducer = mock(IdMappingHeartbeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
         when(downloadJob.getProcessedEntries()).thenReturn(PROCESSED_ENTRIES);
     }

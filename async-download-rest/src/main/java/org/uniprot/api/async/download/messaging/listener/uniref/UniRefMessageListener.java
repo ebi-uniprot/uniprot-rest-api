@@ -14,8 +14,7 @@ import org.uniprot.api.async.download.messaging.config.uniref.UniRefAsyncDownloa
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitTemplate;
 import org.uniprot.api.async.download.messaging.listener.common.AbstractMessageListener;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -43,11 +42,11 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             MessageConverter converter,
             UniRefDownloadConfigProperties uniRefDownloadConfigProperties,
             UniRefAsyncDownloadQueueConfigProperties queueConfigProperties,
-            DownloadJobRepository jobRepository,
+            UniRefDownloadJobRepository jobRepository,
             UniRefDownloadResultWriter uniRefDownloadResultWriter,
             UniRefRabbitTemplate uniRefRabbitTemplate,
             UniRefEntryLightService service,
-            HeartbeatProducer heartbeatProducer,
+            UniRefHeartbeatProducer heartbeatProducer,
             UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler) {
         super(
                 converter,
