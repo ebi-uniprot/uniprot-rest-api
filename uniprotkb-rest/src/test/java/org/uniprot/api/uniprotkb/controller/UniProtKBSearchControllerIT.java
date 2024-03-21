@@ -2569,12 +2569,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
-                                                                    "##sequence-region Q8DIA7 1 761")))
-                                    .resultMatcher(
-                                            MockMvcResultMatchers.content()
-                                                    .string(
-                                                            containsString(
-                                                                    "##sequence-region P21802 1 821")))
+                                                                    "P21802\tUniProtKB\tSignal peptide\t1\t21\t.\t.\t.\tOntology_term=ECO:0000255;evidence=ECO:0000255")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
