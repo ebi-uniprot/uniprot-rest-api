@@ -1186,7 +1186,6 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                     .string(
                                                             containsString(
                                                                     "##gff-version 3\n"
-                                                                            + "##sequence-region Q8DIA7 1 761\n"
                                                                             + "Q8DIA7\tUniProtKB\tChain\t1\t761\t.\t.\t.\tID=PRO_0000100496;Note=Phosphoribosylformylglycinamidine synthase subunit PurL")))
                                     .build())
                     .contentTypeParam(

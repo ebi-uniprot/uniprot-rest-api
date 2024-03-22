@@ -431,7 +431,7 @@ class UniProtQueryProcessorTest {
     @Test
     void changeLowercaseAccessionToUppercase() {
         when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("accession"));
-        
+
         String processedQuery = processor.processQuery("GO:1234567 OR accession:p12345");
         assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
     }
