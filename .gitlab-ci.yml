@@ -111,7 +111,7 @@ k8s:docker-build-deploy:
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
     K8S_ENV: 'dev'
-    RELEASE_NAME: '2024_01'
+    RELEASE_NAME: '2024_02'
     RELEASE_DATE: '$RELEASE_DATE'
     REST_ARTIFACT: 'all-rest'
   when: on_success
