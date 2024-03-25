@@ -52,7 +52,7 @@ public class HeartbeatProducer {
                                         throwable ->
                                                 log.warn(
                                                         MessageFormat.format(
-                                                                "Job {0} was failed to update the processed count to {1} in solr phase due to {2}",
+                                                                "Job {0} failed to update the processed count to {1} in Solr phase due to {2}",
                                                                 downloadJob.getId(),
                                                                 newUpdateCount,
                                                                 throwable.getFailure())))
@@ -67,14 +67,14 @@ public class HeartbeatProducer {
                                                                 LocalDateTime.now())));
                         log.info(
                                 String.format(
-                                        "%s: Download Job ID: %s was updated in Solr phase",
+                                        "%s: Job ID: %s updated in Solr phase",
                                         downloadJob.getUpdateCount(), downloadJob.getId()));
                     });
 
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "%s: Updating Download Job ID: %s in Solr phase was failed, %s",
+                            "%s: Updating Job ID: %s in Solr phase failed, %s",
                             downloadJob.getUpdateCount(),
                             downloadJob.getId(),
                             Arrays.toString(e.getStackTrace())));
@@ -125,7 +125,7 @@ public class HeartbeatProducer {
                                         throwable ->
                                                 log.warn(
                                                         MessageFormat.format(
-                                                                "Job {0} was failed to update the processed count to {1} in writing phase due to {2}",
+                                                                "Job ID {0} failed to update the processed count to {1} in Voldemort phase due to {2}",
                                                                 downloadJob.getId(),
                                                                 newUpdateCount,
                                                                 throwable.getFailure())))
@@ -139,7 +139,7 @@ public class HeartbeatProducer {
                                                                 PROCESSED_ENTRIES, pe)));
                         log.info(
                                 String.format(
-                                        "%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
+                                        "%s: Job ID: %s updated in Voldemort phase. Entries processed: %d",
                                         downloadJob.getUpdateCount(),
                                         downloadJob.getId(),
                                         downloadJob.getProcessedEntries()));
@@ -147,7 +147,7 @@ public class HeartbeatProducer {
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "%s: Updating Download Job ID: %s in writing phase was failed. Number of entries processed: %d, %s",
+                            "%s: Updating Job ID: %s in Voldemort phase failed. Entries processed: %d, %s",
                             downloadJob.getUpdateCount(),
                             downloadJob.getId(),
                             downloadJob.getProcessedEntries(),
