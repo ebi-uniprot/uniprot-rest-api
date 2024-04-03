@@ -21,8 +21,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.catalina.connector.ClientAbortException;
-import org.apache.solr.common.StringUtils;
-import org.apache.solr.common.util.StrUtils;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
