@@ -196,7 +196,7 @@ class ResponseExceptionHandlerTest {
                 new IllegalDownloadJobSubmissionException(jobId, message);
 
         ResponseEntity<JobSubmitResponse> responseEntity =
-                errorHandler.handleIllegalDownloadJobSubmissionException(error, request);
+                errorHandler.handleIllegalDownloadJobSubmissionException(error);
 
         // then
         assertNotNull(responseEntity);

@@ -530,6 +530,57 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
+    void resubmit_withForceOnAlreadyFinishedJobWithAcceptAll() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.ALL)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true"));
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("has already been finished")));
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFinishedJobWithoutAccept() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        IdMappingDownloadJob downloadJob =
+                IdMappingDownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true"));
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("has already been finished")));
+    }
+
+    @Test
     void resubmit_withForceOnAlreadyFailedJobAfterMaxRetry() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
         String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
