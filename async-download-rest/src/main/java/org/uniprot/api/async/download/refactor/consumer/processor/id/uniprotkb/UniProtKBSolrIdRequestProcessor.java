@@ -1,34 +1,39 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb;
 
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.id.IdRequestProcessor;
 import org.uniprot.api.async.download.refactor.consumer.processor.id.SolrIdRequestProcessor;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
-import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.util.stream.Stream;
 
 @Component
-public class UniProtKBSolrIdRequestProcessor implements IdRequestProcessor<UniProtKBDownloadRequest> {
-    private final UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor;
-    private final UniProtKBSolrIdH5RequestProcessor uniProtKBSolrIdH5RequestProcessor;
+public  class UniProtKBSolrIdRequestProcessor extends SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    private final UniProtEntryService uniProtEntryService;
 
-    public UniProtKBSolrIdRequestProcessor(UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor, UniProtKBSolrIdH5RequestProcessor uniProtKBSolrIdH5RequestProcessor) {
-        this.uniProtKBDefaultSolrIdRequestProcessor = uniProtKBDefaultSolrIdRequestProcessor;
-        this.uniProtKBSolrIdH5RequestProcessor = uniProtKBSolrIdH5RequestProcessor;
+    protected UniProtKBSolrIdRequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, UniProtEntryService uniProtEntryService) {
+        super(downloadFileHandler, jobService);
+        this.uniProtEntryService = uniProtEntryService;
     }
 
     @Override
-    public void process(UniProtKBDownloadRequest request) {
-        MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        getRequestProcessor(contentType).process(request);
+    protected long getSolrHits(UniProtKBDownloadRequest downloadRequest) {
+        UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
+        searchRequest.setQuery(downloadRequest.getQuery());
+        searchRequest.setIncludeIsoform(downloadRequest.getIncludeIsoform());
+        searchRequest.setSize(0);
+        QueryResult<UniProtKBEntry> searchResults = uniProtEntryService.search(searchRequest);
+        return searchResults.getPage().getTotalElements();
     }
 
-    private SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> getRequestProcessor(MediaType contentType) {
-        if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-            return uniProtKBSolrIdH5RequestProcessor;
-        }
-        return uniProtKBDefaultSolrIdRequestProcessor;
+    @Override
+    protected Stream<String> streamIds(UniProtKBDownloadRequest downloadRequest) {
+        return uniProtEntryService.streamIdsForDownload(downloadRequest);
     }
-
 }

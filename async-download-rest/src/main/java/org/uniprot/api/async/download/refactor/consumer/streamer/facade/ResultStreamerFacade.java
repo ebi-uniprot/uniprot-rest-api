@@ -21,6 +21,7 @@ public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends 
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
                     N_TRIPLES_MEDIA_TYPE, "nt");
+    //todo resuse the existing or create common
     private final RDFResultStreamer<T, R> rdfResultStreamer;
     private final ListResultStreamer<T, R> listResultStreamer;
     private final BatchResultStreamer<T, R, S> batchResultStreamer;

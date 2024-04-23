@@ -23,14 +23,14 @@ public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<Un
     private final UniProtKBJobService jobService;
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
     private final UniProtKBMessagingService messagingService;
-    private final UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor;
+    private final UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor;
 
-    public UniProtKBSolrIdH5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor) {
+    public UniProtKBSolrIdH5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor) {
         super(downloadFileHandler, jobService);
         this.jobService = jobService;
         this.embeddingsQueueConfigProperties = embeddingsQueueConfigProperties;
         this.messagingService = messagingService;
-        this.uniProtKBDefaultSolrIdRequestProcessor = uniProtKBDefaultSolrIdRequestProcessor;
+        this.uniProtKBSolrIdRequestProcessor = uniProtKBSolrIdRequestProcessor;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<Un
         long maxEntryCount = embeddingsQueueConfigProperties.getMaxEntryCount();
 
         if (solrHits <= maxEntryCount) {
-            uniProtKBDefaultSolrIdRequestProcessor.process(request);
+            uniProtKBSolrIdRequestProcessor.process(request);
             sendMessageToEmbeddingsQueue(request.getJobId());
             jobService.update(request.getJobId(), Map.of(STATUS, JobStatus.UNFINISHED));
         } else {
@@ -51,12 +51,12 @@ public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<Un
 
     @Override
     protected long getSolrHits(UniProtKBDownloadRequest downloadRequest) {
-        return uniProtKBDefaultSolrIdRequestProcessor.getSolrHits(downloadRequest);
+        return uniProtKBSolrIdRequestProcessor.getSolrHits(downloadRequest);
     }
 
     @Override
     protected Stream<String> streamIds(UniProtKBDownloadRequest downloadRequest) {
-        return uniProtKBDefaultSolrIdRequestProcessor.streamIds(downloadRequest);
+        return uniProtKBSolrIdRequestProcessor.streamIds(downloadRequest);
     }
 
     private void sendMessageToEmbeddingsQueue(String jobId) {

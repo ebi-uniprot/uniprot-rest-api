@@ -36,6 +36,7 @@ public abstract class ContentBasedAndRetriableMessageListener<T extends Download
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
+    //todo rename consumer
 
 
     protected ContentBasedAndRetriableMessageListener(MessagingService messagingService, RequestProcessor<T> requestProcessor, AsyncDownloadFileHandler asyncDownloadFileHandler, JobService<R> jobService, MessageConverter messageConverter) {

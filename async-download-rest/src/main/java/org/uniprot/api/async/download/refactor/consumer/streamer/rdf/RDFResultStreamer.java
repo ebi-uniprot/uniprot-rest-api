@@ -21,6 +21,7 @@ public abstract class RDFResultStreamer<T extends DownloadRequest, R extends Dow
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
                     N_TRIPLES_MEDIA_TYPE, "nt");
+    //todo using common, look at T,R, S naming convention
     private final HeartbeatProducer heartbeatProducer;
     private final RdfStreamer rdfStreamer;
 

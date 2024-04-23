@@ -14,7 +14,6 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -66,7 +65,7 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
                 outputWriter.writeContents(context, gzipOutputStream, Instant.now(), new AtomicInteger());
 
             } catch (Exception exception) {
-                throw new ResultProcessorException(exception.getMessage());
+                throw new ResultProcessingException(exception.getMessage());
             } finally {
                 heartbeatProducer.stop(request.getJobId());
             }
