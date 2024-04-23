@@ -389,7 +389,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         // ... inactive entry that was merged into 'activeAcc' entry
         InactiveUniProtEntry inactiveEntry =
                 InactiveUniProtEntry.from(
-                        inactiveAcc, "I8FBX0_MYCAB", InactiveEntryMocker.MERGED, activeAcc);
+                        inactiveAcc, "I8FBX0_MYCAB", InactiveEntryMocker.MERGED, activeAcc, null);
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
 
@@ -521,7 +521,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.inactiveReason.inactiveReasonType", is("DELETED")));
+                                "$.inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(
+                        jsonPath("$.inactiveReason.deletedReason", is("Sequence source deletion")));
     }
 
     @Test

@@ -211,8 +211,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
                 .andExpect(
                         jsonPath(
-                                "$.results[1].to.inactiveReason.inactiveReasonType",
-                                is("DELETED")));
+                                "$.results[1].to.inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[1].to.inactiveReason.deletedReason",
+                                is("Proteome Exclusion")));
     }
 
     @Test
