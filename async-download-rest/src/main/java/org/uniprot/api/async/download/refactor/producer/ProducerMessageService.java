@@ -22,7 +22,7 @@ import org.uniprot.api.rest.request.HashGenerator;
 
 @Slf4j
 public abstract class ProducerMessageService<T extends DownloadRequest, R extends DownloadJob> {
-    protected static final String JOB_ID = "jobId";
+    public static final String JOB_ID = "jobId";
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
     private final MessagingService messagingService;

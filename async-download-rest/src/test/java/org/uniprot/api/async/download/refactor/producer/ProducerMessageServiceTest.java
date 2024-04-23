@@ -20,7 +20,7 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
 
-abstract class ProducerMessageServiceTest<T extends DownloadRequest, R extends DownloadJob> {
+public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R extends DownloadJob> {
     protected static final String JOB_ID = "someJobId";
     @Mock protected Message message;
     @Mock private JobSubmitFeedback feedback;

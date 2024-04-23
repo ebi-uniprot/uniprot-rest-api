@@ -1,0 +1,70 @@
+package org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.processor.id.SolrIdRequestProcessor;
+import org.uniprot.api.async.download.refactor.messaging.uniprotkb.UniProtKBMessagingService;
+import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+import java.util.Map;
+import java.util.stream.Stream;
+
+@Slf4j
+@Component
+public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    public static final String STATUS = "status";
+    private final UniProtKBJobService jobService;
+    private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
+    private final UniProtKBMessagingService messagingService;
+    private final UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor;
+
+    public UniProtKBSolrIdH5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtKBDefaultSolrIdRequestProcessor uniProtKBDefaultSolrIdRequestProcessor) {
+        super(downloadFileHandler, jobService);
+        this.jobService = jobService;
+        this.embeddingsQueueConfigProperties = embeddingsQueueConfigProperties;
+        this.messagingService = messagingService;
+        this.uniProtKBDefaultSolrIdRequestProcessor = uniProtKBDefaultSolrIdRequestProcessor;
+    }
+
+    @Override
+    public void process(UniProtKBDownloadRequest request) {
+        long solrHits = getSolrHits(request);
+        long maxEntryCount = embeddingsQueueConfigProperties.getMaxEntryCount();
+
+        if (solrHits <= maxEntryCount) {
+            uniProtKBDefaultSolrIdRequestProcessor.process(request);
+            sendMessageToEmbeddingsQueue(request.getJobId());
+            jobService.update(request.getJobId(), Map.of(STATUS, JobStatus.UNFINISHED));
+        } else {
+            log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
+            jobService.update(request.getJobId(), Map.of(STATUS, JobStatus.ABORTED, "error",
+                    "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s".formatted(maxEntryCount, solrHits)));
+        }
+    }
+
+    @Override
+    protected long getSolrHits(UniProtKBDownloadRequest downloadRequest) {
+        return uniProtKBDefaultSolrIdRequestProcessor.getSolrHits(downloadRequest);
+    }
+
+    @Override
+    protected Stream<String> streamIds(UniProtKBDownloadRequest downloadRequest) {
+        return uniProtKBDefaultSolrIdRequestProcessor.streamIds(downloadRequest);
+    }
+
+    private void sendMessageToEmbeddingsQueue(String jobId) {
+        log.info("Sending h5 message to embeddings queue for further processing for jobId {}", jobId);
+        MessageProperties msgProps = new MessageProperties();
+        msgProps.setHeader(JOB_ID_HEADER, jobId);
+        Message message = new Message(new byte[]{}, msgProps);
+        messagingService.send(message, embeddingsQueueConfigProperties.getExchangeName(), embeddingsQueueConfigProperties.getRoutingKey());
+        log.info("Message with jobId {} sent to embeddings queue {}", jobId, this.embeddingsQueueConfigProperties.getQueueName());
+    }
+}

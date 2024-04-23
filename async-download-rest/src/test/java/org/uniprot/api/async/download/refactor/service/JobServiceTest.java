@@ -1,11 +1,12 @@
 package org.uniprot.api.async.download.refactor.service;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,12 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 
-@ExtendWith(MockitoExtension.class)
-class JobServiceTest {
+
+public abstract class JobServiceTest<T extends DownloadJob> {
     public static final String ID = "id";
-    @Mock private DownloadJob downloadJob;
-    @Mock private DownloadJobRepository downloadJobRepository;
-    @InjectMocks private JobService jobService;
+    protected T downloadJob;
+    protected Optional<T> downloadJobOpt;
+    protected DownloadJobRepository<T> downloadJobRepository;
+    protected JobService<T> jobService;
 
     @Test
     void create() {
@@ -47,10 +49,9 @@ class JobServiceTest {
 
     @Test
     void find() {
-        Optional<DownloadJob> expected = Mockito.mock(Optional.class);
-        when(downloadJobRepository.findById(ID)).thenReturn(expected);
+        when(downloadJobRepository.findById(ID)).thenReturn(downloadJobOpt);
 
-        assertSame(expected, jobService.find(ID));
+        assertSame(downloadJobOpt, jobService.find(ID));
     }
 
     @Test

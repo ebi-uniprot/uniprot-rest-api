@@ -38,6 +38,10 @@ public class HeartbeatProducer {
                         .withDelay(Duration.ofMillis(heartbeatConfig.getRetryDelayInMillis()));
     }
 
+    public void createForIds(String id) {
+        createForIds((DownloadJob) (jobRepository.findById(id).get()));
+    }
+
     public void createForIds(DownloadJob downloadJob) {
         try {
             createIfEligible(
