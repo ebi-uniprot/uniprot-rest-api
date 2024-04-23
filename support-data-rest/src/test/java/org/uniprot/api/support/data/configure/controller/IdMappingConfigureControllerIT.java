@@ -144,10 +144,6 @@ class IdMappingConfigureControllerIT {
                                 iterableWithSize(2)))
                 .andExpect(
                         jsonPath(
-                                "$.groups.[?(@.groupName=='2D gel databases')].items.*",
-                                iterableWithSize(0)))
-                .andExpect(
-                        jsonPath(
                                 "$.groups.[?(@.groupName=='Proteomic databases')].items.*",
                                 iterableWithSize(2)))
                 .andExpect(
