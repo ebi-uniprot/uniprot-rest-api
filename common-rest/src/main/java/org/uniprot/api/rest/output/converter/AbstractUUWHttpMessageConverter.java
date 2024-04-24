@@ -237,7 +237,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         long millisDuration = Duration.between(start, now).toMillis();
         int secDuration = (int) millisDuration / 1000;
         String rate = String.format("%.2f", ((double) counter) / secDuration);
-        log.debug(
+        log.info(
                 "Entities written by {}: {} with duration: {} ({} entries/sec)",
                 getClass(),
                 counter,

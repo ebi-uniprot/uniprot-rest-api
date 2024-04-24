@@ -3,14 +3,14 @@ package org.uniprot.api.proteome.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.xml.bind.Marshaller;
+
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.core.xml.proteome.ProteomeConverter;
-
-import jakarta.xml.bind.Marshaller;
 
 /**
  * @author jluo

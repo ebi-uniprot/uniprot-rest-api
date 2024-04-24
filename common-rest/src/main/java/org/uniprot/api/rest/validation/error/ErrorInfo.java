@@ -3,8 +3,8 @@ package org.uniprot.api.rest.validation.error;
 import java.util.Collections;
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Error response entity that provide error message details
