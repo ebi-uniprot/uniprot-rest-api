@@ -35,8 +35,6 @@
 		<jacoco.version>0.8.8</jacoco.version>
 		<jackson-bom.version>2.13.4</jackson-bom.version>
 		<jackson.version>2.13.4</jackson.version>
-		<jakarta-activation.version>2.0.1</jakarta-activation.version>
-		<jakarta-xml-bind.version>4.0.0</jakarta-xml-bind.version>
 		<jayway.version>2.4.0</jayway.version>
 		<jna.version>5.8.0</jna.version>
 		<java.version>17</java.version>

@@ -106,6 +106,7 @@
 			<artifactId>jaxb-api</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 	</dependencies>
 
 	<repositories>
