@@ -15,6 +15,7 @@ import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.lang.Nullable;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 /** @author lgonzales */
@@ -23,7 +24,7 @@ public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverte
     private final Marshaller marshaller;
 
     public ErrorMessageXMLConverter() {
-        super(MediaType.APPLICATION_XML);
+        super(MediaType.APPLICATION_XML, UniProtMediaType.RDF_MEDIA_TYPE);
         marshaller = createMarshaller();
     }
 
