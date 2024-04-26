@@ -1,9 +1,6 @@
 package org.uniprot.api.idmapping.common.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -304,30 +301,20 @@ public abstract class BasicIdService<T, U> {
     private List<IdMappingStringPair> applySort(
             List<IdMappingStringPair> mappedIdPairs, List<String> solrToIds) {
         // create a Map<To,List<From>>
-        Map<String, List<String>> toMap =
-                mappedIdPairs.stream()
-                        .collect(
-                                Collectors.groupingBy(
-                                        IdMappingStringPair::getTo,
-                                        Collectors.mapping(
-                                                IdMappingStringPair::getFrom,
-                                                Collectors.toList())));
-        mappedIdPairs =
-                solrToIds.stream()
-                        .flatMap(
-                                to ->
-                                        getToList(to, toMap).stream()
-                                                .map(from -> new IdMappingStringPair(from, to)))
-                        .collect(Collectors.toList());
-        return mappedIdPairs;
-    }
+        Map<String, List<IdMappingStringPair>> toFromMap = new HashMap<>();
+        for (IdMappingStringPair mappedIdPair : mappedIdPairs) {
+            String from = mappedIdPair.getFrom();
+            String to = mappedIdPair.getTo();
+            toFromMap.putIfAbsent(to, new ArrayList<>());
+            toFromMap.get(to).add(new IdMappingStringPair(from, to));
+        }
 
-    private List<String> getToList(String lookupKey, Map<String, List<String>> toMap) {
-        return toMap.entrySet().stream()
-                .filter(entry -> lookupKey.contains(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElseThrow();
+        List<IdMappingStringPair> sortedPairs = new ArrayList<>();
+        for (String solrToId : solrToIds) {
+            List<IdMappingStringPair> idPairs = toFromMap.get(solrToId);
+            sortedPairs.addAll(idPairs);
+        }
+        return sortedPairs;
     }
 
     private List<IdMappingStringPair> applyQueryFilter(
