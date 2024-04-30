@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.refactor.consumer.listener;
+package org.uniprot.api.async.download.refactor.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class ContentBasedAndRetriableMessageListener<T extends DownloadRequest, R extends DownloadJob> implements MessageListener {
+public abstract class ContentBasedAndRetriableMessageConsumer<T extends DownloadRequest, R extends DownloadJob> implements MessageListener {
     private static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     private static final String JOB_ID_HEADER = "jobId";
@@ -36,10 +36,9 @@ public abstract class ContentBasedAndRetriableMessageListener<T extends Download
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
-    //todo rename consumer
 
 
-    protected ContentBasedAndRetriableMessageListener(MessagingService messagingService, RequestProcessor<T> requestProcessor, AsyncDownloadFileHandler asyncDownloadFileHandler, JobService<R> jobService, MessageConverter messageConverter) {
+    protected ContentBasedAndRetriableMessageConsumer(MessagingService messagingService, RequestProcessor<T> requestProcessor, AsyncDownloadFileHandler asyncDownloadFileHandler, JobService<R> jobService, MessageConverter messageConverter) {
         this.messagingService = messagingService;
         this.requestProcessor = requestProcessor;
         this.asyncDownloadFileHandler = asyncDownloadFileHandler;

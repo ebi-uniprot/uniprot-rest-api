@@ -6,31 +6,29 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.id.SolrIdRequestProcessor;
 import org.uniprot.api.async.download.refactor.messaging.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 
 import java.util.Map;
-import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Slf4j
 @Component
-public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    public static final String STATUS = "status";
+public class UniProtKBSolrIdH5RequestProcessor extends UniProtKBSolrIdRequestProcessor {
+    protected static final String STATUS = "status";
     private final UniProtKBJobService jobService;
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
     private final UniProtKBMessagingService messagingService;
-    private final UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor;
 
-    public UniProtKBSolrIdH5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor) {
-        super(downloadFileHandler, jobService);
+    public UniProtKBSolrIdH5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtEntryService uniProtKBEntryService) {
+        super(downloadFileHandler, jobService, uniProtKBEntryService);
         this.jobService = jobService;
         this.embeddingsQueueConfigProperties = embeddingsQueueConfigProperties;
         this.messagingService = messagingService;
-        this.uniProtKBSolrIdRequestProcessor = uniProtKBSolrIdRequestProcessor;
     }
 
     @Override
@@ -39,24 +37,14 @@ public class UniProtKBSolrIdH5RequestProcessor extends SolrIdRequestProcessor<Un
         long maxEntryCount = embeddingsQueueConfigProperties.getMaxEntryCount();
 
         if (solrHits <= maxEntryCount) {
-            uniProtKBSolrIdRequestProcessor.process(request);
+            super.process(request);
             sendMessageToEmbeddingsQueue(request.getJobId());
-            jobService.update(request.getJobId(), Map.of(STATUS, JobStatus.UNFINISHED));
+            jobService.update(request.getJobId(), Map.of(STATUS, UNFINISHED));
         } else {
             log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
-            jobService.update(request.getJobId(), Map.of(STATUS, JobStatus.ABORTED, "error",
+            jobService.update(request.getJobId(), Map.of(STATUS, ABORTED, "error",
                     "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s".formatted(maxEntryCount, solrHits)));
         }
-    }
-
-    @Override
-    protected long getSolrHits(UniProtKBDownloadRequest downloadRequest) {
-        return uniProtKBSolrIdRequestProcessor.getSolrHits(downloadRequest);
-    }
-
-    @Override
-    protected Stream<String> streamIds(UniProtKBDownloadRequest downloadRequest) {
-        return uniProtKBSolrIdRequestProcessor.streamIds(downloadRequest);
     }
 
     private void sendMessageToEmbeddingsQueue(String jobId) {

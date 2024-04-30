@@ -45,30 +45,28 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
     public void process(T request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
 
-        if (!UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-            String jobId = request.getJobId();
-            String fileNameWithExt = jobId + FileType.GZIP.getExtension();
-            Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
-            AbstractUUWHttpMessageConverter<S, S> outputWriter = getOutputWriter(contentType, getType());
+        String jobId = request.getJobId();
+        String fileNameWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
+        AbstractUUWHttpMessageConverter<S, S> outputWriter = getOutputWriter(contentType, getType());
 
-            try (Stream<String> ids = Files.lines(fileHandler.getIdFile(jobId));
-                 OutputStream output =
-                         Files.newOutputStream(
-                                 resultPath,
-                                 StandardOpenOption.WRITE,
-                                 StandardOpenOption.CREATE,
-                                 StandardOpenOption.TRUNCATE_EXISTING);
-                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+        try (Stream<String> ids = Files.lines(fileHandler.getIdFile(jobId));
+             OutputStream output =
+                     Files.newOutputStream(
+                             resultPath,
+                             StandardOpenOption.WRITE,
+                             StandardOpenOption.CREATE,
+                             StandardOpenOption.TRUNCATE_EXISTING);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
-                MessageConverterContext<S> context = resultStreamerFacade.getConvertedResult(request, ids);
+            MessageConverterContext<S> context = resultStreamerFacade.getConvertedResult(request, ids);
 
-                outputWriter.writeContents(context, gzipOutputStream, Instant.now(), new AtomicInteger());
+            outputWriter.writeContents(context, gzipOutputStream, Instant.now(), new AtomicInteger());
 
-            } catch (Exception exception) {
-                throw new ResultProcessingException(exception.getMessage());
-            } finally {
-                heartbeatProducer.stop(request.getJobId());
-            }
+        } catch (Exception exception) {
+            throw new ResultProcessingException(exception.getMessage());
+        } finally {
+            heartbeatProducer.stop(request.getJobId());
         }
 
     }

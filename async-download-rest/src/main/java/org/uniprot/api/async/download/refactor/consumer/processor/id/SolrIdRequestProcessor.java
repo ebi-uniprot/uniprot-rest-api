@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public abstract class SolrIdRequestProcessor<T extends SolrStreamDownloadRequest, R extends DownloadJob> implements IdRequestProcessor<T> {
     protected static final String JOB_ID_HEADER = "jobId";
-    public static final String TOTAL_ENTRIES = "totalEntries";
+    protected static final String TOTAL_ENTRIES = "totalEntries";
     private final AsyncDownloadFileHandler downloadFileHandler;
     private final JobService<R> jobService;
 
