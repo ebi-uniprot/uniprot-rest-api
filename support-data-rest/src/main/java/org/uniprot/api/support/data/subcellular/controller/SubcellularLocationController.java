@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.SUBCELLULAR_LOCATION_ID_REGEX;
 
 import java.util.Optional;
 
@@ -51,7 +52,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class SubcellularLocationController extends BasicSearchController<SubcellularLocationEntry> {
     private static final String DATA_TYPE = "locations";
     private final SubcellularLocationService subcellularLocationService;
-    private static final String SUBCELLULAR_LOCATION_ID_REGEX = "^SL-[0-9]{4}";
 
     public SubcellularLocationController(
             ApplicationEventPublisher eventPublisher,

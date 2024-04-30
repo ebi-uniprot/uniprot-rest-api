@@ -305,6 +305,27 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                 .andExpect(jsonPath("$.results.*.sequence.md5", contains(md5)));
     }
 
+    @Test
+    void searchDefaultSearchWithLowercaseId() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "upi0000083a11")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083A11")));
+    }
+
     @Override
     protected List<Triple<String, String, List<String>>> getTriplets() {
         return List.of(

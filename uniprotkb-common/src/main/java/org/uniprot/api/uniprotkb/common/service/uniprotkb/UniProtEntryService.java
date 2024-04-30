@@ -79,9 +79,6 @@ public class UniProtEntryService
     private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
 
-    private static final Pattern CLEAN_QUERY_REGEX =
-            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
-
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniProtKBFacetConfig uniprotKBFacetConfig,
