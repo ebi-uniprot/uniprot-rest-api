@@ -32,6 +32,7 @@ import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.request.UniSaveRequest;
+import org.uniprot.core.uniprotkb.DeletedReason;
 
 /**
  * Created 08/04/20
@@ -81,6 +82,73 @@ class UniSaveServiceImplTest {
             assertThat(events.get(0).getEventType(), is(eventType.toString()));
             assertThat(events.get(0).getTargetAccession(), is(targetAcc));
             assertThat(events.get(0).getRelease(), is(releaseNumber));
+        }
+
+        @Test
+        void canGetAccessionStatusDeletedWithReason() {
+            // given
+            String accession = ACCESSION;
+            String targetAcc = "target acc";
+            String releaseNumber = "1";
+            AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+            status.setAccession(accession);
+            IdentifierStatus identifierStatus = mock(IdentifierStatus.class);
+            when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
+            ReleaseImpl release = new ReleaseImpl();
+            release.setReleaseNumber(releaseNumber);
+            release.setReleaseDate(new Date());
+            when(identifierStatus.getEventRelease()).thenReturn(release);
+            EventTypeEnum eventType = EventTypeEnum.DELETED;
+            when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
+            when(identifierStatus.getDeletionReasonId()).thenReturn(11);
+            status.setEvents(singletonList(identifierStatus));
+            when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
+
+            // when
+            UniSaveEntry entry = uniSaveService.getAccessionStatus(accession);
+
+            // then
+            List<AccessionEvent> events = entry.getEvents();
+            assertThat(entry.getAccession(), is(accession));
+            assertThat(events, hasSize(1));
+            assertThat(events.get(0).getEventType(), is(eventType.toString()));
+            assertThat(events.get(0).getTargetAccession(), is(targetAcc));
+            assertThat(events.get(0).getRelease(), is(releaseNumber));
+            assertThat(
+                    events.get(0).getDeletedReason(), is(DeletedReason.SOURCE_DELETION.getName()));
+        }
+
+        @Test
+        void canGetAccessionStatusDeletedWithoutReason() {
+            // given
+            String accession = ACCESSION;
+            String targetAcc = "target acc";
+            String releaseNumber = "1";
+            AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+            status.setAccession(accession);
+            IdentifierStatus identifierStatus = mock(IdentifierStatus.class);
+            when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
+            ReleaseImpl release = new ReleaseImpl();
+            release.setReleaseNumber(releaseNumber);
+            release.setReleaseDate(new Date());
+            when(identifierStatus.getEventRelease()).thenReturn(release);
+            EventTypeEnum eventType = EventTypeEnum.DELETED;
+            when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
+            when(identifierStatus.getDeletionReasonId()).thenReturn(null);
+            status.setEvents(singletonList(identifierStatus));
+            when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
+
+            // when
+            UniSaveEntry entry = uniSaveService.getAccessionStatus(accession);
+
+            // then
+            List<AccessionEvent> events = entry.getEvents();
+            assertThat(entry.getAccession(), is(accession));
+            assertThat(events, hasSize(1));
+            assertThat(events.get(0).getEventType(), is(eventType.toString()));
+            assertThat(events.get(0).getTargetAccession(), is(targetAcc));
+            assertThat(events.get(0).getRelease(), is(releaseNumber));
+            assertThat(events.get(0).getDeletedReason(), is(DeletedReason.UNKNOWN.getName()));
         }
 
         @Test
@@ -326,32 +394,34 @@ class UniSaveServiceImplTest {
             UniSaveEntry.UniSaveEntryBuilder entryBuilder =
                     UniSaveEntry.builder()
                             .content(
-                                    "ID   P12345_ID        Unreviewed;        60 AA.\n"
-                                            + "AC   P12345;\n"
-                                            + "DT   13-FEB-2019, integrated into UniProtKB/TrEMBL.\n"
-                                            + "DT   13-FEB-2019, sequence version 1.\n"
-                                            + "DT   11-DEC-2019, entry version 1.\n"
-                                            + "DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:AYX10384.1};\n"
-                                            + "GN   ORFNames=EGX52_05955 {ECO:0000313|EMBL:AYX10384.1};\n"
-                                            + "OS   Yersinia pseudotuberculosis.\n"
-                                            + "OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;\n"
-                                            + "OC   Yersiniaceae; Yersinia.\n"
-                                            + "OX   NCBI_TaxID=633 {ECO:0000313|EMBL:AYX10384.1, ECO:0000313|Proteomes:UP000277634};\n"
-                                            + "RN   [1] {ECO:0000313|Proteomes:UP000277634}\n"
-                                            + "RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].\n"
-                                            + "RC   STRAIN=FDAARGOS_580 {ECO:0000313|Proteomes:UP000277634};\n"
-                                            + "RA   Goldberg B., Campos J., Tallon L., Sadzewicz L., Zhao X., Vavikolanu K.,\n"
-                                            + "RA   Mehta A., Aluvathingal J., Nadendla S., Geyer C., Nandy P., Yan Y.,\n"
-                                            + "RA   Sichtig H.;\n"
-                                            + "RT   \"FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):\n"
-                                            + "RT   Supporting development and validation of Infectious Disease Dx tests.\";\n"
-                                            + "RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.\n"
-                                            + "DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.\n"
-                                            + "DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.\n"
-                                            + "DR   Proteomes; UP000277634; Chromosome.\n"
-                                            + "PE   4: Predicted;\n"
-                                            + "SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;\n"
-                                            + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n");
+                                    """
+                                            ID   P12345_ID        Unreviewed;        60 AA.
+                                            AC   P12345;
+                                            DT   13-FEB-2019, integrated into UniProtKB/TrEMBL.
+                                            DT   13-FEB-2019, sequence version 1.
+                                            DT   11-DEC-2019, entry version 1.
+                                            DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:AYX10384.1};
+                                            GN   ORFNames=EGX52_05955 {ECO:0000313|EMBL:AYX10384.1};
+                                            OS   Yersinia pseudotuberculosis.
+                                            OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;
+                                            OC   Yersiniaceae; Yersinia.
+                                            OX   NCBI_TaxID=633 {ECO:0000313|EMBL:AYX10384.1, ECO:0000313|Proteomes:UP000277634};
+                                            RN   [1] {ECO:0000313|Proteomes:UP000277634}
+                                            RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+                                            RC   STRAIN=FDAARGOS_580 {ECO:0000313|Proteomes:UP000277634};
+                                            RA   Goldberg B., Campos J., Tallon L., Sadzewicz L., Zhao X., Vavikolanu K.,
+                                            RA   Mehta A., Aluvathingal J., Nadendla S., Geyer C., Nandy P., Yan Y.,
+                                            RA   Sichtig H.;
+                                            RT   "FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):
+                                            RT   Supporting development and validation of Infectious Disease Dx tests.";
+                                            RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.
+                                            DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.
+                                            DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.
+                                            DR   Proteomes; UP000277634; Chromosome.
+                                            PE   4: Predicted;
+                                            SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;
+                                                 MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC
+                                            """);
 
             // when
             uniSaveService.addCopyright(entryBuilder);
@@ -360,36 +430,38 @@ class UniSaveServiceImplTest {
             assertThat(
                     entryBuilder.build().getContent(),
                     is(
-                            "ID   P12345_ID        Unreviewed;        60 AA.\n"
-                                    + "AC   P12345;\n"
-                                    + "DT   13-FEB-2019, integrated into UniProtKB/TrEMBL.\n"
-                                    + "DT   13-FEB-2019, sequence version 1.\n"
-                                    + "DT   11-DEC-2019, entry version 1.\n"
-                                    + "DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:AYX10384.1};\n"
-                                    + "GN   ORFNames=EGX52_05955 {ECO:0000313|EMBL:AYX10384.1};\n"
-                                    + "OS   Yersinia pseudotuberculosis.\n"
-                                    + "OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;\n"
-                                    + "OC   Yersiniaceae; Yersinia.\n"
-                                    + "OX   NCBI_TaxID=633 {ECO:0000313|EMBL:AYX10384.1, ECO:0000313|Proteomes:UP000277634};\n"
-                                    + "RN   [1] {ECO:0000313|Proteomes:UP000277634}\n"
-                                    + "RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].\n"
-                                    + "RC   STRAIN=FDAARGOS_580 {ECO:0000313|Proteomes:UP000277634};\n"
-                                    + "RA   Goldberg B., Campos J., Tallon L., Sadzewicz L., Zhao X., Vavikolanu K.,\n"
-                                    + "RA   Mehta A., Aluvathingal J., Nadendla S., Geyer C., Nandy P., Yan Y.,\n"
-                                    + "RA   Sichtig H.;\n"
-                                    + "RT   \"FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):\n"
-                                    + "RT   Supporting development and validation of Infectious Disease Dx tests.\";\n"
-                                    + "RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.\n"
-                                    + "CC   ---------------------------------------------------------------------------\n"
-                                    + "CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms\n"
-                                    + "CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License\n"
-                                    + "CC   ---------------------------------------------------------------------------\n"
-                                    + "DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.\n"
-                                    + "DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.\n"
-                                    + "DR   Proteomes; UP000277634; Chromosome.\n"
-                                    + "PE   4: Predicted;\n"
-                                    + "SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;\n"
-                                    + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n"));
+                            """
+                                    ID   P12345_ID        Unreviewed;        60 AA.
+                                    AC   P12345;
+                                    DT   13-FEB-2019, integrated into UniProtKB/TrEMBL.
+                                    DT   13-FEB-2019, sequence version 1.
+                                    DT   11-DEC-2019, entry version 1.
+                                    DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:AYX10384.1};
+                                    GN   ORFNames=EGX52_05955 {ECO:0000313|EMBL:AYX10384.1};
+                                    OS   Yersinia pseudotuberculosis.
+                                    OC   Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacterales;
+                                    OC   Yersiniaceae; Yersinia.
+                                    OX   NCBI_TaxID=633 {ECO:0000313|EMBL:AYX10384.1, ECO:0000313|Proteomes:UP000277634};
+                                    RN   [1] {ECO:0000313|Proteomes:UP000277634}
+                                    RP   NUCLEOTIDE SEQUENCE [LARGE SCALE GENOMIC DNA].
+                                    RC   STRAIN=FDAARGOS_580 {ECO:0000313|Proteomes:UP000277634};
+                                    RA   Goldberg B., Campos J., Tallon L., Sadzewicz L., Zhao X., Vavikolanu K.,
+                                    RA   Mehta A., Aluvathingal J., Nadendla S., Geyer C., Nandy P., Yan Y.,
+                                    RA   Sichtig H.;
+                                    RT   "FDA dAtabase for Regulatory Grade micrObial Sequences (FDA-ARGOS):
+                                    RT   Supporting development and validation of Infectious Disease Dx tests.";
+                                    RL   Submitted (NOV-2018) to the EMBL/GenBank/DDBJ databases.
+                                    CC   ---------------------------------------------------------------------------
+                                    CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+                                    CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+                                    CC   ---------------------------------------------------------------------------
+                                    DR   EMBL; CP033715; AYX10384.1; -; Genomic_DNA.
+                                    DR   RefSeq; WP_072092108.1; NZ_PDEJ01000002.1.
+                                    DR   Proteomes; UP000277634; Chromosome.
+                                    PE   4: Predicted;
+                                    SQ   SEQUENCE   60 AA;  6718 MW;  701D8D73381524E8 CRC64;
+                                         MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC
+                                    """));
         }
 
         @Test

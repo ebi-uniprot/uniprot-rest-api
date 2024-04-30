@@ -3,7 +3,7 @@ package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,8 +18,7 @@ import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyLineage;
 import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.*;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.store.config.UniProtDataType;
@@ -55,6 +54,38 @@ class UniProtEntryQueryResultsConverterTest {
         Optional<UniProtKBEntry> uniProtKBEntry = converter.convertDoc(doc, emptyList());
 
         assertThat(uniProtKBEntry).isPresent();
+    }
+
+    @Test
+    void canConvertInactiveDeletedDocToEntry() {
+        String acc = "P12345";
+        UniProtDocument doc = UniProtDocMocker.createInactiveDoc(acc, "DELETED:SOURCE_DELETION");
+        Optional<UniProtKBEntry> uniProtKBEntry = converter.convertDoc(doc, emptyList());
+
+        assertThat(uniProtKBEntry).isPresent();
+        UniProtKBEntry entry = uniProtKBEntry.get();
+        assertEquals(acc, entry.getPrimaryAccession().getValue());
+        assertEquals(UniProtKBEntryType.INACTIVE, entry.getEntryType());
+        assertNotNull(entry.getInactiveReason());
+        EntryInactiveReason inactiveReason = entry.getInactiveReason();
+        assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
+        assertEquals(DeletedReason.SOURCE_DELETION, inactiveReason.getDeletedReason());
+    }
+
+    @Test
+    void canConvertInactiveMergedDocToEntry() {
+        String acc = "P12345";
+        UniProtDocument doc = UniProtDocMocker.createInactiveDoc(acc, "MERGED:P21802");
+        Optional<UniProtKBEntry> uniProtKBEntry = converter.convertDoc(doc, emptyList());
+
+        assertThat(uniProtKBEntry).isPresent();
+        UniProtKBEntry entry = uniProtKBEntry.get();
+        assertEquals(acc, entry.getPrimaryAccession().getValue());
+        assertEquals(UniProtKBEntryType.INACTIVE, entry.getEntryType());
+        assertNotNull(entry.getInactiveReason());
+        EntryInactiveReason inactiveReason = entry.getInactiveReason();
+        assertEquals(InactiveReasonType.MERGED, inactiveReason.getInactiveReasonType());
+        assertEquals(List.of("P21802"), inactiveReason.getMergeDemergeTos());
     }
 
     @Test

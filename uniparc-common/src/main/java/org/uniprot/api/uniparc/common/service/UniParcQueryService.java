@@ -57,7 +57,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     public static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_FIELD = "uniprotkb";
-    public static final String MD5_STR = "md5";
+    public static final String CHECKSUM_STR = "checksum";
     private static final String COMMA_STR = ",";
     private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
@@ -119,7 +119,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public UniParcEntry getBySequence(UniParcSequenceRequest sequenceRequest) {
 
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
-        UniParcEntry uniParcEntry = getEntity(MD5_STR, md5Value);
+        UniParcEntry uniParcEntry = getEntity(CHECKSUM_STR, md5Value);
 
         return filterUniParcStream(Stream.of(uniParcEntry), sequenceRequest)
                 .findFirst()

@@ -9,6 +9,7 @@ import org.apache.solr.common.SolrDocument;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.EntryInactiveReasonBuilder;
@@ -40,6 +41,13 @@ public class UniprotKBMappingRepository {
                 } else {
                     EntryInactiveReasonBuilder inactiveReasonBuilder =
                             new EntryInactiveReasonBuilder().type(InactiveReasonType.DELETED);
+                    if (Utils.notNullNotEmpty(document.inactiveReason)) {
+                        String[] inactiveReason = document.inactiveReason.split(":");
+                        if (inactiveReason.length == 2) {
+                            inactiveReasonBuilder.deletedReason(
+                                    DeletedReason.valueOf(inactiveReason[1].strip()));
+                        }
+                    }
                     String id = "";
                     if (Utils.notNullNotEmpty(document.id)) {
                         id = document.id.get(0);

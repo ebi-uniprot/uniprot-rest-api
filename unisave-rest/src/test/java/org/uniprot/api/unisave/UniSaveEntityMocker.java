@@ -29,6 +29,16 @@ public class UniSaveEntityMocker {
         return status;
     }
 
+    public static IdentifierStatus mockIdentifierStatus(
+            EventTypeEnum eventType,
+            String sourceAccession,
+            String targetAccession,
+            int deletedReasonId) {
+        IdentifierStatus status = mockIdentifierStatus(eventType, sourceAccession, targetAccession);
+        status.setDeletionReasonId(deletedReasonId);
+        return status;
+    }
+
     public static EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
         EntryInfoImpl entryInfo = new EntryInfoImpl();
         entryInfo.setName("name");
