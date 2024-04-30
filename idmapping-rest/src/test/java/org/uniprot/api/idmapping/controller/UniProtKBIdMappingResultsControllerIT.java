@@ -51,6 +51,7 @@ import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RdfPrologs;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -211,8 +212,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
                 .andExpect(
                         jsonPath(
-                                "$.results[1].to.inactiveReason.inactiveReasonType",
-                                is("DELETED")));
+                                "$.results[1].to.inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[1].to.inactiveReason.deletedReason",
+                                is(DeletedReason.PROTEOME_EXCLUSION.getName())));
     }
 
     @Test

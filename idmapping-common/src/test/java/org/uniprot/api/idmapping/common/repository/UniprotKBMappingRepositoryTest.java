@@ -9,6 +9,7 @@ import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -23,6 +24,7 @@ class UniprotKBMappingRepositoryTest {
         solrDocument.put("accession_id", "I8FBX0");
         solrDocument.put("id", "INACTIVE_DROME");
         solrDocument.put("active", false);
+        solrDocument.put("inactive_reason", "DELETED:SWISSPROT_DELETION");
         Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(solrDocument);
 
@@ -33,6 +35,8 @@ class UniprotKBMappingRepositoryTest {
         assertEquals(UniProtKBEntryType.INACTIVE, result.getEntryType());
         assertEquals(
                 InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
+        assertEquals(
+                DeletedReason.SWISSPROT_DELETION, result.getInactiveReason().getDeletedReason());
     }
 
     @Test

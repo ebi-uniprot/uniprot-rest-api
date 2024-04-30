@@ -21,9 +21,11 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.AccessionStatusInfo;
 import org.uniprot.api.unisave.repository.domain.Entry;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.api.unisave.util.DateConvertUtils;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.util.Utils;
 
 @Service
@@ -235,14 +237,25 @@ public class UniSaveServiceImpl implements UniSaveService {
     private List<AccessionEvent> entryStatusInfoToEvents(AccessionStatusInfo statusInfo) {
         return statusInfo.getEvents().stream()
                 .filter(this::isEventDateOnOrBeforeCurrentReleaseDate)
-                .map(
-                        event ->
-                                AccessionEvent.builder()
-                                        .eventType(event.getEventTypeEnum().toString())
-                                        .release(event.getEventRelease().getReleaseNumber())
-                                        .targetAccession(event.getTargetAccession())
-                                        .build())
+                .map(this::mapEntryStatusEvent)
                 .collect(Collectors.toList());
+    }
+
+    private AccessionEvent mapEntryStatusEvent(
+            org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
+        AccessionEvent.AccessionEventBuilder buider =
+                AccessionEvent.builder()
+                        .eventType(event.getEventTypeEnum().toString())
+                        .release(event.getEventRelease().getReleaseNumber())
+                        .targetAccession(event.getTargetAccession());
+        if (event.getEventTypeEnum() == EventTypeEnum.DELETED) {
+            String reasonId = "0";
+            if (event.getDeletionReasonId() != null) {
+                reasonId = String.valueOf(event.getDeletionReasonId());
+            }
+            buider.deletedReason(DeletedReason.fromId(reasonId).getName());
+        }
+        return buider.build();
     }
 
     private UniSaveEntry.UniSaveEntryBuilder entryInfo2UniSaveEntryBuilder(

@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -56,6 +54,7 @@ import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.UniProtKBId;
@@ -85,6 +84,8 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @ContextConfiguration(
         classes = {
@@ -187,7 +188,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -314,7 +314,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchSecondaryAccession() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
@@ -350,7 +349,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchCanonicalOnly() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -392,7 +390,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchCanonicalIsoformAccession() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -433,7 +430,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchIncludeCanonicalAndIsoForm() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -472,7 +468,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchByAccessionAndIncludeIsoForm() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -511,7 +506,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchIsoFormOnly() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -593,7 +587,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
         InactiveUniProtEntry inactiveDrome =
                 InactiveUniProtEntry.from(
-                        "I8FBX0", "INACTIVE_DROME", InactiveEntryMocker.DELETED, null);
+                        "I8FBX0",
+                        "INACTIVE_DROME",
+                        InactiveEntryMocker.DELETED,
+                        null,
+                        "SOURCE_DELETION");
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
@@ -1108,7 +1106,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
-                                contains("DELETED")));
+                                contains("DELETED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.inactiveReason.deletedReason",
+                                contains(DeletedReason.SOURCE_DELETION.getName())));
 
         // when search accession by default field, returns only itself
         response =
@@ -1164,7 +1166,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
-                                contains("DELETED")));
+                                contains("DELETED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.inactiveReason.deletedReason",
+                                contains(DeletedReason.SOURCE_DELETION.getName())));
 
         // when search accession by default field, returns only itself
         response =
@@ -1328,7 +1334,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void cannotReturnMatchedFieldsForXML() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -1794,7 +1799,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchTestReturnDBSNP() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        String acc = entry.getPrimaryAccession().getValue();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
@@ -2026,49 +2030,27 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
-            switch (searchField) {
-                case "accession":
-                case "accession_id":
-                    value = "P21802";
-                    break;
-                case "organism_id":
-                case "virus_host_id":
-                case "taxonomy_id":
-                    value = "9606";
-                    break;
-                case "length":
-                case "mass":
-                    value = "[* TO *]";
-                    break;
-                case "proteome":
-                    value = "UP000000000";
-                    break;
-                case "annotation_score":
-                    value = "5";
-                    break;
-                case "uniref_cluster_50":
-                    value = "UniRef50_P00001";
-                    break;
-                case "uniref_cluster_90":
-                    value = "UniRef90_P00001";
-                    break;
-                case "uniref_cluster_100":
-                    value = "UniRef100_P00001";
-                    break;
-                case "uniparc":
-                    value = "UPI0000000001";
-                    break;
-                case "existence":
-                    value = "1";
-                    break;
-                case "date_modified":
-                case "date_created":
-                case "date_sequence_modified":
-                case "lit_pubdate":
-                    String now = Instant.now().toString();
-                    value = "[* TO " + now + "]";
-                    break;
-            }
+            value =
+                    switch (searchField) {
+                        case "accession", "accession_id" -> "P21802";
+                        case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
+                        case "length", "mass" -> "[* TO *]";
+                        case "proteome" -> "UP000000000";
+                        case "annotation_score" -> "5";
+                        case "uniref_cluster_50" -> "UniRef50_P00001";
+                        case "uniref_cluster_90" -> "UniRef90_P00001";
+                        case "uniref_cluster_100" -> "UniRef100_P00001";
+                        case "uniparc" -> "UPI0000000001";
+                        case "existence" -> "1";
+                        case "date_modified",
+                                "date_created",
+                                "date_sequence_modified",
+                                "lit_pubdate" -> {
+                            String now = Instant.now().toString();
+                            yield "[* TO " + now + "]";
+                        }
+                        default -> value;
+                    };
         }
         return value;
     }
@@ -2111,7 +2093,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
             InactiveUniProtEntry inactiveDrome =
                     InactiveUniProtEntry.from(
-                            "I8FBX0", "INACTIVE_DROME", InactiveEntryMocker.DELETED, null);
+                            "I8FBX0",
+                            "INACTIVE_DROME",
+                            InactiveEntryMocker.DELETED,
+                            null,
+                            "SOURCE_DELETION");
             getStoreManager()
                     .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
