@@ -1,13 +1,20 @@
 package org.uniprot.api.support.data.disease.service;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.DISEASE_REGEX;
+
+import java.util.regex.Pattern;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
+import org.uniprot.api.support.data.disease.request.DiseaseSearchRequest;
 import org.uniprot.api.support.data.disease.request.DiseaseSolrQueryConfig;
 import org.uniprot.api.support.data.disease.request.DiseaseSolrSortClause;
 import org.uniprot.api.support.data.disease.response.DiseaseDocumentToDiseaseConverter;
@@ -24,6 +31,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     private final SearchFieldConfig searchFieldConfig;
     private final RdfStreamer rdfStreamer;
     private final DefaultDocumentIdStream<DiseaseDocument> documentIdStream;
+    private static final Pattern DISEASE_REGEX_PATTERN = Pattern.compile(DISEASE_REGEX);
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -65,5 +73,15 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     @Override
     protected RdfStreamer getRdfStreamer() {
         return rdfStreamer;
+    }
+
+    @Override
+    public SolrRequest createSearchSolrRequest(SearchRequest request) {
+        DiseaseSearchRequest searchRequest = (DiseaseSearchRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+        if (DISEASE_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
+            searchRequest.setQuery(cleanQuery.toUpperCase());
+        }
+        return super.createSearchSolrRequest(searchRequest);
     }
 }

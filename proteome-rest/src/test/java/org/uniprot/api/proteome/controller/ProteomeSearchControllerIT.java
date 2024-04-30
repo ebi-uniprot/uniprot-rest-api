@@ -182,6 +182,26 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
                 .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
+    @Test
+    void searchLowercaseId() throws Exception {
+        // given
+        saveEntries(2);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "up000005001")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].id", is("up000005001".toUpperCase())));
+    }
+
     @Override
     protected List<Triple<String, String, List<String>>> getTriplets() {
         return List.of(

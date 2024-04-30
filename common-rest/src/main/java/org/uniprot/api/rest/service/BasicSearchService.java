@@ -45,7 +45,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected final AbstractSolrSortClause solrSortClause;
     protected final SolrQueryConfig queryBoosts;
     protected final FacetConfig facetConfig;
-    private static final Pattern CLEAN_QUERY_REGEX =
+    protected static final Pattern CLEAN_QUERY_REGEX =
             Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     // If this property is not set then it is set to empty and later it is set to

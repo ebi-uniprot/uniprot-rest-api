@@ -456,6 +456,31 @@ class DiseaseControllerSearchTestIT {
                 .andExpect(jsonPath("$.results.*.id", Matchers.contains(accession)));
     }
 
+    @Test
+    void testSearchDiseaseWithLowercaseAccession() throws Exception {
+        // given
+        String searchString = "di-03495";
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getSearchRequestPath())
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                                .param("query", searchString));
+
+        // then
+        JSONObject result = new JSONObject(response.andReturn().getResponse().getContentAsString());
+        JSONArray results = result.getJSONArray("results");
+        Assertions.assertEquals(1, results.length());
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results[0].id", Matchers.equalTo(searchString.toUpperCase())));
+    }
+
     private List<DiseaseDocument> convertToDocs(List<DiseaseEntry> diseases) {
         List<DiseaseDocument> docs = new ArrayList<>();
 
