@@ -4,10 +4,10 @@ import java.util.Date;
 
 import javax.persistence.*;
 
-import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.Release;
+
+import lombok.Data;
 
 @Entity(name = "Release")
 @NamedQueries({

@@ -14,8 +14,6 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
@@ -36,6 +34,8 @@ import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.Utils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @param <T>

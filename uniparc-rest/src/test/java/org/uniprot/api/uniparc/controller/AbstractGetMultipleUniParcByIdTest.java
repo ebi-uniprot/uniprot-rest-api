@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -54,6 +52,8 @@ import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad
@@ -213,7 +213,8 @@ abstract class AbstractGetMultipleUniParcByIdTest {
 
     protected static Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
-                .getReturnFields().stream()
+                .getReturnFields()
+                .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 

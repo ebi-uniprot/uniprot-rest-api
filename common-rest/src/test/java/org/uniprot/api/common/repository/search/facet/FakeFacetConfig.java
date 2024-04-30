@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 public class FakeFacetConfig extends FacetConfig {
 
     @Override

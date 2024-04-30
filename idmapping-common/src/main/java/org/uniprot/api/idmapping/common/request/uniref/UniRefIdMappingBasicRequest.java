@@ -2,9 +2,6 @@ package org.uniprot.api.idmapping.common.request.uniref;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.uniprot.api.idmapping.common.request.IdMappingPageRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
@@ -13,6 +10,8 @@ import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author lgonzales

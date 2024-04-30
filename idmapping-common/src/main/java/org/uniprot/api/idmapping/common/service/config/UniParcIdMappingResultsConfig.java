@@ -3,8 +3,6 @@ package org.uniprot.api.idmapping.common.service.config;
 import java.io.IOException;
 import java.time.Duration;
 
-import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,6 +26,8 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortRemoteUniParcEntryStore;
 import org.uniprot.store.search.SolrCollection;
+
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

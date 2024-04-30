@@ -6,12 +6,12 @@ import java.util.function.LongConsumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.api.rest.service.RdfService;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
-import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RdfService;
 
 @Slf4j
 public class RdfStreamer {

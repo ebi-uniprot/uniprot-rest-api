@@ -13,7 +13,9 @@ import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.Test;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 class FacetResponseConverterTest {
 
     private final QueryResponse queryResponse = mock(QueryResponse.class);

@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +32,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.RetrievalException;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.search.document.Document;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * Created 22/08/18

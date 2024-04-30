@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import lombok.Builder;
-import lombok.Data;
-
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -15,6 +12,9 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.core.util.Pair;
+
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * Created 07/09/18

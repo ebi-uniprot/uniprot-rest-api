@@ -5,10 +5,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -34,6 +30,10 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

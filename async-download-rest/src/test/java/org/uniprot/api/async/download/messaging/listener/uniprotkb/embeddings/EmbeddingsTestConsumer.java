@@ -3,8 +3,6 @@ package org.uniprot.api.async.download.messaging.listener.uniprotkb.embeddings;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.amqp.core.MessageListener;
@@ -19,6 +17,8 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.Embe
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+
+import lombok.extern.slf4j.Slf4j;
 
 @TestConfiguration
 @Slf4j

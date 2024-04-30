@@ -14,13 +14,13 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.core.util.Utils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Constraint(validatedBy = ValidGetByIdsRequest.GetByIdsRequestValidator.class)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})

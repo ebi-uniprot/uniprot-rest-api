@@ -10,8 +10,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -22,6 +20,8 @@ import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {

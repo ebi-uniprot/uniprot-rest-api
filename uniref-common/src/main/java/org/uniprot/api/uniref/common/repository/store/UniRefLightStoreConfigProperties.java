@@ -1,8 +1,8 @@
 package org.uniprot.api.uniref.common.repository.store;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 /**
  * @author lgonzales

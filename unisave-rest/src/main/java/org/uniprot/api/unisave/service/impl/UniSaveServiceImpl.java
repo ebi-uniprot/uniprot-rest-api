@@ -10,8 +10,6 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -27,6 +25,8 @@ import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.api.unisave.util.DateConvertUtils;
 import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.util.Utils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j

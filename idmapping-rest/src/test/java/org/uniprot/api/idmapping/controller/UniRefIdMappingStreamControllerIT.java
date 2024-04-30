@@ -119,7 +119,8 @@ class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControlle
     @Override
     protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF)
-                .getReturnFields().stream()
+                .getReturnFields()
+                .stream()
                 .map(
                         returnField -> {
                             String lightPath =

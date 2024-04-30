@@ -2,13 +2,12 @@ package org.uniprot.api.uniparc.common.service.request;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
-import lombok.Data;
-
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidEnumDisplayValue;
 import org.uniprot.core.uniparc.UniParcDatabase;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * @author sahmad

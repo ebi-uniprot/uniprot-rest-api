@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniprotkb.common.repository.model.PublicationEntry;
 import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
@@ -19,6 +17,8 @@ import org.uniprot.core.publication.MappedReference;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 07/01/2021

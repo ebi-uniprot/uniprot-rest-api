@@ -11,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,6 +23,9 @@ import org.uniprot.core.util.Utils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Strings;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Interrogate a running Id Mapping service and determine how long fetching from PIR takes, and how

@@ -8,9 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -26,6 +23,9 @@ import org.uniprot.core.uniprotkb.impl.UniProtKBIdBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}

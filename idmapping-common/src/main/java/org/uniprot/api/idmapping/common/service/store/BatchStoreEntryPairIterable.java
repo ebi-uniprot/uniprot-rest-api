@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.store.datastore.UniProtStoreClient;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

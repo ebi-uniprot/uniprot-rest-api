@@ -3,8 +3,6 @@ package org.uniprot.api.async.download.messaging.producer.idmapping;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -22,6 +20,8 @@ import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j

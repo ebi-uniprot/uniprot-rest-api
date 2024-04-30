@@ -4,12 +4,12 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
-import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.ContentTypeEnum;
 import org.uniprot.api.unisave.repository.domain.EntryContent;
 
 import com.google.common.base.Preconditions;
+
+import lombok.Data;
 
 /**
  * The Entry Content that is embedded in the Entry table.

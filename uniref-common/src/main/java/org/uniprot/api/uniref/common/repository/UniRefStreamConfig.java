@@ -3,9 +3,6 @@ package org.uniprot.api.uniref.common.repository;
 import java.io.IOException;
 import java.time.Duration;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,7 +22,12 @@ import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
 
-/** @author jluo date: 21 Aug 2019 */
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
+
+/**
+ * @author jluo date: 21 Aug 2019
+ */
 @Configuration
 @Import(RepositoryConfig.class)
 @Slf4j

@@ -18,7 +18,9 @@ import org.springframework.lang.Nullable;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 public class ErrorMessageXMLConverter extends AbstractGenericHttpMessageConverter<ErrorInfo> {
 
     private final Marshaller marshaller;

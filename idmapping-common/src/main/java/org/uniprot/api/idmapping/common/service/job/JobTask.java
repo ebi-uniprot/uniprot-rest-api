@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
@@ -14,6 +12,8 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

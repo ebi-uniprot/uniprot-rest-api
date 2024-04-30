@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.StopStreamException;
@@ -19,7 +17,11 @@ import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-/** @author Edd */
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author Edd
+ */
 @Slf4j
 public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniSaveEntry> {
     private static final int MAX_COLUMNS = 60;

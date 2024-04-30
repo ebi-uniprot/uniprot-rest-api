@@ -15,8 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import nl.altindag.log.LogCaptor;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -35,6 +33,8 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPip
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import nl.altindag.log.LogCaptor;
 
 /**
  * This class tests the full flow of functionality offered by {@link UniProtQueryProcessor},

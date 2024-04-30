@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -72,6 +70,8 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lgonzales

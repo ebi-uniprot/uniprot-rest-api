@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,6 +16,8 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
+
+import junit.framework.AssertionFailedError;
 
 class AdvancedSearchTermIT {
     private static final String CONTEXT_PATH = "/uniprot/api";

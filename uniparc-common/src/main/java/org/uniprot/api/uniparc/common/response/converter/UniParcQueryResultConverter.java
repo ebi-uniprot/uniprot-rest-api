@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Function;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

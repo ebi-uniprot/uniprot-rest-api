@@ -13,7 +13,9 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 class PaginatedResultsListenerTest {
 
     @Test
