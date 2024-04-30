@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.tuple.Triple;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -56,6 +54,7 @@ import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.UniProtKBId;
@@ -85,6 +84,8 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @ContextConfiguration(
         classes = {
@@ -1109,7 +1110,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.deletedReason",
-                                contains("Sequence source deletion")));
+                                contains(DeletedReason.SOURCE_DELETION.getName())));
 
         // when search accession by default field, returns only itself
         response =
@@ -1169,7 +1170,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.deletedReason",
-                                contains("Sequence source deletion")));
+                                contains(DeletedReason.SOURCE_DELETION.getName())));
 
         // when search accession by default field, returns only itself
         response =
@@ -2029,23 +2030,27 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
-            value = switch (searchField) {
-                case "accession", "accession_id" -> "P21802";
-                case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
-                case "length", "mass" -> "[* TO *]";
-                case "proteome" -> "UP000000000";
-                case "annotation_score" -> "5";
-                case "uniref_cluster_50" -> "UniRef50_P00001";
-                case "uniref_cluster_90" -> "UniRef90_P00001";
-                case "uniref_cluster_100" -> "UniRef100_P00001";
-                case "uniparc" -> "UPI0000000001";
-                case "existence" -> "1";
-                case "date_modified", "date_created", "date_sequence_modified", "lit_pubdate" -> {
-                    String now = Instant.now().toString();
-                    yield "[* TO " + now + "]";
-                }
-                default -> value;
-            };
+            value =
+                    switch (searchField) {
+                        case "accession", "accession_id" -> "P21802";
+                        case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
+                        case "length", "mass" -> "[* TO *]";
+                        case "proteome" -> "UP000000000";
+                        case "annotation_score" -> "5";
+                        case "uniref_cluster_50" -> "UniRef50_P00001";
+                        case "uniref_cluster_90" -> "UniRef90_P00001";
+                        case "uniref_cluster_100" -> "UniRef100_P00001";
+                        case "uniparc" -> "UPI0000000001";
+                        case "existence" -> "1";
+                        case "date_modified",
+                                "date_created",
+                                "date_sequence_modified",
+                                "lit_pubdate" -> {
+                            String now = Instant.now().toString();
+                            yield "[* TO " + now + "]";
+                        }
+                        default -> value;
+                    };
         }
         return value;
     }

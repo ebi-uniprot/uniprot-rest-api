@@ -60,6 +60,7 @@ import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -72,7 +73,9 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @ContextConfiguration(classes = {UniProtKBDataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
@@ -523,7 +526,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DELETED")))
                 .andExpect(
-                        jsonPath("$.inactiveReason.deletedReason", is("Sequence source deletion")));
+                        jsonPath(
+                                "$.inactiveReason.deletedReason",
+                                is(DeletedReason.SOURCE_DELETION.getName())));
     }
 
     @Test

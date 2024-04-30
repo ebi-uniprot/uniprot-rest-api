@@ -48,6 +48,7 @@ import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -418,7 +419,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                 .andExpect(
                         jsonPath(
                                 "$.results[1].to.inactiveReason.deletedReason",
-                                is("Proteome Exclusion")));
+                                is(DeletedReason.PROTEOME_EXCLUSION.getName())));
     }
 
     @ParameterizedTest(name = "[{index}] contentType with inactive {0} show inactive {1}")
