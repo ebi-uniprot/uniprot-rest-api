@@ -10,9 +10,8 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
-import org.uniprot.api.proteome.request.ProteomeSearchRequest;
+import org.uniprot.api.proteome.request.ProteomeBasicRequest;
 import org.uniprot.api.rest.request.BasicRequest;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -56,7 +55,12 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
             BasicRequest request,
             AbstractSolrSortClause solrSortClause,
             SolrQueryConfig queryBoosts) {
-        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
+        ProteomeBasicRequest proteomeBasicRequest = (ProteomeBasicRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+        if (PROTEOME_ID_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
+            proteomeBasicRequest.setQuery(cleanQuery.toUpperCase());
+        }
+        return super.createSolrRequestBuilder(proteomeBasicRequest, solrSortClause, queryBoosts);
     }
 
     @Override
@@ -67,15 +71,5 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     @Override
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return proteomeQueryProcessorConfig;
-    }
-
-    @Override
-    public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        ProteomeSearchRequest searchRequest = (ProteomeSearchRequest) request;
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
-        if (PROTEOME_ID_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
-            searchRequest.setQuery(cleanQuery.toUpperCase());
-        }
-        return super.createSearchSolrRequest(searchRequest);
     }
 }

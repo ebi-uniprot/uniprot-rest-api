@@ -33,6 +33,7 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.*;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -324,18 +325,28 @@ public class UniProtEntryService
     }
 
     @Override
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        UniProtKBBasicRequest uniProtRequest = (UniProtKBBasicRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+        if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
+            uniProtRequest.setQuery(cleanQuery.toUpperCase());
+        }
+        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
+    }
+
+    @Override
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
 
         if (isSearchAll(uniProtRequest)) {
             uniProtRequest.setQuery(getQueryFieldName(ACTIVE) + ":" + true);
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
                     uniProtRequest.getQuery() + " AND " + getQueryFieldName(ACTIVE) + ":" + true);
-        } else if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
-            uniProtRequest.setQuery(cleanQuery.toUpperCase());
         }
 
         // fill the common params from the basic service class

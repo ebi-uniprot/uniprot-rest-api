@@ -113,6 +113,26 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     }
 
     @Test
+    void proteomeLowercaseIdWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "up000005010");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].id", is("UP000005010")));
+    }
+
+    @Test
     void proteomeQueryEmptyResults() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =

@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -18,7 +19,7 @@ import lombok.Data;
  * @since 23/11/2020
  */
 @Data
-public class ProteomeBasicRequest {
+public class ProteomeBasicRequest implements BasicRequest {
 
     @Parameter(description = QUERY_PROTEOME_DESCRIPTION, example = QUERY_PROTEOME_EXAMPLE)
     @NotNull(message = "{search.required}")

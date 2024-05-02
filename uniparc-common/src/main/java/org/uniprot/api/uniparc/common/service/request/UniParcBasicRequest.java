@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
@@ -16,7 +17,7 @@ import lombok.Data;
  * @since 18/06/2020
  */
 @Data
-public class UniParcBasicRequest {
+public class UniParcBasicRequest implements BasicRequest {
 
     @Parameter(description = QUERY_UNIPARC_DESCRIPTION, example = QUERY_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")

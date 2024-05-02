@@ -267,6 +267,26 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                         "UPI0000283A01")));
     }
 
+    @Test
+    void streamDefaultSearchWithLowercaseId() throws Exception {
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "upi0000283A10");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000283A10")));
+    }
+
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
     @MethodSource("getAllSortFields")
     void streamCanSortAllPossibleSortFields(String sortField) throws Exception {
