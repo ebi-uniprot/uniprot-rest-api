@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances for facet

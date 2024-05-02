@@ -9,7 +9,9 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** @author eddturner */
+/**
+ * @author eddturner
+ */
 public class UniSaveJsonMessageConverter extends JsonMessageConverter<UniSaveEntry> {
 
     public UniSaveJsonMessageConverter() {

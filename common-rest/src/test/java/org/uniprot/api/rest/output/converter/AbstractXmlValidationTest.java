@@ -18,8 +18,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -33,6 +31,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 29/11/2021

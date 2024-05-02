@@ -1,9 +1,9 @@
 package org.uniprot.api.rest.output;
 
+import org.uniprot.api.common.repository.search.EntryPair;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import org.uniprot.api.common.repository.search.EntryPair;
 
 @Builder
 @Getter

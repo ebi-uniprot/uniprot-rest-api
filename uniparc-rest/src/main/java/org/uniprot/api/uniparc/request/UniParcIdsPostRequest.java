@@ -1,11 +1,11 @@
 package org.uniprot.api.uniparc.request;
 
-import lombok.Data;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.IdsDownloadRequest;
 import org.uniprot.api.rest.validation.ValidPostByIdsRequest;
 import org.uniprot.store.config.UniProtDataType;
+
+import lombok.Data;
 
 /**
  * @author sahmad

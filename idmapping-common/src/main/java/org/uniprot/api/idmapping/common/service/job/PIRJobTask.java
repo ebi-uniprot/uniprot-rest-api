@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -19,6 +17,8 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.search.SolrCollection;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PIRJobTask extends JobTask {

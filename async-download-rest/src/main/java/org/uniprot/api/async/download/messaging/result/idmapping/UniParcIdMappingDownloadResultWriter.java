@@ -3,8 +3,6 @@ package org.uniprot.api.async.download.messaging.result.idmapping;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -19,6 +17,8 @@ import org.uniprot.api.idmapping.common.service.store.impl.UniParcBatchStoreEntr
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniparc.UniParcEntry;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j

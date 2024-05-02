@@ -29,8 +29,6 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -64,7 +62,11 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 
-/** @author lgonzales */
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author lgonzales
+ */
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractSearchControllerIT {
@@ -913,7 +915,8 @@ public abstract class AbstractSearchControllerIT {
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }

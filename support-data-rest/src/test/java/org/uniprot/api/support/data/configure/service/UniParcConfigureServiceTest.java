@@ -5,12 +5,12 @@ import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CON
 
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author lgonzales

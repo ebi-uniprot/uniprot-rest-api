@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -38,6 +35,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
 import org.uniprot.store.search.SolrCollection;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author sahmad

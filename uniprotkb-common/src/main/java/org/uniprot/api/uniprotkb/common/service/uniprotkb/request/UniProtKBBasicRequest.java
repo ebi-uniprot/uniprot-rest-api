@@ -5,12 +5,11 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import lombok.Data;
-
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * @author lgonzales

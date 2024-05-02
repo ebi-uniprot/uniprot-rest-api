@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -17,6 +15,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 09/10/2019

@@ -19,8 +19,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -36,6 +34,8 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {

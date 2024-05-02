@@ -4,12 +4,12 @@ import static org.uniprot.api.common.repository.search.SolrQueryConverter.*;
 import static org.uniprot.core.util.Utils.notNull;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 14/06/19

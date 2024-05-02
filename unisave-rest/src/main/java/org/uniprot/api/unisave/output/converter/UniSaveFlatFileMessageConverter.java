@@ -7,7 +7,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 
-/** @author eddturner */
+/**
+ * @author eddturner
+ */
 public class UniSaveFlatFileMessageConverter
         extends AbstractEntityHttpMessageConverter<UniSaveEntry> {
 

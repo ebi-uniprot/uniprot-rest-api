@@ -8,13 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.rest.output.context.FileType;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AsyncDownloadFileHandler {

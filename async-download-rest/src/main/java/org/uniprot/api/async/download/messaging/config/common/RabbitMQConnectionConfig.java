@@ -1,8 +1,8 @@
 package org.uniprot.api.async.download.messaging.config.common;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 /**
  * Rabbit MQ properties bean that will be injected with values from application.properties.

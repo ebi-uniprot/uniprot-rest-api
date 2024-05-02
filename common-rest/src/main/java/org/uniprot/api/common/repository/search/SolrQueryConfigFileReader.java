@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 04/09/19

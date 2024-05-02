@@ -6,9 +6,6 @@ import static org.uniprot.api.idmapping.common.response.converter.uniprotkb.UniP
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +29,9 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created 21/08/18

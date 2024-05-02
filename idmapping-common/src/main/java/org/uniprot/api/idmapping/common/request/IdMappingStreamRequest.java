@@ -4,14 +4,13 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.Pattern;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * Created 20/05/2021

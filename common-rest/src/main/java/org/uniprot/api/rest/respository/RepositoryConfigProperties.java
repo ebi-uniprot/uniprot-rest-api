@@ -1,8 +1,8 @@
 package org.uniprot.api.rest.respository;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 /**
  * Solr properties bean that will be injected with values from application.properties.

@@ -10,12 +10,12 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This Return Fields Constraint Validator class is responsible to verify if the inputted return

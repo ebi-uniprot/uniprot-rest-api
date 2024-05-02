@@ -6,8 +6,6 @@ import static org.uniprot.api.rest.request.SearchRequest.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
-import lombok.Data;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.validation.ValidContentTypes;
@@ -17,6 +15,7 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.uniprotkb.common.service.publication.PublicationFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * @author lgonzales

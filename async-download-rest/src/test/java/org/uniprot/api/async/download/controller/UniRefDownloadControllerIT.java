@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,6 +54,8 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "idmapping"})

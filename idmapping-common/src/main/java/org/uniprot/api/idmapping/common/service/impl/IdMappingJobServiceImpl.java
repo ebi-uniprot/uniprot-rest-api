@@ -3,8 +3,6 @@ package org.uniprot.api.idmapping.common.service.impl;
 import java.util.Date;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,8 @@ import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.request.HashGenerator;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 23/02/2021

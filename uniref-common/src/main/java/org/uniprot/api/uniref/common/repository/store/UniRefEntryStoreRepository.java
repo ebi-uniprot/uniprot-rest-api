@@ -8,10 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -27,6 +23,10 @@ import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.voldemort.RetrievalException;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author jluo

@@ -2,8 +2,6 @@ package org.uniprot.api.support.data.crossref.request;
 
 import java.util.function.Function;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
@@ -11,6 +9,8 @@ import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

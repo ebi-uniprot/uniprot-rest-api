@@ -7,8 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -42,6 +40,8 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

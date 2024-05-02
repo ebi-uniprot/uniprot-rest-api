@@ -390,7 +390,8 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
 
     private Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC_CROSSREF)
-                .getReturnFields().stream()
+                .getReturnFields()
+                .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 }

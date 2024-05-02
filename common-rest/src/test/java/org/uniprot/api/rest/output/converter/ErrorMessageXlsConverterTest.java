@@ -18,7 +18,9 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 class ErrorMessageXlsConverterTest {
 
     @Test

@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
 
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
 
 @Slf4j
 public class HeartbeatProducer {

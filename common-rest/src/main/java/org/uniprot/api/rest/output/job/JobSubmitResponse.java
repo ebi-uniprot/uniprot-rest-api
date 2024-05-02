@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.output.job;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author sahmad

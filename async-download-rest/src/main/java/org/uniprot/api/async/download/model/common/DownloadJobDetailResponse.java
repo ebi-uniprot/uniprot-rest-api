@@ -2,11 +2,11 @@ package org.uniprot.api.async.download.model.common;
 
 import java.util.List;
 
-import lombok.Data;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Data;
 
 /**
  * @author lgonzales

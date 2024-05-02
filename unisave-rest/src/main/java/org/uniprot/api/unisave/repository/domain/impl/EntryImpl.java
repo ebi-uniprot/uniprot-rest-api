@@ -2,10 +2,10 @@ package org.uniprot.api.unisave.repository.domain.impl;
 
 import javax.persistence.*;
 
-import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.Entry;
+
+import lombok.Data;
 
 @Entity(name = "Entry")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "entry_version"}))

@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-
 import org.apache.commons.lang3.StringUtils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -23,6 +19,10 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder(toBuilder = true)

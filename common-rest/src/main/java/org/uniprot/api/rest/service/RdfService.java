@@ -3,12 +3,12 @@ package org.uniprot.api.rest.service;
 import java.net.URI;
 import java.util.*;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.store.datastore.common.StoreService;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RdfService<T> implements StoreService<T> {

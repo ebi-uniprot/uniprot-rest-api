@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

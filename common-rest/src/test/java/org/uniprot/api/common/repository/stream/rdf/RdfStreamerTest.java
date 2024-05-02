@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.jodah.failsafe.RetryPolicy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +20,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
+
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

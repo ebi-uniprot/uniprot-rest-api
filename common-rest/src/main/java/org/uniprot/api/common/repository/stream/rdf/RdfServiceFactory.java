@@ -3,11 +3,11 @@ package org.uniprot.api.common.repository.stream.rdf;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Data;
-
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
+
+import lombok.Data;
 
 public class RdfServiceFactory {
     private final Map<RdfServiceIdentifier, RdfService<String>> serviceMap = new HashMap<>();

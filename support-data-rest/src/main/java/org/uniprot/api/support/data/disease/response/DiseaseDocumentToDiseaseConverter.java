@@ -3,14 +3,14 @@ package org.uniprot.api.support.data.disease.response;
 import java.io.IOException;
 import java.util.function.Function;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

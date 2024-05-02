@@ -7,9 +7,6 @@ import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;

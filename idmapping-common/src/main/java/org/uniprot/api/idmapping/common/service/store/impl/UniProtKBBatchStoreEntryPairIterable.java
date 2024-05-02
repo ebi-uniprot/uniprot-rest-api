@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterableUtil;
 import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
@@ -16,6 +13,9 @@ import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.common.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

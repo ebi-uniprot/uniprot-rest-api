@@ -8,8 +8,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
-import lombok.Data;
-
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
@@ -19,6 +17,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * @author lgonzales
@@ -29,7 +28,8 @@ public class HelpCentreSearchRequest implements SearchRequest {
 
     @Parameter(hidden = true)
     private static final String fieldsWithoutContent =
-            ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.HELP).getReturnFields()
+            ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.HELP)
+                    .getReturnFields()
                     .stream()
                     .map(ReturnField::getName)
                     .filter(fieldName -> !fieldName.equals("content"))

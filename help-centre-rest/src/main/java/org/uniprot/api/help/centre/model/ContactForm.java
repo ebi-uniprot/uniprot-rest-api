@@ -3,10 +3,10 @@ package org.uniprot.api.help.centre.model;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+import org.uniprot.api.rest.validation.IsEmpty;
+
 import lombok.Getter;
 import lombok.Setter;
-
-import org.uniprot.api.rest.validation.IsEmpty;
 
 @Getter
 @Setter

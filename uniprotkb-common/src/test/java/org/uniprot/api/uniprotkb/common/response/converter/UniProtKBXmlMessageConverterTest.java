@@ -2,8 +2,6 @@ package org.uniprot.api.uniprotkb.common.response.converter;
 
 import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_COMPLEX;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -12,6 +10,8 @@ import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
 import org.uniprot.api.uniprotkb.common.response.UniProtKBMessageConverterConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 class UniProtKBXmlMessageConverterTest extends AbstractXmlValidationTest<UniProtKBEntry> {

@@ -3,12 +3,12 @@ package org.uniprot.api.common.repository.stream.store;
 import java.util.Iterator;
 import java.util.List;
 
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.store.datastore.UniProtStoreClient;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
-import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.store.datastore.UniProtStoreClient;
 
 @Slf4j
 public class BatchStoreIterable<T> extends BatchIterable<T> {

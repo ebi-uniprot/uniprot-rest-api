@@ -67,23 +67,27 @@ public class IdMappingUniProtKBITUtils {
         if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
-            value = switch (searchField) {
-                case "accession_id", "accession" -> "Q00011";
-                case "mass", "length" -> "[* TO *]";
-                case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
-                case "date_modified", "date_sequence_modified", "date_created", "lit_pubdate" -> {
-                    String now = Instant.now().toString();
-                    yield "[* TO " + now + "]";
-                }
-                case "proteome" -> "UP000000000";
-                case "annotation_score" -> "5";
-                case "uniref_cluster_50" -> "UniRef50_P00001";
-                case "uniref_cluster_90" -> "UniRef90_P00001";
-                case "uniref_cluster_100" -> "UniRef100_P00001";
-                case "uniparc" -> "UPI0000000001";
-                case "existence" -> "1";
-                default -> value;
-            };
+            value =
+                    switch (searchField) {
+                        case "accession_id", "accession" -> "Q00011";
+                        case "mass", "length" -> "[* TO *]";
+                        case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
+                        case "date_modified",
+                                "date_sequence_modified",
+                                "date_created",
+                                "lit_pubdate" -> {
+                            String now = Instant.now().toString();
+                            yield "[* TO " + now + "]";
+                        }
+                        case "proteome" -> "UP000000000";
+                        case "annotation_score" -> "5";
+                        case "uniref_cluster_50" -> "UniRef50_P00001";
+                        case "uniref_cluster_90" -> "UniRef90_P00001";
+                        case "uniref_cluster_100" -> "UniRef100_P00001";
+                        case "uniparc" -> "UPI0000000001";
+                        case "existence" -> "1";
+                        default -> value;
+                    };
         }
         return value;
     }

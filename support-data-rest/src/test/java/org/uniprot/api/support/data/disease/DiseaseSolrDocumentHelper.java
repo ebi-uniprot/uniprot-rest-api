@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
@@ -20,6 +18,8 @@ import org.uniprot.store.search.document.DocumentConversionException;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DiseaseSolrDocumentHelper {

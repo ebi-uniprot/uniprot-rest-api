@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @Data
 @Builder
 public class GetIdContentTypeParam {

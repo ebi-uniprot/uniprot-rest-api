@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -67,6 +65,8 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 22/06/2020

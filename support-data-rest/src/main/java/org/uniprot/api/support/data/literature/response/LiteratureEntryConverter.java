@@ -2,14 +2,14 @@ package org.uniprot.api.support.data.literature.response;
 
 import java.util.function.Function;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lgonzales

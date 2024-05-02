@@ -6,9 +6,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -25,7 +22,12 @@ import org.uniprot.api.unisave.output.converter.UniSaveFlatFileMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveJsonMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveTSVMessageConverter;
 
-/** @author Edd */
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * @author Edd
+ */
 @Configuration
 @Getter
 @Setter

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +42,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.PublicationDocumentMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lgonzales

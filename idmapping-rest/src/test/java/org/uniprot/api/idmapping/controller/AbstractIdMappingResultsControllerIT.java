@@ -359,7 +359,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
 
     private Stream<Arguments> getAllSearchFields() {
         return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItems().stream()
+                .getSearchFieldItems()
+                .stream()
                 .map(SearchFieldItem::getFieldName)
                 .map(Arguments::of);
     }
