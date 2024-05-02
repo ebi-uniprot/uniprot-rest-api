@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -18,7 +19,7 @@ import lombok.Data;
  * @created 21/01/2021
  */
 @Data
-public class KeywordBasicRequest {
+public class KeywordBasicRequest implements BasicRequest {
     @Parameter(description = QUERY_KEYWORDS_DESCRIPTION, example = QUERY_KEYWORDS_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")

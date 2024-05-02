@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -18,7 +19,7 @@ import lombok.Data;
  * @created 01/02/2021
  */
 @Data
-public class CrossRefBasicRequest {
+public class CrossRefBasicRequest implements BasicRequest {
 
     @Parameter(description = QUERY_CROSSREF_DESCRIPTION, example = QUERY_CROSSREF_EXAMPLE)
     @NotNull(message = "{search.required}")

@@ -22,8 +22,9 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -223,16 +224,19 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
-    public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        if (request instanceof UniParcSearchRequest searchRequest) {
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        if (request instanceof UniParcBasicRequest uniParcBasicRequest) {
             String cleanQuery =
                     CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
             if (UNIPARC_UPI_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
-                searchRequest.setQuery(cleanQuery.toUpperCase());
+                uniParcBasicRequest.setQuery(cleanQuery.toUpperCase());
             }
-            return super.createSearchSolrRequest(searchRequest);
+            return super.createSolrRequestBuilder(uniParcBasicRequest, solrSortClause, queryBoosts);
         }
-        return super.createSearchSolrRequest(request);
+        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

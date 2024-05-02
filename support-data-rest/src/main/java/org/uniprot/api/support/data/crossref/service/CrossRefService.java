@@ -10,7 +10,8 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -73,12 +74,15 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     }
 
     @Override
-    public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        CrossRefSearchRequest xrefRequest = (CrossRefSearchRequest) request;
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        CrossRefBasicRequest xrefRequest = (CrossRefBasicRequest) request;
         String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
         if (CROSS_REF_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
             xrefRequest.setQuery(cleanQuery.toUpperCase());
         }
-        return super.createSearchSolrRequest(xrefRequest);
+        return super.createSolrRequestBuilder(xrefRequest, solrSortClause, queryBoosts);
     }
 }

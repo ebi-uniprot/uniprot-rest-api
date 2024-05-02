@@ -10,11 +10,12 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
-import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSearchRequest;
+import org.uniprot.api.support.data.subcellular.request.SubcellularLocationBasicRequest;
 import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSolrQueryConfig;
 import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSortClause;
 import org.uniprot.api.support.data.subcellular.response.SubcellularLocationEntryConverter;
@@ -82,12 +83,17 @@ public class SubcellularLocationService
     }
 
     @Override
-    public SolrRequest createSearchSolrRequest(SearchRequest request) {
-        SubcellularLocationSearchRequest searchRequest = (SubcellularLocationSearchRequest) request;
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        SubcellularLocationBasicRequest subcellularLocationBasicRequest =
+                (SubcellularLocationBasicRequest) request;
         String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
         if (SUBCELLULAR_LOCATION_ID_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
-            searchRequest.setQuery(cleanQuery.toUpperCase());
+            subcellularLocationBasicRequest.setQuery(cleanQuery.toUpperCase());
         }
-        return super.createSearchSolrRequest(searchRequest);
+        return super.createSolrRequestBuilder(
+                subcellularLocationBasicRequest, solrSortClause, queryBoosts);
     }
 }
