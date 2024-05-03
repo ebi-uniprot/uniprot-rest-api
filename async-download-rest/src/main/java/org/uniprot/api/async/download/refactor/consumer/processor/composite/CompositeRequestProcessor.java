@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.refactor.consumer.processor.idresult;
+package org.uniprot.api.async.download.refactor.consumer.processor.composite;
 
 import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;

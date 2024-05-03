@@ -53,8 +53,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
         try {
             jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
             log.info("Received job {} in listener", jobId);
-            T request = (T) this.messageConverter.fromMessage(message);
-            request.setJobId(jobId);
 
             if (isMaxRetriedReached(message)) {
                 rejectMessage(message, jobId);
@@ -62,7 +60,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
                 String error = "Unable to find jobId " + jobId + " in db";
                 DownloadJob downloadJob = jobService.find(jobId).orElseThrow(() -> new MessageListenerException(error));
                 cleanIfNecessary(downloadJob);
-                // run the job if it has errored out
+                // run the job only if it has errored out
                 if (isJobSeenBefore(jobId) && JobStatus.ERROR != downloadJob.getStatus()) {
                     if (downloadJob.getStatus() == JobStatus.RUNNING) {
                         log.warn("The job {} is running by other thread", jobId);
@@ -71,11 +69,12 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
                     }
                 } else {
                     jobService.update(jobId, Map.of(STATUS, JobStatus.RUNNING));
+                    T request = (T) this.messageConverter.fromMessage(message);
+                    request.setJobId(jobId);
                     requestProcessor.process(request);
+                    jobService.update(jobId, Map.of(STATUS, JobStatus.FINISHED));
+                    log.info("Message with jobId {} processed successfully", jobId);
                 }
-
-                jobService.update(jobId, Map.of(STATUS, JobStatus.FINISHED));
-                log.info("Message with jobId {} processed successfully", jobId);
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= messagingService.getMaxRetryCount()) {

@@ -42,28 +42,13 @@ class UniProtKBSolrIdRequestProcessorTest extends SolrIdRequestProcessorTest<Uni
         jobService = uniProtKBJobService;
         downloadRequest = uniProtKBDownloadRequest;
         requestProcessor = new UniProtKBSolrIdRequestProcessor(uniProtKBAsyncDownloadFileHandler, uniProtKBJobService, uniProtEntryService);
-        mockUniProtKB();
-    }
-
-    protected void mockUniProtKB() {
-        mockRequest();
-        mockStream();
-        mockSolrHits();
-    }
-
-    protected void mockSolrHits() {
+        when(downloadRequest.getQuery()).thenReturn(QUERY);
+        when(downloadRequest.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORMS);
+        when(uniProtEntryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
         when(uniProtEntryService.search(argThat(sr -> QUERY.equals(((UniProtKBSearchRequest) sr).getQuery()) && Boolean.parseBoolean(INCLUDE_ISOFORMS) == ((UniProtKBSearchRequest) sr).isIncludeIsoform() && sr.getSize() == 0)))
                 .thenReturn(searchResults);
         when(searchResults.getPage()).thenReturn(page);
         when(page.getTotalElements()).thenReturn(SOLR_HITS);
     }
 
-    private void mockStream() {
-        when(uniProtEntryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
-    }
-
-    protected void mockRequest() {
-        when(downloadRequest.getQuery()).thenReturn(QUERY);
-        when(downloadRequest.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORMS);
-    }
 }

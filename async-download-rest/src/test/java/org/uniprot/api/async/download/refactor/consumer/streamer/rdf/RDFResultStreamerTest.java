@@ -38,7 +38,7 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
         Stream<String> ids = Stream.of("id1", "id2", "id3");
         List<String> redfList = List.of("rdf1", "rdf2", "rdf3");
         Stream<String> rdf = redfList.stream();
-        when(rdfStreamer.stream(eq(ids), eq(getDataType()), eq(RDF), any(LongConsumer.class))).thenReturn(rdf);
+        when(rdfStreamer.stream(eq(ids), eq(rdfResultStreamer.getDataType()), eq(RDF), any(LongConsumer.class))).thenReturn(rdf);
 
         Stream<String> result = rdfResultStreamer.stream(request, ids);
 
@@ -53,5 +53,4 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
         assertThrows(IllegalArgumentException.class, () -> rdfResultStreamer.stream(request, Stream.of()));
     }
 
-    protected abstract String getDataType();
 }

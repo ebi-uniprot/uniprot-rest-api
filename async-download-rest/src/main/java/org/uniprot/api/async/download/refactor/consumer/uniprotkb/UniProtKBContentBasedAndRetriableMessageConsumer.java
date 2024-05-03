@@ -6,7 +6,7 @@ import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloa
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.ContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.messaging.uniprotkb.UniProtKBMessagingService;
-import org.uniprot.api.async.download.refactor.consumer.processor.idresult.uniprotkb.UniProtKBRequestProcessor;
+import org.uniprot.api.async.download.refactor.consumer.processor.uniprotkb.UniProtKBRequestProcessor;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 

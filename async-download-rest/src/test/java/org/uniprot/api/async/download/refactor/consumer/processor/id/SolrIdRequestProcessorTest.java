@@ -26,24 +26,12 @@ public abstract  class SolrIdRequestProcessorTest<T extends SolrStreamDownloadRe
 
     @Test
     void process() {
-        mock();
-        doAdditionalMocks();
+        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
 
         requestProcessor.process(downloadRequest);
 
         verify(jobService).update(JOB_ID, Map.of(TOTAL_ENTRIES, SOLR_HITS));
         verify(asyncDownloadFileHandler).writeIds(JOB_ID, idStream);
-        doAdditionalVerifications();
     }
 
-    protected void mock() {
-        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
-    }
-
-    protected void doAdditionalMocks() {
-
-    }
-
-    protected void doAdditionalVerifications() {
-    }
 }
