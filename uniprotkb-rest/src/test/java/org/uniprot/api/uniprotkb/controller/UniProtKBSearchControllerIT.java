@@ -214,6 +214,105 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         "Invalid includeIsoform parameter value. Expected true or false")));
     }
 
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "\"HGNC:3689\"",
+                "FGFR2",
+                "HGNC",
+                "3689",
+                "\"hgnc-HGNC:3689\"",
+                "hgnc-HGNC",
+                "hgnc-3689"
+            })
+    void searchWithHGNCIdAndProperties(String xref) throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=xref:" + xref)
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "embl-joined",
+                "embl-JOINED",
+                "joined",
+                "embl-genomic_dna",
+                "embl-Genomic_DNA",
+                "JOINED",
+                "Genomic_DNA",
+                "genomic_dna"
+            })
+    void searchWithEMBLXrefStatus(String xref) throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=xref:" + xref)
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results[0].primaryAccession", is(acc)));
+    }
+
+    @Test
+    void searchWithPIRSFXrefEntryName() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=xref:pirsf-FGFR")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("P21802")));
+    }
+
     @Test
     void searchWithForwardSlash() throws Exception {
         // given
