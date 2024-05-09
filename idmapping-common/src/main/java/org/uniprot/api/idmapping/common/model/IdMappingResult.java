@@ -3,12 +3,12 @@ package org.uniprot.api.idmapping.common.model;
 import java.io.Serializable;
 import java.util.List;
 
+import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-
-import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 
 /**
  * Created 17/02/2021

@@ -14,4 +14,5 @@ public class AccessionEvent {
     private String targetAccession;
     private String eventType;
     private String release;
+    private String deletedReason;
 }

@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.mockito.stubbing.OngoingStubbing;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

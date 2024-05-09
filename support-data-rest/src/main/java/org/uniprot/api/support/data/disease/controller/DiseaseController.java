@@ -3,6 +3,7 @@ package org.uniprot.api.support.data.disease.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.DISEASE_REGEX;
 
 import java.util.Optional;
 
@@ -46,7 +47,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     private static final String DATA_TYPE = "diseases";
     @Autowired private DiseaseService diseaseService;
-    public static final String ACCESSION_REGEX = "DI-(\\d{5})";
 
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
@@ -93,7 +93,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
             @Parameter(description = ID_DISEASE_DESCRIPTION, example = ID_DISEASE_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
-                            regexp = ACCESSION_REGEX,
+                            regexp = DISEASE_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.disease.invalid.id}")
                     String id,

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * Used to store fields used to configure the query processor

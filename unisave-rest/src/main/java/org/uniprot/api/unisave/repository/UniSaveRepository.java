@@ -8,8 +8,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -19,7 +17,10 @@ import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.util.Utils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Profile({"live", "offline"})
 @Service
@@ -146,7 +147,11 @@ public class UniSaveRepository {
                     EntryInfoImpl entryInfo = new EntryInfoImpl();
                     entryInfo.setAccession(accession);
                     entryInfo.setDeleted(true);
-                    entryInfo.setDeletionReason(deletedStatus.getDeletionReason());
+                    String reasonId = "0";
+                    if (deletedStatus.getDeletionReasonId() != null) {
+                        reasonId = String.valueOf(deletedStatus.getDeletionReasonId());
+                    }
+                    entryInfo.setDeletionReason(DeletedReason.fromId(reasonId).getName());
                     entryInfo.setFirstRelease(deletedStatus.getEventRelease());
                     entryInfo.setLastRelease(deletedStatus.getEventRelease());
                     entryInfos.add(0, entryInfo);

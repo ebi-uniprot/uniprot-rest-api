@@ -3,14 +3,14 @@ package org.uniprot.api.common.repository.solrstream;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.core.util.Utils;
+
+import lombok.Getter;
 
 /**
  * This class creates expression to make solr streaming facet function call.

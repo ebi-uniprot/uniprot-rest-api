@@ -4,9 +4,6 @@ import static java.util.Arrays.asList;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -32,6 +29,9 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author jluo
  * @date: 22 Aug 2019
@@ -41,7 +41,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 @Setter
 public class UniRefMessageConverterConfig {
     @Bean
-    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
+    public WebMvcConfigurer uniRefExtendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

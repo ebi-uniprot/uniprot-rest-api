@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -45,16 +43,16 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.controller.ControllerITUtils;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
-import org.uniprot.core.taxonomy.impl.*;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
@@ -68,6 +66,8 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Created 22/06/2020
  *
@@ -78,8 +78,7 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @WebMvcTest({UniProtKBController.class})
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
+            UniProtKBDataStoreTestConfig.class,
             UniProtKBREST.class,
             ErrorHandlerConfig.class
         })
@@ -157,6 +156,27 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                                         HttpHeaders.ACCEPT_ENCODING,
                                         HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
                                         HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
+    }
+
+    @Test
+    void streamCanReturnLowercaseAccessionSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "p00001");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P00001")));
     }
 
     @Test

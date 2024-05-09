@@ -3,10 +3,10 @@ package org.uniprot.api.rest.output.context;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+
 import lombok.Builder;
 import lombok.Data;
-
-import org.springframework.http.MediaType;
 
 /**
  * Created 10/09/18

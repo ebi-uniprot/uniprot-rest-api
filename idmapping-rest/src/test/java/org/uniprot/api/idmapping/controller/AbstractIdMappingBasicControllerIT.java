@@ -40,7 +40,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
@@ -55,7 +55,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author lgonzales
  * @since 08/03/2021
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
+@ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControllerIT {
 
@@ -421,7 +421,8 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }

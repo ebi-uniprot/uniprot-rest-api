@@ -12,7 +12,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 public class ControllerITUtils {
 
     public static final String CACHE_VALUE = "public, max-age=3600";
@@ -33,7 +35,9 @@ public class ControllerITUtils {
                 requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
                         .filter(
                                 requestMappingInfo ->
-                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                        requestMappingInfo
+                                                .getPatternsCondition()
+                                                .getPatterns()
                                                 .stream()
                                                 .anyMatch(path -> path.startsWith(requestPath)))
                         .findFirst()
@@ -57,7 +61,9 @@ public class ControllerITUtils {
                 requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
                         .filter(
                                 requestMappingInfo ->
-                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                        requestMappingInfo
+                                                .getPatternsCondition()
+                                                .getPatterns()
                                                 .stream()
                                                 .anyMatch(path -> path.equals(requestPath)))
                         .findFirst()
@@ -73,7 +79,9 @@ public class ControllerITUtils {
                 requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
                         .filter(
                                 requestMappingInfo ->
-                                        requestMappingInfo.getPatternsCondition().getPatterns()
+                                        requestMappingInfo
+                                                .getPatternsCondition()
+                                                .getPatterns()
                                                 .stream()
                                                 .anyMatch(path -> path.startsWith(requestPath)))
                         .findFirst()

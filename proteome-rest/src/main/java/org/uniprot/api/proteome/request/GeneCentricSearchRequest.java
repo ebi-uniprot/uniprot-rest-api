@@ -5,15 +5,14 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author jluo

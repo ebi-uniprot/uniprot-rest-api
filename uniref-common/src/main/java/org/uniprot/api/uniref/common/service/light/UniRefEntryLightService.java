@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -63,9 +64,10 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RdfStreamer unirefRdfStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate,
-            TupleStreamDocumentIdStream solrIdStreamer) {
+            RdfStreamer uniRefRdfStreamer,
+            @Qualifier("uniRefFacetTupleStreamTemplate")
+                    FacetTupleStreamTemplate facetTupleStreamTemplate,
+            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream solrIdStreamer) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -78,7 +80,7 @@ public class UniRefEntryLightService
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.rdfStreamer = unirefRdfStreamer;
+        this.rdfStreamer = uniRefRdfStreamer;
     }
 
     @Override

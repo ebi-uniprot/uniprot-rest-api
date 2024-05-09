@@ -10,9 +10,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.PositiveOrZero;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -21,6 +18,8 @@ import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Search cursor request Entity

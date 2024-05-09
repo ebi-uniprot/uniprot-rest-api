@@ -8,9 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.function.Function;
 
-import lombok.Builder;
-import lombok.Data;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +27,9 @@ import org.uniprot.api.rest.search.FakeSolrSortClause;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
+
+import lombok.Builder;
+import lombok.Data;
 
 @ExtendWith(MockitoExtension.class)
 class BasicSearchServiceTest {

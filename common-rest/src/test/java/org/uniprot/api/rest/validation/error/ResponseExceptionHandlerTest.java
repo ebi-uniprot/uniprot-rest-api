@@ -29,7 +29,9 @@ import org.uniprot.api.common.exception.*;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 class ResponseExceptionHandlerTest {
     private static final String REQUEST_URL = "http://localhost/test";
     private static ResponseExceptionHandler errorHandler;
@@ -196,7 +198,7 @@ class ResponseExceptionHandlerTest {
                 new IllegalDownloadJobSubmissionException(jobId, message);
 
         ResponseEntity<JobSubmitResponse> responseEntity =
-                errorHandler.handleIllegalDownloadJobSubmissionException(error, request);
+                errorHandler.handleIllegalDownloadJobSubmissionException(error);
 
         // then
         assertNotNull(responseEntity);

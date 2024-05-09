@@ -5,15 +5,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * Represents a request object containing the details to create a Solr streaming expressions for a

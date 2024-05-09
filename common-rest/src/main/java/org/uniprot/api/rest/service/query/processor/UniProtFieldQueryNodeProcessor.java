@@ -84,22 +84,23 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
 
             if (field.equals(IMPOSSIBLE_FIELD)) {
                 return defaultSearchToQueryString(text);
-            } else if (validWhiteListFields(field, text)) {
-                return field.toUpperCase() + "\\:" + text;
-            } else if (UNIPROTKB_ACCESSION_FIELD.equals(field)) {
-                return field + SOLR_FIELD_SEPARATOR + text.toUpperCase();
-            } else if (validFieldIgnoreCase(field)) {
-                return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
-            } else {
-                // is an alias => return the field itself
-                Optional<SearchFieldItem> searchFieldItemByAlias =
-                        searchFieldConfig.findSearchFieldItemByAlias(field);
-                if (searchFieldItemByAlias.isPresent()) {
-                    return searchFieldItemByAlias.get().getFieldName()
-                            + SOLR_FIELD_SEPARATOR
-                            + text;
-                }
             }
+            if (validWhiteListFields(field, text)) {
+                return field.toUpperCase() + "\\:" + text;
+            }
+
+            if (UNIPROTKB_ACCESSION_FIELD.equals(field)) {
+                text = text.toUpperCase();
+            }
+            if (validFieldIgnoreCase(field)) {
+                return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
+            }
+            Optional<SearchFieldItem> searchFieldItem =
+                    searchFieldConfig.findSearchFieldItemByAlias(field);
+            if (searchFieldItem.isPresent()) {
+                return searchFieldItem.get().getFieldName() + SOLR_FIELD_SEPARATOR + text;
+            }
+
             return super.toQueryString(escaper);
         }
 

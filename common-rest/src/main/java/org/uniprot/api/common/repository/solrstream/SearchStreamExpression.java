@@ -1,10 +1,10 @@
 package org.uniprot.api.common.repository.solrstream;
 
-import lombok.Getter;
-
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.uniprot.core.util.Utils;
+
+import lombok.Getter;
 
 /**
  * This class creates expression to make solr streaming search function call.

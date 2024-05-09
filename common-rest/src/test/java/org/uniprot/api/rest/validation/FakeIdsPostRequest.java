@@ -1,9 +1,9 @@
 package org.uniprot.api.rest.validation;
 
+import org.uniprot.api.rest.request.IdsSearchRequest;
+
 import lombok.Builder;
 import lombok.Data;
-
-import org.uniprot.api.rest.request.IdsSearchRequest;
 
 /**
  * @author sahmad

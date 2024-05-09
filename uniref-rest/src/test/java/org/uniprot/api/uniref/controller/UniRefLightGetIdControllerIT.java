@@ -32,7 +32,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -52,7 +52,7 @@ import org.uniprot.store.search.SolrCollection;
  */
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
+            UniRefDataStoreTestConfig.class,
             UniRefRestApplication.class,
             ErrorHandlerConfig.class
         })
@@ -68,7 +68,7 @@ class UniRefLightGetIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
-    @MockBean(name = "unirefRdfRestTemplate")
+    @MockBean(name = "uniRefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String ID_LIGHT_PREFIX_PATH = "/uniref/";

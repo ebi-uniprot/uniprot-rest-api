@@ -3,10 +3,10 @@ package org.uniprot.api.common.repository.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.*;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+
+import lombok.*;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.

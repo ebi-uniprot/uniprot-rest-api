@@ -3,11 +3,11 @@ package org.uniprot.api.common.repository.stream.document;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import lombok.Builder;
-
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.store.search.document.Document;
+
+import lombok.Builder;
 
 /**
  * @author sahmad

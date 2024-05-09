@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -21,12 +19,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.common.service.PIRResponseConverter;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 17/02/2021

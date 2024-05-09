@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.params.MapSolrParams;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.store.search.SolrCollection;
+
+import lombok.AllArgsConstructor;
 
 @Repository
 @AllArgsConstructor

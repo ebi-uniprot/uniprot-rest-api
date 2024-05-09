@@ -3,14 +3,14 @@ package org.uniprot.api.idmapping.common.service.store.impl;
 import java.util.Iterator;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.common.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

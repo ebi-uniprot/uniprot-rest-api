@@ -2,10 +2,10 @@ package org.uniprot.api.common.repository.stream.rdf;
 
 import java.time.temporal.ChronoUnit;
 
+import org.springframework.web.client.ResourceAccessException;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
-
-import org.springframework.web.client.ResourceAccessException;
 
 /**
  * @author sahmad

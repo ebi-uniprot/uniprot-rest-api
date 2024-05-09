@@ -34,12 +34,7 @@ import org.uniprot.store.search.document.help.HelpDocument;
  * @author lgonzales
  * @since 08/07/2021
  */
-@ContextConfiguration(
-        classes = {
-            HelpCentreStoreTestConfig.class,
-            HelpCentreRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {HelpCentreRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(HelpCentreController.class)
 @ExtendWith(

@@ -1,14 +1,6 @@
 package org.uniprot.api.aa.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -52,7 +44,7 @@ import org.uniprot.store.search.SolrCollection;
  * @author sahmad
  * @created 19/07/2021
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, AARestApplication.class})
+@ContextConfiguration(classes = {AARestApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ArbaController.class)
 @ExtendWith(

@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.KEYWORD_ID_REGEX;
 
 import java.util.Optional;
 
@@ -47,7 +48,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class KeywordController extends BasicSearchController<KeywordEntry> {
     private static final String DATA_TYPE = "keywords";
     private final KeywordService keywordService;
-    private static final String KEYWORD_ID_REGEX = "^KW-[0-9]{4}";
 
     public KeywordController(
             ApplicationEventPublisher eventPublisher,

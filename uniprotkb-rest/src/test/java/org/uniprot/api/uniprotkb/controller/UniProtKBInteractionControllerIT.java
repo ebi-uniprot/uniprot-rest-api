@@ -4,8 +4,6 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.util.HashMap;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -26,10 +24,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -45,14 +42,15 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Created 06/05/2020
  *
  * @author Edd
  */
 @Slf4j
-@ContextConfiguration(
-        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+@ContextConfiguration(classes = {UniProtKBDataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBInteractionController.class)
 @AutoConfigureWebClient
@@ -67,7 +65,8 @@ class UniProtKBInteractionControllerIT {
     private static final String NON_EXISTENT_ENTRY = "P99993";
     @RegisterExtension static final DataStoreManager STORE_MANAGER = new DataStoreManager();
     private final UniProtKBEntry entryWithNoInteractions =
-            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);;
+            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+    ;
     @Autowired private UniprotQueryRepository repository;
     @Autowired private UniProtKBStoreClient storeClient;
     @Autowired private MockMvc mockMvc;

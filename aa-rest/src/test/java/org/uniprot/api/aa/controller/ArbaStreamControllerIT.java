@@ -7,9 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,8 +44,7 @@ import org.uniprot.store.search.SolrCollection;
  * @author sahmad
  * @created 19/07/2021
  */
-@ContextConfiguration(
-        classes = {DataStoreTestConfig.class, AARestApplication.class, ErrorHandlerConfig.class})
+@ContextConfiguration(classes = {AARestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ArbaController.class)
 @ExtendWith(value = {SpringExtension.class})

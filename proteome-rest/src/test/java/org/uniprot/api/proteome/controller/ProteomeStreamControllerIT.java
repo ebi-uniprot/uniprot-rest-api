@@ -42,12 +42,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
  * @author lgonzales
  * @since 23/11/2020
  */
-@ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            ProteomeRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {ProteomeRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class})
@@ -115,6 +110,26 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(jsonPath("$.results[0].taxonomy.taxonId", is(9606)))
                 .andExpect(jsonPath("$.results[0].superkingdom", is("eukaryota")))
                 .andExpect(jsonPath("$.results[0].proteomeType", is("Other proteome")));
+    }
+
+    @Test
+    void proteomeLowercaseIdWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "up000005010");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].id", is("UP000005010")));
     }
 
     @Test

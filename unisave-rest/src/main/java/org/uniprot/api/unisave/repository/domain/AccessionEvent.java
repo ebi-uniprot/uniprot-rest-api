@@ -10,4 +10,6 @@ public interface AccessionEvent {
     String getTargetAccession();
 
     Release getEventRelease();
+
+    Integer getDeletionReasonId();
 }

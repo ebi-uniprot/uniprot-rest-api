@@ -28,8 +28,6 @@ import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,7 +47,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
@@ -70,6 +68,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author lgonzales
  * @since 08/01/2021
@@ -77,7 +77,7 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 @Slf4j
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
+            UniRefDataStoreTestConfig.class,
             UniRefRestApplication.class,
             ErrorHandlerConfig.class
         })

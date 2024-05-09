@@ -2,13 +2,13 @@ package org.uniprot.api.common.repository.solrstream;
 
 import java.util.Objects;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.DefaultStreamFactory;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible for providing {@link StreamFactory} and {@link StreamContext} for the

@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -70,6 +68,8 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author lgonzales
  * @since 15/06/2020
@@ -99,7 +99,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
 
-    @MockBean(name = "uniparcRdfRestTemplate")
+    @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
@@ -265,6 +265,26 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                         "UPI0000283A03",
                                         "UPI0000283A02",
                                         "UPI0000283A01")));
+    }
+
+    @Test
+    void streamDefaultSearchWithLowercaseId() throws Exception {
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "upi0000283A10");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000283A10")));
     }
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")

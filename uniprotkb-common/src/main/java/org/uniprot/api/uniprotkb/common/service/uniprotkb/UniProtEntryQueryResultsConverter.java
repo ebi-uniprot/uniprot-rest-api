@@ -2,15 +2,11 @@ package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
@@ -27,6 +23,9 @@ import org.uniprot.core.uniprotkb.impl.UniProtKBIdBuilder;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * The purpose of this class is to simplify conversion of {@code QueryResult<UniProtDocument>}
@@ -114,28 +113,37 @@ class UniProtEntryQueryResultsConverter {
 
     private Optional<UniProtKBEntry> getInactiveUniProtEntry(UniProtDocument doc) {
         UniProtKBAccession accession = new UniProtKBAccessionBuilder(doc.accession).build();
-        List<String> mergeDemergeList = new ArrayList<>();
 
-        String[] reasonItems = doc.inactiveReason.split(":");
-        InactiveReasonType type = InactiveReasonType.valueOf(reasonItems[0].toUpperCase());
-        if (reasonItems.length > 1) {
-            mergeDemergeList.addAll(Arrays.asList(reasonItems[1].split(",")));
-        }
-
-        String id = "";
-        if (Utils.notNullNotEmpty(doc.id)) {
-            id = doc.id.get(0);
-        }
-        UniProtKBId uniProtkbId = new UniProtKBIdBuilder(id).build();
-        EntryInactiveReason inactiveReason =
-                new EntryInactiveReasonBuilder()
-                        .type(type)
-                        .mergeDemergeTosSet(mergeDemergeList)
-                        .build();
+        UniProtKBId uniProtkbId = getUniProtKBId(doc);
+        EntryInactiveReason inactiveReason = getInactiveReason(doc);
 
         UniProtKBEntryBuilder entryBuilder =
                 new UniProtKBEntryBuilder(accession, uniProtkbId, inactiveReason);
         return Optional.of(entryBuilder.build());
+    }
+
+    private static UniProtKBId getUniProtKBId(UniProtDocument doc) {
+        String id = "";
+        if (Utils.notNullNotEmpty(doc.id)) {
+            id = doc.id.get(0);
+        }
+        return new UniProtKBIdBuilder(id).build();
+    }
+
+    private EntryInactiveReason getInactiveReason(UniProtDocument doc) {
+        EntryInactiveReasonBuilder builder = new EntryInactiveReasonBuilder();
+
+        String[] reasonItems = doc.inactiveReason.split(":");
+        InactiveReasonType type = InactiveReasonType.valueOf(reasonItems[0].toUpperCase());
+        builder.type(type);
+        if (reasonItems.length > 1) {
+            if (type == InactiveReasonType.DELETED) {
+                builder.deletedReason(DeletedReason.valueOf(reasonItems[1].strip()));
+            } else {
+                builder.mergeDemergeTosSet(Arrays.asList(reasonItems[1].split(",")));
+            }
+        }
+        return builder.build();
     }
 
     private Optional<UniProtKBEntry> getEntryFromStore(UniProtDocument doc) {

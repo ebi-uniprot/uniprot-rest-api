@@ -1,11 +1,6 @@
 package org.uniprot.api.help.centre.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -40,12 +35,7 @@ import org.uniprot.store.search.document.help.HelpDocument;
  * @author jluo
  * @date: 13 Apr 2022
  */
-@ContextConfiguration(
-        classes = {
-            HelpCentreStoreTestConfig.class,
-            HelpCentreRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {HelpCentreRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ReleaseNotesController.class)
 @ExtendWith(

@@ -7,11 +7,10 @@ import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
-import lombok.Data;
-
 import org.springdoc.api.annotations.ParameterObject;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * Created 27/03/20

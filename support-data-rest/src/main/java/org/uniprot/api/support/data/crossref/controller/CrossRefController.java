@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.CROSS_REF_REGEX;
 
 import java.util.Optional;
 
@@ -47,7 +48,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     private static final String DATA_TYPE = "databases";
     @Autowired private CrossRefService crossRefService;
-    private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
     public CrossRefController(
             ApplicationEventPublisher eventPublisher,
@@ -85,7 +85,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @Parameter(description = ID_CROSSREF_DESCRIPTION, example = ID_CROSSREF_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
-                            regexp = ACCESSION_REGEX,
+                            regexp = CROSS_REF_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.crossref.invalid.id}")
                     String id,

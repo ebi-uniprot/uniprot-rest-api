@@ -12,7 +12,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>1.0.29-SNAPSHOT</version>
+	<version>1.0.31-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
@@ -35,12 +35,10 @@
 		<jacoco.version>0.8.8</jacoco.version>
 		<jackson-bom.version>2.13.4</jackson-bom.version>
 		<jackson.version>2.13.4</jackson.version>
-		<jakarta-activation.version>2.0.1</jakarta-activation.version>
-		<jakarta-xml-bind.version>4.0.0</jakarta-xml-bind.version>
 		<jayway.version>2.4.0</jayway.version>
 		<jna.version>5.8.0</jna.version>
 		<java.version>17</java.version>
-		<logback.version>1.2.3</logback.version>
+		<logback.version>1.2.12</logback.version>
 		<lombok.version>1.18.22</lombok.version>
 		<maven.compiler.version>3.8.0</maven.compiler.version>
 		<maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
@@ -50,11 +48,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<redisson-version>3.17.4</redisson-version>
-		<slf4j.version>1.7.25</slf4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 		<solr.core>8.11.2</solr.core>
 		<solrj.version>8.11.2</solrj.version>
 		<spring.boot.version>2.7.3</spring.boot.version>
-		<spotless.version>1.24.1</spotless.version>
+		<spotless.version>2.43.0</spotless.version>
 		<testcontainers.version>1.19.4</testcontainers.version>
 		<uniprot-core.version>${project.version}</uniprot-core.version>
 		<uniprot-store.version>${project.version}</uniprot-store.version>
@@ -73,6 +71,7 @@
 		<module>uniref-common</module>
 		<module>uniref-rest</module>
 		<module>support-data-common</module>
+		<module>async-download-rest</module>
 		<module>support-data-rest</module>
 		<module>proteome-rest</module>
 		<module>unisave-rest</module>
@@ -272,7 +271,7 @@
 				<configuration>
 					<java>
 						<googleJavaFormat>
-							<version>1.7</version>
+							<version>1.15.0</version>
 							<!-- Optional, available versions: GOOGLE, AOSP https://github.com/google/google-java-format/blob/master/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java -->
 							<style>AOSP</style>
 						</googleJavaFormat>

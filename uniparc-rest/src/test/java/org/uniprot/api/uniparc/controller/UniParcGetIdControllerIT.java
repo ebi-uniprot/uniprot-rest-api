@@ -29,6 +29,7 @@ import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
+import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 
 /**
@@ -51,7 +52,7 @@ import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
-    @MockBean(name = "uniparcRdfRestTemplate")
+    @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override

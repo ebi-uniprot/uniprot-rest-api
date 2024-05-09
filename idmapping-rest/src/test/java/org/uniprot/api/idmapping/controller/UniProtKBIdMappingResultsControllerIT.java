@@ -44,13 +44,14 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RdfPrologs;
+import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -62,7 +63,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
  * @created 18/02/2021
  */
 @ActiveProfiles(profiles = {"offline", "idmapping"})
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
+@ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
@@ -211,8 +212,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
                 .andExpect(
                         jsonPath(
-                                "$.results[1].to.inactiveReason.inactiveReasonType",
-                                is("DELETED")));
+                                "$.results[1].to.inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[1].to.inactiveReason.deletedReason",
+                                is(DeletedReason.PROTEOME_EXCLUSION.getName())));
     }
 
     @Test

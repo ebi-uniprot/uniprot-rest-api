@@ -1,7 +1,6 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,12 +23,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.uniprot.api.help.centre.HelpCentreRestApplication;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 
-@ContextConfiguration(
-        classes = {
-            HelpCentreStoreTestConfig.class,
-            HelpCentreRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+@ContextConfiguration(classes = {HelpCentreRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ContactController.class)
 @ExtendWith(

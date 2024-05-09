@@ -92,7 +92,7 @@ class ResultsConfigTest {
         TupleStreamDocumentIdStream documentIdStream =
                 config.documentIdStream(tupleStreamTemplate, configProps);
         StoreStreamerConfig<UniProtKBEntry> result =
-                config.storeStreamerConfig(
+                config.uniProtKBStoreStreamerConfig(
                         uniprotClient, tupleStreamTemplate, configProps, documentIdStream);
         assertNotNull(result);
     }

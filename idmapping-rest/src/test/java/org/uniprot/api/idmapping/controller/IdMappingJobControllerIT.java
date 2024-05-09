@@ -54,10 +54,10 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

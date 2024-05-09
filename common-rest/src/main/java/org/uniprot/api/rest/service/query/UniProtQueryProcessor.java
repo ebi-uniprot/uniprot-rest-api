@@ -5,9 +5,6 @@ import static org.uniprot.store.search.SolrQueryUtil.*;
 import java.util.Collections;
 import java.util.List;
 
-import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
@@ -16,6 +13,9 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class does the following:

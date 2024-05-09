@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 class CursorPageTest {
 
     private static final UriComponentsBuilder uriBuilder =

@@ -3,11 +3,8 @@ package org.uniprot.api.uniref.common.repository;
 import java.io.IOException;
 import java.time.Duration;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
-
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,16 +22,20 @@ import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
 
-/** @author jluo date: 21 Aug 2019 */
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.RetryPolicy;
+
+/**
+ * @author jluo date: 21 Aug 2019
+ */
 @Configuration
 @Import(RepositoryConfig.class)
 @Slf4j
 public class UniRefStreamConfig {
 
-    @Bean
+    @Bean(name = "uniRefTupleStreamTemplate")
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties,
-            HttpClient httpClient,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties configProperties,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -45,35 +46,17 @@ public class UniRefStreamConfig {
     }
 
     @Bean
-    public StoreStreamer<UniRefEntryLight> unirefEntryStoreStreamer(
-            UniRefLightStoreClient uniRefLightStoreClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
-
-        RetryPolicy<Object> storeRetryPolicy =
-                new RetryPolicy<>()
-                        .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
-
-        StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig =
-                StoreStreamerConfig.<UniRefEntryLight>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(uniRefLightStoreClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(storeRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
+    public StoreStreamer<UniRefEntryLight> uniRefEntryStoreStreamer(
+            StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig) {
         return new StoreStreamer<>(storeStreamerConfig);
     }
 
-    @Bean
+    @Bean(name = "uniRefStoreStreamerConfig")
     public StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig(
             UniRefLightStoreClient uniRefLightStoreClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream documentIdStream) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
@@ -90,24 +73,25 @@ public class UniRefStreamConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("uniRefStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.uniref")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean
+    @Bean("uniRefFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate facetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniref.name())
                 .zookeeperHost(configProperties.getZkHost())
                 .build();
     }
 
-    @Bean
+    @Bean("uniRefDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
-            TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
+            @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .streamConfig(streamConfig)

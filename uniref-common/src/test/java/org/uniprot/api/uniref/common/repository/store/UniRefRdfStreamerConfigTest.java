@@ -34,20 +34,20 @@ class UniRefRdfStreamerConfigTest {
     @Test
     void unirefRdfStreamer() {
         RdfStreamer rdfStreamer =
-                unirefRdfStreamerConfig.unirefRdfStreamer(properties, rdfServiceFactory);
+                unirefRdfStreamerConfig.uniRefRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void unirefRdfServiceFactory() {
         RdfServiceFactory rdfServiceFactory =
-                unirefRdfStreamerConfig.unirefRdfServiceFactory(restTemplate);
+                unirefRdfStreamerConfig.uniRefRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 
     @Test
     void unirefRdfRestTemplate() {
-        RestTemplate template = unirefRdfStreamerConfig.unirefRdfRestTemplate(properties);
+        RestTemplate template = unirefRdfStreamerConfig.uniRefRdfRestTemplate(properties);
         assertNotNull(template);
     }
 }

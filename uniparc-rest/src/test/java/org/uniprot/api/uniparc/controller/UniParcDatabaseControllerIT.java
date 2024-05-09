@@ -49,6 +49,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
+import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -389,7 +390,8 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
 
     private Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC_CROSSREF)
-                .getReturnFields().stream()
+                .getReturnFields()
+                .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 }

@@ -5,11 +5,11 @@ import java.time.Duration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * This class wraps an existing {@link TupleStream}, originating from a streaming result set from

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 public abstract class AbstractSearchParameterResolver implements ParameterResolver {
 
     @Override

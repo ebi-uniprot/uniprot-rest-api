@@ -3,12 +3,12 @@ package org.uniprot.api.support.data.configure.response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-
 import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Getter;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)

@@ -33,7 +33,9 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @ExtendWith(SpringExtension.class)
 @EnableConfigurationProperties(value = UniProtKBFacetConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,7 +43,8 @@ class SolrQueryRepositoryIT {
 
     private static GeneralSolrQueryRepository queryRepo;
 
-    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();;
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+    ;
 
     @Autowired UniProtKBFacetConfig facetConfig;
 

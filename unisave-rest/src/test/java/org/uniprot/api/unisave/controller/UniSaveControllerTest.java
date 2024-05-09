@@ -38,10 +38,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.unisave.UniSaveRESTApplication;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.EntryInfo;
-import org.uniprot.api.unisave.repository.domain.impl.AccessionStatusInfoImpl;
-import org.uniprot.api.unisave.repository.domain.impl.DiffImpl;
-import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
-import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
+import org.uniprot.core.uniprotkb.DeletedReason;
 
 /**
  * Created 06/04/20
@@ -187,12 +186,13 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                ">P12345: EV=3-4 SV=2\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=1-2 SV=1\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG")));
+                                                """
+                                                        >P12345: EV=3-4 SV=2
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=1-2 SV=1
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG""")));
     }
 
     @Test
@@ -226,12 +226,13 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                ">P12345: EV=3-4 SV=2\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=2 SV=1\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG")));
+                                                """
+                                                        >P12345: EV=3-4 SV=2
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=2 SV=1
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG""")));
     }
 
     @Test
@@ -265,12 +266,13 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                ">P12345: EV=3 SV=2\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=2 SV=1\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG")));
+                                                """
+                                                        >P12345: EV=3 SV=2
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=2 SV=1
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG""")));
     }
 
     @Test
@@ -310,15 +312,16 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                ">P12345: EV=7 SV=4\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=3-5 SV=2\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=1 SV=1\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG")));
+                                                """
+                                                        >P12345: EV=7 SV=4
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=3-5 SV=2
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=1 SV=1
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG""")));
     }
 
     @Test
@@ -351,12 +354,13 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                ">P12345: EV=3-4 SV=2\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG\n"
-                                                        + ">P12345: EV=1-2 SV=1\n"
-                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                                        + "FQIIGETVSSTNRG")));
+                                                """
+                                                        >P12345: EV=3-4 SV=2
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG
+                                                        >P12345: EV=1-2 SV=1
+                                                        MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC
+                                                        FQIIGETVSSTNRG""")));
     }
 
     @Test
@@ -387,11 +391,13 @@ class UniSaveControllerTest {
                         content()
                                 .string(
                                         containsString(
-                                                "Entry version\tSequence version\tEntry name\tDatabase\tNumber\tDate\tReplaces\tReplaced by\n"
-                                                        + "4\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
-                                                        + "3\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
-                                                        + "2\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
-                                                        + "1\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n")));
+                                                """
+                                                        Entry version\tSequence version\tEntry name\tDatabase\tNumber\tDate\tReplaces\tReplaced by
+                                                        4\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t
+                                                        3\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t
+                                                        2\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t
+                                                        1\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t
+                                                        """)));
     }
 
     @Test
@@ -570,6 +576,9 @@ class UniSaveControllerTest {
         // given
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
         status.setAccession(ACCESSION);
+        IdentifierStatus event = mockIdentifierStatus(EventTypeEnum.DELETED, ACCESSION, "", 1);
+        event.setEventRelease(mockRelease("1"));
+        status.setEvents(List.of(event));
         when(uniSaveRepository.retrieveEntryStatusInfo(ACCESSION)).thenReturn(status);
 
         // when
@@ -581,7 +590,14 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.accession", is(ACCESSION)));
+                .andExpect(jsonPath("$.accession", is(ACCESSION)))
+                .andExpect(jsonPath("$.events.size()", is(1)))
+                .andExpect(jsonPath("$.events[0].eventType", is(EventTypeEnum.DELETED.toString())))
+                .andExpect(jsonPath("$.events[0].release", is("1")))
+                .andExpect(
+                        jsonPath(
+                                "$.events[0].deletedReason",
+                                is(DeletedReason.SOURCE_DELETION.getName())));
     }
 
     @Test

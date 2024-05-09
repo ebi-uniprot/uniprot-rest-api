@@ -1,7 +1,5 @@
 package org.uniprot.api.support.data.common.keyword.service;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -10,6 +8,8 @@ import org.uniprot.api.rest.converter.SolrDocumentRdfIdConverter;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.support.data.common.keyword.repository.KeywordRepository;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

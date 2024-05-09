@@ -2,15 +2,15 @@ package org.uniprot.api.unisave.repository.domain.impl;
 
 import javax.persistence.*;
 
-import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.AccessionEvent;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+
+import lombok.Data;
 
 /** Created with IntelliJ IDEA. User: wudong Date: 12/11/2013 Time: 14:24 */
 @Entity(name = "IdentifierStatus")
 @IdClass(IdentifierStatusId.class)
-@Table(name = "DELETED_MERGED_ACCESSION_VIEW")
+@Table(name = "DELETED_MERGED_ACCESSION_MV1")
 @NamedQueries({
     @NamedQuery(
             name = "IdentifierStatus.FIND_BY_FIRST_COLUMN",
@@ -56,8 +56,8 @@ public class IdentifierStatus implements AccessionEvent {
     @Column(name = "WITHDRAWN")
     private String withdrawnFlag;
 
-    @Column(name = "DELETION_REASON")
-    private String deletionReason;
+    @Column(name = "deletion_reason_id")
+    private Integer deletionReasonId;
 
     public boolean isWithdrawn() {
         return withdrawnFlag != null;
