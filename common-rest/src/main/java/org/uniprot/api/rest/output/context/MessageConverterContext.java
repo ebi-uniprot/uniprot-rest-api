@@ -39,6 +39,7 @@ public class MessageConverterContext<T> {
     private ExtraOptions extraOptions;
     private Collection<ProblemPair> warnings;
     private boolean isLargeDownload;
+    private String proteomeId;
     private boolean subsequence;
     /**
      * A map to store accessions along with their associated sequence ranges and a flag indicating

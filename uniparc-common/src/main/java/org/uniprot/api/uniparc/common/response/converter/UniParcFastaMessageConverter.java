@@ -5,15 +5,21 @@ import java.io.OutputStream;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
-import org.uniprot.core.parser.fasta.UniParcFastaParser;
+import org.uniprot.core.parser.fasta.uniparc.UniParcFastaParser;
+import org.uniprot.core.parser.fasta.uniparc.UniParcProteomeFastaParser;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author jluo
  * @date: 25 Jun 2019
  */
 public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniParcEntry> {
+
+    private static final ThreadLocal<String> TL_PROTEOME_ID = new ThreadLocal<>();
+
     public UniParcFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, UniParcEntry.class);
     }
@@ -23,7 +29,24 @@ public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConve
     }
 
     @Override
+    protected void before(
+            MessageConverterContext<UniParcEntry> context, OutputStream outputStream) {
+        TL_PROTEOME_ID.set(context.getProteomeId());
+    }
+
+    @Override
     protected void writeEntity(UniParcEntry entity, OutputStream outputStream) throws IOException {
-        outputStream.write((UniParcFastaParser.toFasta(entity) + "\n").getBytes());
+        String proteomeId = TL_PROTEOME_ID.get();
+        if(Utils.notNullNotEmpty(proteomeId)){
+            outputStream.write((UniParcProteomeFastaParser.toFasta(entity, proteomeId) + "\n").getBytes());
+        } else {
+            outputStream.write((UniParcFastaParser.toFasta(entity) + "\n").getBytes());
+        }
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        TL_PROTEOME_ID.remove();
     }
 }

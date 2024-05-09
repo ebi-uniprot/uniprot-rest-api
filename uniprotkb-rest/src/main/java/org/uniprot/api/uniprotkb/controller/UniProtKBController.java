@@ -423,6 +423,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 accessionsRequest.isDownload(),
                 false,
                 accessionRangesMap,
+                null,
                 request,
                 response);
     }

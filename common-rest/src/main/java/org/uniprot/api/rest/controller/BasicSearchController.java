@@ -155,7 +155,7 @@ public abstract class BasicSearchController<T> {
             HttpServletRequest request,
             HttpServletResponse response) {
         return this.getSearchResponse(
-                result, fields, isDownload, subSequence, null, request, response);
+                result, fields, isDownload, subSequence, null, null, request, response);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
@@ -164,6 +164,7 @@ public abstract class BasicSearchController<T> {
             boolean isDownload,
             boolean subSequence,
             Map<String, List<Pair<String, Boolean>>> accessionSequenceStatus,
+            String proteomeId,
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
@@ -175,6 +176,7 @@ public abstract class BasicSearchController<T> {
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setMatchedFields(result.getMatchedFields());
         context.setSuggestions(result.getSuggestions());
+        context.setProteomeId(proteomeId);
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             Stream<String> accList = result.getContent().map(this::getEntityId);
             context.setEntityIds(accList);

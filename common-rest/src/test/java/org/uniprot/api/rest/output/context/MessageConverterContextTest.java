@@ -42,6 +42,7 @@ class MessageConverterContextTest {
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());
+        String proteomeId = "UP000000001";
 
         MessageConverterContext<String> context =
                 MessageConverterContext.<String>builder()
@@ -52,6 +53,7 @@ class MessageConverterContextTest {
                         .facets(facets)
                         .matchedFields(matchedFields)
                         .fields(fields)
+                        .proteomeId(proteomeId)
                         .resource(resource)
                         .subsequence(true)
                         .isLargeDownload(true)
@@ -69,6 +71,7 @@ class MessageConverterContextTest {
         assertThat(context.getFacets(), is(facets));
         assertThat(context.getMatchedFields(), is(matchedFields));
         assertThat(context.getFields(), is(fields));
+        assertThat(context.getProteomeId(), is(proteomeId));
         assertThat(context.getResource(), is(resource));
         assertThat(context.isSubsequence(), is(true));
         assertThat(context.isLargeDownload(), is(true));
@@ -98,6 +101,7 @@ class MessageConverterContextTest {
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());
+        String proteomeId = "UP000000001";
 
         MessageConverterContext<String> context =
                 MessageConverterContext.<String>builder()
@@ -108,6 +112,7 @@ class MessageConverterContextTest {
                         .facets(facets)
                         .matchedFields(matchedFIelds)
                         .fields(fields)
+                        .proteomeId(proteomeId)
                         .resource(resource)
                         .subsequence(true)
                         .isLargeDownload(true)
@@ -135,6 +140,7 @@ class MessageConverterContextTest {
         assertThat(context.getExtraOptions(), is(extraOptions));
         assertThat(context.getSuggestions(), is(suggestions));
         assertThat(context.getWarnings(), is(warnings));
+        assertThat(context.getProteomeId(), is(proteomeId));
     }
 
     @Test

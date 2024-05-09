@@ -366,7 +366,15 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
         QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByUpIdRequest);
 
-        return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
+        return super.getSearchResponse(
+                results,
+                getByUpIdRequest.getFields(),
+                false,
+                false,
+                null,
+                getByUpIdRequest.getUpId(),
+                request,
+                response);
     }
 
     @GetMapping(
