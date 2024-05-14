@@ -74,12 +74,12 @@ class UniSaveRepositoryIT {
     }
 
     @Test
-    void getEntryInfosWithDeletedReason() {
+    void getEntryInfosWithUnknownDeletedReason() {
         // given
         EntryImpl entry = createEntry(1);
         testEntityManager.persist(entry);
 
-        DeletedReason deletedReason = DeletedReason.SOURCE_DELETION;
+        DeletedReason deletedReason = DeletedReason.UNKNOWN;
         int deletedReasonId = deletedReason.getIds().get(0);
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
@@ -99,7 +99,7 @@ class UniSaveRepositoryIT {
                         .map(EntryInfo::getDeletionReason)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()),
-                contains(deletedReason.getName()));
+                emptyIterable());
     }
 
     @Test
@@ -127,7 +127,7 @@ class UniSaveRepositoryIT {
         EntryImpl entry = createEntry(1);
         testEntityManager.persist(entry);
 
-        DeletedReason deletedReason = DeletedReason.SOURCE_DELETION;
+        DeletedReason deletedReason = DeletedReason.SOURCE_DELETION_EMBL;
         int deletedReasonId = deletedReason.getIds().get(0);
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
@@ -169,7 +169,7 @@ class UniSaveRepositoryIT {
 
         // then
         assertThat(entryInfo.isDeleted(), is(true));
-        assertThat(entryInfo.getDeletionReason(), is(DeletedReason.UNKNOWN.getName()));
+        assertThat(entryInfo.getDeletionReason(), nullValue());
     }
 
     @Test
