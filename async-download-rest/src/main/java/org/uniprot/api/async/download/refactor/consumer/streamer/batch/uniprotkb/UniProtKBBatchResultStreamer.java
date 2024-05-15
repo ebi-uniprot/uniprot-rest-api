@@ -30,18 +30,13 @@ public class UniProtKBBatchResultStreamer extends BatchResultStreamer<UniProtKBD
     }
 
     @Override
-    protected StoreRequest getStoreRequest(UniProtKBDownloadRequest request) {
-        return service.buildStoreRequest(request);
-    }
-
-    @Override
     protected BatchStoreIterable<UniProtKBEntry> getBatchStoreIterable(
-            Iterator<String> idsIterator, StoreRequest storeRequest) {
+            Iterator<String> idsIterator, UniProtKBDownloadRequest request) {
         return new UniProtKBBatchStoreIterable(
                 idsIterator,
                 storeStreamerConfig.getStoreClient(),
                 storeStreamerConfig.getStoreFetchRetryPolicy(),
                 storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
-                lineageService, storeRequest.isAddLineage());
+                lineageService, service.buildStoreRequest(request).isAddLineage());
     }
 }

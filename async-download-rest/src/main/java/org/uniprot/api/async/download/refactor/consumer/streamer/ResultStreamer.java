@@ -6,7 +6,7 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 
 import java.util.stream.Stream;
 
-public abstract class ResultStreamer<T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class ResultStreamer<T extends DownloadRequest, R extends DownloadJob, S, P> {
     private final JobService<R> jobService;
 
     protected ResultStreamer(JobService<R> jobService) {

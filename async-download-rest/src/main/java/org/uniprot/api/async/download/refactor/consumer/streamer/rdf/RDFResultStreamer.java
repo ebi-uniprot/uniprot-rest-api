@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.refactor.consumer.streamer.rdf;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.streamer.IdResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.ResultStreamer;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
@@ -14,7 +15,7 @@ import java.util.stream.Stream;
 
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-public abstract class RDFResultStreamer<T extends DownloadRequest, R extends DownloadJob> extends ResultStreamer<T, R, String> {
+public abstract class RDFResultStreamer<T extends DownloadRequest, R extends DownloadJob> extends IdResultStreamer<T, R, String> {
 
     private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(

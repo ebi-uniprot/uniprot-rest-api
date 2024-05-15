@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Slf4j
-public abstract class BatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, S> extends ResultStreamer<T, R, S> {
+public abstract class BatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, S, P> extends ResultStreamer<T, R, S, P> {
     private final HeartbeatProducer heartbeatProducer;
 
     protected BatchResultStreamer(HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
@@ -26,7 +26,7 @@ public abstract class BatchResultStreamer<T extends DownloadRequest, R extends D
     @Override
     public Stream<S> stream(T request, Stream<String> ids) {
         R job = getJob(request);
-        BatchStoreIterable<S> batchStoreIterable = getBatchStoreIterable(ids.iterator(), getStoreRequest(request));
+        Iterable<Collection<S>> batchStoreIterable = getBatchStoreIterable(ids.iterator(), request);
 
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .peek(
@@ -40,7 +40,5 @@ public abstract class BatchResultStreamer<T extends DownloadRequest, R extends D
                                         request.getJobId()));
     }
 
-    protected abstract StoreRequest getStoreRequest(T request);
-
-    protected abstract BatchStoreIterable<S> getBatchStoreIterable(Iterator<String> idsIterator, StoreRequest storeRequest);
+    protected abstract Iterable<Collection<S>> getBatchStoreIterable(Iterator<P> idsIterator, T request);
 }

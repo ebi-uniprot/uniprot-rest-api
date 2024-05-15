@@ -23,13 +23,8 @@ public class UniRefBatchResultStreamer extends BatchResultStreamer<UniRefDownloa
     }
 
     @Override
-    protected StoreRequest getStoreRequest(UniRefDownloadRequest request) {
-        return StoreRequest.builder().addLineage(false).build();
-    }
-
-    @Override
     public BatchStoreIterable<UniRefEntryLight> getBatchStoreIterable(
-            Iterator<String> idsIterator, StoreRequest storeRequest) {
+            Iterator<String> idsIterator, UniRefDownloadRequest request) {
         return new BatchStoreIterable<>(
                 idsIterator,
                 storeStreamerConfig.getStoreClient(),

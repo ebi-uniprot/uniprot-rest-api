@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.*;
 
-public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends DownloadJob, S>{
     private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
