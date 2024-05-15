@@ -2099,6 +2099,34 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         "Fields 'xref_ensembl_full, xref_kegg_full' are only supported by TSV (text/plain;format=tsv) format.")));
     }
 
+    @Test
+    void searchWhitelistVGNCIdDefaultSearch() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                        .param("query", "VGNC:38517")
+                                        .param("fields", "accession")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("F1Q0X3")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
