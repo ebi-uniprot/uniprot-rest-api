@@ -3,11 +3,11 @@ package org.uniprot.api.unisave.repository.domain.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-
 import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
 import org.uniprot.api.unisave.repository.domain.EntryInfo;
 import org.uniprot.api.unisave.repository.domain.Release;
+
+import lombok.Data;
 
 @Data
 public class EntryInfoImpl implements EntryInfo {

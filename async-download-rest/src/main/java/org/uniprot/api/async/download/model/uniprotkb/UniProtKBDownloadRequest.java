@@ -3,9 +3,6 @@ package org.uniprot.api.async.download.model.uniprotkb;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_DESCRIPTION;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_EXAMPLE;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
@@ -17,6 +14,8 @@ import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

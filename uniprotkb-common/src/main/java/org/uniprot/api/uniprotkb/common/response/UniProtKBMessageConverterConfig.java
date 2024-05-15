@@ -7,9 +7,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -28,6 +25,9 @@ import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Created 21/08/18

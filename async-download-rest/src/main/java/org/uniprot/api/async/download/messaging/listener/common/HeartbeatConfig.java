@@ -1,9 +1,9 @@
 package org.uniprot.api.async.download.messaging.listener.common;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import lombok.Data;
 
 @Configuration
 @ConfigurationProperties(prefix = "async.download.heartbeat")

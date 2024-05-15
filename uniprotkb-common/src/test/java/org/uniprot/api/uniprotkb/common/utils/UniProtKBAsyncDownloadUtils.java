@@ -7,9 +7,6 @@ import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -116,7 +113,8 @@ public class UniProtKBAsyncDownloadUtils {
     public static void saveInactiveEntries(DataStoreManager storeManager) {
         for (int i = 0; i < 2; i++) {
             InactiveUniProtEntry inactiveEntry =
-                    InactiveUniProtEntry.from("I8FBX" + i, "INACTIVE_DROME", DELETED, null);
+                    InactiveUniProtEntry.from(
+                            "I8FBX" + i, "INACTIVE_DROME", DELETED, null, "SOURCE_DELETION");
             storeManager.saveEntriesInSolr(
                     DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
         }
@@ -165,11 +163,5 @@ public class UniProtKBAsyncDownloadUtils {
                         .id(String.valueOf(taxId))
                         .taxonomyObj(taxonomyObj);
         cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
-    }
-
-    public static void prepareDownloadFolders(String idsFolder, String resultFolder)
-            throws IOException {
-        Files.createDirectories(Path.of(idsFolder));
-        Files.createDirectories(Path.of(resultFolder));
     }
 }

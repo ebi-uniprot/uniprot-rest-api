@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.unisave.error.UniSaveEntryNotFoundException;
 import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
+import org.uniprot.core.uniprotkb.DeletedReason;
 
 /**
  * Created 16/04/2020
@@ -77,11 +79,14 @@ class UniSaveRepositoryIT {
         EntryImpl entry = createEntry(1);
         testEntityManager.persist(entry);
 
+        DeletedReason deletedReason = DeletedReason.SOURCE_DELETION;
+        int deletedReasonId = deletedReason.getIds().get(0);
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
-                        EventTypeEnum.DELETED, entry.getAccession(), "does not matter");
-        String deletedReason = "a hurricane";
-        identifierStatus.setDeletionReason(deletedReason);
+                        EventTypeEnum.DELETED,
+                        entry.getAccession(),
+                        "does not matter",
+                        deletedReasonId);
         testEntityManager.persist(identifierStatus);
 
         // when
@@ -94,7 +99,7 @@ class UniSaveRepositoryIT {
                         .map(EntryInfo::getDeletionReason)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList()),
-                contains(deletedReason));
+                contains(deletedReason.getName()));
     }
 
     @Test
@@ -106,8 +111,6 @@ class UniSaveRepositoryIT {
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(
                         EventTypeEnum.DELETED, entry.getAccession(), "does not matter");
-        String deletedReason = "a hurricane";
-        identifierStatus.setDeletionReason(deletedReason);
         identifierStatus.setWithdrawnFlag("any value means it's withdrawn");
         testEntityManager.persist(identifierStatus);
 
@@ -116,6 +119,57 @@ class UniSaveRepositoryIT {
 
         // then
         assertThat(entryInfos, is(emptyIterable()));
+    }
+
+    @Test
+    void getEntryInfosForDeleteEntryInfoWithDeletedReason() {
+        // given
+        EntryImpl entry = createEntry(1);
+        testEntityManager.persist(entry);
+
+        DeletedReason deletedReason = DeletedReason.SOURCE_DELETION;
+        int deletedReasonId = deletedReason.getIds().get(0);
+        IdentifierStatus identifierStatus =
+                mockIdentifierStatus(
+                        EventTypeEnum.DELETED,
+                        entry.getAccession(),
+                        "does not matter",
+                        deletedReasonId);
+        testEntityManager.persist(identifierStatus);
+
+        // when
+        EntryInfo entryInfo =
+                repository.retrieveEntryInfos(entry.getAccession()).stream()
+                        .filter(EntryInfo::isDeleted)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+
+        // then
+        assertThat(entryInfo.isDeleted(), is(true));
+        assertThat(entryInfo.getDeletionReason(), is(deletedReason.getName()));
+    }
+
+    @Test
+    void getEntryInfosForDeleteEntryInfoWithoutDeletedReason() {
+        // given
+        EntryImpl entry = createEntry(1);
+        testEntityManager.persist(entry);
+
+        IdentifierStatus identifierStatus =
+                mockIdentifierStatus(
+                        EventTypeEnum.DELETED, entry.getAccession(), "does not matter");
+        testEntityManager.persist(identifierStatus);
+
+        // when
+        EntryInfo entryInfo =
+                repository.retrieveEntryInfos(entry.getAccession()).stream()
+                        .filter(EntryInfo::isDeleted)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+
+        // then
+        assertThat(entryInfo.isDeleted(), is(true));
+        assertThat(entryInfo.getDeletionReason(), is(DeletedReason.UNKNOWN.getName()));
     }
 
     @Test

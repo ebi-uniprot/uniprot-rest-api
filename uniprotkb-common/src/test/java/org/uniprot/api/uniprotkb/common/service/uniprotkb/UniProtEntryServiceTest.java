@@ -53,7 +53,9 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-/** @author tibrahim */
+/**
+ * @author tibrahim
+ */
 @ExtendWith(MockitoExtension.class)
 class UniProtEntryServiceTest {
 

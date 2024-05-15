@@ -7,13 +7,12 @@ import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author lgonzales

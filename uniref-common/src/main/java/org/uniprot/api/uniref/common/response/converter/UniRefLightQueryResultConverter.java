@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.function.Function;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author jluo

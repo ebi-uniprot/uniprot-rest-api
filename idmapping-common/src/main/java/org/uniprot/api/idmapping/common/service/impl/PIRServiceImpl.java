@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -27,6 +25,8 @@ import org.uniprot.api.idmapping.common.service.PIRResponseConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 17/02/2021

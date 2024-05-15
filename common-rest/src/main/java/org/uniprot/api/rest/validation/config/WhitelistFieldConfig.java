@@ -2,13 +2,13 @@ package org.uniprot.api.rest.validation.config;
 
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * In Our UniProtKB database we have some ids that has the following format

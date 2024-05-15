@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultMatcher;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultMatcher;
-
-/** @author sahmad */
+/**
+ * @author sahmad
+ */
 @Data
 @Builder
 public class DownloadParamAndResult {

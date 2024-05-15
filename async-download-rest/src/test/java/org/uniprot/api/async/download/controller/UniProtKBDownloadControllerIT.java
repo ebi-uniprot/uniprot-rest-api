@@ -11,8 +11,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
@@ -65,6 +63,8 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ActiveProfiles(profiles = {"offline", "idmapping"})

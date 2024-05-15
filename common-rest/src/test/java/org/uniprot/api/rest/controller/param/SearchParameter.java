@@ -3,13 +3,15 @@ package org.uniprot.api.rest.controller.param;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.test.web.servlet.ResultMatcher;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-import org.springframework.test.web.servlet.ResultMatcher;
-
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @Data
 @Builder
 public class SearchParameter {

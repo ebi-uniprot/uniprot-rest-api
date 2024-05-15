@@ -16,7 +16,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.store.search.SolrCollection;
 
-/** @author sahmad */
+/**
+ * @author sahmad
+ */
 class FacetTupleStreamTemplateTest {
     private static FacetTupleStreamTemplate tupleStreamTemplate;
     private static HttpClient httpClient;

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @Component
 public class KeywordSortClause extends AbstractSolrSortClause {
     private static final String DOC_ID = "id";

@@ -28,8 +28,6 @@ import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -69,6 +67,8 @@ import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lgonzales

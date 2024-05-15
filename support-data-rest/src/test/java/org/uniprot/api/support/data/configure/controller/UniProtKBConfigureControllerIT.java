@@ -28,7 +28,9 @@ import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @WebMvcTest(UniProtKBConfigureController.class)

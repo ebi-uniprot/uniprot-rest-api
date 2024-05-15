@@ -5,11 +5,11 @@ import static org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKB
 import java.util.Iterator;
 import java.util.List;
 
-import net.jodah.failsafe.RetryPolicy;
-
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+
+import net.jodah.failsafe.RetryPolicy;
 
 public class UniProtKBBatchStoreIterable extends BatchStoreIterable<UniProtKBEntry> {
 

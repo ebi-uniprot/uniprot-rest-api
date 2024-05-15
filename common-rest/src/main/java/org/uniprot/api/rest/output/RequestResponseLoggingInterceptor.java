@@ -11,7 +11,9 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 
-/** @author sahmad interceptor for rest template */
+/**
+ * @author sahmad interceptor for rest template
+ */
 public class RequestResponseLoggingInterceptor implements ClientHttpRequestInterceptor {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());

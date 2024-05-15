@@ -1,8 +1,8 @@
 package org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 @Data
 @ConfigurationProperties(prefix = "async.download.embeddings")

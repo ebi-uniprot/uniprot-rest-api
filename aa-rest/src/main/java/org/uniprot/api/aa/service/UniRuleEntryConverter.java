@@ -3,14 +3,14 @@ package org.uniprot.api.aa.service;
 import java.io.IOException;
 import java.util.function.Function;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.core.json.parser.unirule.UniRuleJsonConfig;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad

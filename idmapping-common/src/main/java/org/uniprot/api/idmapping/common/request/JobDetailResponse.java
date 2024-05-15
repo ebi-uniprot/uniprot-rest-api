@@ -2,12 +2,12 @@ package org.uniprot.api.idmapping.common.request;
 
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author lgonzales

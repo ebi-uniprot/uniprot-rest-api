@@ -319,7 +319,8 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
 
     @Override
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
                 .stream()
                 .map(
                         returnField -> {

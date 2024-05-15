@@ -10,9 +10,6 @@ import static org.mockito.Mockito.when;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import lombok.*;
-import net.jodah.failsafe.RetryPolicy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.EntryPair;
@@ -28,6 +25,9 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.RetrievalException;
+
+import lombok.*;
+import net.jodah.failsafe.RetryPolicy;
 
 class BatchStoreEntryPairIterableTest {
     private UniProtStoreClient<FakeName> storeClient;

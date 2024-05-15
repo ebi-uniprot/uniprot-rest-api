@@ -2,11 +2,11 @@ package org.uniprot.api.async.download.model.uniprotkb;
 
 import java.time.LocalDateTime;
 
-import lombok.Builder;
-
 import org.springframework.data.redis.core.RedisHash;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+
+import lombok.Builder;
 
 @RedisHash("uniprotkb")
 public class UniProtKBDownloadJob extends DownloadJob {

@@ -12,8 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -24,6 +22,8 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Abstract HTTP message converter extending {@link AbstractHttpMessageConverter} that implements a

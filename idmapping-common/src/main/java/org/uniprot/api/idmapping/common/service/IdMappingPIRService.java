@@ -33,7 +33,8 @@ public abstract class IdMappingPIRService {
                 CursorPage.of(request.getCursor(), pageSize, result.getMappedIds().size());
 
         Stream<IdMappingStringPair> pageContent =
-                result.getMappedIds()
+                result
+                        .getMappedIds()
                         .subList(
                                 cursorPage.getOffset().intValue(),
                                 CursorPage.getNextOffset(cursorPage))

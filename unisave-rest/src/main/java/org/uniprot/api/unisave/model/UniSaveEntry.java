@@ -2,11 +2,11 @@ package org.uniprot.api.unisave.model;
 
 import java.util.List;
 
-import lombok.Builder;
-import lombok.Data;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.Builder;
+import lombok.Data;
 
 /**
  * Created 20/03/20

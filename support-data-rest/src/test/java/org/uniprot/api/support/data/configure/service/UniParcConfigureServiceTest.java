@@ -5,12 +5,12 @@ import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CON
 
 import java.util.List;
 
-import junit.framework.AssertionFailedError;
-
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author lgonzales
@@ -38,7 +38,7 @@ class UniParcConfigureServiceTest {
         UniParcConfigureService service = new UniParcConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(14, result.size());
+        assertEquals(15, result.size());
 
         AdvancedSearchTerm database =
                 result.stream()

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 public abstract class AbstractGetIdContentTypeParamResolver implements ParameterResolver {
 
     @Override

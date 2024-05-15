@@ -10,7 +10,9 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 
-/** @author jluo */
+/**
+ * @author jluo
+ */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
 @ComponentScan(

@@ -67,49 +67,27 @@ public class IdMappingUniProtKBITUtils {
         if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
             value = "[* TO *]";
         } else {
-            switch (searchField) {
-                case "accession_id":
-                case "accession":
-                    value = "Q00011";
-                    break;
-                case "mass":
-                case "length":
-                    value = "[* TO *]";
-                    break;
-                case "organism_id":
-                case "virus_host_id":
-                case "taxonomy_id":
-                    value = "9606";
-                    break;
-                case "date_modified":
-                case "date_sequence_modified":
-                case "date_created":
-                case "lit_pubdate":
-                    String now = Instant.now().toString();
-                    value = "[* TO " + now + "]";
-                    break;
-                case "proteome":
-                    value = "UP000000000";
-                    break;
-                case "annotation_score":
-                    value = "5";
-                    break;
-                case "uniref_cluster_50":
-                    value = "UniRef50_P00001";
-                    break;
-                case "uniref_cluster_90":
-                    value = "UniRef90_P00001";
-                    break;
-                case "uniref_cluster_100":
-                    value = "UniRef100_P00001";
-                    break;
-                case "uniparc":
-                    value = "UPI0000000001";
-                    break;
-                case "existence":
-                    value = "1";
-                    break;
-            }
+            value =
+                    switch (searchField) {
+                        case "accession_id", "accession" -> "Q00011";
+                        case "mass", "length" -> "[* TO *]";
+                        case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
+                        case "date_modified",
+                                "date_sequence_modified",
+                                "date_created",
+                                "lit_pubdate" -> {
+                            String now = Instant.now().toString();
+                            yield "[* TO " + now + "]";
+                        }
+                        case "proteome" -> "UP000000000";
+                        case "annotation_score" -> "5";
+                        case "uniref_cluster_50" -> "UniRef50_P00001";
+                        case "uniref_cluster_90" -> "UniRef90_P00001";
+                        case "uniref_cluster_100" -> "UniRef100_P00001";
+                        case "uniparc" -> "UPI0000000001";
+                        case "existence" -> "1";
+                        default -> value;
+                    };
         }
         return value;
     }
@@ -120,7 +98,7 @@ public class IdMappingUniProtKBITUtils {
         inactiveDoc.accession = "I8FBX0";
         inactiveDoc.id.add("INACTIVE_DROME");
         inactiveDoc.idInactive = "INACTIVE_DROME";
-        inactiveDoc.inactiveReason = "DELETED";
+        inactiveDoc.inactiveReason = "DELETED:PROTEOME_EXCLUSION";
         inactiveDoc.active = false;
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), inactiveDoc);
         cloudSolrClient.commit(SolrCollection.uniprot.name());
