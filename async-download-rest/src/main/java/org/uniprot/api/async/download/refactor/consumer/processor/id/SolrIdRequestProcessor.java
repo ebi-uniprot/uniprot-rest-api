@@ -1,19 +1,22 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.id;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
 
-import java.util.Map;
-import java.util.stream.Stream;
-
-public abstract class SolrIdRequestProcessor<T extends SolrStreamDownloadRequest, R extends DownloadJob> implements IdRequestProcessor<T> {
+public abstract class SolrIdRequestProcessor<
+                T extends SolrStreamDownloadRequest, R extends DownloadJob>
+        implements IdRequestProcessor<T> {
     protected static final String TOTAL_ENTRIES = "totalEntries";
     private final AsyncDownloadFileHandler downloadFileHandler;
     private final JobService<R> jobService;
 
-    protected SolrIdRequestProcessor(AsyncDownloadFileHandler downloadFileHandler, JobService<R> jobService) {
+    protected SolrIdRequestProcessor(
+            AsyncDownloadFileHandler downloadFileHandler, JobService<R> jobService) {
         this.downloadFileHandler = downloadFileHandler;
         this.jobService = jobService;
     }
@@ -25,7 +28,7 @@ public abstract class SolrIdRequestProcessor<T extends SolrStreamDownloadRequest
     }
 
     protected void updateTotalEntries(T request, long totalEntries) {
-        jobService.update(request.getJobId(), Map.of(TOTAL_ENTRIES,totalEntries));
+        jobService.update(request.getJobId(), Map.of(TOTAL_ENTRIES, totalEntries));
     }
 
     protected abstract long getSolrHits(T downloadRequest);

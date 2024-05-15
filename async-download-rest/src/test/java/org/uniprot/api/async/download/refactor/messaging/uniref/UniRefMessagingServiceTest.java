@@ -10,15 +10,15 @@ import org.uniprot.api.async.download.refactor.messaging.MessagingServiceTest;
 
 @ExtendWith(MockitoExtension.class)
 class UniRefMessagingServiceTest extends MessagingServiceTest {
-    @Mock
-    private UniRefAsyncDownloadQueueConfigProperties uniRefAsyncDownloadQueueConfigProperties;
-    @Mock
-    private UniRefRabbitTemplate uniRefRabbitTemplate;
+    @Mock private UniRefAsyncDownloadQueueConfigProperties uniRefAsyncDownloadQueueConfigProperties;
+    @Mock private UniRefRabbitTemplate uniRefRabbitTemplate;
 
     @BeforeEach
     void setUp() {
         queueConfigProperties = uniRefAsyncDownloadQueueConfigProperties;
         rabbitTemplate = uniRefRabbitTemplate;
-        messagingService = new UniRefMessagingService(uniRefAsyncDownloadQueueConfigProperties, uniRefRabbitTemplate);
+        messagingService =
+                new UniRefMessagingService(
+                        uniRefAsyncDownloadQueueConfigProperties, uniRefRabbitTemplate);
     }
 }

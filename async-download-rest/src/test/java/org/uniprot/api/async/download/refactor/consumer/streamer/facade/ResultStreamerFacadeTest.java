@@ -1,5 +1,14 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -10,16 +19,8 @@ import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-import java.util.stream.Stream;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
-
-public abstract class ResultStreamerFacadeTest<T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class ResultStreamerFacadeTest<
+        T extends DownloadRequest, R extends DownloadJob, S> {
     public static final String FIELDS = "fields";
     protected MessageConverterContext<S> messageConverterContext;
     protected RDFResultStreamer<T, R> rdfResultStreamer;
@@ -29,12 +30,9 @@ public abstract class ResultStreamerFacadeTest<T extends DownloadRequest, R exte
     protected ResultStreamerFacade<T, R, S> resultStreamerFacade;
     protected T downloadRequest;
     protected Stream<S> entryStream;
-    @Mock
-    private Stream<String> ids;
-    @Mock
-    private Stream<String> rdfStream;
-    @Mock
-    private Stream<String> listStream;
+    @Mock private Stream<String> ids;
+    @Mock private Stream<String> rdfStream;
+    @Mock private Stream<String> listStream;
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
@@ -43,8 +41,9 @@ public abstract class ResultStreamerFacadeTest<T extends DownloadRequest, R exte
     @Test
     void getConvertedResult_rdfType() {
         when(downloadRequest.getFormat()).thenReturn("application/rdf+xml");
-        when(converterContextFactory.get(getResource(), RDF_MEDIA_TYPE)).thenReturn(messageConverterContext);
-        when(rdfResultStreamer.stream(downloadRequest,ids)).thenReturn(rdfStream);
+        when(converterContextFactory.get(getResource(), RDF_MEDIA_TYPE))
+                .thenReturn(messageConverterContext);
+        when(rdfResultStreamer.stream(downloadRequest, ids)).thenReturn(rdfStream);
 
         resultStreamerFacade.getConvertedResult(downloadRequest, ids);
 
@@ -56,8 +55,9 @@ public abstract class ResultStreamerFacadeTest<T extends DownloadRequest, R exte
     @Test
     void getConvertedResult_ListType() {
         when(downloadRequest.getFormat()).thenReturn("text/plain;format=list");
-        when(converterContextFactory.get(getResource(), LIST_MEDIA_TYPE)).thenReturn(messageConverterContext);
-        when(listResultStreamer.stream(downloadRequest,ids)).thenReturn(listStream);
+        when(converterContextFactory.get(getResource(), LIST_MEDIA_TYPE))
+                .thenReturn(messageConverterContext);
+        when(listResultStreamer.stream(downloadRequest, ids)).thenReturn(listStream);
 
         resultStreamerFacade.getConvertedResult(downloadRequest, ids);
 
@@ -69,8 +69,9 @@ public abstract class ResultStreamerFacadeTest<T extends DownloadRequest, R exte
     @Test
     void getConvertedResult() {
         when(downloadRequest.getFormat()).thenReturn("application/json");
-        when(converterContextFactory.get(getResource(), APPLICATION_JSON)).thenReturn(messageConverterContext);
-        when(batchResultStreamer.stream(downloadRequest,ids)).thenReturn(entryStream);
+        when(converterContextFactory.get(getResource(), APPLICATION_JSON))
+                .thenReturn(messageConverterContext);
+        when(batchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
 
         resultStreamerFacade.getConvertedResult(downloadRequest, ids);
 

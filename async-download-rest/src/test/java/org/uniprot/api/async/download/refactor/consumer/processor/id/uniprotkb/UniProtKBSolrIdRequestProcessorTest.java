@@ -1,5 +1,8 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb;
 
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,40 +18,41 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
-class UniProtKBSolrIdRequestProcessorTest extends SolrIdRequestProcessorTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+class UniProtKBSolrIdRequestProcessorTest
+        extends SolrIdRequestProcessorTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     private static final String QUERY = "uniprotKBQuery";
     private static final String INCLUDE_ISOFORMS = "false";
-    @Mock
-    private QueryResult<UniProtKBEntry> searchResults;
-    @Mock
-    protected UniProtEntryService uniProtEntryService;
-    @Mock
-    private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
-    @Mock
-    private UniProtKBJobService uniProtKBJobService;
-    @Mock
-    private UniProtKBDownloadRequest uniProtKBDownloadRequest;
-    @Mock
-    private Page page;
-
+    @Mock private QueryResult<UniProtKBEntry> searchResults;
+    @Mock protected UniProtEntryService uniProtEntryService;
+    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+    @Mock private UniProtKBJobService uniProtKBJobService;
+    @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
+    @Mock private Page page;
 
     @BeforeEach
     void setUp() {
         asyncDownloadFileHandler = uniProtKBAsyncDownloadFileHandler;
         jobService = uniProtKBJobService;
         downloadRequest = uniProtKBDownloadRequest;
-        requestProcessor = new UniProtKBSolrIdRequestProcessor(uniProtKBAsyncDownloadFileHandler, uniProtKBJobService, uniProtEntryService);
+        requestProcessor =
+                new UniProtKBSolrIdRequestProcessor(
+                        uniProtKBAsyncDownloadFileHandler,
+                        uniProtKBJobService,
+                        uniProtEntryService);
         when(downloadRequest.getQuery()).thenReturn(QUERY);
         when(downloadRequest.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORMS);
         when(uniProtEntryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
-        when(uniProtEntryService.search(argThat(sr -> QUERY.equals(((UniProtKBSearchRequest) sr).getQuery()) && Boolean.parseBoolean(INCLUDE_ISOFORMS) == ((UniProtKBSearchRequest) sr).isIncludeIsoform() && sr.getSize() == 0)))
+        when(uniProtEntryService.search(
+                        argThat(
+                                sr ->
+                                        QUERY.equals(((UniProtKBSearchRequest) sr).getQuery())
+                                                && Boolean.parseBoolean(INCLUDE_ISOFORMS)
+                                                        == ((UniProtKBSearchRequest) sr)
+                                                                .isIncludeIsoform()
+                                                && sr.getSize() == 0)))
                 .thenReturn(searchResults);
         when(searchResults.getPage()).thenReturn(page);
         when(page.getTotalElements()).thenReturn(SOLR_HITS);
     }
-
 }

@@ -11,15 +11,12 @@ import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBRDFResultStreamerTest extends RDFResultStreamerTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    @Mock
-    protected UniProtKBDownloadRequest uniProtKBDownloadRequest;
-    @Mock
-    protected UniProtKBDownloadJob uniProtKBDownloadJob;
-    @Mock
-    protected UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
-    @Mock
-    protected UniProtKBJobService uniProtKBJobService;
+class UniProtKBRDFResultStreamerTest
+        extends RDFResultStreamerTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    @Mock protected UniProtKBDownloadRequest uniProtKBDownloadRequest;
+    @Mock protected UniProtKBDownloadJob uniProtKBDownloadJob;
+    @Mock protected UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
+    @Mock protected UniProtKBJobService uniProtKBJobService;
 
     @BeforeEach
     void setUp() {
@@ -27,7 +24,8 @@ class UniProtKBRDFResultStreamerTest extends RDFResultStreamerTest<UniProtKBDown
         job = uniProtKBDownloadJob;
         heartbeatProducer = uniProtKBHeartbeatProducer;
         jobService = uniProtKBJobService;
-        rdfResultStreamer = new UniProtKBRDFResultStreamer(uniProtKBHeartbeatProducer, uniProtKBJobService, rdfStreamer);
+        rdfResultStreamer =
+                new UniProtKBRDFResultStreamer(
+                        uniProtKBHeartbeatProducer, uniProtKBJobService, rdfStreamer);
     }
-
 }

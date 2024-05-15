@@ -11,15 +11,12 @@ import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBListResultStreamerTest extends ListResultStreamerTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    @Mock
-    private UniProtKBDownloadRequest uniProtKBRequest;
-    @Mock
-    private UniProtKBDownloadJob uniProtKBJob;
-    @Mock
-    private UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
-    @Mock
-    private UniProtKBJobService uniProtKBJobService;
+class UniProtKBListResultStreamerTest
+        extends ListResultStreamerTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    @Mock private UniProtKBDownloadRequest uniProtKBRequest;
+    @Mock private UniProtKBDownloadJob uniProtKBJob;
+    @Mock private UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
+    @Mock private UniProtKBJobService uniProtKBJobService;
 
     @BeforeEach
     void setUp() {
@@ -27,6 +24,7 @@ class UniProtKBListResultStreamerTest extends ListResultStreamerTest<UniProtKBDo
         job = uniProtKBJob;
         heartbeatProducer = uniProtKBHeartbeatProducer;
         jobService = uniProtKBJobService;
-        listResultStreamer = new UniProtKBListResultStreamer(uniProtKBHeartbeatProducer, uniProtKBJobService);
+        listResultStreamer =
+                new UniProtKBListResultStreamer(uniProtKBHeartbeatProducer, uniProtKBJobService);
     }
 }

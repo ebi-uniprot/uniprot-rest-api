@@ -1,9 +1,10 @@
 package org.uniprot.api.async.download.refactor.messaging;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessagingService {
@@ -32,12 +33,18 @@ public class MessagingService {
 
     public void sendToRetry(Message message) {
         send(message, queueConfigProperties.getRetryQueueName());
-        log.info("Message with jobId {} sent to retry queue {}", message.getMessageProperties().getHeader(JOB_ID_HEADER), queueConfigProperties.getRetryQueueName());
+        log.info(
+                "Message with jobId {} sent to retry queue {}",
+                message.getMessageProperties().getHeader(JOB_ID_HEADER),
+                queueConfigProperties.getRetryQueueName());
     }
 
     public void sendToRejected(Message message) {
         send(message, queueConfigProperties.getRejectedQueueName());
-        log.info("Message with jobId {} sent to rejected queue {}", message.getMessageProperties().getHeader(JOB_ID_HEADER), queueConfigProperties.getRejectedQueueName());
+        log.info(
+                "Message with jobId {} sent to rejected queue {}",
+                message.getMessageProperties().getHeader(JOB_ID_HEADER),
+                queueConfigProperties.getRejectedQueueName());
     }
 
     public int getMaxRetryCount() {

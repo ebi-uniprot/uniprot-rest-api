@@ -1,10 +1,10 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer;
 
+import java.util.stream.Stream;
+
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
-
-import java.util.stream.Stream;
 
 public abstract class ResultStreamer<T extends DownloadRequest, R extends DownloadJob, S, P> {
     private final JobService<R> jobService;
@@ -17,6 +17,9 @@ public abstract class ResultStreamer<T extends DownloadRequest, R extends Downlo
 
     protected R getJob(T request) {
         String jobId = request.getJobId();
-        return jobService.find(jobId).orElseThrow(() -> new IllegalArgumentException("job id %s not found".formatted(jobId)));
+        return jobService
+                .find(jobId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("job id %s not found".formatted(jobId)));
     }
 }

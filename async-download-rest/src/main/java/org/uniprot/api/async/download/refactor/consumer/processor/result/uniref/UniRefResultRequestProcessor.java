@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.result.uniref;
 
+import java.lang.reflect.Type;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
@@ -13,15 +15,25 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.lang.reflect.Type;
-
 @Component
-public class UniRefResultRequestProcessor extends ResultRequestProcessor<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
-    private static final Type type = (new ParameterizedTypeReference<MessageConverterContext<UniRefEntryLight>>() {})
+public class UniRefResultRequestProcessor
+        extends ResultRequestProcessor<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+    private static final Type type =
+            (new ParameterizedTypeReference<MessageConverterContext<UniRefEntryLight>>() {})
                     .getType();
 
-    public UniRefResultRequestProcessor(UniRefDownloadConfigProperties downloadConfigProperties, UniRefHeartbeatProducer heartbeatProducer, UniRefAsyncDownloadFileHandler fileHandler, UniRefResultStreamerFacade uniProtKBResultStreamerFacade, UUWMessageConverterFactory uuwMessageConverterFactory) {
-        super(downloadConfigProperties, heartbeatProducer, fileHandler, uniProtKBResultStreamerFacade, uuwMessageConverterFactory);
+    public UniRefResultRequestProcessor(
+            UniRefDownloadConfigProperties downloadConfigProperties,
+            UniRefHeartbeatProducer heartbeatProducer,
+            UniRefAsyncDownloadFileHandler fileHandler,
+            UniRefResultStreamerFacade uniProtKBResultStreamerFacade,
+            UUWMessageConverterFactory uuwMessageConverterFactory) {
+        super(
+                downloadConfigProperties,
+                heartbeatProducer,
+                fileHandler,
+                uniProtKBResultStreamerFacade,
+                uuwMessageConverterFactory);
     }
 
     @Override

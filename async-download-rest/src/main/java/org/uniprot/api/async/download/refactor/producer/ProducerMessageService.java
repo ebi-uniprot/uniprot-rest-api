@@ -4,8 +4,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.Objects;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -19,6 +17,8 @@ import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class ProducerMessageService<T extends DownloadRequest, R extends DownloadJob> {

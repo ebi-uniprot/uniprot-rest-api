@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
-import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.rest.output.context.FileType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,16 +20,18 @@ public abstract class AsyncDownloadFileHandler {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
 
-    protected AsyncDownloadFileHandler(DownloadConfigProperties downloadConfigProperties, HeartbeatProducer heartbeatProducer) {
+    protected AsyncDownloadFileHandler(
+            DownloadConfigProperties downloadConfigProperties,
+            HeartbeatProducer heartbeatProducer) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.heartbeatProducer = heartbeatProducer;
     }
 
-    public void writeIds(String jobId, Stream<String> ids)  {
+    public void writeIds(String jobId, Stream<String> ids) {
         Path idsFile = getIdFile(jobId);
         try (BufferedWriter writer =
-                     Files.newBufferedWriter(
-                             idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                Files.newBufferedWriter(
+                        idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             Iterable<String> iterator = ids::iterator;
             for (String id : iterator) {
                 writer.append(id);

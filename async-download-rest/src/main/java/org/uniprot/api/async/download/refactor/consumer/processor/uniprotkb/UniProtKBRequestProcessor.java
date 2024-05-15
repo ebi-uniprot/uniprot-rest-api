@@ -14,7 +14,9 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
     private final UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor;
     private final UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor;
 
-    public UniProtKBRequestProcessor(UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor, UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor) {
+    public UniProtKBRequestProcessor(
+            UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor,
+            UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor) {
         this.uniProtKBSolrIdHD5RequestProcessor = uniProtKBSolrIdHD5RequestProcessor;
         this.uniProtKBCompositeRequestProcessor = uniProtKBCompositeRequestProcessor;
     }

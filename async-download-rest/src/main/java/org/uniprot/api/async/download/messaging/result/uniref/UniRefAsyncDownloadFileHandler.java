@@ -8,7 +8,8 @@ import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileH
 @Component
 public class UniRefAsyncDownloadFileHandler extends AsyncDownloadFileHandler {
     public UniRefAsyncDownloadFileHandler(
-            UniRefDownloadConfigProperties uniRefDownloadConfigProperties, UniProtKBHeartbeatProducer uniRefHeartbeatProducer) {
+            UniRefDownloadConfigProperties uniRefDownloadConfigProperties,
+            UniProtKBHeartbeatProducer uniRefHeartbeatProducer) {
         super(uniRefDownloadConfigProperties, uniRefHeartbeatProducer);
     }
 }

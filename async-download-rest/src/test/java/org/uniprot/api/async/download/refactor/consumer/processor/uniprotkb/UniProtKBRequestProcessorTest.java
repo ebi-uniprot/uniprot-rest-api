@@ -1,5 +1,8 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.uniprotkb;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,21 +12,14 @@ import org.uniprot.api.async.download.refactor.consumer.processor.composite.unip
 import org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb.UniProtKBSolrIdHD5RequestProcessor;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class UniProtKBRequestProcessorTest {
     private static final String JSON = "application/json";
     private static final String HD5 = "application/x-hdf5";
-    @Mock
-    private UniProtKBDownloadRequest uniProtKBDownloadRequest;
-    @Mock
-    private UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor;
-    @Mock
-    private UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor;
-    @InjectMocks
-    private UniProtKBRequestProcessor uniProtKBRequestProcessor;
+    @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
+    @Mock private UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor;
+    @Mock private UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor;
+    @InjectMocks private UniProtKBRequestProcessor uniProtKBRequestProcessor;
 
     @Test
     void process() {

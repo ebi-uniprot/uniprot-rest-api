@@ -5,9 +5,6 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIREF_DESCRI
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIREF_EXAMPLE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
@@ -15,6 +12,8 @@ import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

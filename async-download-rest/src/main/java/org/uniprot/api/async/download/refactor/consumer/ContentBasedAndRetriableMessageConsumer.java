@@ -1,19 +1,5 @@
 package org.uniprot.api.async.download.refactor.consumer;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.messaging.MessagingService;
-import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
-import org.uniprot.api.async.download.refactor.service.JobService;
-import org.uniprot.api.rest.download.model.JobStatus;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -21,8 +7,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
+import org.uniprot.api.async.download.refactor.messaging.MessagingService;
+import org.uniprot.api.async.download.refactor.request.DownloadRequest;
+import org.uniprot.api.async.download.refactor.service.JobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-public abstract class ContentBasedAndRetriableMessageConsumer<T extends DownloadRequest, R extends DownloadJob> implements MessageListener {
+public abstract class ContentBasedAndRetriableMessageConsumer<
+                T extends DownloadRequest, R extends DownloadJob>
+        implements MessageListener {
     private static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     private static final String JOB_ID_HEADER = "jobId";
@@ -37,15 +40,18 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
 
-
-    protected ContentBasedAndRetriableMessageConsumer(MessagingService messagingService, RequestProcessor<T> requestProcessor, AsyncDownloadFileHandler asyncDownloadFileHandler, JobService<R> jobService, MessageConverter messageConverter) {
+    protected ContentBasedAndRetriableMessageConsumer(
+            MessagingService messagingService,
+            RequestProcessor<T> requestProcessor,
+            AsyncDownloadFileHandler asyncDownloadFileHandler,
+            JobService<R> jobService,
+            MessageConverter messageConverter) {
         this.messagingService = messagingService;
         this.requestProcessor = requestProcessor;
         this.asyncDownloadFileHandler = asyncDownloadFileHandler;
         this.jobService = jobService;
         this.messageConverter = messageConverter;
     }
-
 
     @Override
     public void onMessage(Message message) {
@@ -58,7 +64,10 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
                 rejectMessage(message, jobId);
             } else {
                 String error = "Unable to find jobId " + jobId + " in db";
-                DownloadJob downloadJob = jobService.find(jobId).orElseThrow(() -> new MessageListenerException(error));
+                DownloadJob downloadJob =
+                        jobService
+                                .find(jobId)
+                                .orElseThrow(() -> new MessageListenerException(error));
                 cleanIfNecessary(downloadJob);
                 // run the job only if it has errored out
                 if (isJobSeenBefore(jobId) && JobStatus.ERROR != downloadJob.getStatus()) {
@@ -80,7 +89,13 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
             if (getRetryCountByBroker(message) <= messagingService.getMaxRetryCount()) {
                 log.error("Download job id {} failed with error {}", jobId, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
-                jobService.update(jobId, Map.of(RETRY_COUNT, getRetryCount(updatedMessage), STATUS, JobStatus.ERROR));
+                jobService.update(
+                        jobId,
+                        Map.of(
+                                RETRY_COUNT,
+                                getRetryCount(updatedMessage),
+                                STATUS,
+                                JobStatus.ERROR));
                 log.warn("Sending message for jobId {} to retry queue", jobId);
                 messagingService.sendToRetry(updatedMessage);
             } else {
@@ -95,7 +110,8 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
     }
 
     private boolean isJobSeenBefore(String jobId) {
-        return asyncDownloadFileHandler.isIdFileExist(jobId) && asyncDownloadFileHandler.isResultFileExist(jobId);
+        return asyncDownloadFileHandler.isIdFileExist(jobId)
+                && asyncDownloadFileHandler.isResultFileExist(jobId);
     }
 
     private void cleanIfNecessary(DownloadJob downloadJob) {
@@ -117,7 +133,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
         cleanFilesAndResetCounts(jobId);
     }
 
-
     private Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
         Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
@@ -135,7 +150,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
         builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
         return builder.build();
     }
-
 
     private boolean isMaxRetriedReached(Message message) {
         return getRetryCount(message) >= messagingService.getMaxRetryCount();
@@ -173,7 +187,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<T extends Download
 
         return retriedByBroker;
     }
-
 
     private void cleanFilesAndResetCounts(String jobId) {
         jobService.update(

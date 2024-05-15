@@ -1,33 +1,37 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
-import org.springframework.http.MediaType;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamer;
-import org.uniprot.api.async.download.refactor.consumer.streamer.list.ListResultStreamer;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
-import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.RDFResultStreamer;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.*;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.*;
+import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.list.ListResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.RDFResultStreamer;
+import org.uniprot.api.async.download.refactor.request.DownloadRequest;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends DownloadJob, S>{
+public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends DownloadJob, S> {
     private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
                     N_TRIPLES_MEDIA_TYPE, "nt");
-    //todo resuse the existing or create common
+    // todo resuse the existing or create common
     private final RDFResultStreamer<T, R> rdfResultStreamer;
     private final ListResultStreamer<T, R> listResultStreamer;
     private final BatchResultStreamer<T, R, S> batchResultStreamer;
     private final MessageConverterContextFactory<S> converterContextFactory;
 
-    protected ResultStreamerFacade(RDFResultStreamer<T, R> rdfResultStreamer, ListResultStreamer<T, R> listResultStreamer, BatchResultStreamer<T, R, S> batchResultStreamer, MessageConverterContextFactory<S> converterContextFactory) {
+    protected ResultStreamerFacade(
+            RDFResultStreamer<T, R> rdfResultStreamer,
+            ListResultStreamer<T, R> listResultStreamer,
+            BatchResultStreamer<T, R, S> batchResultStreamer,
+            MessageConverterContextFactory<S> converterContextFactory) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
         this.batchResultStreamer = batchResultStreamer;
@@ -36,7 +40,8 @@ public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends 
 
     public MessageConverterContext<S> getConvertedResult(T request, Stream<String> ids) {
         MediaType contentType = valueOf(request.getFormat());
-        MessageConverterContext<S> context = converterContextFactory.get(getResource(), contentType);
+        MessageConverterContext<S> context =
+                converterContextFactory.get(getResource(), contentType);
         context.setFields(request.getFields());
         context.setContentType(contentType);
 
@@ -52,5 +57,4 @@ public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends 
     }
 
     protected abstract Resource getResource();
-
 }

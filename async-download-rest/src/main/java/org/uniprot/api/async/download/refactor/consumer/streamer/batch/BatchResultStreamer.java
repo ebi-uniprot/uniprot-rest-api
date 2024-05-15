@@ -1,22 +1,21 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.batch;
 
-import lombok.extern.slf4j.Slf4j;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.IdResultStreamer;
-import org.uniprot.api.async.download.refactor.consumer.streamer.ResultStreamer;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
-import org.uniprot.api.async.download.refactor.service.JobService;
-import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.streamer.IdResultStreamer;
+import org.uniprot.api.async.download.refactor.request.DownloadRequest;
+import org.uniprot.api.async.download.refactor.service.JobService;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-public abstract class BatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, S> extends IdResultStreamer<T, R, S> {
+public abstract class BatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, S>
+        extends IdResultStreamer<T, R, S> {
     private final HeartbeatProducer heartbeatProducer;
 
     protected BatchResultStreamer(HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
@@ -31,8 +30,8 @@ public abstract class BatchResultStreamer<T extends DownloadRequest, R extends D
 
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .peek(
-                        entityCollection -> heartbeatProducer.createForResults(
-                                job, entityCollection.size()))
+                        entityCollection ->
+                                heartbeatProducer.createForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
                 .onClose(
                         () ->
@@ -41,5 +40,6 @@ public abstract class BatchResultStreamer<T extends DownloadRequest, R extends D
                                         request.getJobId()));
     }
 
-    protected abstract Iterable<Collection<S>> getBatchStoreIterable(Iterator<String> idsIterator, T request);
+    protected abstract Iterable<Collection<S>> getBatchStoreIterable(
+            Iterator<String> idsIterator, T request);
 }
