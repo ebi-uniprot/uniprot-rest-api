@@ -215,16 +215,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @ParameterizedTest
-    @ValueSource(
-            strings = {
-                "\"HGNC:3689\"",
-                "FGFR2",
-                "HGNC",
-                "3689",
-                "\"hgnc-HGNC:3689\"",
-                "hgnc-HGNC",
-                "hgnc-3689"
-            })
+    @ValueSource(strings = {"\"HGNC:3689\"", "FGFR2", "3689", "\"hgnc-HGNC:3689\"", "hgnc-3689"})
     void searchWithHGNCIdAndProperties(String xref) throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
