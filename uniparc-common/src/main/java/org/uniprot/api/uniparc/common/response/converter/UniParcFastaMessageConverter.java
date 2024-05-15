@@ -37,8 +37,9 @@ public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConve
     @Override
     protected void writeEntity(UniParcEntry entity, OutputStream outputStream) throws IOException {
         String proteomeId = TL_PROTEOME_ID.get();
-        if(Utils.notNullNotEmpty(proteomeId)){
-            outputStream.write((UniParcProteomeFastaParser.toFasta(entity, proteomeId) + "\n").getBytes());
+        if (Utils.notNullNotEmpty(proteomeId)) {
+            outputStream.write(
+                    (UniParcProteomeFastaParser.toFasta(entity, proteomeId) + "\n").getBytes());
         } else {
             outputStream.write((UniParcFastaParser.toFasta(entity) + "\n").getBytes());
         }
