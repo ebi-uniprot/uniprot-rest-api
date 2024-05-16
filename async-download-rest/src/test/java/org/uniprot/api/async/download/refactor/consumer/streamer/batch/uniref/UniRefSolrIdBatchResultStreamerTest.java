@@ -7,13 +7,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefHeartbeatProducer;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamerTest;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamerTest;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
@@ -25,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UniRefBatchResultStreamerTest extends BatchResultStreamerTest<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+public class UniRefSolrIdBatchResultStreamerTest extends SolrIdBatchResultStreamerTest<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private static final int BATCH_SIZE = 2;
     @Mock
     private UniRefDownloadRequest uniRefDownloadRequest;
@@ -55,7 +53,7 @@ public class UniRefBatchResultStreamerTest extends BatchResultStreamerTest<UniRe
         job = uniRefDownloadJob;
         heartbeatProducer = uniRefHeartbeatProducer;
         jobService = uniRefJobService;
-        batchResultStreamer = new UniRefBatchResultStreamer(uniRefHeartbeatProducer, uniRefJobService, uniRefEntryStoreStreamerConfig);
+        solrIdBatchResultStreamer = new UniRefSolrIdBatchResultStreamer(uniRefHeartbeatProducer, uniRefJobService, uniRefEntryStoreStreamerConfig);
     }
 
     @Override

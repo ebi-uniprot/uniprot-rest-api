@@ -13,7 +13,7 @@ public abstract class ResultStreamer<T extends DownloadRequest, R extends Downlo
         this.jobService = jobService;
     }
 
-    public abstract Stream<S> stream(T request, Stream<String> ids);
+    public abstract Stream<P> stream(T request, Stream<S> ids);
 
     protected R getJob(T request) {
         String jobId = request.getJobId();

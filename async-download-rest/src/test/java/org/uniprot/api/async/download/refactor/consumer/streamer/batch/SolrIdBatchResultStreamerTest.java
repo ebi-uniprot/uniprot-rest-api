@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
-public abstract class BatchResultStreamerTest<T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class SolrIdBatchResultStreamerTest<T extends DownloadRequest, R extends DownloadJob, S> {
     private static final String JOB_ID = "jobId";
     protected T request;
     protected R job;
     protected HeartbeatProducer heartbeatProducer;
     protected JobService<R> jobService;
-    protected BatchResultStreamer<T, R, S> batchResultStreamer;
+    protected SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
 
     @Test
     void stream() {
@@ -32,7 +32,7 @@ public abstract class BatchResultStreamerTest<T extends DownloadRequest, R exten
         List<String> idList = List.of("id1", "id2", "id3");
         Stream<String> ids = idList.stream();
 
-        Stream<S> result = batchResultStreamer.stream(request, ids);
+        Stream<S> result = solrIdBatchResultStreamer.stream(request, ids);
 
         assertThat(result).hasSameElementsAs(getEntryList());
         InOrder inOrder = inOrder(heartbeatProducer);
@@ -45,7 +45,7 @@ public abstract class BatchResultStreamerTest<T extends DownloadRequest, R exten
         when(request.getJobId()).thenReturn(JOB_ID);
         when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> batchResultStreamer.stream(request, Stream.of()));
+        assertThrows(IllegalArgumentException.class, () -> solrIdBatchResultStreamer.stream(request, Stream.of()));
 
     }
 

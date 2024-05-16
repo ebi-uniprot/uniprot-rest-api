@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.uniprotkb.UniProtKBBatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.uniprotkb.UniProtKBSolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.facade.ResultStreamerFacadeTest;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.uniprotkb.UniProtKBListResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.uniprotkb.UniProtKBRDFResultStreamer;
@@ -32,7 +32,7 @@ class UniProtKBResultStreamerFacadeTest extends ResultStreamerFacadeTest<UniProt
     @Mock
     private UniProtKBListResultStreamer uniProtKBListResultStreamer;
     @Mock
-    private UniProtKBBatchResultStreamer uniProtKBBatchResultStreamer;
+    private UniProtKBSolrIdBatchResultStreamer uniProtKBBatchResultStreamer;
     @Mock
     private MessageConverterContextFactory<UniProtKBEntry> uniProtKBConverterContextFactory;
 
@@ -43,7 +43,7 @@ class UniProtKBResultStreamerFacadeTest extends ResultStreamerFacadeTest<UniProt
         downloadRequest = uniProtKBDownloadRequest;
         rdfResultStreamer = uniProtKBRDFResultStreamer;
         listResultStreamer = uniProtKBListResultStreamer;
-        batchResultStreamer = uniProtKBBatchResultStreamer;
+        solrIdBatchResultStreamer = uniProtKBBatchResultStreamer;
         converterContextFactory = uniProtKBConverterContextFactory;
         resultStreamerFacade = new UniProtKBResultStreamerFacade(uniProtKBRDFResultStreamer, uniProtKBListResultStreamer, uniProtKBBatchResultStreamer, uniProtKBConverterContextFactory);
         mock();
