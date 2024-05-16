@@ -1,6 +1,9 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+
+import java.util.Map;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.stereotype.Component;
@@ -12,13 +15,12 @@ import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 
-import java.util.Map;
-
-import static org.uniprot.api.rest.download.model.JobStatus.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class UniProtKBSolrIdHD5RequestProcessor implements IdRequestProcessor<UniProtKBDownloadRequest> {
+public class UniProtKBSolrIdHD5RequestProcessor
+        implements IdRequestProcessor<UniProtKBDownloadRequest> {
     protected static final String STATUS = "status";
     protected static final String JOB_ID_HEADER = "jobId";
     private final UniProtKBJobService jobService;
@@ -26,11 +28,18 @@ public class UniProtKBSolrIdHD5RequestProcessor implements IdRequestProcessor<Un
     private final UniProtKBMessagingService messagingService;
     private final UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor;
 
-    public UniProtKBSolrIdHD5RequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, UniProtKBMessagingService messagingService, UniProtEntryService uniProtKBEntryService) {
+    public UniProtKBSolrIdHD5RequestProcessor(
+            UniProtKBAsyncDownloadFileHandler downloadFileHandler,
+            UniProtKBJobService jobService,
+            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
+            UniProtKBMessagingService messagingService,
+            UniProtEntryService uniProtKBEntryService) {
         this.jobService = jobService;
         this.embeddingsQueueConfigProperties = embeddingsQueueConfigProperties;
         this.messagingService = messagingService;
-        uniProtKBSolrIdRequestProcessor = new UniProtKBSolrIdRequestProcessor(downloadFileHandler, jobService, uniProtKBEntryService);
+        uniProtKBSolrIdRequestProcessor =
+                new UniProtKBSolrIdRequestProcessor(
+                        downloadFileHandler, jobService, uniProtKBEntryService);
     }
 
     @Override
@@ -44,17 +53,31 @@ public class UniProtKBSolrIdHD5RequestProcessor implements IdRequestProcessor<Un
             jobService.update(request.getJobId(), Map.of(STATUS, UNFINISHED));
         } else {
             log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
-            jobService.update(request.getJobId(), Map.of(STATUS, ABORTED, "error",
-                    "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s".formatted(maxEntryCount, solrHits)));
+            jobService.update(
+                    request.getJobId(),
+                    Map.of(
+                            STATUS,
+                            ABORTED,
+                            "error",
+                            "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s"
+                                    .formatted(maxEntryCount, solrHits)));
         }
     }
 
     private void sendMessageToEmbeddingsQueue(String jobId) {
-        log.info("Sending h5 message to embeddings queue for further processing for jobId {}", jobId);
+        log.info(
+                "Sending h5 message to embeddings queue for further processing for jobId {}",
+                jobId);
         MessageProperties msgProps = new MessageProperties();
         msgProps.setHeader(JOB_ID_HEADER, jobId);
-        Message message = new Message(new byte[]{}, msgProps);
-        messagingService.send(message, embeddingsQueueConfigProperties.getExchangeName(), embeddingsQueueConfigProperties.getRoutingKey());
-        log.info("Message with jobId {} sent to embeddings queue {}", jobId, this.embeddingsQueueConfigProperties.getQueueName());
+        Message message = new Message(new byte[] {}, msgProps);
+        messagingService.send(
+                message,
+                embeddingsQueueConfigProperties.getExchangeName(),
+                embeddingsQueueConfigProperties.getRoutingKey());
+        log.info(
+                "Message with jobId {} sent to embeddings queue {}",
+                jobId,
+                this.embeddingsQueueConfigProperties.getQueueName());
     }
 }

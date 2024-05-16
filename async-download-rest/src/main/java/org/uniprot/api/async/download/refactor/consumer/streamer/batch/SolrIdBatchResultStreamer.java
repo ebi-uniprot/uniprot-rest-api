@@ -1,22 +1,25 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.batch;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.streamer.IdResultStreamer;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, P> extends IdResultStreamer<T, R, P> {
+public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, P>
+        extends IdResultStreamer<T, R, P> {
     private final HeartbeatProducer heartbeatProducer;
 
-    protected SolrIdBatchResultStreamer(HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
+    protected SolrIdBatchResultStreamer(
+            HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
         super(jobService);
         this.heartbeatProducer = heartbeatProducer;
     }
@@ -28,8 +31,8 @@ public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R ext
 
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .peek(
-                        entityCollection -> heartbeatProducer.createForResults(
-                                job, entityCollection.size()))
+                        entityCollection ->
+                                heartbeatProducer.createForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
                 .onClose(
                         () ->
@@ -38,5 +41,6 @@ public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R ext
                                         request.getJobId()));
     }
 
-    protected abstract Iterable<Collection<P>> getBatchStoreIterable(Iterator<String> idsIterator, T request);
+    protected abstract Iterable<Collection<P>> getBatchStoreIterable(
+            Iterator<String> idsIterator, T request);
 }

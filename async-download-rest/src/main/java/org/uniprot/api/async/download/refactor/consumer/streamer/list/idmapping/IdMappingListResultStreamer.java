@@ -8,9 +8,11 @@ import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownlo
 import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
 
 @Component
-public class IdMappingListResultStreamer extends ListResultStreamer<IdMappingDownloadRequest, IdMappingDownloadJob> {
+public class IdMappingListResultStreamer
+        extends ListResultStreamer<IdMappingDownloadRequest, IdMappingDownloadJob> {
 
-    public IdMappingListResultStreamer(IdMappingHeartbeatProducer heartbeatProducer, IdMappingJobService jobService) {
+    public IdMappingListResultStreamer(
+            IdMappingHeartbeatProducer heartbeatProducer, IdMappingJobService jobService) {
         super(heartbeatProducer, jobService);
     }
 }

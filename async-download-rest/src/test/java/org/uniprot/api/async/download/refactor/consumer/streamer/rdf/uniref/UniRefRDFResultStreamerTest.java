@@ -11,15 +11,12 @@ import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequ
 import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
 
 @ExtendWith(MockitoExtension.class)
-class UniRefRDFResultStreamerTest extends RDFResultStreamerTest<UniRefDownloadRequest, UniRefDownloadJob> {
-    @Mock
-    protected UniRefDownloadRequest uniRefDownloadRequest;
-    @Mock
-    protected UniRefDownloadJob uniRefDownloadJob;
-    @Mock
-    protected UniRefHeartbeatProducer uniRefHeartbeatProducer;
-    @Mock
-    protected UniRefJobService uniRefJobService;
+class UniRefRDFResultStreamerTest
+        extends RDFResultStreamerTest<UniRefDownloadRequest, UniRefDownloadJob> {
+    @Mock protected UniRefDownloadRequest uniRefDownloadRequest;
+    @Mock protected UniRefDownloadJob uniRefDownloadJob;
+    @Mock protected UniRefHeartbeatProducer uniRefHeartbeatProducer;
+    @Mock protected UniRefJobService uniRefJobService;
 
     @BeforeEach
     void setUp() {
@@ -27,7 +24,7 @@ class UniRefRDFResultStreamerTest extends RDFResultStreamerTest<UniRefDownloadRe
         job = uniRefDownloadJob;
         heartbeatProducer = uniRefHeartbeatProducer;
         jobService = uniRefJobService;
-        rdfResultStreamer = new UniRefRDFResultStreamer(uniRefHeartbeatProducer, uniRefJobService, rdfStreamer);
+        rdfResultStreamer =
+                new UniRefRDFResultStreamer(uniRefHeartbeatProducer, uniRefJobService, rdfStreamer);
     }
-
 }

@@ -1,18 +1,18 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.list;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
-import org.uniprot.api.async.download.refactor.service.JobService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.request.DownloadRequest;
+import org.uniprot.api.async.download.refactor.service.JobService;
 
 public abstract class ListResultStreamerTest<T extends DownloadRequest, R extends DownloadJob> {
     private static final String JOB_ID = "jobId";
@@ -40,6 +40,8 @@ public abstract class ListResultStreamerTest<T extends DownloadRequest, R extend
         when(request.getJobId()).thenReturn(JOB_ID);
         when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> listResultStreamer.stream(request, Stream.of()));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> listResultStreamer.stream(request, Stream.of()));
     }
 }

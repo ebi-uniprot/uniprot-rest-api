@@ -1,5 +1,13 @@
 package org.uniprot.api.async.download.refactor.producer.idmapping;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.download.model.JobStatus.NEW;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -14,14 +22,6 @@ import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceTe
 import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.request.HashGenerator;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.rest.download.model.JobStatus.NEW;
 
 @ExtendWith(MockitoExtension.class)
 class IdMappingProducerMessageServiceTest

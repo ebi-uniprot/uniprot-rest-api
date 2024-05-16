@@ -1,5 +1,13 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.refactor.consumer.streamer.batch.IdMappingBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.idmapping.IdMappingListResultStreamer;
@@ -16,28 +24,25 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
-
 public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
     private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
                     N_TRIPLES_MEDIA_TYPE, "nt");
-    //todo resuse the existing or create common
+    // todo resuse the existing or create common
     private final IdMappingRDFStreamer rdfResultStreamer;
     private final IdMappingListResultStreamer listResultStreamer;
     private final IdMappingBatchResultStreamer<Q, P> solrIdBatchResultStreamer;
     private final MessageConverterContextFactory<P> converterContextFactory;
     private final IdMappingJobCacheService idMappingJobCacheService;
 
-    protected IdMappingResultStreamerFacade(IdMappingRDFStreamer rdfResultStreamer, IdMappingListResultStreamer listResultStreamer, IdMappingBatchResultStreamer<Q, P> solrIdBatchResultStreamer, MessageConverterContextFactory<P> converterContextFactory, IdMappingJobCacheService idMappingJobCacheService) {
+    protected IdMappingResultStreamerFacade(
+            IdMappingRDFStreamer rdfResultStreamer,
+            IdMappingListResultStreamer listResultStreamer,
+            IdMappingBatchResultStreamer<Q, P> solrIdBatchResultStreamer,
+            MessageConverterContextFactory<P> converterContextFactory,
+            IdMappingJobCacheService idMappingJobCacheService) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
         this.solrIdBatchResultStreamer = solrIdBatchResultStreamer;
@@ -46,10 +51,18 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
     }
 
     public MessageConverterContext<P> getConvertedResult(IdMappingDownloadRequest request) {
-        IdMappingJob idMappingJobInput = Optional.ofNullable(idMappingJobCacheService.getCompletedJobAsResource(request.getJobId())).orElseThrow(() -> new IllegalArgumentException("Invalid Job Id " + request.getJobId()));
+        IdMappingJob idMappingJobInput =
+                Optional.ofNullable(
+                                idMappingJobCacheService.getCompletedJobAsResource(
+                                        request.getJobId()))
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Invalid Job Id " + request.getJobId()));
         IdMappingResult idMappingResult = idMappingJobInput.getIdMappingResult();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        MessageConverterContext<P> context = converterContextFactory.get(getResourceType(), contentType);
+        MessageConverterContext<P> context =
+                converterContextFactory.get(getResourceType(), contentType);
         ExtraOptions extraOptions = IdMappingServiceUtils.getExtraOptions(idMappingResult);
         context.setExtraOptions(extraOptions);
         context.setWarnings(idMappingResult.getWarnings());
@@ -57,11 +70,15 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
         context.setContentType(contentType);
 
         if (SUPPORTED_RDF_TYPES.containsKey(contentType)) {
-            context.setEntityIds(rdfResultStreamer.stream(request, getToIds(idMappingResult).stream()));
+            context.setEntityIds(
+                    rdfResultStreamer.stream(request, getToIds(idMappingResult).stream()));
         } else if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(listResultStreamer.stream(request,  getToIds(idMappingResult).stream()));
+            context.setEntityIds(
+                    listResultStreamer.stream(request, getToIds(idMappingResult).stream()));
         } else {
-            context.setEntities(solrIdBatchResultStreamer.stream(request, idMappingResult.getMappedIds().stream()));
+            context.setEntities(
+                    solrIdBatchResultStreamer.stream(
+                            request, idMappingResult.getMappedIds().stream()));
         }
 
         return context;
@@ -74,5 +91,4 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
                 .map(IdMappingStringPair::getTo)
                 .collect(Collectors.toSet());
     }
-
 }

@@ -1,11 +1,13 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.batch.uniprotkb;
 
+import java.util.Iterator;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
@@ -13,15 +15,20 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchSt
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import java.util.Iterator;
-
 @Component
-public class UniProtKBSolrIdBatchResultStreamer extends SolrIdBatchResultStreamer<UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+public class UniProtKBSolrIdBatchResultStreamer
+        extends SolrIdBatchResultStreamer<
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private final UniProtEntryService service;
     private final TaxonomyLineageService lineageService;
     private final StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;
 
-    public UniProtKBSolrIdBatchResultStreamer(UniProtKBHeartbeatProducer heartbeatProducer, UniProtKBJobService jobService, UniProtEntryService service, TaxonomyLineageService lineageService, StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig) {
+    public UniProtKBSolrIdBatchResultStreamer(
+            UniProtKBHeartbeatProducer heartbeatProducer,
+            UniProtKBJobService jobService,
+            UniProtEntryService service,
+            TaxonomyLineageService lineageService,
+            StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig) {
         super(heartbeatProducer, jobService);
         this.service = service;
         this.lineageService = lineageService;
@@ -36,6 +43,7 @@ public class UniProtKBSolrIdBatchResultStreamer extends SolrIdBatchResultStreame
                 storeStreamerConfig.getStoreClient(),
                 storeStreamerConfig.getStoreFetchRetryPolicy(),
                 storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
-                lineageService, service.buildStoreRequest(request).isAddLineage());
+                lineageService,
+                service.buildStoreRequest(request).isAddLineage());
     }
 }

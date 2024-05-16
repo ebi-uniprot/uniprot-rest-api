@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.refactor.service.uniref;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -8,12 +10,9 @@ import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepo
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.refactor.service.JobServiceTest;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 public class UniRefJobServiceTest extends JobServiceTest<UniRefDownloadJob> {
-    @Mock
-    private UniRefDownloadJob uniRefDownloadJob;
+    @Mock private UniRefDownloadJob uniRefDownloadJob;
     @Mock private UniRefDownloadJobRepository uniRefDownloadJobRepository;
 
     @BeforeEach

@@ -1,5 +1,10 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniref;
 
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -14,19 +19,13 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.util.stream.Stream;
-
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
-
 @ExtendWith(MockitoExtension.class)
-class UniRefResultStreamerFacadeTest extends ResultStreamerFacadeTest<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
-    @Mock
-    private Stream<UniRefEntryLight> uniRefEntryLightStream;
-    @Mock
-    private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;
-    @Mock
-    private UniRefDownloadRequest uniRefDownloadRequest;
+class UniRefResultStreamerFacadeTest
+        extends ResultStreamerFacadeTest<
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+    @Mock private Stream<UniRefEntryLight> uniRefEntryLightStream;
+    @Mock private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;
+    @Mock private UniRefDownloadRequest uniRefDownloadRequest;
     @Mock private UniRefRDFResultStreamer uniRefRDFResultStreamer;
     @Mock private UniRefListResultStreamer uniRefListResultStreamer;
     @Mock private UniRefSolrIdBatchResultStreamer uniRefBatchResultStreamer;
@@ -41,7 +40,12 @@ class UniRefResultStreamerFacadeTest extends ResultStreamerFacadeTest<UniRefDown
         listResultStreamer = uniRefListResultStreamer;
         solrIdBatchResultStreamer = uniRefBatchResultStreamer;
         converterContextFactory = uniRefConverterContextFactory;
-        resultStreamerFacade = new UniRefResultStreamerFacade(uniRefRDFResultStreamer, uniRefListResultStreamer, uniRefBatchResultStreamer, uniRefConverterContextFactory);
+        resultStreamerFacade =
+                new UniRefResultStreamerFacade(
+                        uniRefRDFResultStreamer,
+                        uniRefListResultStreamer,
+                        uniRefBatchResultStreamer,
+                        uniRefConverterContextFactory);
         mock();
     }
 

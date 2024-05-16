@@ -7,8 +7,12 @@ import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownlo
 import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 
-public abstract class IdMappingRDFStreamer extends RDFResultStreamer<IdMappingDownloadRequest, IdMappingDownloadJob> {
-    protected IdMappingRDFStreamer(IdMappingHeartbeatProducer heartbeatProducer, IdMappingJobService jobService, RdfStreamer idMappingRdfStreamer) {
+public abstract class IdMappingRDFStreamer
+        extends RDFResultStreamer<IdMappingDownloadRequest, IdMappingDownloadJob> {
+    protected IdMappingRDFStreamer(
+            IdMappingHeartbeatProducer heartbeatProducer,
+            IdMappingJobService jobService,
+            RdfStreamer idMappingRdfStreamer) {
         super(heartbeatProducer, jobService, idMappingRdfStreamer);
     }
 }

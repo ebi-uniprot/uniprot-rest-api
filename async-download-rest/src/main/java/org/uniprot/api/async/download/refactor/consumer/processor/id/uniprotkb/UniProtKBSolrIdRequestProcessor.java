@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.id.uniprotkb;
 
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
@@ -11,13 +13,15 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import java.util.stream.Stream;
-
 @Component
-public  class UniProtKBSolrIdRequestProcessor extends SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+public class UniProtKBSolrIdRequestProcessor
+        extends SolrIdRequestProcessor<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     private final UniProtEntryService uniProtEntryService;
 
-    protected UniProtKBSolrIdRequestProcessor(UniProtKBAsyncDownloadFileHandler downloadFileHandler, UniProtKBJobService jobService, UniProtEntryService uniProtEntryService) {
+    protected UniProtKBSolrIdRequestProcessor(
+            UniProtKBAsyncDownloadFileHandler downloadFileHandler,
+            UniProtKBJobService jobService,
+            UniProtEntryService uniProtEntryService) {
         super(downloadFileHandler, jobService);
         this.uniProtEntryService = uniProtEntryService;
     }

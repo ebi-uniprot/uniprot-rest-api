@@ -10,19 +10,19 @@ import org.uniprot.api.async.download.refactor.consumer.processor.result.uniref.
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
-class UniRefCompositeRequestProcessorTest extends CompositeRequestProcessorTest<UniRefDownloadRequest> {
+class UniRefCompositeRequestProcessorTest
+        extends CompositeRequestProcessorTest<UniRefDownloadRequest> {
     @Mock private UniRefSolrIdRequestProcessor uniRefSolrIdRequestProcessor;
     @Mock private UniRefResultRequestProcessor uniRefResultRequestProcessor;
-    @Mock
-    private UniRefDownloadRequest uniRefDownloadRequest;
-
-
+    @Mock private UniRefDownloadRequest uniRefDownloadRequest;
 
     @BeforeEach
     void setUp() {
         downloadRequest = uniRefDownloadRequest;
         requestProcessor1 = uniRefSolrIdRequestProcessor;
         requestProcessor2 = uniRefResultRequestProcessor;
-        compositeRequestProcessor = new UniRefCompositeRequestProcessor(uniRefSolrIdRequestProcessor, uniRefResultRequestProcessor);
+        compositeRequestProcessor =
+                new UniRefCompositeRequestProcessor(
+                        uniRefSolrIdRequestProcessor, uniRefResultRequestProcessor);
     }
 }

@@ -9,7 +9,10 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 public class UniProtKBIdMappingRDFResultStreamer extends IdMappingRDFStreamer {
     private static final String ID_MAPPING_DATA_TYPE = "uniprotkb";
 
-    public UniProtKBIdMappingRDFResultStreamer(IdMappingHeartbeatProducer heartbeatProducer, IdMappingJobService jobService, RdfStreamer idMappingRdfStreamer) {
+    public UniProtKBIdMappingRDFResultStreamer(
+            IdMappingHeartbeatProducer heartbeatProducer,
+            IdMappingJobService jobService,
+            RdfStreamer idMappingRdfStreamer) {
         super(heartbeatProducer, jobService, idMappingRdfStreamer);
     }
 

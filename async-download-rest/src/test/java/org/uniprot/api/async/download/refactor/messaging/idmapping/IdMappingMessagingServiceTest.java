@@ -12,13 +12,15 @@ import org.uniprot.api.async.download.refactor.messaging.MessagingServiceTest;
 class IdMappingMessagingServiceTest extends MessagingServiceTest {
     @Mock
     private IdMappingAsyncDownloadQueueConfigProperties idMappingAsyncDownloadQueueConfigProperties;
-    @Mock
-    private IdMappingRabbitTemplate idMappingRabbitTemplate;
+
+    @Mock private IdMappingRabbitTemplate idMappingRabbitTemplate;
 
     @BeforeEach
     void setUp() {
         queueConfigProperties = idMappingAsyncDownloadQueueConfigProperties;
         rabbitTemplate = idMappingRabbitTemplate;
-        messagingService = new IdMappingMessagingService(idMappingAsyncDownloadQueueConfigProperties, idMappingRabbitTemplate);
+        messagingService =
+                new IdMappingMessagingService(
+                        idMappingAsyncDownloadQueueConfigProperties, idMappingRabbitTemplate);
     }
 }

@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.refactor.service.idmapping;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -8,12 +10,9 @@ import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobR
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.refactor.service.JobServiceTest;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 class IdMappingJobServiceTest extends JobServiceTest<IdMappingDownloadJob> {
-    @Mock
-    private IdMappingDownloadJob idMappingDownloadJob;
+    @Mock private IdMappingDownloadJob idMappingDownloadJob;
     @Mock private IdMappingDownloadJobRepository idMappingDownloadJobRepository;
 
     @BeforeEach

@@ -8,9 +8,11 @@ import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequ
 import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
 
 @Component
-public class UniRefListResultStreamer extends ListResultStreamer<UniRefDownloadRequest, UniRefDownloadJob> {
+public class UniRefListResultStreamer
+        extends ListResultStreamer<UniRefDownloadRequest, UniRefDownloadJob> {
 
-    public UniRefListResultStreamer(UniRefHeartbeatProducer heartbeatProducer, UniRefJobService jobService) {
+    public UniRefListResultStreamer(
+            UniRefHeartbeatProducer heartbeatProducer, UniRefJobService jobService) {
         super(heartbeatProducer, jobService);
     }
 }

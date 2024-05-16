@@ -1,15 +1,15 @@
 package org.uniprot.api.async.download.refactor.messaging;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public abstract class MessagingServiceTest {
     public static final String RETRY_QUEUE = "retryQueue";
@@ -19,10 +19,8 @@ public abstract class MessagingServiceTest {
     public static final String SOME_JOB_ID = "someJobId";
     public static final String EXCHANGE = "exchange";
     public static final String ROUTING_KEY = "routingKey";
-    @Mock
-    private Message message;
-    @Mock
-    private MessageProperties messageProperties;
+    @Mock private Message message;
+    @Mock private MessageProperties messageProperties;
     protected AsyncDownloadQueueConfigProperties queueConfigProperties;
     protected RabbitTemplate rabbitTemplate;
     protected MessagingService messagingService;

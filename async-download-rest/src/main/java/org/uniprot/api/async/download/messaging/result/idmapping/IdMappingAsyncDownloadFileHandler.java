@@ -8,7 +8,8 @@ import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileH
 @Component
 public class IdMappingAsyncDownloadFileHandler extends AsyncDownloadFileHandler {
     public IdMappingAsyncDownloadFileHandler(
-            IdMappingDownloadConfigProperties idMappingDownloadConfigProperties, IdMappingHeartbeatProducer idMappingHeartbeatProducer) {
+            IdMappingDownloadConfigProperties idMappingDownloadConfigProperties,
+            IdMappingHeartbeatProducer idMappingHeartbeatProducer) {
         super(idMappingDownloadConfigProperties, idMappingHeartbeatProducer);
     }
 }

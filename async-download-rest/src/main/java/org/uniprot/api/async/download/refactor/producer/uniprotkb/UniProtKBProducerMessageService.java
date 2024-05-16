@@ -2,8 +2,6 @@ package org.uniprot.api.async.download.refactor.producer.uniprotkb;
 
 import java.time.LocalDateTime;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.producer.uniprotkb.UniProtKBAsyncDownloadSubmissionRules;
@@ -15,6 +13,8 @@ import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j

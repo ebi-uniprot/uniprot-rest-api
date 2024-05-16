@@ -1,12 +1,12 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 @Component
 public class UUWMessageConverterFactory {
@@ -16,8 +16,7 @@ public class UUWMessageConverterFactory {
         this.messageConverters = messageConverters;
     }
 
-    public AbstractUUWHttpMessageConverter<?, ?> getOutputWriter(
-            MediaType contentType, Type type) {
+    public AbstractUUWHttpMessageConverter<?, ?> getOutputWriter(MediaType contentType, Type type) {
         return messageConverters.stream()
                 .filter(AbstractUUWHttpMessageConverter.class::isInstance)
                 .filter(
