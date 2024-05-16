@@ -142,7 +142,7 @@ class QueryFieldValidatorTest {
 
         boolean result =
                 validator.isValid(
-                        "HGNC:12345 AND PR:12345 AND SLP:000001924 AND HostDB:ENSG00000182022 AND MetaCyc:HS04074-MON AND EcoCyc:PD00221",
+                        "HGNC:12345 AND PR:A0PK11 AND SLP:000001924 AND HostDB:ENSG00000182022 AND MetaCyc:HS04074-MON AND EcoCyc:PD00221",
                         null);
         assertTrue(result);
     }
@@ -261,21 +261,31 @@ class QueryFieldValidatorTest {
             strings = {
                 "amoebadb:ACA1_000210",
                 "cryptodb:cgd6_2720",
+                "ecocyc:G7409-MONOMER",
                 "fb:FBgn0086655",
                 "fungidb:NCU02389",
+                "hostdb:ENSMFAG00000008940",
                 "giardiadb:GL50581_3440",
+                "hgnc:123456",
+                "lncrna:CR42862",
+                "metacyc:ENSG00000162971-MONOMER",
                 "microsporidiadb:ECU07_0840",
                 "mgi:1860512",
+                "mrna:MD14G0162800",
+                "pac:PPA1390",
                 "phi:10479",
                 "piroplasmadb:TA12905",
                 "plasmodb:PF3D7_0703700",
+                "pr:A0PK11",
                 "refseq:YP_009725255",
                 "refseq:P0DTD3",
                 "rgd:1305291",
                 "sgd:S000003801",
+                "slp:000001973",
                 "toxodb:TGME49_244440",
                 "trichdb:TVAG_095560",
                 "tritrypdb:LmjF.28.0550",
+                "vectorbase:BGLB000032",
                 "vgnc:11568",
                 "wb:WBGene00012341",
                 "xenbase:XB-GENE-491829",
@@ -352,7 +362,9 @@ class QueryFieldValidatorTest {
             }
             Map<String, String> whiteListFields = new HashMap<>();
             whiteListFields.put("hgnc", "^[0-9]+$");
-            whiteListFields.put("pr", "^[0-9]+$");
+            whiteListFields.put(
+                    "pr",
+                    "(?i)([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])(-[0-9]+)?");
             whiteListFields.put("slp", "^[0-9]{9}$");
             whiteListFields.put("hostdb", "^[0-9A-Za-z-]+$");
             whiteListFields.put("ecocyc", "^[0-9A-Za-z-]+$");
@@ -366,7 +378,7 @@ class QueryFieldValidatorTest {
             whiteListFields.put("mgi", "^[0-9]+");
             whiteListFields.put("microsporidiadb", "^[0-9A-Za-z_]+");
             whiteListFields.put("mrna", "^[0-9A-Za-z_]+");
-            whiteListFields.put("pac", "^[0-9]+");
+            whiteListFields.put("pac", "^[0-9A-Z]+");
             whiteListFields.put("phi", "^[0-9]+");
             whiteListFields.put("piroplasmadb", "^[0-9A-Za-z_]+");
             whiteListFields.put("plasmodb", "^[0-9A-Za-z_]+");

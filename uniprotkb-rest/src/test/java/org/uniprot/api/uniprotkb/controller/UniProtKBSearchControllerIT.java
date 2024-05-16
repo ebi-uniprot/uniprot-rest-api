@@ -2100,7 +2100,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
-    void searchWhitelistVGNCIdDefaultSearch() throws Exception {
+    void searchWhitelistInvalidVGNCIdDefaultSearch() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -2110,21 +2110,20 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(SEARCH_RESOURCE)
-                                        .param("query", "VGNC:38517")
-                                        .param("fields", "accession")
+                                        .param("query", "VGNC:sample38517")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(MockMvcResultHandlers.log())
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("F1Q0X3")));
+                                "$.messages.*", contains("'VGNC' is not a valid search field")));
     }
 
     @Override
