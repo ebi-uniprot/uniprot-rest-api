@@ -10,6 +10,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 
@@ -572,7 +573,7 @@ class UniSaveControllerTest {
 
     // resource /{accession}/status
     @Test
-    void canGetStatus() throws Exception {
+    void canGetStatusForDeletedEntries() throws Exception {
         // given
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
         status.setAccession(ACCESSION);
@@ -597,7 +598,33 @@ class UniSaveControllerTest {
                 .andExpect(
                         jsonPath(
                                 "$.events[0].deletedReason",
-                                is(DeletedReason.SOURCE_DELETION.getName())));
+                                is(DeletedReason.SOURCE_DELETION_EMBL.getName())));
+    }
+
+    @Test
+    void canGetStatusForUnknownDeletedEntries() throws Exception {
+        // given
+        AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+        status.setAccession(ACCESSION);
+        IdentifierStatus event = mockIdentifierStatus(EventTypeEnum.DELETED, ACCESSION, "", 12);
+        event.setEventRelease(mockRelease("1"));
+        status.setEvents(List.of(event));
+        when(uniSaveRepository.retrieveEntryStatusInfo(ACCESSION)).thenReturn(status);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION + STATUS)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.accession", is(ACCESSION)))
+                .andExpect(jsonPath("$.events.size()", is(1)))
+                .andExpect(jsonPath("$.events[0].eventType", is(EventTypeEnum.DELETED.toString())))
+                .andExpect(jsonPath("$.events[0].release", is("1")))
+                .andExpect(jsonPath("$.events[0].deletedReason").doesNotExist());
     }
 
     @Test

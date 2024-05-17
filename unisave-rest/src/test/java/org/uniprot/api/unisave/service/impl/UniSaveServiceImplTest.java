@@ -2,8 +2,7 @@ package org.uniprot.api.unisave.service.impl;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
@@ -100,7 +99,7 @@ class UniSaveServiceImplTest {
             when(identifierStatus.getEventRelease()).thenReturn(release);
             EventTypeEnum eventType = EventTypeEnum.DELETED;
             when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
-            when(identifierStatus.getDeletionReasonId()).thenReturn(11);
+            when(identifierStatus.getDeletionReasonId()).thenReturn(1);
             status.setEvents(singletonList(identifierStatus));
             when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
 
@@ -115,7 +114,8 @@ class UniSaveServiceImplTest {
             assertThat(events.get(0).getTargetAccession(), is(targetAcc));
             assertThat(events.get(0).getRelease(), is(releaseNumber));
             assertThat(
-                    events.get(0).getDeletedReason(), is(DeletedReason.SOURCE_DELETION.getName()));
+                    events.get(0).getDeletedReason(),
+                    is(DeletedReason.SOURCE_DELETION_EMBL.getName()));
         }
 
         @Test
@@ -148,7 +148,7 @@ class UniSaveServiceImplTest {
             assertThat(events.get(0).getEventType(), is(eventType.toString()));
             assertThat(events.get(0).getTargetAccession(), is(targetAcc));
             assertThat(events.get(0).getRelease(), is(releaseNumber));
-            assertThat(events.get(0).getDeletedReason(), is(DeletedReason.UNKNOWN.getName()));
+            assertThat(events.get(0).getDeletedReason(), nullValue());
         }
 
         @Test

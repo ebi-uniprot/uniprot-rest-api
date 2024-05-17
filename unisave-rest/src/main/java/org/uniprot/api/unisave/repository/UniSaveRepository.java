@@ -150,8 +150,11 @@ public class UniSaveRepository {
                     String reasonId = "0";
                     if (deletedStatus.getDeletionReasonId() != null) {
                         reasonId = String.valueOf(deletedStatus.getDeletionReasonId());
+                        DeletedReason deletedReason = DeletedReason.fromId(reasonId);
+                        if (deletedReason != DeletedReason.UNKNOWN) {
+                            entryInfo.setDeletionReason(deletedReason.getName());
+                        }
                     }
-                    entryInfo.setDeletionReason(DeletedReason.fromId(reasonId).getName());
                     entryInfo.setFirstRelease(deletedStatus.getEventRelease());
                     entryInfo.setLastRelease(deletedStatus.getEventRelease());
                     entryInfos.add(0, entryInfo);
