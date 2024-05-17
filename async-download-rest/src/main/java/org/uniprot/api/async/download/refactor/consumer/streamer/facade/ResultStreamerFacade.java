@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.ListResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.RDFResultStreamer;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
@@ -24,17 +24,17 @@ public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends 
     // todo resuse the existing or create common
     private final RDFResultStreamer<T, R> rdfResultStreamer;
     private final ListResultStreamer<T, R> listResultStreamer;
-    private final BatchResultStreamer<T, R, S> batchResultStreamer;
+    private final SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
     private final MessageConverterContextFactory<S> converterContextFactory;
 
     protected ResultStreamerFacade(
             RDFResultStreamer<T, R> rdfResultStreamer,
             ListResultStreamer<T, R> listResultStreamer,
-            BatchResultStreamer<T, R, S> batchResultStreamer,
+            SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer,
             MessageConverterContextFactory<S> converterContextFactory) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
-        this.batchResultStreamer = batchResultStreamer;
+        this.solrIdBatchResultStreamer = solrIdBatchResultStreamer;
         this.converterContextFactory = converterContextFactory;
     }
 
@@ -50,7 +50,7 @@ public abstract class ResultStreamerFacade<T extends DownloadRequest, R extends 
         } else if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(listResultStreamer.stream(request, ids));
         } else {
-            context.setEntities(batchResultStreamer.stream(request, ids));
+            context.setEntities(solrIdBatchResultStreamer.stream(request, ids));
         }
 
         return context;

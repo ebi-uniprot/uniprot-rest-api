@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefHeartbeatProducer;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamerTest;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamerTest;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
@@ -24,8 +24,8 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-public class UniRefBatchResultStreamerTest
-        extends BatchResultStreamerTest<
+public class UniRefSolrIdBatchResultStreamerTest
+        extends SolrIdBatchResultStreamerTest<
                 UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private static final int BATCH_SIZE = 2;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
@@ -45,8 +45,8 @@ public class UniRefBatchResultStreamerTest
         job = uniRefDownloadJob;
         heartbeatProducer = uniRefHeartbeatProducer;
         jobService = uniRefJobService;
-        batchResultStreamer =
-                new UniRefBatchResultStreamer(
+        solrIdBatchResultStreamer =
+                new UniRefSolrIdBatchResultStreamer(
                         uniRefHeartbeatProducer, uniRefJobService, uniRefEntryStoreStreamerConfig);
     }
 

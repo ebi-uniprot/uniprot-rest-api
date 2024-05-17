@@ -5,7 +5,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.uniref.UniRefBatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.uniref.UniRefSolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.facade.ResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.uniref.UniRefListResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.uniref.UniRefRDFResultStreamer;
@@ -20,7 +20,7 @@ public class UniRefResultStreamerFacade
     public UniRefResultStreamerFacade(
             UniRefRDFResultStreamer rdfResultStreamer,
             UniRefListResultStreamer listResultStreamer,
-            UniRefBatchResultStreamer batchResultStreamer,
+            UniRefSolrIdBatchResultStreamer batchResultStreamer,
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory) {
         super(rdfResultStreamer, listResultStreamer, batchResultStreamer, converterContextFactory);
     }

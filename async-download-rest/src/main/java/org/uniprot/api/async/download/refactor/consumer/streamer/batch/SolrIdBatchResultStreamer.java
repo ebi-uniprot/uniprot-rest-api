@@ -14,19 +14,20 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class BatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, S>
-        extends IdResultStreamer<T, R, S> {
+public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R extends DownloadJob, P>
+        extends IdResultStreamer<T, R, P> {
     private final HeartbeatProducer heartbeatProducer;
 
-    protected BatchResultStreamer(HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
+    protected SolrIdBatchResultStreamer(
+            HeartbeatProducer heartbeatProducer, JobService<R> jobService) {
         super(jobService);
         this.heartbeatProducer = heartbeatProducer;
     }
 
     @Override
-    public Stream<S> stream(T request, Stream<String> ids) {
+    public Stream<P> stream(T request, Stream<String> ids) {
         R job = getJob(request);
-        Iterable<Collection<S>> batchStoreIterable = getBatchStoreIterable(ids.iterator(), request);
+        Iterable<Collection<P>> batchStoreIterable = getBatchStoreIterable(ids.iterator(), request);
 
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .peek(
@@ -40,6 +41,6 @@ public abstract class BatchResultStreamer<T extends DownloadRequest, R extends D
                                         request.getJobId()));
     }
 
-    protected abstract Iterable<Collection<S>> getBatchStoreIterable(
+    protected abstract Iterable<Collection<P>> getBatchStoreIterable(
             Iterator<String> idsIterator, T request);
 }

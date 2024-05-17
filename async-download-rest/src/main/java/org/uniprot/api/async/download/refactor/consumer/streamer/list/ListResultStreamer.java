@@ -4,12 +4,12 @@ import java.util.stream.Stream;
 
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.IdResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.IdIdResultStreamer;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
 
 public abstract class ListResultStreamer<T extends DownloadRequest, R extends DownloadJob>
-        extends IdResultStreamer<T, R, String> {
+        extends IdIdResultStreamer<T, R> {
 
     private final HeartbeatProducer heartbeatProducer;
 

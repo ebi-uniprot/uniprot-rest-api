@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
@@ -16,14 +16,14 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @Component
-public class UniProtKBBatchResultStreamer
-        extends BatchResultStreamer<
+public class UniProtKBSolrIdBatchResultStreamer
+        extends SolrIdBatchResultStreamer<
                 UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private final UniProtEntryService service;
     private final TaxonomyLineageService lineageService;
     private final StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;
 
-    public UniProtKBBatchResultStreamer(
+    public UniProtKBSolrIdBatchResultStreamer(
             UniProtKBHeartbeatProducer heartbeatProducer,
             UniProtKBJobService jobService,
             UniProtEntryService service,

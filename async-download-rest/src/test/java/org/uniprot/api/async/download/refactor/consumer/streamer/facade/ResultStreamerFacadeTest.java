@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.ListResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.RDFResultStreamer;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
@@ -25,7 +25,7 @@ public abstract class ResultStreamerFacadeTest<
     protected MessageConverterContext<S> messageConverterContext;
     protected RDFResultStreamer<T, R> rdfResultStreamer;
     protected ListResultStreamer<T, R> listResultStreamer;
-    protected BatchResultStreamer<T, R, S> batchResultStreamer;
+    protected SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
     protected MessageConverterContextFactory<S> converterContextFactory;
     protected ResultStreamerFacade<T, R, S> resultStreamerFacade;
     protected T downloadRequest;
@@ -71,7 +71,7 @@ public abstract class ResultStreamerFacadeTest<
         when(downloadRequest.getFormat()).thenReturn("application/json");
         when(converterContextFactory.get(getResource(), APPLICATION_JSON))
                 .thenReturn(messageConverterContext);
-        when(batchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
+        when(solrIdBatchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
 
         resultStreamerFacade.getConvertedResult(downloadRequest, ids);
 

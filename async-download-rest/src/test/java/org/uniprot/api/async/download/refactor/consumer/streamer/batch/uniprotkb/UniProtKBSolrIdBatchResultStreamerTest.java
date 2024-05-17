@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.batch.BatchResultStreamerTest;
+import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamerTest;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
@@ -27,8 +27,8 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBBatchResultStreamerTest
-        extends BatchResultStreamerTest<
+public class UniProtKBSolrIdBatchResultStreamerTest
+        extends SolrIdBatchResultStreamerTest<
                 UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private static final int BATCH_SIZE = 2;
     public static final boolean ADD_LINEAGE = false;
@@ -52,8 +52,8 @@ public class UniProtKBBatchResultStreamerTest
         job = uniProtKBDownloadJob;
         heartbeatProducer = uniProtKBHeartbeatProducer;
         jobService = uniProtKBJobService;
-        batchResultStreamer =
-                new UniProtKBBatchResultStreamer(
+        solrIdBatchResultStreamer =
+                new UniProtKBSolrIdBatchResultStreamer(
                         uniProtKBHeartbeatProducer,
                         uniProtKBJobService,
                         uniProtEntryService,
