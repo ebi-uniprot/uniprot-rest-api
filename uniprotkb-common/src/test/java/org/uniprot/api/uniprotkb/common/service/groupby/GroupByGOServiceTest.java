@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.service.go.GOService;
 import org.uniprot.api.uniprotkb.common.service.go.model.GoRelation;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.*;
@@ -69,6 +70,8 @@ class GroupByGOServiceTest {
     @Mock private GOService goService;
     @Mock private UniProtEntryService uniProtEntryService;
 
+    @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
+
     private GroupByGOService service;
 
     private static List<FacetField> getFacetFields(String id, long count) {
@@ -94,6 +97,8 @@ class GroupByGOServiceTest {
     @BeforeEach
     void setup() {
         service = new GroupByGOService(goService, uniProtEntryService);
+        when(uniProtEntryService.getQueryProcessorConfig())
+                .thenReturn(uniProtKBQueryProcessorConfig);
     }
 
     @Test

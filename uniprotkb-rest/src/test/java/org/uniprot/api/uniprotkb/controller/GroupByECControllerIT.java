@@ -248,6 +248,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
         uniProtDocument.ecNumbers = ecs;
         uniProtDocument.organismTaxId = Integer.parseInt(organismId);
         uniProtDocument.taxLineageIds = List.of(Integer.parseInt(organismId));
+        uniProtDocument.chebi.add(CHEBI_ID);
         save(uniProtDocument);
     }
 

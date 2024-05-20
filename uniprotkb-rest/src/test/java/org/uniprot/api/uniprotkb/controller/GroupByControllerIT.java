@@ -14,6 +14,7 @@ import org.uniprot.store.search.document.Document;
 
 public abstract class GroupByControllerIT {
     private static final String INVALID_ORGANISM_ID = "36";
+    protected static final String CHEBI_ID = "12345678";
 
     @Test
     void getGroupBy_emptyResults() throws Exception {
@@ -70,6 +71,17 @@ public abstract class GroupByControllerIT {
                         MockMvcResultMatchers.content()
                                 .string(containsStringIgnoringCase("id value should be")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.parent").doesNotExist());
+    }
+
+    @Test
+    void getGroupBy_ChebiUppercaseQuery() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
+
+        getMockMvc()
+                .perform(MockMvcRequestBuilders.get(getPath()).param("query", "CHEBI:" + CHEBI_ID))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     protected void save(DataStoreManager.StoreType type, Document doc) {
