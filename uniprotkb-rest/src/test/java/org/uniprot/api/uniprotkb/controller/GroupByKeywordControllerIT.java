@@ -281,6 +281,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
         uniProtDocument.keywords = keywords;
         uniProtDocument.organismTaxId = Integer.parseInt(organismId);
         uniProtDocument.taxLineageIds = List.of(Integer.parseInt(organismId));
+        uniProtDocument.chebi.add(CHEBI_ID);
         save(DataStoreManager.StoreType.UNIPROT, uniProtDocument);
     }
 

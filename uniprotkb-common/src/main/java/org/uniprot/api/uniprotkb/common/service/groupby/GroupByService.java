@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.*;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 
@@ -82,8 +83,11 @@ public abstract class GroupByService<T> {
     }
 
     protected List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
+        String processedQuery =
+                UniProtQueryProcessor.newInstance(uniProtEntryService.getQueryProcessorConfig())
+                        .processQuery(query);
         List<FacetField> facetFields =
-                uniProtEntryService.getFacets(query, getFacetParams(entries));
+                uniProtEntryService.getFacets(processedQuery, getFacetParams(entries));
 
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()

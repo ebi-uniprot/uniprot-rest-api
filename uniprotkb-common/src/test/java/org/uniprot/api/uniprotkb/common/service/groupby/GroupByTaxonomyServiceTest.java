@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.common.taxonomy.service.TaxonomyService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.*;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
@@ -94,11 +95,14 @@ class GroupByTaxonomyServiceTest {
     private static final String SOME_QUERY = "someQuery";
     @Mock private TaxonomyService taxonomyService;
     @Mock private UniProtEntryService uniProtEntryService;
+    @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
     private GroupByTaxonomyService service;
 
     @BeforeEach
     void setup() {
         service = new GroupByTaxonomyService(taxonomyService, uniProtEntryService);
+        when(uniProtEntryService.getQueryProcessorConfig())
+                .thenReturn(uniProtKBQueryProcessorConfig);
     }
 
     @Test

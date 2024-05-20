@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.service.ec.ECService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.*;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
@@ -42,11 +43,14 @@ class GroupByECServiceTest {
     private static final String SOME_QUERY = "someQuery";
     @Mock private ECService ecService;
     @Mock private UniProtEntryService uniProtEntryService;
+    @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
     private GroupByECService service;
 
     @BeforeEach
     void setup() {
         service = new GroupByECService(ecService, uniProtEntryService);
+        when(uniProtEntryService.getQueryProcessorConfig())
+                .thenReturn(uniProtKBQueryProcessorConfig);
     }
 
     @Test

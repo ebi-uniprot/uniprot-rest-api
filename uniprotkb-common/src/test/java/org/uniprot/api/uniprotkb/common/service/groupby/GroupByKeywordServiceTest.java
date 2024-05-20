@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.common.keyword.service.KeywordService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.*;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
@@ -83,6 +84,8 @@ class GroupByKeywordServiceTest {
     @Mock private KeywordService keywordService;
     @Mock private UniProtEntryService uniProtEntryService;
 
+    @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
+
     private GroupByKeywordService service;
 
     private static List<FacetField> getFacetFields(String id, long count) {
@@ -108,6 +111,8 @@ class GroupByKeywordServiceTest {
     @BeforeEach
     void setup() {
         service = new GroupByKeywordService(keywordService, uniProtEntryService);
+        when(uniProtEntryService.getQueryProcessorConfig())
+                .thenReturn(uniProtKBQueryProcessorConfig);
     }
 
     @Test
