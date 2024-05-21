@@ -1,16 +1,20 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.ListResultStreamer;
@@ -19,23 +23,30 @@ import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-public abstract class ResultStreamerFacadeTest<
+public abstract class SolrIdResultStreamerFacadeTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
     public static final String FIELDS = "fields";
+    public static final String JOB_ID = "someJobId";
     protected MessageConverterContext<S> messageConverterContext;
     protected RDFResultStreamer<T, R> rdfResultStreamer;
     protected ListResultStreamer<T, R> listResultStreamer;
     protected SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
     protected MessageConverterContextFactory<S> converterContextFactory;
-    protected ResultStreamerFacade<T, R, S> resultStreamerFacade;
+    protected SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
+    protected AsyncDownloadFileHandler fileHandler;
     protected T downloadRequest;
     protected Stream<S> entryStream;
     @Mock private Stream<String> ids;
     @Mock private Stream<String> rdfStream;
     @Mock private Stream<String> listStream;
+    @Mock private Path path;
+    @Mock private Stream<String> stream;
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
+        MockedStatic<Files> filesMockedStatic = mockStatic(Files.class);
+        when(fileHandler.getIdFile(JOB_ID)).thenReturn(path);
+        filesMockedStatic.when(() -> Files.lines(path)).thenReturn(stream);
     }
 
     @Test
@@ -45,7 +56,7 @@ public abstract class ResultStreamerFacadeTest<
                 .thenReturn(messageConverterContext);
         when(rdfResultStreamer.stream(downloadRequest, ids)).thenReturn(rdfStream);
 
-        resultStreamerFacade.getConvertedResult(downloadRequest, ids);
+        solrIdResultStreamerFacade.getConvertedResult(downloadRequest);
 
         verify(messageConverterContext).setFields(FIELDS);
         verify(messageConverterContext).setContentType(RDF_MEDIA_TYPE);
@@ -59,7 +70,7 @@ public abstract class ResultStreamerFacadeTest<
                 .thenReturn(messageConverterContext);
         when(listResultStreamer.stream(downloadRequest, ids)).thenReturn(listStream);
 
-        resultStreamerFacade.getConvertedResult(downloadRequest, ids);
+        solrIdResultStreamerFacade.getConvertedResult(downloadRequest);
 
         verify(messageConverterContext).setFields(FIELDS);
         verify(messageConverterContext).setContentType(LIST_MEDIA_TYPE);
@@ -73,7 +84,7 @@ public abstract class ResultStreamerFacadeTest<
                 .thenReturn(messageConverterContext);
         when(solrIdBatchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
 
-        resultStreamerFacade.getConvertedResult(downloadRequest, ids);
+        solrIdResultStreamerFacade.getConvertedResult(downloadRequest);
 
         verify(messageConverterContext).setFields(FIELDS);
         verify(messageConverterContext).setContentType(APPLICATION_JSON);

@@ -8,31 +8,30 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.result.ResultRequestProcessor;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniprotkb.UniProtKBResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.processor.result.SolrIdResultRequestProcessor;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniprotkb.UniProtKBSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @Component
-public class UniProtKBResultRequestProcessor
-        extends ResultRequestProcessor<
-                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+public class UniProtKBSolrIdResultRequestProcessor
+        extends SolrIdResultRequestProcessor<
+                        UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private static final Type type =
             (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {})
                     .getType();
 
-    public UniProtKBResultRequestProcessor(
+    public UniProtKBSolrIdResultRequestProcessor(
             UniProtKBDownloadConfigProperties downloadConfigProperties,
             UniProtKBHeartbeatProducer heartbeatProducer,
             UniProtKBAsyncDownloadFileHandler fileHandler,
-            UniProtKBResultStreamerFacade uniProtKBResultStreamerFacade,
+            UniProtKBSolrIdResultStreamerFacade uniProtKBResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(
                 downloadConfigProperties,
                 heartbeatProducer,
-                fileHandler,
                 uniProtKBResultStreamerFacade,
                 uuwMessageConverterFactory);
     }

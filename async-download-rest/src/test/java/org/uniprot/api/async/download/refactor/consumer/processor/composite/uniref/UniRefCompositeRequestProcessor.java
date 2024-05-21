@@ -6,14 +6,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.refactor.consumer.processor.composite.CompositeRequestProcessorTest;
 import org.uniprot.api.async.download.refactor.consumer.processor.id.uniref.UniRefSolrIdRequestProcessor;
-import org.uniprot.api.async.download.refactor.consumer.processor.result.uniref.UniRefResultRequestProcessor;
+import org.uniprot.api.async.download.refactor.consumer.processor.result.uniref.UniRefSolrIdResultRequestProcessor;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
 class UniRefCompositeRequestProcessorTest
         extends CompositeRequestProcessorTest<UniRefDownloadRequest> {
     @Mock private UniRefSolrIdRequestProcessor uniRefSolrIdRequestProcessor;
-    @Mock private UniRefResultRequestProcessor uniRefResultRequestProcessor;
+    @Mock private UniRefSolrIdResultRequestProcessor uniRefResultRequestProcessor;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
 
     @BeforeEach

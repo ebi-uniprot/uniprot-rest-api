@@ -1,5 +1,25 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.result;
 
+import org.springframework.http.MediaType;
+import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.IdMappingResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.IdMappingServiceUtils;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
+
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -7,47 +27,39 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
-import org.springframework.http.MediaType;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.ResultStreamerFacade;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
-import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
-public abstract class ResultRequestProcessor<T extends DownloadRequest, R extends DownloadJob, S>
-        implements RequestProcessor<T> {
+public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
+        implements RequestProcessor<IdMappingDownloadRequest> {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
     private final AsyncDownloadFileHandler fileHandler;
-    private final ResultStreamerFacade<T, R, S> resultStreamerFacade;
+    private final IdMappingResultStreamerFacade<Q, P> solrIdResultStreamerFacade;
     private final UUWMessageConverterFactory uuwMessageConverterFactory;
+    private final IdMappingJobCacheService idMappingJobCacheService;
+    private final MessageConverterContextFactory<P> converterContextFactory;
 
-    protected ResultRequestProcessor(
+    protected IdMappingResultRequestProcessor(
             DownloadConfigProperties downloadConfigProperties,
             HeartbeatProducer heartbeatProducer,
             AsyncDownloadFileHandler fileHandler,
-            ResultStreamerFacade<T, R, S> resultStreamerFacade,
-            UUWMessageConverterFactory uuwMessageConverterFactory) {
+            IdMappingResultStreamerFacade<Q, P> solrIdResultStreamerFacade,
+            UUWMessageConverterFactory uuwMessageConverterFactory, IdMappingJobCacheService idMappingJobCacheService, MessageConverterContextFactory<P> converterContextFactory) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.heartbeatProducer = heartbeatProducer;
         this.fileHandler = fileHandler;
-        this.resultStreamerFacade = resultStreamerFacade;
+        this.solrIdResultStreamerFacade = solrIdResultStreamerFacade;
         this.uuwMessageConverterFactory = uuwMessageConverterFactory;
+        this.idMappingJobCacheService = idMappingJobCacheService;
+        this.converterContextFactory = converterContextFactory;
     }
 
     @Override
-    public void process(T request) {
+    public void process(IdMappingDownloadRequest request) {
         try {
             MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
 
@@ -55,11 +67,7 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
             String fileNameWithExt = jobId + FileType.GZIP.getExtension();
             Path resultPath =
                     Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
-            AbstractUUWHttpMessageConverter<S, S> outputWriter =
-                    (AbstractUUWHttpMessageConverter<S, S>)
-                            uuwMessageConverterFactory.getOutputWriter(contentType, getType());
 
-            Stream<String> ids = Files.lines(fileHandler.getIdFile(jobId));
             OutputStream outputStream =
                     Files.newOutputStream(
                             resultPath,
@@ -68,9 +76,10 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
                             StandardOpenOption.TRUNCATE_EXISTING);
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
 
-            MessageConverterContext<S> context =
-                    resultStreamerFacade.getConvertedResult(request, ids);
-
+            MessageConverterContext<P> context = solrIdResultStreamerFacade.getConvertedResult(request);
+            AbstractUUWHttpMessageConverter<P, Q> outputWriter =
+                    (AbstractUUWHttpMessageConverter<P, Q>)
+                            uuwMessageConverterFactory.getOutputWriter(contentType, getType());
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());
 
@@ -80,6 +89,8 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
             heartbeatProducer.stop(request.getJobId());
         }
     }
+
+    protected abstract Resource getResource();
 
     protected abstract Type getType();
 }

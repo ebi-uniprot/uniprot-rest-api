@@ -23,14 +23,14 @@ import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProp
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.ResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
-public abstract class ResultRequestProcessorTest<
+public abstract class SolrIdResultRequestProcessorTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
     public static final String CONTENT_TYPE = "application/json";
     public static final String JOB_ID = "someJobId";
@@ -39,13 +39,11 @@ public abstract class ResultRequestProcessorTest<
     protected DownloadConfigProperties downloadConfigProperties;
     protected HeartbeatProducer heartbeatProducer;
     protected AsyncDownloadFileHandler fileHandler;
-    protected ResultStreamerFacade<T, R, S> resultStreamerFacade;
-    protected ResultRequestProcessor<T, R, S> resultRequestProcessor;
+    protected SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
+    protected SolrIdResultRequestProcessor<T, R, S> solrIdResultRequestProcessor;
     protected UUWMessageConverterFactory messageConverterFactory;
     @Mock private AbstractUUWHttpMessageConverter outputWriter;
     @Mock private MessageConverterContext<S> context;
-    @Mock private Path path;
-    @Mock private Stream<String> stream;
     @Mock private Path resultPath;
     @Mock private OutputStream outputStream;
     @Mock private Instant instant;
@@ -55,13 +53,11 @@ public abstract class ResultRequestProcessorTest<
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
         when(request.getJobId()).thenReturn(JOB_ID);
         when(messageConverterFactory.getOutputWriter(
-                        MediaType.APPLICATION_JSON, resultRequestProcessor.getType()))
+                        MediaType.APPLICATION_JSON, solrIdResultRequestProcessor.getType()))
                 .thenReturn(outputWriter);
-        when(resultStreamerFacade.getConvertedResult(request, stream)).thenReturn(context);
+        when(solrIdResultStreamerFacade.getConvertedResult(request)).thenReturn(context);
         when(downloadConfigProperties.getResultFilesFolder()).thenReturn(RESULT_FOLDER);
-        when(fileHandler.getIdFile(JOB_ID)).thenReturn(path);
         MockedStatic<Files> filesMockedStatic = mockStatic(Files.class);
-        filesMockedStatic.when(() -> Files.lines(path)).thenReturn(stream);
         filesMockedStatic
                 .when(
                         () ->
@@ -82,7 +78,7 @@ public abstract class ResultRequestProcessorTest<
         MockedConstruction<AtomicInteger> atomicIntegerMockedConstruction =
                 Mockito.mockConstruction(AtomicInteger.class, (mock, context) -> {});
 
-        resultRequestProcessor.process(request);
+        solrIdResultRequestProcessor.process(request);
 
         verify(outputWriter)
                 .writeContents(
@@ -109,7 +105,7 @@ public abstract class ResultRequestProcessorTest<
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(
-                ResultProcessingException.class, () -> resultRequestProcessor.process(request));
+                ResultProcessingException.class, () -> solrIdResultRequestProcessor.process(request));
 
         verify(heartbeatProducer).stop(JOB_ID);
     }

@@ -8,20 +8,20 @@ import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConf
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.result.ResultRequestProcessorTest;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniref.UniRefResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.processor.result.SolrIdResultRequestProcessorTest;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniref.UniRefSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 @ExtendWith(MockitoExtension.class)
-public class UniRefResultRequestProcessorTest
-        extends ResultRequestProcessorTest<
-                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+public class UniRefSolrIdResultRequestProcessorTest
+        extends SolrIdResultRequestProcessorTest<
+                        UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     @Mock private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
     @Mock private UniRefHeartbeatProducer uniRefHeartbeatProducer;
     @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
-    @Mock private UniRefResultStreamerFacade uniRefResultStreamerFacade;
+    @Mock private UniRefSolrIdResultStreamerFacade uniRefResultStreamerFacade;
     @Mock private UUWMessageConverterFactory uuwMessageConverterFactory;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
 
@@ -30,10 +30,10 @@ public class UniRefResultRequestProcessorTest
         downloadConfigProperties = uniRefDownloadConfigProperties;
         heartbeatProducer = uniRefHeartbeatProducer;
         fileHandler = uniRefAsyncDownloadFileHandler;
-        resultStreamerFacade = uniRefResultStreamerFacade;
+        solrIdResultStreamerFacade = uniRefResultStreamerFacade;
         messageConverterFactory = uuwMessageConverterFactory;
-        resultRequestProcessor =
-                new UniRefResultRequestProcessor(
+        solrIdResultRequestProcessor =
+                new UniRefSolrIdResultRequestProcessor(
                         uniRefDownloadConfigProperties,
                         uniRefHeartbeatProducer,
                         uniRefAsyncDownloadFileHandler,
