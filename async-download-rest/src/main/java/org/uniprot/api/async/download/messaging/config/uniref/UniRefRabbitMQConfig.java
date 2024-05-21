@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
-import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageListener;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.refactor.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -87,11 +87,11 @@ public class UniRefRabbitMQConfig {
     @Bean
     public MessageListenerContainer uniRefMessageListenerContainer(
             ConnectionFactory connectionFactory,
-            UniRefMessageListener uniRefMessageListener,
+            UniRefContentBasedAndRetriableMessageConsumer uniRefMessageConsumer,
             UniRefAsyncDownloadQueueConfigProperties configProps) {
 
         return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
-                connectionFactory, uniRefMessageListener, configProps);
+                connectionFactory, uniRefMessageConsumer, configProps);
     }
 
     @Bean

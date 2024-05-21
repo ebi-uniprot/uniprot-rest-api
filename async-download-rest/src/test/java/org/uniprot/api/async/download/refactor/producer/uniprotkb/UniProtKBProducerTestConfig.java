@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ComponentScan({"org.uniprot.api.async.download.refactor.producer.uniprotkb",
         "org.uniprot.api.async.download.refactor.messaging.uniprotkb",
         "org.uniprot.api.async.download.refactor.service.uniprotkb",
+        "org.uniprot.api.async.download.refactor.consumer.uniprotkb",
         "org.uniprot.api.async.download.messaging.config.uniprotkb",
         "org.uniprot.api.async.download.messaging.result.uniprotkb",
         "org.uniprot.api.async.download.messaging.listener.common",

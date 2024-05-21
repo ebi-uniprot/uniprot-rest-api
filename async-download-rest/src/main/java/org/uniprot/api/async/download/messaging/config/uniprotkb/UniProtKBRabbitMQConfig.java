@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
-import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -97,10 +97,10 @@ public class UniProtKBRabbitMQConfig {
     @Bean
     public MessageListenerContainer uniProtKBMessageListenerContainer(
             ConnectionFactory connectionFactory,
-            UniProtKBMessageListener uniProtKBMessageListener,
+            UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBMessageConsumer,
             UniProtKBAsyncDownloadQueueConfigProperties configProps) {
         return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
-                connectionFactory, uniProtKBMessageListener, configProps);
+                connectionFactory, uniProtKBMessageConsumer, configProps);
     }
 
     @Bean

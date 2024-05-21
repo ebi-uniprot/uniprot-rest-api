@@ -34,10 +34,10 @@ import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMess
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,10 +73,13 @@ class UniProtKBProducerMessageServiceIT {
     UniProtKBDownloadJobRepository jobRepository;
 
     @MockBean
-    private UniProtKBDownloadResultWriter uniProtKBWriter;
+    private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBConsumer;
 
+    //TODO: uniProtKBListener and uniProtKBWriter need to be remove when we organise HeartBeat bean config
     @MockBean
     private UniProtKBMessageListener uniProtKBListener;
+    @MockBean
+    private UniProtKBDownloadResultWriter uniProtKBWriter;
 
     @Captor
     ArgumentCaptor<Message> messageCaptor;
@@ -155,7 +158,7 @@ class UniProtKBProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
         assertEquals("60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f", jobId);
 
-        Mockito.verify(uniProtKBListener, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
@@ -176,7 +179,7 @@ class UniProtKBProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
 
         assertEquals("1a9848044d4910bc55dccdaa673f4713d5ab091e", jobId);
-        Mockito.verify(uniProtKBListener, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
@@ -197,7 +200,7 @@ class UniProtKBProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
 
         assertEquals("975516c6b26115d2d1e0e3a0903feaae618e0bfb", jobId);
-        Mockito.verify(uniProtKBListener, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
