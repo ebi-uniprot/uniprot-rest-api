@@ -1,9 +1,13 @@
 package org.uniprot.api.async.download.messaging.config.uniref;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
+import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageListener;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -78,6 +82,16 @@ public class UniRefRabbitMQConfig {
         return BindingBuilder.bind(uniRefUndeliveredQueue)
                 .to((DirectExchange) uniRefDownloadExchange)
                 .with(uniRefUndeliveredQueue.getName());
+    }
+
+    @Bean
+    public MessageListenerContainer uniRefMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            UniRefMessageListener uniRefMessageListener,
+            UniRefAsyncDownloadQueueConfigProperties configProps) {
+
+        return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
+                connectionFactory, uniRefMessageListener, configProps);
     }
 
     @Bean

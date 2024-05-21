@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestConfiguration
 @ComponentScan({"org.uniprot.api.async.download.refactor.producer.uniprotkb",
+        "org.uniprot.api.async.download.refactor.messaging.uniprotkb",
         "org.uniprot.api.async.download.refactor.service.uniprotkb",
         "org.uniprot.api.async.download.messaging.config.uniprotkb",
         "org.uniprot.api.async.download.messaging.result.uniprotkb",
@@ -35,54 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         "org.uniprot.api.async.download.messaging.producer.uniprotkb"})
 @Testcontainers
 class UniProtKBProducerTestConfig {
-
-    private static final String REDIS_IMAGE_VERSION = "redis:6-alpine";
-    private static final String RABBITMQ_IMAGE_VERSION = "rabbitmq:3-management";
-
-    @Container
-    private static GenericContainer redisServer =
-            new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION))
-                    .withExposedPorts(6379)
-                    .withReuse(true);
-/*
-    @Container
-    protected static RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse(RABBITMQ_IMAGE_VERSION));*/
-
-    @DynamicPropertySource
-    public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        Startables.deepStart(/*rabbitMQContainer,*/ redisServer).join();
-        //assertTrue(rabbitMQContainer.isRunning());
-        assertTrue(redisServer.isRunning());
-        //propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
-        //propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
-        System.setProperty("uniprot.redis.host", redisServer.getHost());
-        System.setProperty(
-                "uniprot.redis.port", String.valueOf(redisServer.getFirstMappedPort()));
-        propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-        redisServer.start();
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        this.redisServer.stop();
-    }
-
-    @Bean(destroyMethod = "shutdown")
-    RedissonClient redisson() {
-        Config config = new Config();
-        config.useSingleServer()
-                .setAddress(
-                        "redis://"
-                                + redisServer.getHost()
-                                + ":"
-                                + redisServer.getFirstMappedPort());
-        return Redisson.create(config);
-    }
 
     @Bean
     public HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadHashGenerator(
@@ -103,6 +57,15 @@ class UniProtKBProducerTestConfig {
             return builder.toString().toCharArray();
         };
         return new HashGenerator<>(function, hashSalt);
+    }
+
+
+    @Bean(destroyMethod = "shutdown")
+    RedissonClient redisson() {
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://"+System.getProperty("uniprot.redis.host")+":"+System.getProperty("uniprot.redis.port"));
+        return Redisson.create(config);
     }
 
 
