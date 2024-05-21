@@ -26,14 +26,14 @@ public class UniProtKBProducerMessageService
             UniProtKBJobService jobService,
             MessageConverter messageConverter,
             UniProtKBMessagingService messagingService,
-            HashGenerator<UniProtKBDownloadRequest> hashGenerator,
+            HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadHashGenerator,
             UniProtKBAsyncDownloadFileHandler asyncDownloadFileHandler,
             UniProtKBAsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
         super(
                 jobService,
                 messageConverter,
                 messagingService,
-                hashGenerator,
+                uniProtKBDownloadHashGenerator,
                 asyncDownloadFileHandler,
                 asyncDownloadSubmissionRules);
         this.jobService = jobService;
