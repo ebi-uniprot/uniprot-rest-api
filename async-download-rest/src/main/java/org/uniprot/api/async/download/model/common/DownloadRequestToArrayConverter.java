@@ -1,17 +1,20 @@
 package org.uniprot.api.async.download.model.common;
 
+import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
+
 import java.util.Objects;
 import java.util.function.Function;
 
-public class DownloadRequestToArrayConverter implements Function<DownloadRequest, char[]> {
+public class DownloadRequestToArrayConverter<T extends SolrStreamDownloadRequest> implements Function<T, char[]> {
+
     @Override
-    public char[] apply(DownloadRequest request) {
+    public char[] apply(T request) {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getQuery().strip().toLowerCase());
-        if (request.hasFields()) {
+        if (Objects.nonNull(request.getFields())) {
             builder.append(request.getFields().strip().toLowerCase());
         }
-        if (request.hasSort()) {
+        if (Objects.nonNull(request.getSort())) {
             builder.append(request.getSort().strip().toLowerCase());
         }
 

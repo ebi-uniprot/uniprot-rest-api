@@ -10,6 +10,7 @@ import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfi
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -103,9 +104,15 @@ public class UniProtKBRabbitMQConfig {
                 connectionFactory, uniProtKBMessageConsumer, configProps);
     }
 
-    @Bean
+    @Bean //TODO: We need to remove it
     public HashGenerator<DownloadRequest> uniProtKBHashGenerator(
             @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
+    }
+
+    @Bean
+    public HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadHashGenerator(
+            @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new DownloadRequestToArrayConverter<>(), hashSalt);
     }
 }
