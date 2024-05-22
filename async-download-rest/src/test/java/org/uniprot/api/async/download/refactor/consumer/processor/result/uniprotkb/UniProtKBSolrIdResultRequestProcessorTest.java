@@ -20,7 +20,6 @@ public class UniProtKBSolrIdResultRequestProcessorTest
                         UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     @Mock private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
     @Mock private UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
-    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
     @Mock private UniProtKBSolrIdResultStreamerFacade uniProtKBResultStreamerFacade;
     @Mock private UUWMessageConverterFactory uuwMessageConverterFactory;
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
@@ -29,14 +28,12 @@ public class UniProtKBSolrIdResultRequestProcessorTest
     void setUp() {
         downloadConfigProperties = uniProtKBDownloadConfigProperties;
         heartbeatProducer = uniProtKBHeartbeatProducer;
-        fileHandler = uniProtKBAsyncDownloadFileHandler;
         solrIdResultStreamerFacade = uniProtKBResultStreamerFacade;
         messageConverterFactory = uuwMessageConverterFactory;
         solrIdResultRequestProcessor =
                 new UniProtKBSolrIdResultRequestProcessor(
                         uniProtKBDownloadConfigProperties,
                         uniProtKBHeartbeatProducer,
-                        uniProtKBAsyncDownloadFileHandler,
                         uniProtKBResultStreamerFacade,
                         uuwMessageConverterFactory);
         request = uniProtKBDownloadRequest;

@@ -20,7 +20,7 @@ public class UniProtKBIdMappingResultStreamerFacade extends IdMappingResultStrea
     }
 
     @Override
-    protected Resource getResourceType() {
+    protected Resource getResource() {
         return Resource.UNIPROTKB;
     }
 }

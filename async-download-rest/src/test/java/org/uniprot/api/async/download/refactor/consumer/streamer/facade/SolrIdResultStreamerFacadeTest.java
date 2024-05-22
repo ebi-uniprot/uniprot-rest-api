@@ -1,16 +1,7 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.stream.Stream;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -22,6 +13,17 @@ import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.RDFResultSt
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
 public abstract class SolrIdResultStreamerFacadeTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
@@ -36,23 +38,34 @@ public abstract class SolrIdResultStreamerFacadeTest<
     protected AsyncDownloadFileHandler fileHandler;
     protected T downloadRequest;
     protected Stream<S> entryStream;
-    @Mock private Stream<String> ids;
-    @Mock private Stream<String> rdfStream;
-    @Mock private Stream<String> listStream;
-    @Mock private Path path;
-    @Mock private Stream<String> stream;
+    private MockedStatic<Files> filesMockedStatic;
+    @Mock
+    private Stream<String> ids;
+    @Mock
+    private Stream<String> rdfStream;
+    @Mock
+    private Stream<String> listStream;
+    @Mock
+    private Path path;
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
-        MockedStatic<Files> filesMockedStatic = mockStatic(Files.class);
+        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
         when(fileHandler.getIdFile(JOB_ID)).thenReturn(path);
-        filesMockedStatic.when(() -> Files.lines(path)).thenReturn(stream);
+        filesMockedStatic = mockStatic(Files.class);
+        filesMockedStatic.when(() -> Files.lines(path)).thenReturn(ids);
+    }
+
+    @AfterEach
+    void afterEach() {
+        filesMockedStatic.reset();
+        filesMockedStatic.close();
     }
 
     @Test
     void getConvertedResult_rdfType() {
         when(downloadRequest.getFormat()).thenReturn("application/rdf+xml");
-        when(converterContextFactory.get(getResource(), RDF_MEDIA_TYPE))
+        when(converterContextFactory.get(solrIdResultStreamerFacade.getResource(), RDF_MEDIA_TYPE))
                 .thenReturn(messageConverterContext);
         when(rdfResultStreamer.stream(downloadRequest, ids)).thenReturn(rdfStream);
 
@@ -66,7 +79,7 @@ public abstract class SolrIdResultStreamerFacadeTest<
     @Test
     void getConvertedResult_ListType() {
         when(downloadRequest.getFormat()).thenReturn("text/plain;format=list");
-        when(converterContextFactory.get(getResource(), LIST_MEDIA_TYPE))
+        when(converterContextFactory.get(solrIdResultStreamerFacade.getResource(), LIST_MEDIA_TYPE))
                 .thenReturn(messageConverterContext);
         when(listResultStreamer.stream(downloadRequest, ids)).thenReturn(listStream);
 
@@ -80,7 +93,7 @@ public abstract class SolrIdResultStreamerFacadeTest<
     @Test
     void getConvertedResult() {
         when(downloadRequest.getFormat()).thenReturn("application/json");
-        when(converterContextFactory.get(getResource(), APPLICATION_JSON))
+        when(converterContextFactory.get(solrIdResultStreamerFacade.getResource(), APPLICATION_JSON))
                 .thenReturn(messageConverterContext);
         when(solrIdBatchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
 
@@ -90,6 +103,4 @@ public abstract class SolrIdResultStreamerFacadeTest<
         verify(messageConverterContext).setContentType(APPLICATION_JSON);
         verify(messageConverterContext).setEntities(entryStream);
     }
-
-    protected abstract Resource getResource();
 }

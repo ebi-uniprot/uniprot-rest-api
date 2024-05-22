@@ -64,10 +64,8 @@ public abstract class SolrIdResultRequestProcessor<T extends DownloadRequest, R 
             AbstractUUWHttpMessageConverter<S, S> outputWriter =
                     (AbstractUUWHttpMessageConverter<S, S>)
                             uuwMessageConverterFactory.getOutputWriter(contentType, getType());
-
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());
-
         } catch (Exception ex) {
             throw new ResultProcessingException(ex.getMessage());
         } finally {

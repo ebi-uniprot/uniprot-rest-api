@@ -20,7 +20,7 @@ public class UniParcIdMappingResultStreamerFacade  extends IdMappingResultStream
     }
 
     @Override
-    protected Resource getResourceType() {
+    protected Resource getResource() {
         return Resource.UNIPARC;
     }
 }

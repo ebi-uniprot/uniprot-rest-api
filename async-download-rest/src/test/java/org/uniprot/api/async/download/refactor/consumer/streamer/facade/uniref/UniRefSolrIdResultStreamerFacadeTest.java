@@ -52,9 +52,4 @@ class UniRefSolrIdResultStreamerFacadeTest
                         uniRefAsyncDownloadFileHandler);
         mock();
     }
-
-    @Override
-    protected Resource getResource() {
-        return UNIREF;
-    }
 }

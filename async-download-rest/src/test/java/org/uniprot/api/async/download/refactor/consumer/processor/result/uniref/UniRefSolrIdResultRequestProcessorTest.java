@@ -20,7 +20,6 @@ public class UniRefSolrIdResultRequestProcessorTest
                         UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     @Mock private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
     @Mock private UniRefHeartbeatProducer uniRefHeartbeatProducer;
-    @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
     @Mock private UniRefSolrIdResultStreamerFacade uniRefResultStreamerFacade;
     @Mock private UUWMessageConverterFactory uuwMessageConverterFactory;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
@@ -29,14 +28,12 @@ public class UniRefSolrIdResultRequestProcessorTest
     void setUp() {
         downloadConfigProperties = uniRefDownloadConfigProperties;
         heartbeatProducer = uniRefHeartbeatProducer;
-        fileHandler = uniRefAsyncDownloadFileHandler;
         solrIdResultStreamerFacade = uniRefResultStreamerFacade;
         messageConverterFactory = uuwMessageConverterFactory;
         solrIdResultRequestProcessor =
                 new UniRefSolrIdResultRequestProcessor(
                         uniRefDownloadConfigProperties,
                         uniRefHeartbeatProducer,
-                        uniRefAsyncDownloadFileHandler,
                         uniRefResultStreamerFacade,
                         uuwMessageConverterFactory);
         request = uniRefDownloadRequest;

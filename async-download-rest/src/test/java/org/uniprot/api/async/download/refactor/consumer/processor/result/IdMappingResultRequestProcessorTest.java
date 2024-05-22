@@ -6,12 +6,11 @@ import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.SolrIdResultStreamerFacade;
-import org.uniprot.api.async.download.refactor.request.DownloadRequest;
+import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
+import org.uniprot.api.async.download.messaging.listener.idmapping.IdMappingHeartbeatProducer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.IdMappingResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
@@ -29,19 +28,19 @@ import java.util.zip.GZIPOutputStream;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public abstract class SolrIdResultRequestProcessorTest<
-        T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair<Q>> {
     public static final String CONTENT_TYPE = "application/json";
     public static final String JOB_ID = "someJobId";
     public static final String RESULT_FOLDER = "resultFolder";
-    protected T request;
-    protected DownloadConfigProperties downloadConfigProperties;
-    protected HeartbeatProducer heartbeatProducer;
-    protected SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
-    protected SolrIdResultRequestProcessor<T, R, S> solrIdResultRequestProcessor;
+    @Mock
+    protected IdMappingDownloadRequest request;
+    protected IdMappingDownloadConfigProperties downloadConfigProperties;
+    protected IdMappingHeartbeatProducer heartbeatProducer;
+    protected IdMappingResultStreamerFacade<Q,P> solrIdResultStreamerFacade;
+    protected IdMappingResultRequestProcessor<Q,P> solrIdResultRequestProcessor;
     protected UUWMessageConverterFactory messageConverterFactory;
     @Mock private AbstractUUWHttpMessageConverter outputWriter;
-    @Mock private MessageConverterContext<S> context;
+    @Mock private MessageConverterContext<P> context;
     @Mock private Path resultPath;
     @Mock private OutputStream outputStream;
     @Mock private Instant instant;

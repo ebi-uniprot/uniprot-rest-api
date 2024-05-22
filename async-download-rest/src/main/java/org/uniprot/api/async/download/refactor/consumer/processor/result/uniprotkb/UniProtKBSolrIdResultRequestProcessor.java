@@ -26,7 +26,6 @@ public class UniProtKBSolrIdResultRequestProcessor
     public UniProtKBSolrIdResultRequestProcessor(
             UniProtKBDownloadConfigProperties downloadConfigProperties,
             UniProtKBHeartbeatProducer heartbeatProducer,
-            UniProtKBAsyncDownloadFileHandler fileHandler,
             UniProtKBSolrIdResultStreamerFacade uniProtKBResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(

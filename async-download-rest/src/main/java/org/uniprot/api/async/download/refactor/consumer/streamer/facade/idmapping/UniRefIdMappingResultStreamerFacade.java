@@ -20,7 +20,7 @@ public class UniRefIdMappingResultStreamerFacade extends IdMappingResultStreamer
     }
 
     @Override
-    protected Resource getResourceType() {
+    protected Resource getResource() {
         return Resource.UNIREF;
     }
 }

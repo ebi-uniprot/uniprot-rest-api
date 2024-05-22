@@ -51,9 +51,4 @@ class UniProtKBSolrIdResultStreamerFacadeTest
                         uniProtKBConverterContextFactory, uniProtKBAsyncDownloadFileHandler);
         mock();
     }
-
-    @Override
-    protected Resource getResource() {
-        return UNIPROTKB;
-    }
 }
