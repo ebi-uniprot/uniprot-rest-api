@@ -1,11 +1,17 @@
 package org.uniprot.api.async.download.messaging.config.uniref;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
 import org.uniprot.api.async.download.model.common.DownloadRequest;
 import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.refactor.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -81,8 +87,24 @@ public class UniRefRabbitMQConfig {
     }
 
     @Bean
+    public MessageListenerContainer uniRefMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            UniRefContentBasedAndRetriableMessageConsumer uniRefMessageConsumer,
+            UniRefAsyncDownloadQueueConfigProperties configProps) {
+
+        return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
+                connectionFactory, uniRefMessageConsumer, configProps);
+    }
+
+    @Bean //TODO: We need to remove it
     public HashGenerator<DownloadRequest> uniRefHashGenerator(
             @Value("${async.download.uniref.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
+    }
+
+    @Bean
+    public HashGenerator<UniRefDownloadRequest> uniRefDownloadHashGenerator(
+            @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new DownloadRequestToArrayConverter<>(), hashSalt);
     }
 }
