@@ -8,20 +8,19 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.result.ResultRequestProcessorTest;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniprotkb.UniProtKBResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.processor.result.SolrIdResultRequestProcessorTest;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniprotkb.UniProtKBSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBResultRequestProcessorTest
-        extends ResultRequestProcessorTest<
-                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+public class UniProtKBSolrIdResultRequestProcessorTest
+        extends SolrIdResultRequestProcessorTest<
+                        UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     @Mock private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
     @Mock private UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
-    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
-    @Mock private UniProtKBResultStreamerFacade uniProtKBResultStreamerFacade;
+    @Mock private UniProtKBSolrIdResultStreamerFacade uniProtKBResultStreamerFacade;
     @Mock private UUWMessageConverterFactory uuwMessageConverterFactory;
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
 
@@ -29,14 +28,12 @@ public class UniProtKBResultRequestProcessorTest
     void setUp() {
         downloadConfigProperties = uniProtKBDownloadConfigProperties;
         heartbeatProducer = uniProtKBHeartbeatProducer;
-        fileHandler = uniProtKBAsyncDownloadFileHandler;
-        resultStreamerFacade = uniProtKBResultStreamerFacade;
+        solrIdResultStreamerFacade = uniProtKBResultStreamerFacade;
         messageConverterFactory = uuwMessageConverterFactory;
-        resultRequestProcessor =
-                new UniProtKBResultRequestProcessor(
+        solrIdResultRequestProcessor =
+                new UniProtKBSolrIdResultRequestProcessor(
                         uniProtKBDownloadConfigProperties,
                         uniProtKBHeartbeatProducer,
-                        uniProtKBAsyncDownloadFileHandler,
                         uniProtKBResultStreamerFacade,
                         uuwMessageConverterFactory);
         request = uniProtKBDownloadRequest;

@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.common.response.model;
 
+import lombok.EqualsAndHashCode;
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
@@ -12,6 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@EqualsAndHashCode
 public class UniProtKBEntryPair implements EntryPair<UniProtKBEntry> {
     private final String from;
     private final UniProtKBEntry to;

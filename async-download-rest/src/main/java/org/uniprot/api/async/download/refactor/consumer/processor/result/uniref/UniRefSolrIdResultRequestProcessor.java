@@ -8,30 +8,28 @@ import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConf
 import org.uniprot.api.async.download.messaging.listener.uniref.UniRefHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.processor.result.ResultRequestProcessor;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniref.UniRefResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.processor.result.SolrIdResultRequestProcessor;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.uniref.UniRefSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
-public class UniRefResultRequestProcessor
-        extends ResultRequestProcessor<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+public class UniRefSolrIdResultRequestProcessor
+        extends SolrIdResultRequestProcessor<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private static final Type type =
             (new ParameterizedTypeReference<MessageConverterContext<UniRefEntryLight>>() {})
                     .getType();
 
-    public UniRefResultRequestProcessor(
+    public UniRefSolrIdResultRequestProcessor(
             UniRefDownloadConfigProperties downloadConfigProperties,
             UniRefHeartbeatProducer heartbeatProducer,
-            UniRefAsyncDownloadFileHandler fileHandler,
-            UniRefResultStreamerFacade uniProtKBResultStreamerFacade,
+            UniRefSolrIdResultStreamerFacade uniProtKBResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(
                 downloadConfigProperties,
                 heartbeatProducer,
-                fileHandler,
                 uniProtKBResultStreamerFacade,
                 uuwMessageConverterFactory);
     }

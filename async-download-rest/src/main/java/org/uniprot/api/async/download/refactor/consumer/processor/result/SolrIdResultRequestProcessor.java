@@ -8,16 +8,14 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.refactor.consumer.streamer.facade.ResultStreamerFacade;
+import org.uniprot.api.async.download.refactor.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -25,24 +23,21 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
-public abstract class ResultRequestProcessor<T extends DownloadRequest, R extends DownloadJob, S>
+public abstract class SolrIdResultRequestProcessor<T extends DownloadRequest, R extends DownloadJob, S>
         implements RequestProcessor<T> {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
-    private final AsyncDownloadFileHandler fileHandler;
-    private final ResultStreamerFacade<T, R, S> resultStreamerFacade;
+    private final SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
     private final UUWMessageConverterFactory uuwMessageConverterFactory;
 
-    protected ResultRequestProcessor(
+    protected SolrIdResultRequestProcessor(
             DownloadConfigProperties downloadConfigProperties,
             HeartbeatProducer heartbeatProducer,
-            AsyncDownloadFileHandler fileHandler,
-            ResultStreamerFacade<T, R, S> resultStreamerFacade,
+            SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.heartbeatProducer = heartbeatProducer;
-        this.fileHandler = fileHandler;
-        this.resultStreamerFacade = resultStreamerFacade;
+        this.solrIdResultStreamerFacade = solrIdResultStreamerFacade;
         this.uuwMessageConverterFactory = uuwMessageConverterFactory;
     }
 
@@ -55,11 +50,7 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
             String fileNameWithExt = jobId + FileType.GZIP.getExtension();
             Path resultPath =
                     Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
-            AbstractUUWHttpMessageConverter<S, S> outputWriter =
-                    (AbstractUUWHttpMessageConverter<S, S>)
-                            uuwMessageConverterFactory.getOutputWriter(contentType, getType());
 
-            Stream<String> ids = Files.lines(fileHandler.getIdFile(jobId));
             OutputStream outputStream =
                     Files.newOutputStream(
                             resultPath,
@@ -69,11 +60,12 @@ public abstract class ResultRequestProcessor<T extends DownloadRequest, R extend
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
 
             MessageConverterContext<S> context =
-                    resultStreamerFacade.getConvertedResult(request, ids);
-
+                    solrIdResultStreamerFacade.getConvertedResult(request);
+            AbstractUUWHttpMessageConverter<S, S> outputWriter =
+                    (AbstractUUWHttpMessageConverter<S, S>)
+                            uuwMessageConverterFactory.getOutputWriter(contentType, getType());
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());
-
         } catch (Exception ex) {
             throw new ResultProcessingException(ex.getMessage());
         } finally {
