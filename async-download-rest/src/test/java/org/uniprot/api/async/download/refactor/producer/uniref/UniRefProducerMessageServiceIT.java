@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.refactor.producer.uniprotkb;
+package org.uniprot.api.async.download.refactor.producer.uniref;
 
 import junit.framework.AssertionFailedError;
 import org.junit.jupiter.api.Test;
@@ -15,36 +15,39 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
-import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
+import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitMQConfig;
+import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
+import org.uniprot.api.async.download.messaging.listener.uniref.UniRefMessageListener;
+import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.refactor.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceIT;
-import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-@Import({UniProtKBProducerMessageServiceIT.UniProtKBProducerTestConfig.class, UniProtKBRabbitMQConfig.class})
+@Import({UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class, UniRefRabbitMQConfig.class})
 @EnableConfigurationProperties({UniProtKBDownloadConfigProperties.class})
-class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
+public class UniRefProducerMessageServiceIT extends ProducerMessageServiceIT {
 
     @Autowired
-    private UniProtKBProducerMessageService service;
+    private UniRefProducerMessageService service;
 
     @Autowired
-    UniProtKBDownloadJobRepository jobRepository;
+    UniRefDownloadJobRepository jobRepository;
 
     @MockBean
-    private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBConsumer;
+    private UniRefContentBasedAndRetriableMessageConsumer uniRefConsumer;
 
-    //TODO: uniProtKBListener and uniProtKBWriter need to be remove when we organise HeartBeat bean config
+    //TODO: uniRefListener, uniRefWriter and heartBeat need to be remove when we organise HeartBeat bean config
     @MockBean
-    private UniProtKBMessageListener uniProtKBListener;
+    private UniRefMessageListener uniRefListener;
     @MockBean
-    private UniProtKBDownloadResultWriter uniProtKBWriter;
+    private UniRefDownloadResultWriter uniRefWriter;
+    @MockBean
+    private UniProtKBHeartbeatProducer heartBeat;
 
     @Captor
     ArgumentCaptor<Message> messageCaptor;
@@ -61,7 +64,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
 
     @Test
     void sendMessage_withForceAndAllowed() {
-        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        UniRefDownloadRequest request = new UniRefDownloadRequest();
         request.setQuery("query value");
         request.setSort("accession asc");
         request.setFormat("json");
@@ -70,7 +73,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
         assertEquals("60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f", jobId);
 
-        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniRefConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
@@ -82,7 +85,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
 
     @Test
     void sendMessage_withForceAndAllowed2() {
-        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        UniRefDownloadRequest request = new UniRefDownloadRequest();
         request.setQuery("query2 value");
         request.setSort("accession2 asc");
         request.setFormat("json");
@@ -91,7 +94,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
 
         assertEquals("1a9848044d4910bc55dccdaa673f4713d5ab091e", jobId);
-        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniRefConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
@@ -103,7 +106,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
 
     @Test
     void sendMessage_withForceAndAllowed3() {
-        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        UniRefDownloadRequest request = new UniRefDownloadRequest();
         request.setQuery("query3 value");
         request.setSort("accession3 asc");
         request.setFormat("json");
@@ -112,7 +115,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
         String jobId = service.sendMessage(request);
 
         assertEquals("975516c6b26115d2d1e0e3a0903feaae618e0bfb", jobId);
-        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(uniRefConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
@@ -123,15 +126,15 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
     }
 
     @TestConfiguration
-    @ComponentScan({"org.uniprot.api.async.download.refactor.producer.uniprotkb",
-            "org.uniprot.api.async.download.refactor.messaging.uniprotkb",
-            "org.uniprot.api.async.download.refactor.service.uniprotkb",
-            "org.uniprot.api.async.download.refactor.consumer.uniprotkb",
-            "org.uniprot.api.async.download.messaging.config.uniprotkb",
-            "org.uniprot.api.async.download.messaging.result.uniprotkb",
+    @ComponentScan({"org.uniprot.api.async.download.refactor.producer.uniref",
+            "org.uniprot.api.async.download.refactor.messaging.uniref",
+            "org.uniprot.api.async.download.refactor.service.uniref",
+            "org.uniprot.api.async.download.refactor.consumer.uniref",
+            "org.uniprot.api.async.download.messaging.config.uniref",
+            "org.uniprot.api.async.download.messaging.result.uniref",
             "org.uniprot.api.async.download.messaging.listener.common",
-            "org.uniprot.api.async.download.messaging.listener.uniprotkb",
-            "org.uniprot.api.async.download.messaging.producer.uniprotkb"})
-    static class UniProtKBProducerTestConfig {
+            "org.uniprot.api.async.download.messaging.listener.uniref",
+            "org.uniprot.api.async.download.messaging.producer.uniref"})
+    static class UniRefProducerTestConfig {
     }
 }
