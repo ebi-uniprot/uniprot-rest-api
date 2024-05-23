@@ -1,6 +1,7 @@
 package org.uniprot.api.async.download.controller.validator;
 
-import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequest;
+
+import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
 
 public interface IdMappingDownloadRequestValidator {
 

@@ -3,7 +3,7 @@ package org.uniprot.api.async.download.controller.validator;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestImpl;
+import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.common.exception.InvalidRequestException;
 
 class UniParcIdMappingDownloadRequestValidatorTest {
@@ -17,7 +17,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithInvalidFormatNull() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
 
         UniParcIdMappingDownloadRequestValidator validator =
                 new UniParcIdMappingDownloadRequestValidator();
@@ -31,7 +31,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithFormatInvalid() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("html");
         UniParcIdMappingDownloadRequestValidator validator =
                 new UniParcIdMappingDownloadRequestValidator();
@@ -45,7 +45,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithSimpleFormatValidate() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("json");
 
         UniParcIdMappingDownloadRequestValidator validator =
@@ -55,7 +55,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithFullFormatValidate() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("application/json");
 
         UniParcIdMappingDownloadRequestValidator validator =
@@ -65,7 +65,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithInValidFields() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("fasta");
         request.setFields("upid, identity");
 
@@ -81,7 +81,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithInValidField() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("fasta");
         request.setFields("invalid");
 
@@ -95,7 +95,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithValidFields() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("fasta");
         request.setFields(" upi , checksum ");
 
@@ -106,7 +106,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
 
     @Test
     void canValidateWithValidField() {
-        IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setFormat("fasta");
         request.setFields(" organism_id ");
 

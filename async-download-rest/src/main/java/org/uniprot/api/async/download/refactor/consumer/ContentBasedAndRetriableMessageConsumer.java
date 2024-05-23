@@ -69,6 +69,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                                 .find(jobId)
                                 .orElseThrow(() -> new MessageListenerException(error));
                 cleanIfNecessary(downloadJob);
+
                 // run the job only if it has errored out
                 if (isJobSeenBefore(jobId) && JobStatus.ERROR != downloadJob.getStatus()) {
                     if (downloadJob.getStatus() == JobStatus.RUNNING) {

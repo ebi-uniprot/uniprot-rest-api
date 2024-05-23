@@ -1,34 +1,30 @@
 package org.uniprot.api.async.download.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
-import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.producer.uniref.UniRefRabbitProducerMessageService;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
-import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.job.JobStatusResponse;
-import org.uniprot.api.rest.output.job.JobSubmitResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
+import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
+import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
+import org.uniprot.api.async.download.refactor.producer.uniref.UniRefProducerMessageService;
+import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.output.job.JobStatusResponse;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 /**
  * @author tibrahim
@@ -41,16 +37,15 @@ public class UniRefDownloadController extends BasicDownloadController {
 
     static final String UNIREF_RESOURCE = "/uniref";
     static final String DOWNLOAD_RESOURCE = UNIREF_RESOURCE + "/download";
-    private final ProducerMessageService messageService;
-    private final DownloadJobRepository jobRepository;
+    private final UniRefProducerMessageService messageService;
+    private final UniRefJobService jobService;
 
     public UniRefDownloadController(
-            UniRefRabbitProducerMessageService uniRefRabbitProducerMessageService,
-            UniRefDownloadJobRepository jobRepository,
-            HeartbeatConfig heartbeatConfig) {
+            UniRefProducerMessageService uniRefRabbitProducerMessageService,
+            HeartbeatConfig heartbeatConfig, UniRefJobService jobService) {
         super(heartbeatConfig);
         this.messageService = uniRefRabbitProducerMessageService;
-        this.jobRepository = jobRepository;
+        this.jobService = jobService;
     }
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
@@ -85,8 +80,9 @@ public class UniRefDownloadController extends BasicDownloadController {
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId) {
-        Optional<DownloadJob> optJob = jobRepository.findById(jobId);
-        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+
+        UniRefDownloadJob job = this.jobService.find(jobId).orElseThrow(
+                () -> new ResourceNotFoundException("jobId " + jobId + " doesn't exist"));
         return getAsyncDownloadStatus(job);
     }
 
@@ -110,8 +106,8 @@ public class UniRefDownloadController extends BasicDownloadController {
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
 
-        Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
-        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+        UniRefDownloadJob job = this.jobService.find(jobId).orElseThrow(
+                () -> new ResourceNotFoundException("jobId " + jobId + " doesn't exist"));
         String requestURL = servletRequest.getRequestURL().toString();
 
         return getDownloadJobDetails(requestURL, job);
