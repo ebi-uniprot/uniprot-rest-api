@@ -20,6 +20,7 @@ import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobR
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.refactor.RedisConfigTest;
 import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceIT;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
@@ -31,7 +32,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@Import({UniProtKBProducerMessageServiceIT.UniProtKBProducerTestConfig.class, UniProtKBRabbitMQConfig.class})
+@Import({UniProtKBProducerMessageServiceIT.UniProtKBProducerTestConfig.class, UniProtKBRabbitMQConfig.class, RedisConfigTest.class})
 @EnableConfigurationProperties({UniProtKBDownloadConfigProperties.class})
 class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
 

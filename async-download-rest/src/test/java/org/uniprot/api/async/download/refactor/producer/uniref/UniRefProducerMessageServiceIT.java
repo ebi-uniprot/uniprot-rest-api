@@ -21,6 +21,7 @@ import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloa
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
+import org.uniprot.api.async.download.refactor.RedisConfigTest;
 import org.uniprot.api.async.download.refactor.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceIT;
 import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
@@ -32,7 +33,7 @@ import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@Import({UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class, UniRefRabbitMQConfig.class})
+@Import({UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class, UniRefRabbitMQConfig.class, RedisConfigTest.class})
 @EnableConfigurationProperties({UniRefDownloadConfigProperties.class})
 public class UniRefProducerMessageServiceIT extends ProducerMessageServiceIT {
 
