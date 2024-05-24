@@ -18,11 +18,17 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitMQConfig;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceIT;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,6 +43,12 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
     @Autowired
     UniProtKBDownloadJobRepository jobRepository;
 
+    @Autowired
+    UniProtKBAsyncDownloadFileHandler fileHandler;
+
+    @Autowired
+    UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
+
     @MockBean
     private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBConsumer;
 
@@ -50,38 +62,7 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
     ArgumentCaptor<Message> messageCaptor;
 
     @Test
-    void sendMessage_jobAlreadyExistAndNotAllowed() {
-
-    }
-
-    @Test
-    void sendMessage_withoutForceAndAllowed() {
-
-    }
-
-    @Test
-    void sendMessage_withForceAndAllowed() {
-        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
-        request.setQuery("query value");
-        request.setSort("accession asc");
-        request.setFormat("json");
-        request.setFields("accession,gene");
-
-        String jobId = service.sendMessage(request);
-        assertEquals("60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f", jobId);
-
-        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
-        Message message = messageCaptor.getValue();
-        validateMessage(message, jobId, request);
-
-        //Validate cached data
-        DownloadJob downloadJob = jobRepository.findById(jobId)
-                .orElseThrow(AssertionFailedError::new);
-        validateDownloadJob(jobId, downloadJob, request);
-    }
-
-    @Test
-    void sendMessage_withForceAndAllowed2() {
+    void sendMessage_withSuccess() {
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery("query2 value");
         request.setSort("accession2 asc");
@@ -102,24 +83,65 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
     }
 
     @Test
-    void sendMessage_withForceAndAllowed3() {
+    void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception{
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
-        request.setQuery("query3 value");
-        request.setSort("accession3 asc");
+        request.setQuery("query value");
+        request.setSort("accession asc");
         request.setFormat("json");
         request.setFields("accession,gene");
+        request.setForce(true);
+        String jobId = "60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f";
 
-        String jobId = service.sendMessage(request);
+        // Reproduce Idle Job in Running Status in and files created
+        createJobFiles(jobId, fileHandler, uniProtKBDownloadConfigProperties);
+        LocalDateTime idleSince = LocalDateTime.now().minusMinutes(20);
+        UniProtKBDownloadJob idleJob = new UniProtKBDownloadJob(jobId, JobStatus.RUNNING, null, idleSince, null, 0,request.getQuery(), request.getFields(), request.getSort(),null, request.getFormat(), 100, 10, 1);
+        jobRepository.save(idleJob);
 
-        assertEquals("975516c6b26115d2d1e0e3a0903feaae618e0bfb", jobId);
+        String jobIdResult = service.sendMessage(request);
+        assertEquals(jobIdResult, jobId);
+
+        //Validate message received in Listener
         Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
-        //Validate cached data
+        //Validate cached data is a new Job
         DownloadJob downloadJob = jobRepository.findById(jobId)
                 .orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
+
+        //Validate idle job files were deleted
+        assertFalse(fileHandler.isIdFileExist(jobId));
+        assertFalse(fileHandler.isResultFileExist(jobId));
+    }
+
+    @Test
+    void sendMessage_jobAlreadyRunningAndNotAllowed() {
+        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        request.setQuery("AlreadyExist");
+        request.setFormat("json");
+        String jobId = "a63c4f8dd0687bf13338a98e7115984bf3e1b52d";
+        UniProtKBDownloadJob runningJob = new UniProtKBDownloadJob(jobId, JobStatus.RUNNING, LocalDateTime.now(), LocalDateTime.now(), null, 0,request.getQuery(), request.getFields(), request.getSort(), null, request.getFormat(), 0, 0, 0);
+        jobRepository.save(runningJob);
+
+        IllegalDownloadJobSubmissionException submitionError = assertThrows(IllegalDownloadJobSubmissionException.class, () -> service.sendMessage(request));
+        assertEquals("Job with id "+ jobId +" has already been submitted", submitionError.getMessage());
+    }
+
+    @Test
+    void sendMessage_WithoutFormatDefaultToJson() {
+        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        request.setQuery("Not using format");
+
+        String jobId = "712dc7afcd2514a178e887d68400421666cde5ed";
+        String resultJobId = service.sendMessage(request);
+        assertEquals(jobId, resultJobId);
+        request.setFormat("json");
+
+        Mockito.verify(uniProtKBConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Message message = messageCaptor.getValue();
+        validateMessage(message, jobId, request);
     }
 
     @TestConfiguration
