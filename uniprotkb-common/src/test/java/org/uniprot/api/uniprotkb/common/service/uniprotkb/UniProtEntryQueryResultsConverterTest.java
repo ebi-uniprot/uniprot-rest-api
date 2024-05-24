@@ -69,7 +69,7 @@ class UniProtEntryQueryResultsConverterTest {
         assertNotNull(entry.getInactiveReason());
         EntryInactiveReason inactiveReason = entry.getInactiveReason();
         assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
-        assertEquals(DeletedReason.SOURCE_DELETION_EMBL, inactiveReason.getDeletedReason());
+        assertEquals(DeletedReason.SOURCE_DELETION, inactiveReason.getDeletedReason());
     }
 
     @Test
