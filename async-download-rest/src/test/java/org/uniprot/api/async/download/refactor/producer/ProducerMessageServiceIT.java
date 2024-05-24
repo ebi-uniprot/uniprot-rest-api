@@ -1,7 +1,9 @@
 package org.uniprot.api.async.download.refactor.producer;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -17,18 +19,28 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
+import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.common.MessageProducerConfig;
 import org.uniprot.api.async.download.messaging.config.common.RabbitMQConfigs;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.refactor.RedisConfigTest;
 import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
 import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
 import javax.annotation.PreDestroy;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +57,9 @@ public abstract class ProducerMessageServiceIT {
 
     @Autowired
     MessageConverter converter;
+
+    @TempDir
+    private Path tempDir;
 
     @Container
     private static GenericContainer redisServer =
@@ -107,6 +122,15 @@ public abstract class ProducerMessageServiceIT {
         //Validate received UniProtKBDownloadRequest from Message
         SolrStreamDownloadRequest submittedRequest = (SolrStreamDownloadRequest) converter.fromMessage(message);
         assertEquals(request, submittedRequest);
+    }
+
+    protected void createJobFiles(String jobId, AsyncDownloadFileHandler fileHandler, DownloadConfigProperties downloadConfigProperties) throws IOException {
+        downloadConfigProperties.setIdFilesFolder(tempDir + File.separator + downloadConfigProperties.getIdFilesFolder());
+        downloadConfigProperties.setResultFilesFolder(tempDir + File.separator +  downloadConfigProperties.getResultFilesFolder());
+        Files.createDirectories(Path.of(downloadConfigProperties.getIdFilesFolder()));
+        Files.createDirectories(Path.of(downloadConfigProperties.getResultFilesFolder()));
+        assertTrue(fileHandler.getIdFile(jobId).toFile().createNewFile());
+        assertTrue(fileHandler.getResultFile(jobId).toFile().createNewFile());
     }
 
 }

@@ -58,7 +58,8 @@ public abstract class AsyncDownloadFileHandler {
     }
 
     public Path getResultFile(String jobId) {
-        return getPath(downloadConfigProperties.getResultFilesFolder(), jobId);
+        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
+        return getPath(downloadConfigProperties.getResultFilesFolder(), resultFileName);
     }
 
     private Path getPath(String folder, String fileName) {
@@ -71,8 +72,7 @@ public abstract class AsyncDownloadFileHandler {
     }
 
     public void deleteResultFile(String jobId) {
-        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
-        deleteFile(getResultFile(resultFileName), jobId);
+        deleteFile(getResultFile(jobId), jobId);
     }
 
     public void deleteAllFiles(String jobId) {
