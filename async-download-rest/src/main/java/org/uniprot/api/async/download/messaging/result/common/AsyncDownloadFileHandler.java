@@ -1,5 +1,10 @@
 package org.uniprot.api.async.download.messaging.result.common;
 
+import lombok.extern.slf4j.Slf4j;
+import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
+import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.rest.output.context.FileType;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,13 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
-
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
-import org.uniprot.api.rest.output.context.FileType;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AsyncDownloadFileHandler {
@@ -88,7 +86,7 @@ public abstract class AsyncDownloadFileHandler {
                     "Unable to delete file {} during IOException failure for job id {}",
                     file.toFile().getName(),
                     jobId);
-            throw new MessageListenerException(e);
+            throw new FileHandelerException(e);
         }
     }
 }

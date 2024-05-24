@@ -16,10 +16,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBDownloadResultWriter;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
@@ -51,12 +49,6 @@ class UniProtKBProducerMessageServiceIT extends ProducerMessageServiceIT {
 
     @MockBean
     private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBConsumer;
-
-    //TODO: uniProtKBListener and uniProtKBWriter need to be remove when we organise HeartBeat bean config
-    @MockBean
-    private UniProtKBMessageListener uniProtKBListener;
-    @MockBean
-    private UniProtKBDownloadResultWriter uniProtKBWriter;
 
     @Captor
     ArgumentCaptor<Message> messageCaptor;

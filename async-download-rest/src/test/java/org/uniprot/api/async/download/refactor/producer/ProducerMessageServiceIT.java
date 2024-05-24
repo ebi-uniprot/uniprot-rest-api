@@ -1,8 +1,6 @@
 package org.uniprot.api.async.download.refactor.producer;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -13,7 +11,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -23,31 +20,23 @@ import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProp
 import org.uniprot.api.async.download.messaging.config.common.MessageProducerConfig;
 import org.uniprot.api.async.download.messaging.config.common.RabbitMQConfigs;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
-import org.uniprot.api.async.download.messaging.listener.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.RedisConfigTest;
 import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
-import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
 import javax.annotation.PreDestroy;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import({MessageProducerConfig.class, RedisConfiguration.class, RabbitMQConfigs.class, RedisConfigTest.class})
+@Import({MessageProducerConfig.class, RedisConfiguration.class, RabbitMQConfigs.class})
 @EnableConfigurationProperties({HeartbeatConfig.class})
 @TestPropertySource("classpath:application.properties")
 public abstract class ProducerMessageServiceIT {
@@ -113,10 +102,10 @@ public abstract class ProducerMessageServiceIT {
         MessageProperties messageValues = message.getMessageProperties();
         assertEquals("application/json", messageValues.getContentType());
         assertEquals("UTF-8", messageValues.getContentEncoding());
-        assertNotNull(messageValues.getHeaders().get(BaseAbstractMessageListener.JOB_ID_HEADER));
+        assertNotNull(messageValues.getHeaders().get("jobId"));
 
         //Validate Message Header data
-        String jobFromHeader = (String) messageValues.getHeaders().get(BaseAbstractMessageListener.JOB_ID_HEADER);
+        String jobFromHeader = (String) messageValues.getHeaders().get("jobId");
         assertEquals(jobId, jobFromHeader);
 
         //Validate received UniProtKBDownloadRequest from Message

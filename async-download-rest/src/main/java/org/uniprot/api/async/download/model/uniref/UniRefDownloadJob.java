@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.model.uniref;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 import org.springframework.data.redis.core.RedisHash;
@@ -11,6 +12,7 @@ import lombok.Builder;
 @RedisHash("uniref")
 public class UniRefDownloadJob extends DownloadJob {
 
+    @Serial
     private static final long serialVersionUID = 3430390961923980454L;
 
     @Builder

@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.refactor.consumer.streamer.batch.IdMappingBatchResultStreamer;
 import org.uniprot.api.async.download.refactor.consumer.streamer.facade.IdMappingResultStreamerFacadeTest;
 import org.uniprot.api.async.download.refactor.consumer.streamer.list.idmapping.IdMappingListResultStreamer;
-import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.idmapping.IdMappingRDFStreamer;
+import org.uniprot.api.async.download.refactor.consumer.streamer.rdf.idmapping.UniParcIdMappingRDFResultStreamer;
 import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -16,7 +16,7 @@ import org.uniprot.core.uniparc.UniParcEntry;
 @ExtendWith(MockitoExtension.class)
 public class UniParcIdMappingResultStreamerFacadeTest extends IdMappingResultStreamerFacadeTest<UniParcEntry, UniParcEntryPair> {
     @Mock
-    private IdMappingRDFStreamer rdfResultStreamer;
+    private UniParcIdMappingRDFResultStreamer rdfResultStreamer;
     @Mock
     private IdMappingListResultStreamer listResultStreamer;
     @Mock

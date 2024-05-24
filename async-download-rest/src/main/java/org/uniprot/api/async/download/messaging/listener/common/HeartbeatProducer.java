@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
 
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
+import org.uniprot.api.async.download.refactor.service.JobService;
 
 @Slf4j
 public class HeartbeatProducer {
@@ -26,11 +26,11 @@ public class HeartbeatProducer {
     // number processed entries for a given job id, at the time it was last updated in the cache
     private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final HeartbeatConfig heartbeatConfig;
-    private final DownloadJobRepository jobRepository;
+    private final JobService<? extends DownloadJob> jobService;
 
-    public HeartbeatProducer(HeartbeatConfig heartbeatConfig, DownloadJobRepository jobRepository) {
+    public HeartbeatProducer(HeartbeatConfig heartbeatConfig, JobService<? extends DownloadJob> jobRepository) {
         this.heartbeatConfig = heartbeatConfig;
-        this.jobRepository = jobRepository;
+        this.jobService = jobRepository;
         this.retryPolicy =
                 new RetryPolicy<>()
                         .handle(Exception.class)
@@ -39,7 +39,7 @@ public class HeartbeatProducer {
     }
 
     public void createForIds(String id) {
-        createForIds((DownloadJob) (jobRepository.findById(id).get()));
+        createForIds(jobService.find(id).get());
     }
 
     public void createForIds(DownloadJob downloadJob) {
@@ -62,7 +62,7 @@ public class HeartbeatProducer {
                                                                 throwable.getFailure())))
                                 .run(
                                         () ->
-                                                jobRepository.update(
+                                                jobService.update(
                                                         downloadJob.getId(),
                                                         Map.of(
                                                                 UPDATE_COUNT,
@@ -135,7 +135,7 @@ public class HeartbeatProducer {
                                                                 throwable.getFailure())))
                                 .run(
                                         () ->
-                                                jobRepository.update(
+                                                jobService.update(
                                                         downloadJob.getId(),
                                                         Map.of(
                                                                 UPDATE_COUNT, newUpdateCount,

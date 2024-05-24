@@ -4,10 +4,10 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class IdMappingDownloadRequestToArrayConverter
-        implements Function<IdMappingDownloadRequest, char[]> {
+        implements Function<org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest, char[]> {
 
     @Override
-    public char[] apply(IdMappingDownloadRequest request) {
+    public char[] apply(org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest request) {
         StringBuilder builder = new StringBuilder();
 
         if (Objects.nonNull(request.getJobId())) {

@@ -40,7 +40,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
-import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.common.DownloadJob;
@@ -160,7 +159,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
-                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
+                        "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
                         this.maxEntryCount,
                         UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         String query = "key:value";
@@ -202,7 +201,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
-                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
+                        "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
                         this.maxEntryCount,
                         UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         DownloadJob job =

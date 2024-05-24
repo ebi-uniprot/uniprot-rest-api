@@ -23,7 +23,7 @@ class DownloadJobRepositoryTest {
     @MockBean private UniProtKBDownloadJobRepository jobRepository;
 
     @Test
-    void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
+    void whenSavingJob_thenAvailableOnRetrieval() {
         String jobId = "123456789";
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder jobBuilder =
                 UniProtKBDownloadJob.builder();

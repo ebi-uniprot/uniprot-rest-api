@@ -50,7 +50,7 @@ public class TestConfig {
 
     @Bean(destroyMethod = "shutdown")
     @Profile("idmapping")
-    RedissonClient redisson() {
+    RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
                 .setAddress(

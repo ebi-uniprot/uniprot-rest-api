@@ -1,20 +1,19 @@
 package org.uniprot.api.async.download.refactor.producer.idmapping;
 
-import java.time.LocalDateTime;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.producer.idmapping.IdMappingAsyncDownloadSubmissionRules;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
-import org.uniprot.api.async.download.refactor.messaging.MessagingService;
+import org.uniprot.api.async.download.refactor.messaging.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.refactor.producer.ProducerMessageService;
 import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.HashGenerator;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
 
 @Component
 @Slf4j
@@ -25,10 +24,10 @@ public class IdMappingProducerMessageService
     protected IdMappingProducerMessageService(
             IdMappingJobService jobService,
             MessageConverter messageConverter,
-            MessagingService messagingService,
+            IdMappingMessagingService messagingService,
             HashGenerator<IdMappingDownloadRequest> hashGenerator,
-            AsyncDownloadFileHandler asyncDownloadFileHandler,
-            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler,
+            IdMappingAsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
         super(
                 jobService,
                 messageConverter,

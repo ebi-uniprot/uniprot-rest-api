@@ -1,28 +1,28 @@
 package org.uniprot.api.async.download.messaging.producer.common;
 
+import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
+import org.uniprot.api.async.download.refactor.service.JobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.Optional;
 
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
-import org.uniprot.api.rest.download.model.JobStatus;
-
 public abstract class AsyncDownloadSubmissionRules {
     private final int maxRetryCount;
     private final int maxWaitingTime;
-    private final DownloadJobRepository downloadJobRepository;
+    private final JobService<? extends DownloadJob> downloadJobRepository;
 
-    public AsyncDownloadSubmissionRules(
-            int maxRetryCount, int maxWaitingTime, DownloadJobRepository downloadJobRepository) {
+    protected AsyncDownloadSubmissionRules(
+            int maxRetryCount, int maxWaitingTime, JobService<? extends DownloadJob> downloadJobRepository) {
         this.maxRetryCount = maxRetryCount;
         this.maxWaitingTime = maxWaitingTime;
         this.downloadJobRepository = downloadJobRepository;
     }
 
     public JobSubmitFeedback submit(String jobId, boolean force) {
-        Optional<DownloadJob> downloadJobOpt = downloadJobRepository.findById(jobId);
+        Optional<? extends DownloadJob> downloadJobOpt = downloadJobRepository.find(jobId);
         if (downloadJobOpt.isPresent()) {
             DownloadJob downloadJob = downloadJobOpt.get();
             if (!force) {

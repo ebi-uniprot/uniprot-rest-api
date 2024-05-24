@@ -11,7 +11,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.listener.common.MessageListenerException;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.processor.RequestProcessor;
@@ -67,7 +66,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                 DownloadJob downloadJob =
                         jobService
                                 .find(jobId)
-                                .orElseThrow(() -> new MessageListenerException(error));
+                                .orElseThrow(() -> new MessageConsumerException(error));
                 cleanIfNecessary(downloadJob);
 
                 // run the job only if it has errored out

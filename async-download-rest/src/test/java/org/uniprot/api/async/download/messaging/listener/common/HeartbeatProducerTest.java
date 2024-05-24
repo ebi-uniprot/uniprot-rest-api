@@ -15,8 +15,9 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBHeartbeatProducer;
-import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.refactor.service.JobService;
+import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
 
 @ExtendWith(MockitoExtension.class)
 class HeartbeatProducerTest {
@@ -27,7 +28,7 @@ class HeartbeatProducerTest {
     private final UniProtKBDownloadJob downloadJob =
             UniProtKBDownloadJob.builder().id(JOB_ID).build();
     @Mock private HeartbeatConfig heartbeatConfig;
-    @Mock private UniProtKBDownloadJobRepository jobRepository;
+    @Mock private UniProtKBJobService jobService;
     @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
     private UniProtKBHeartbeatProducer heartBeatProducer;
 
@@ -35,7 +36,7 @@ class HeartbeatProducerTest {
     void setUp() {
         when(heartbeatConfig.getRetryCount()).thenReturn(3);
         when(heartbeatConfig.getRetryDelayInMillis()).thenReturn(100);
-        heartBeatProducer = new UniProtKBHeartbeatProducer(heartbeatConfig, jobRepository);
+        heartBeatProducer = new UniProtKBHeartbeatProducer(heartbeatConfig, jobService);
     }
 
     @Test
@@ -51,7 +52,7 @@ class HeartbeatProducerTest {
     }
 
     private void verifySavedJob(Long processedEntries) {
-        verify(jobRepository).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        verify(jobService).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         Map<String, Object> savedJob = downloadJobArgumentCaptor.getValue();
         assertEquals(1L, savedJob.get(UPDATE_COUNT));
         assertEquals(processedEntries, savedJob.get(PROCESSED_ENTRIES));
@@ -72,7 +73,7 @@ class HeartbeatProducerTest {
 
         heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> lastCall = savedJobs.get(2);
         assertEquals(2L, lastCall.get(UPDATE_COUNT));
@@ -94,7 +95,7 @@ class HeartbeatProducerTest {
 
         heartBeatProducer.createForResults(downloadJob, 50);
 
-        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> lastCall = savedJobs.get(2);
         assertEquals(2L, lastCall.get(UPDATE_COUNT));
@@ -113,8 +114,8 @@ class HeartbeatProducerTest {
         heartBeatProducer.createForResults(downloadJob, 70);
         heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, never()).save(any());
-        verify(jobRepository, never()).update(any(), any());
+        verify(jobService, never()).save(any());
+        verify(jobService, never()).update(any(), any());
     }
 
     @Test
@@ -135,7 +136,7 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getResultsInterval()).thenReturn(50L);
         doThrow(RuntimeException.class)
-                .when(jobRepository)
+                .when(jobService)
                 .update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
@@ -155,7 +156,7 @@ class HeartbeatProducerTest {
 
         heartBeatProducer.createForIds(downloadJob);
         heartBeatProducer.createForIds(downloadJob);
-        verify(jobRepository, times(2)).update(eq(JOB_ID), any(Map.class));
+        verify(jobService, times(2)).update(eq(JOB_ID), any(Map.class));
     }
 
     @Test
@@ -168,8 +169,8 @@ class HeartbeatProducerTest {
         heartBeatProducer.createForIds(downloadJob);
         heartBeatProducer.createForIds(downloadJob);
 
-        verify(jobRepository, never()).save(any());
-        verify(jobRepository, never()).update(any(), any());
+        verify(jobService, never()).save(any());
+        verify(jobService, never()).update(any(), any());
     }
 
     @Test
@@ -177,7 +178,7 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
         doThrow(RuntimeException.class)
-                .when(jobRepository)
+                .when(jobService)
                 .update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
@@ -195,7 +196,7 @@ class HeartbeatProducerTest {
         heartBeatProducer.stop(JOB_ID);
         heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> afterStopped = savedJobs.get(1);
         assertEquals(2L, afterStopped.get(UPDATE_COUNT));

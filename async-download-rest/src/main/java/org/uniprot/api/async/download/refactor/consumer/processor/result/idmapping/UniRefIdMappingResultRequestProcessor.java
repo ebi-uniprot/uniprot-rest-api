@@ -1,6 +1,7 @@
 package org.uniprot.api.async.download.refactor.consumer.processor.result.idmapping;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.async.download.refactor.consumer.processor.result.IdMappingResultRequestProcessor;
@@ -12,6 +13,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 import java.lang.reflect.Type;
 
+@Component
 public class UniRefIdMappingResultRequestProcessor extends IdMappingResultRequestProcessor<UniRefEntryLight, UniRefEntryPair> {
     protected UniRefIdMappingResultRequestProcessor(IdMappingDownloadConfigProperties downloadConfigProperties, IdMappingHeartbeatProducer heartbeatProducer, UniRefIdMappingResultStreamerFacade resultStreamerFacade, UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(downloadConfigProperties, heartbeatProducer, resultStreamerFacade, uuwMessageConverterFactory);
