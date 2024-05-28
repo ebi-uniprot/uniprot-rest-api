@@ -1,39 +1,38 @@
 package org.uniprot.api.async.download.refactor.producer.idmapping;
 
-import junit.framework.AssertionFailedError;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitMQConfig;
+import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
+import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.refactor.RedisConfigTest;
+import org.uniprot.api.async.download.refactor.consumer.ContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.consumer.idmapping.UniParcIdMappingContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.consumer.idmapping.UniProtKBIdMappingContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.consumer.idmapping.UniRefIdMappingContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.refactor.producer.ProducerMessageServiceIT;
-import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
+import org.uniprot.api.async.download.refactor.producer.BasicProducerMessageServiceIT;
+import org.uniprot.api.async.download.refactor.producer.SolrProducerMessageServiceIT;
+import org.uniprot.api.async.download.refactor.producer.SolrProducerMessageService;
+import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 //TODO: Currently we have 3 consumers for idmapping, and we have one queue for it. I think we have to have one consumer only
 // and inside the consumer we need to get the "to" database from idmapping job to process the request accordingly.
@@ -42,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @Import({IdMappingProducerMessageServiceIT.IdMappingProducerTestConfig.class, IdMappingRabbitMQConfig.class, RedisConfigTest.class})
-class IdMappingProducerMessageServiceIT extends ProducerMessageServiceIT {
+class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     @Autowired
     private IdMappingProducerMessageService service;
@@ -68,7 +67,14 @@ class IdMappingProducerMessageServiceIT extends ProducerMessageServiceIT {
     @Captor
     ArgumentCaptor<Message> messageCaptor;
 
-//TODO: We need to change the comment above in order to enable these tests.
+    @Test
+    void toRemove() {
+        assertNotNull(service);
+        assertNotNull(jobRepository);
+        assertNotNull(fileHandler);
+        assertNotNull(idMappingDownloadConfigProperties);
+    }
+    //TODO: We need to change the comment above in order to enable these tests.
 /*
     @Test
     void sendMessage_withSuccess() {
