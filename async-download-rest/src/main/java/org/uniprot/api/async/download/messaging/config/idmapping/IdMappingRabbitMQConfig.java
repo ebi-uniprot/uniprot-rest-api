@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -79,6 +80,7 @@ public class IdMappingRabbitMQConfig {
                 .with(idMappingUndeliveredQueue.getName());
     }
 
+    //TODO: We need to configure IdMappingConsumer
     /*@Bean
     public MessageListenerContainer idMappingMessageListenerContainer(
             ConnectionFactory connectionFactory,
@@ -88,14 +90,8 @@ public class IdMappingRabbitMQConfig {
                 connectionFactory, idMappingMessageListener, configProps);
     }*/
 
-    /*@Bean
-    public HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator(
-            @Value("${async.download.idmapping.hash.salt}") String hashSalt) {
-        return new HashGenerator<>(new IdMappingDownloadRequestToArrayConverter(), hashSalt);
-    }*/
-
     @Bean
-    public HashGenerator<org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest> asyncIdMappingHashGenerator(
+    public HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator(
             @Value("${async.download.idmapping.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new IdMappingDownloadRequestToArrayConverter(), hashSalt);
     }

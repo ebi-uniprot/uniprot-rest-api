@@ -6,6 +6,7 @@ import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSub
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
 
+//TODO: Important: We need to verify if idmapping job (IdMappingJobCacheService) is completed before we start the download
 @Component
 public class IdMappingAsyncDownloadSubmissionRules extends AsyncDownloadSubmissionRules {
     public IdMappingAsyncDownloadSubmissionRules(
