@@ -11,25 +11,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.RedisConfigTest;
-import org.uniprot.api.async.download.refactor.consumer.ContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.refactor.consumer.idmapping.UniParcIdMappingContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.refactor.consumer.idmapping.UniProtKBIdMappingContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.refactor.consumer.idmapping.UniRefIdMappingContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.refactor.consumer.idmapping.IdMappingContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.producer.BasicProducerMessageServiceIT;
-import org.uniprot.api.async.download.refactor.producer.SolrProducerMessageServiceIT;
-import org.uniprot.api.async.download.refactor.producer.SolrProducerMessageService;
-import org.uniprot.api.async.download.refactor.request.SolrStreamDownloadRequest;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,13 +44,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
 
     @MockBean
-    private UniProtKBIdMappingContentBasedAndRetriableMessageConsumer uniprotkbIdMappingConsumer;
-
-    @MockBean
-    private UniParcIdMappingContentBasedAndRetriableMessageConsumer uniparcIdMappingConsumer;
-
-    @MockBean
-    private UniRefIdMappingContentBasedAndRetriableMessageConsumer unirefIdMappingConsumer;
+    private IdMappingContentBasedAndRetriableMessageConsumer idMappingConsumer;
 
     @Captor
     ArgumentCaptor<Message> messageCaptor;
