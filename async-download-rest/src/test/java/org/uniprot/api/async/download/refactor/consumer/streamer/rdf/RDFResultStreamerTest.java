@@ -19,7 +19,7 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 
 public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends DownloadJob> {
-    private static final String JOB_ID = "jobId";
+    private static final String ID = "someId";
     private static final String APPLICATION_RDF_XML = "application/rdf+xml";
     public static final String RDF = "rdf";
     protected T request;
@@ -31,8 +31,8 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
 
     @Test
     void stream() {
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.ofNullable(job));
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         when(request.getFormat()).thenReturn(APPLICATION_RDF_XML);
         Stream<String> ids = Stream.of("id1", "id2", "id3");
         List<String> redfList = List.of("rdf1", "rdf2", "rdf3");
@@ -51,8 +51,8 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(
                 IllegalArgumentException.class,

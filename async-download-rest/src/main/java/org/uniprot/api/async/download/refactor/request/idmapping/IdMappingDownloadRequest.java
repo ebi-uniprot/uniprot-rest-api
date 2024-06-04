@@ -30,6 +30,9 @@ public class IdMappingDownloadRequest implements DownloadRequest {
     @Parameter(hidden = true)
     private boolean force;
 
+    @Parameter(hidden = true)
+    private String id;
+
     @Override
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);

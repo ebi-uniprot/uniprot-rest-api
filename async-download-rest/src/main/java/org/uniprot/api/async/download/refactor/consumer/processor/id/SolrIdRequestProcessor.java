@@ -28,13 +28,13 @@ public abstract class SolrIdRequestProcessor<
     }
 
     protected void updateTotalEntries(T request, long totalEntries) {
-        jobService.update(request.getJobId(), Map.of(TOTAL_ENTRIES, totalEntries));
+        jobService.update(request.getId(), Map.of(TOTAL_ENTRIES, totalEntries));
     }
 
     protected abstract long getSolrHits(T downloadRequest);
 
     private void writeIdentifiers(T request, Stream<String> ids) {
-        downloadFileHandler.writeIds(request.getJobId(), ids);
+        downloadFileHandler.writeIds(request.getId(), ids);
     }
 
     protected abstract Stream<String> streamIds(T downloadRequest);

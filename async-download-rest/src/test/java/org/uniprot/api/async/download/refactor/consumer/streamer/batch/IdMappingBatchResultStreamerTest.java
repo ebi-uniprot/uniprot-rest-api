@@ -21,7 +21,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
 public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>> {
-    private static final String JOB_ID = "jobId";
+    private static final String ID = "someId";
     protected IdMappingJobService jobService;
     protected IdMappingHeartbeatProducer heartbeatProducer;
     @Mock
@@ -33,8 +33,8 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
     @Test
     void stream() {
         mockBatch();
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.ofNullable(job));
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         List<IdMappingStringPair> idMappingStringPairList = List.of(new IdMappingStringPair("from1", "to1"), new IdMappingStringPair("from2", "to2"), new IdMappingStringPair("from3", "to3"));
         Stream<IdMappingStringPair> idMappingPairs = idMappingStringPairList.stream();
 
@@ -52,8 +52,8 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(
                 IllegalArgumentException.class,

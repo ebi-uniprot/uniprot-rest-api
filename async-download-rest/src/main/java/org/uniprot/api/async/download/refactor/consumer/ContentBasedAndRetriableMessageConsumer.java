@@ -79,7 +79,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                 } else {
                     jobService.update(jobId, Map.of(STATUS, JobStatus.RUNNING));
                     T request = (T) this.messageConverter.fromMessage(message);
-                    request.setJobId(jobId);
+                    request.setId(jobId);
                     requestProcessor.process(request);
                     jobService.update(jobId, Map.of(STATUS, JobStatus.FINISHED));
                     log.info("Message with jobId {} processed successfully", jobId);

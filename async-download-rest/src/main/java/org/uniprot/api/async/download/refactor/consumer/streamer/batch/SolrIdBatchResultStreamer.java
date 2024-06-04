@@ -38,7 +38,7 @@ public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R ext
                         () ->
                                 log.info(
                                         "Finished streaming entries for job {}",
-                                        request.getJobId()));
+                                        request.getId()));
     }
 
     protected abstract Iterable<Collection<P>> getBatchStoreIterable(

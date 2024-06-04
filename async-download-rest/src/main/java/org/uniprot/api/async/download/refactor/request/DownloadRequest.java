@@ -1,9 +1,9 @@
 package org.uniprot.api.async.download.refactor.request;
 
 public interface DownloadRequest {
-    void setJobId(String jobId);
+    void setId(String id);
 
-    String getJobId();
+    String getId();
 
     String getFormat();
 

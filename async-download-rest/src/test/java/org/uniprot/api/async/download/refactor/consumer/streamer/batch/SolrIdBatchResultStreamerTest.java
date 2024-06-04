@@ -18,7 +18,7 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 
 public abstract class SolrIdBatchResultStreamerTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
-    private static final String JOB_ID = "jobId";
+    private static final String ID = "someId";
     protected T request;
     protected R job;
     protected HeartbeatProducer heartbeatProducer;
@@ -28,8 +28,8 @@ public abstract class SolrIdBatchResultStreamerTest<
     @Test
     void stream() {
         mockBatch();
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.ofNullable(job));
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         List<String> idList = List.of("id1", "id2", "id3");
         Stream<String> ids = idList.stream();
 
@@ -43,8 +43,8 @@ public abstract class SolrIdBatchResultStreamerTest<
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
+        when(request.getId()).thenReturn(ID);
+        when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(
                 IllegalArgumentException.class,

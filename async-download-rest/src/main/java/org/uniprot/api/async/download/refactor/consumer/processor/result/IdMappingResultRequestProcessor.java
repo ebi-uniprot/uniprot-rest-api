@@ -46,8 +46,8 @@ public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
         try {
             MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
 
-            String jobId = request.getJobId();
-            String fileNameWithExt = jobId + FileType.GZIP.getExtension();
+            String id = request.getId();
+            String fileNameWithExt = id + FileType.GZIP.getExtension();
             Path resultPath =
                     Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
 
@@ -68,7 +68,7 @@ public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
         } catch (Exception ex) {
             throw new ResultProcessingException(ex.getMessage());
         } finally {
-            heartbeatProducer.stop(request.getJobId());
+            heartbeatProducer.stop(request.getId());
         }
     }
 

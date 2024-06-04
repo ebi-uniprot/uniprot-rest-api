@@ -17,7 +17,7 @@ import org.uniprot.api.async.download.refactor.service.JobService;
 public abstract class SolrIdRequestProcessorTest<
         T extends SolrStreamDownloadRequest, R extends DownloadJob> {
     protected static final long SOLR_HITS = 98L;
-    protected static final String JOB_ID = "someJobId";
+    protected static final String ID = "someId";
     @Mock protected Stream<String> idStream;
     protected AsyncDownloadFileHandler asyncDownloadFileHandler;
     protected JobService<R> jobService;
@@ -26,11 +26,11 @@ public abstract class SolrIdRequestProcessorTest<
 
     @Test
     void process() {
-        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
+        when(downloadRequest.getId()).thenReturn(ID);
 
         requestProcessor.process(downloadRequest);
 
-        verify(jobService).update(JOB_ID, Map.of(TOTAL_ENTRIES, SOLR_HITS));
-        verify(asyncDownloadFileHandler).writeIds(JOB_ID, idStream);
+        verify(jobService).update(ID, Map.of(TOTAL_ENTRIES, SOLR_HITS));
+        verify(asyncDownloadFileHandler).writeIds(ID, idStream);
     }
 }

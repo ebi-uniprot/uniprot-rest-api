@@ -1,7 +1,6 @@
 package org.uniprot.api.async.download.refactor.consumer.streamer.facade;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -23,12 +22,11 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
 public abstract class SolrIdResultStreamerFacadeTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
     public static final String FIELDS = "fields";
-    public static final String JOB_ID = "someJobId";
+    public static final String ID = "Id";
     protected MessageConverterContext<S> messageConverterContext;
     protected RDFResultStreamer<T, R> rdfResultStreamer;
     protected ListResultStreamer<T, R> listResultStreamer;
@@ -50,8 +48,8 @@ public abstract class SolrIdResultStreamerFacadeTest<
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
-        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
-        when(fileHandler.getIdFile(JOB_ID)).thenReturn(path);
+        when(downloadRequest.getId()).thenReturn(ID);
+        when(fileHandler.getIdFile(ID)).thenReturn(path);
         filesMockedStatic = mockStatic(Files.class);
         filesMockedStatic.when(() -> Files.lines(path)).thenReturn(ids);
     }

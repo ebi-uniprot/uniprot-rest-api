@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.common.DownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.refactor.request.DownloadRequest;
@@ -32,7 +31,7 @@ import static org.mockito.Mockito.*;
 public abstract class SolrIdResultRequestProcessorTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
     public static final String CONTENT_TYPE = "application/json";
-    public static final String JOB_ID = "someJobId";
+    public static final String ID = "someId";
     public static final String RESULT_FOLDER = "resultFolder";
     protected T request;
     protected DownloadConfigProperties downloadConfigProperties;
@@ -49,7 +48,7 @@ public abstract class SolrIdResultRequestProcessorTest<
     @Test
     void process() throws Exception {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getJobId()).thenReturn(JOB_ID);
+        when(request.getId()).thenReturn(ID);
         when(messageConverterFactory.getOutputWriter(
                         MediaType.APPLICATION_JSON, solrIdResultRequestProcessor.getType()))
                 .thenReturn(outputWriter);
@@ -67,7 +66,7 @@ public abstract class SolrIdResultRequestProcessorTest<
                 .thenReturn(outputStream);
         MockedStatic<Paths> pathsMockedStatic = mockStatic(Paths.class);
         pathsMockedStatic
-                .when(() -> Paths.get(RESULT_FOLDER, JOB_ID + FileType.GZIP.getExtension()))
+                .when(() -> Paths.get(RESULT_FOLDER, ID + FileType.GZIP.getExtension()))
                 .thenReturn(resultPath);
         MockedStatic<Instant> instantMockedStatic = mockStatic(Instant.class);
         instantMockedStatic.when(() -> Instant.now()).thenReturn(instant);
@@ -84,7 +83,7 @@ public abstract class SolrIdResultRequestProcessorTest<
                         gzipOutputStreamMockedConstruction.constructed().get(0),
                         instant,
                         atomicIntegerMockedConstruction.constructed().get(0));
-        verify(heartbeatProducer).stop(JOB_ID);
+        verify(heartbeatProducer).stop(ID);
 
         filesMockedStatic.reset();
         filesMockedStatic.close();
@@ -99,12 +98,12 @@ public abstract class SolrIdResultRequestProcessorTest<
     @Test
     void onMessage_whenExceptionOccurred() {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getJobId()).thenReturn(JOB_ID);
+        when(request.getId()).thenReturn(ID);
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(
                 ResultProcessingException.class, () -> solrIdResultRequestProcessor.process(request));
 
-        verify(heartbeatProducer).stop(JOB_ID);
+        verify(heartbeatProducer).stop(ID);
     }
 }

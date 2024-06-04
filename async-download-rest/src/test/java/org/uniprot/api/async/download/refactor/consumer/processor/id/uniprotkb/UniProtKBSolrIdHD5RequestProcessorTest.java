@@ -28,7 +28,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBSolrIdHD5RequestProcessorTest {
-    protected static final String JOB_ID = "someJobId";
+    protected static final String ID = "someId";
     private static final String EMBEDDINGS_EXCHANGE = "embeddingsExchange";
     private static final String EMBEDDINGS_ROUTING_KEY = "embeddingsRoutingKey";
     private static final String QUERY = "uniprotKBQuery";
@@ -68,15 +68,15 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
                 .send(
                         argThat(
                                 msg ->
-                                        JOB_ID.equals(
+                                        ID.equals(
                                                 msg.getMessageProperties().getHeader("jobId"))),
                         eq(EMBEDDINGS_EXCHANGE),
                         eq(EMBEDDINGS_ROUTING_KEY));
-        verify(uniProtKBJobService).update(JOB_ID, Map.of(STATUS, UNFINISHED));
+        verify(uniProtKBJobService).update(ID, Map.of(STATUS, UNFINISHED));
     }
 
     private void mock(long solrHits) {
-        when(uniProtKBDownloadRequest.getJobId()).thenReturn(JOB_ID);
+        when(uniProtKBDownloadRequest.getId()).thenReturn(ID);
         when(embeddingsQueueConfigProperties.getMaxEntryCount()).thenReturn(MAX_ENTRY_COUNT);
         when(uniProtKBDownloadRequest.getQuery()).thenReturn(QUERY);
         when(uniProtKBDownloadRequest.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORMS);
@@ -109,7 +109,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
 
         verify(uniProtKBJobService)
                 .update(
-                        JOB_ID,
+                        ID,
                         Map.of(
                                 STATUS,
                                 ABORTED,

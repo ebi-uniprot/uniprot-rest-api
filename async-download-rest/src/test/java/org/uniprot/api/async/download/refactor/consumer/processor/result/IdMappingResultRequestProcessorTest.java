@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 
 public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair<Q>> {
     public static final String CONTENT_TYPE = "application/json";
-    public static final String JOB_ID = "someJobId";
+    public static final String ID = "someId";
     public static final String RESULT_FOLDER = "resultFolder";
     @Mock
     protected IdMappingDownloadRequest request;
@@ -48,7 +48,7 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
     @Test
     void process() throws Exception {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getJobId()).thenReturn(JOB_ID);
+        when(request.getId()).thenReturn(ID);
         when(messageConverterFactory.getOutputWriter(
                         MediaType.APPLICATION_JSON, solrIdResultRequestProcessor.getType()))
                 .thenReturn(outputWriter);
@@ -66,7 +66,7 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
                 .thenReturn(outputStream);
         MockedStatic<Paths> pathsMockedStatic = mockStatic(Paths.class);
         pathsMockedStatic
-                .when(() -> Paths.get(RESULT_FOLDER, JOB_ID + FileType.GZIP.getExtension()))
+                .when(() -> Paths.get(RESULT_FOLDER, ID + FileType.GZIP.getExtension()))
                 .thenReturn(resultPath);
         MockedStatic<Instant> instantMockedStatic = mockStatic(Instant.class);
         instantMockedStatic.when(() -> Instant.now()).thenReturn(instant);
@@ -83,7 +83,7 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
                         gzipOutputStreamMockedConstruction.constructed().get(0),
                         instant,
                         atomicIntegerMockedConstruction.constructed().get(0));
-        verify(heartbeatProducer).stop(JOB_ID);
+        verify(heartbeatProducer).stop(ID);
 
         filesMockedStatic.reset();
         filesMockedStatic.close();
@@ -98,12 +98,12 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
     @Test
     void onMessage_whenExceptionOccurred() {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getJobId()).thenReturn(JOB_ID);
+        when(request.getId()).thenReturn(ID);
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(
                 ResultProcessingException.class, () -> solrIdResultRequestProcessor.process(request));
 
-        verify(heartbeatProducer).stop(JOB_ID);
+        verify(heartbeatProducer).stop(ID);
     }
 }

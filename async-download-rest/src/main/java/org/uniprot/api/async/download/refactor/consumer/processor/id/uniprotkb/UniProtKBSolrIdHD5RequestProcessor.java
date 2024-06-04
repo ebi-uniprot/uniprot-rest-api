@@ -49,12 +49,12 @@ public class UniProtKBSolrIdHD5RequestProcessor
 
         if (solrHits <= maxEntryCount) {
             uniProtKBSolrIdRequestProcessor.process(request);
-            sendMessageToEmbeddingsQueue(request.getJobId());
-            jobService.update(request.getJobId(), Map.of(STATUS, UNFINISHED));
+            sendMessageToEmbeddingsQueue(request.getId());
+            jobService.update(request.getId(), Map.of(STATUS, UNFINISHED));
         } else {
             log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
             jobService.update(
-                    request.getJobId(),
+                    request.getId(),
                     Map.of(
                             STATUS,
                             ABORTED,

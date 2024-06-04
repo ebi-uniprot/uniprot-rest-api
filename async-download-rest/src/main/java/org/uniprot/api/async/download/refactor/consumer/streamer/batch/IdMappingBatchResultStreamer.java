@@ -41,7 +41,7 @@ public abstract class IdMappingBatchResultStreamer<Q, P extends EntryPair<Q>>
                         () ->
                                 log.info(
                                         "Finished streaming entries for job {}",
-                                        request.getJobId()));
+                                        request.getId()));
     }
 
     protected abstract BatchStoreEntryPairIterable<P, Q> getBatchStoreEntryPairIterable(

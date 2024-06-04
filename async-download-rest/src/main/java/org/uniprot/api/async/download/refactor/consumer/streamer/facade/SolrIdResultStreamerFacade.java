@@ -64,7 +64,7 @@ public abstract class SolrIdResultStreamerFacade<T extends DownloadRequest, R ex
 
     private Stream<String> getIds(T request) {
         try {
-            return Files.lines(fileHandler.getIdFile(request.getJobId()));
+            return Files.lines(fileHandler.getIdFile(request.getId()));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
