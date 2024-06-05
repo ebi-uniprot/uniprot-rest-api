@@ -25,14 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class ContentBasedAndRetriableMessageConsumer<
                 T extends DownloadRequest, R extends DownloadJob>
         implements MessageListener {
-    private static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
+    protected static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
-    private static final String JOB_ID_HEADER = "jobId";
+    protected static final String JOB_ID_HEADER = "jobId";
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";
     private static final String PROCESSED_ENTRIES = "processedEntries";
     private static final String STATUS = "status";
-    public static final String RETRY_COUNT = "retryCount";
+    private static final String RETRY_COUNT = "retryCount";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
@@ -54,56 +54,56 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
 
     @Override
     public void onMessage(Message message) {
-        String jobId = null;
+        String id = null;
         try {
-            jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
-            log.info("Received job {} in listener", jobId);
+            id = message.getMessageProperties().getHeader(JOB_ID_HEADER);
+            log.info("Received job {} in listener", id);
 
             if (isMaxRetriedReached(message)) {
-                rejectMessage(message, jobId);
+                rejectMessage(message, id);
             } else {
-                String error = "Unable to find jobId " + jobId + " in db";
+                String error = "Unable to find jobId " + id + " in db";
                 DownloadJob downloadJob =
                         jobService
-                                .find(jobId)
+                                .find(id)
                                 .orElseThrow(() -> new MessageConsumerException(error));
                 cleanIfNecessary(downloadJob);
 
                 // run the job only if it has errored out
-                if (isJobSeenBefore(jobId) && JobStatus.ERROR != downloadJob.getStatus()) {
+                if (isJobSeenBefore(id) && JobStatus.ERROR != downloadJob.getStatus()) {
                     if (downloadJob.getStatus() == JobStatus.RUNNING) {
-                        log.warn("The job {} is running by other thread", jobId);
+                        log.warn("The job {} is running by other thread", id);
                     } else {
-                        log.info("The job {} is already processed", jobId);
+                        log.info("The job {} is already processed", id);
                     }
                 } else {
-                    jobService.update(jobId, Map.of(STATUS, JobStatus.RUNNING));
+                    jobService.update(id, Map.of(STATUS, JobStatus.RUNNING));
                     T request = (T) this.messageConverter.fromMessage(message);
-                    request.setId(jobId);
+                    request.setId(id);
                     requestProcessor.process(request);
-                    jobService.update(jobId, Map.of(STATUS, JobStatus.FINISHED));
-                    log.info("Message with jobId {} processed successfully", jobId);
+                    jobService.update(id, Map.of(STATUS, JobStatus.FINISHED));
+                    log.info("Message with jobId {} processed successfully", id);
                 }
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= messagingService.getMaxRetryCount()) {
-                log.error("Download job id {} failed with error {}", jobId, ex.getMessage());
+                log.error("Download job id {} failed with error {}", id, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
-                        jobId,
+                        id,
                         Map.of(
                                 RETRY_COUNT,
                                 getRetryCount(updatedMessage),
                                 STATUS,
                                 JobStatus.ERROR));
-                log.warn("Sending message for jobId {} to retry queue", jobId);
+                log.warn("Sending message for jobId {} to retry queue", id);
                 messagingService.sendToRetry(updatedMessage);
             } else {
                 // the flow should not come here, letting the flow complete without rethrowing
                 // exception to avoid poison message
                 log.error(
                         "Message with jobId {} failed due to error {} which is not handled",
-                        jobId,
+                        id,
                         ex);
             }
         }
