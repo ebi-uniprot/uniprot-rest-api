@@ -51,6 +51,10 @@ public abstract class AsyncDownloadFileHandler {
         return Files.exists(getResultFile(jobId));
     }
 
+    public boolean areAllFilesExist(String jobId) {
+        return isIdFileExist(jobId) && isResultFileExist(jobId);
+    }
+
     public Path getIdFile(String jobId) {
         return getPath(downloadConfigProperties.getIdFilesFolder(), jobId);
     }

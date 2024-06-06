@@ -2,7 +2,7 @@ package org.uniprot.api.async.download.refactor.consumer.uniprotkb;
 
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.refactor.consumer.ContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.refactor.consumer.processor.uniprotkb.UniProtKBRequestProcessor;
@@ -17,7 +17,7 @@ public class UniProtKBContentBasedAndRetriableMessageConsumer
     public UniProtKBContentBasedAndRetriableMessageConsumer(
             UniProtKBMessagingService messagingService,
             UniProtKBRequestProcessor requestProcessor,
-            UniRefAsyncDownloadFileHandler asyncDownloadFileHandler,
+            UniProtKBAsyncDownloadFileHandler asyncDownloadFileHandler,
             UniProtKBJobService jobService,
             MessageConverter messageConverter) {
         super(

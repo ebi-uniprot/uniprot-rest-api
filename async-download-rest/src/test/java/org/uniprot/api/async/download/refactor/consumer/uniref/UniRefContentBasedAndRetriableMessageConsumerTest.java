@@ -22,6 +22,8 @@ class UniRefContentBasedAndRetriableMessageConsumerTest extends ContentBasedAndR
     @Mock private MessageConverter uniRefMessageConverter;
     @Mock
     private UniRefDownloadRequest uniRefDownloadRequest;
+    @Mock
+    private UniRefDownloadJob uniRefDownloadJob;
 
     @BeforeEach
     void setUp() {
@@ -30,6 +32,8 @@ class UniRefContentBasedAndRetriableMessageConsumerTest extends ContentBasedAndR
         asyncDownloadFileHandler = uniRefAsyncDownloadFileHandler;
         jobService = uniRefJobService;
         messageConverter = uniRefMessageConverter;
+        downloadJob = uniRefDownloadJob;
+        downloadRequest = uniRefDownloadRequest;
         messageConsumer = new UniRefContentBasedAndRetriableMessageConsumer(uniRefMessagingService, uniRefRequestProcessor, uniRefAsyncDownloadFileHandler, uniRefJobService, uniRefMessageConverter);
         mockCommon();
     }

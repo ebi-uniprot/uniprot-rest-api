@@ -1,12 +1,6 @@
 package org.uniprot.api.async.download.refactor.consumer;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -19,20 +13,22 @@ import org.uniprot.api.async.download.refactor.request.DownloadRequest;
 import org.uniprot.api.async.download.refactor.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class ContentBasedAndRetriableMessageConsumer<
-                T extends DownloadRequest, R extends DownloadJob>
+        T extends DownloadRequest, R extends DownloadJob>
         implements MessageListener {
     protected static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     protected static final String JOB_ID_HEADER = "jobId";
-    private static final String UPDATE_COUNT = "updateCount";
-    private static final String UPDATED = "updated";
-    private static final String PROCESSED_ENTRIES = "processedEntries";
-    private static final String STATUS = "status";
-    private static final String RETRY_COUNT = "retryCount";
+    protected static final String UPDATE_COUNT = "updateCount";
+    protected static final String UPDATED = "updated";
+    protected static final String PROCESSED_ENTRIES = "processedEntries";
+    protected static final String STATUS = "status";
+    protected static final String RETRY_COUNT = "retryCount";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
@@ -67,7 +63,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                         jobService
                                 .find(id)
                                 .orElseThrow(() -> new MessageConsumerException(error));
-                cleanIfNecessary(downloadJob);
 
                 // run the job only if it has errored out
                 if (isJobSeenBefore(id) && JobStatus.ERROR != downloadJob.getStatus()) {
@@ -77,6 +72,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                         log.info("The job {} is already processed", id);
                     }
                 } else {
+                    cleanIfNecessary(downloadJob);
                     jobService.update(id, Map.of(STATUS, JobStatus.RUNNING));
                     T request = (T) this.messageConverter.fromMessage(message);
                     request.setId(id);
@@ -110,8 +106,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
     }
 
     private boolean isJobSeenBefore(String jobId) {
-        return asyncDownloadFileHandler.isIdFileExist(jobId)
-                && asyncDownloadFileHandler.isResultFileExist(jobId);
+        return asyncDownloadFileHandler.areAllFilesExist(jobId);
     }
 
     private void cleanIfNecessary(DownloadJob downloadJob) {
@@ -135,12 +130,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
 
     private Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
-        Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
-        if (Objects.nonNull(retryCount)) {
-            retryCount++;
-        } else {
-            retryCount = 1;
-        }
+        int retryCount = (Integer) Optional.ofNullable(message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER)).orElse(0) + 1;
 
         String stackTrace =
                 Arrays.stream(ex.getStackTrace())
