@@ -59,7 +59,8 @@ class UniProtEntryQueryResultsConverterTest {
     @Test
     void canConvertInactiveDeletedDocToEntry() {
         String acc = "P12345";
-        UniProtDocument doc = UniProtDocMocker.createInactiveDoc(acc, "DELETED:SOURCE_DELETION");
+        UniProtDocument doc =
+                UniProtDocMocker.createInactiveDoc(acc, "DELETED:SOURCE_DELETION_EMBL");
         Optional<UniProtKBEntry> uniProtKBEntry = converter.convertDoc(doc, emptyList());
 
         assertThat(uniProtKBEntry).isPresent();
@@ -69,7 +70,23 @@ class UniProtEntryQueryResultsConverterTest {
         assertNotNull(entry.getInactiveReason());
         EntryInactiveReason inactiveReason = entry.getInactiveReason();
         assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
-        assertEquals(DeletedReason.SOURCE_DELETION, inactiveReason.getDeletedReason());
+        assertEquals(DeletedReason.SOURCE_DELETION_EMBL, inactiveReason.getDeletedReason());
+    }
+
+    @Test
+    void canConvertInactiveDeletedUnknownDocToEntry() {
+        String acc = "P12345";
+        UniProtDocument doc = UniProtDocMocker.createInactiveDoc(acc, "DELETED");
+        Optional<UniProtKBEntry> uniProtKBEntry = converter.convertDoc(doc, emptyList());
+
+        assertThat(uniProtKBEntry).isPresent();
+        UniProtKBEntry entry = uniProtKBEntry.get();
+        assertEquals(acc, entry.getPrimaryAccession().getValue());
+        assertEquals(UniProtKBEntryType.INACTIVE, entry.getEntryType());
+        assertNotNull(entry.getInactiveReason());
+        EntryInactiveReason inactiveReason = entry.getInactiveReason();
+        assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
+        assertNull(inactiveReason.getDeletedReason());
     }
 
     @Test

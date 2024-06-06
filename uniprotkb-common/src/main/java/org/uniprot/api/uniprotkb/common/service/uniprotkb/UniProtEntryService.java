@@ -144,7 +144,7 @@ public class UniProtEntryService
     }
 
     @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+    public UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return uniProtQueryProcessorConfig;
     }
 

@@ -214,6 +214,96 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         "Invalid includeIsoform parameter value. Expected true or false")));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"\"HGNC:3689\"", "FGFR2", "3689", "\"hgnc-HGNC:3689\"", "hgnc-3689"})
+    void searchWithHGNCIdAndProperties(String xref) throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=xref:" + xref)
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "embl-joined",
+                "embl-JOINED",
+                "joined",
+                "embl-genomic_dna",
+                "embl-Genomic_DNA",
+                "JOINED",
+                "Genomic_DNA",
+                "genomic_dna"
+            })
+    void searchWithEMBLXrefStatus(String xref) throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=xref:" + xref)
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results[0].primaryAccession", is(acc)));
+    }
+
+    @Test
+    void searchWithPIRSFXrefEntryName() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=xref:pirsf-FGFR")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("P21802")));
+    }
+
     @Test
     void searchWithForwardSlash() throws Exception {
         // given
@@ -591,7 +681,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         "INACTIVE_DROME",
                         InactiveEntryMocker.DELETED,
                         null,
-                        "SOURCE_DELETION");
+                        "SOURCE_DELETION_EMBL");
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
@@ -1086,7 +1176,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(SEARCH_RESOURCE)
-                                        .param("query", "accession:I8FBX2")
+                                        .param("query", "accession:I8FBX1")
                                         .param("fields", "accession")
                                         .header(
                                                 HttpHeaders.ACCEPT,
@@ -1099,7 +1189,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("I8FBX2")))
+                                "$.results.*.primaryAccession", contains("I8FBX1")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.entryType", contains("Inactive")))
@@ -1110,13 +1200,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.deletedReason",
-                                contains(DeletedReason.SOURCE_DELETION.getName())));
+                                contains(DeletedReason.PROTEOME_REDUNDANCY.getName())));
 
         // when search accession by default field, returns only itself
         response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=I8FBX2")
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=I8FBX1")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
@@ -1126,9 +1216,17 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("I8FBX2")));
+                                "$.results[0].primaryAccession", is("I8FBX1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.inactiveReason.deletedReason",
+                                contains(DeletedReason.PROTEOME_REDUNDANCY.getName())));
     }
 
     @Test
@@ -1168,9 +1266,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath(
-                                "$.results.*.inactiveReason.deletedReason",
-                                contains(DeletedReason.SOURCE_DELETION.getName())));
+                        MockMvcResultMatchers.jsonPath("$.results.*.inactiveReason.deletedReason")
+                                .doesNotExist());
 
         // when search accession by default field, returns only itself
         response =
@@ -1188,7 +1285,14 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("I8FBX2")));
+                                "$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.inactiveReason.inactiveReasonType",
+                                contains("DELETED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results.*.inactiveReason.deletedReason")
+                                .doesNotExist());
     }
 
     @Test
@@ -2009,6 +2113,33 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         "Fields 'xref_ensembl_full, xref_kegg_full' are only supported by TSV (text/plain;format=tsv) format.")));
     }
 
+    @Test
+    void searchWhitelistInvalidVGNCIdDefaultSearch() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                        .param("query", "VGNC:sample38517")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.messages.*", contains("'VGNC' is not a valid search field")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -2097,7 +2228,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             "INACTIVE_DROME",
                             InactiveEntryMocker.DELETED,
                             null,
-                            "SOURCE_DELETION");
+                            "SOURCE_DELETION_EMBL");
             getStoreManager()
                     .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 

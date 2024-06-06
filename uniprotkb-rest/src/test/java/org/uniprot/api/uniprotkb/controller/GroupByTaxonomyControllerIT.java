@@ -192,6 +192,19 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
     }
 
     @Test
+    void getGroupBy_Chebi() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
+
+        getMockMvc()
+                .perform(MockMvcRequestBuilders.get(getPath()).param("query", "CHEBI:1234"))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(0)));
+    }
+
+    @Test
     void getGroupByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
@@ -276,6 +289,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
         uniProtDocument.accession = accession;
         uniProtDocument.organismTaxId = organismId;
         uniProtDocument.taxLineageIds = taxonomies;
+        uniProtDocument.chebi.add(CHEBI_ID);
         save(DataStoreManager.StoreType.UNIPROT, uniProtDocument);
     }
 
