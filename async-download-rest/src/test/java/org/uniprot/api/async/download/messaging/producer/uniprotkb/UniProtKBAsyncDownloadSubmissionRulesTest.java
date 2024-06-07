@@ -1,0 +1,31 @@
+package org.uniprot.api.async.download.messaging.producer.uniprotkb;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRulesTest;
+import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
+
+@ExtendWith(MockitoExtension.class)
+class UniProtKBAsyncDownloadSubmissionRulesTest extends AsyncDownloadSubmissionRulesTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    @Mock
+    private UniProtKBJobService uniProtKBJobService;
+    @Mock
+    private UniProtKBDownloadJob uniProtKBDownloadJob;
+    @Mock
+    private UniProtKBDownloadRequest uniProtKBDownloadRequest;
+
+    @BeforeEach
+    void setUp() {
+        jobService = uniProtKBJobService;
+        downloadJob = uniProtKBDownloadJob;
+        downloadRequest = uniProtKBDownloadRequest;
+        asyncDownloadSubmissionRules =
+                new UniProtKBAsyncDownloadSubmissionRules(
+                        MAX_RETRY_COUNT, MAX_WAITING_TIME, uniProtKBJobService);
+        mock();
+    }
+}

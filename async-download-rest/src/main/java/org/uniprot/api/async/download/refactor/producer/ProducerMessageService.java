@@ -28,7 +28,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     private final MessagingService messagingService;
     private final HashGenerator<T> hashGenerator;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
-    private final AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
+    private final AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules;
 
     protected ProducerMessageService(
             JobService<R> jobService,
@@ -36,7 +36,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
             MessagingService messagingService,
             HashGenerator<T> hashGenerator,
             AsyncDownloadFileHandler asyncDownloadFileHandler,
-            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules) {
         this.jobService = jobService;
         this.messageConverter = messageConverter;
         this.messagingService = messagingService;
@@ -48,20 +48,20 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     public String sendMessage(T request) {
         preprocess(request);
 
-        String jobId = this.hashGenerator.generateHash(request);
-        boolean force = request.isForce();
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(jobId, force);
+        String id = this.hashGenerator.generateHash(request);
+        request.setId(id);
+        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(request);
 
         if (jobSubmitFeedback.isAllowed()) {
-            cleanIfNecessary(jobId, force);
-            createDownloadJob(jobId, request);
-            sendMessage(jobId, request);
+            cleanIfNecessary(id, request.isForce());
+            createDownloadJob(id, request);
+            sendMessage(id, request);
         } else {
-            log.info("Job is either being processed or already processed {}", jobId);
-            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getMessage());
+            log.info("Job is either being processed or already processed {}", id);
+            throw new IllegalDownloadJobSubmissionException(id, jobSubmitFeedback.getMessage());
         }
 
-        return jobId;
+        return id;
     }
 
     protected void preprocess(T request) {

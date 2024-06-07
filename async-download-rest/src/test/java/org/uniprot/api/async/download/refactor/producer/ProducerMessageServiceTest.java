@@ -30,7 +30,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     protected MessageConverter messageConverter;
     protected MessagingService messagingService;
     protected AsyncDownloadFileHandler asyncDownloadFileHandler;
-    protected AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
+    protected AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules;
     protected ProducerMessageService<T, R> producerMessageService;
 
     @Test
@@ -39,7 +39,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(true);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(JOB_ID, true)).thenReturn(feedback);
+        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -56,7 +56,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(JOB_ID, false)).thenReturn(feedback);
+        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -72,7 +72,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(JOB_ID, false)).thenReturn(feedback);
+        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -89,7 +89,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(JOB_ID, false)).thenReturn(feedback);
+        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
         doThrow(AmqpException.class).when(messagingService).send(message);
 
         assertThrows(
@@ -106,7 +106,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_whenNotAllowed() {
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(feedback.isAllowed()).thenReturn(false);
-        when(asyncDownloadSubmissionRules.submit(JOB_ID, false)).thenReturn(feedback);
+        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         assertThrows(
                 IllegalDownloadJobSubmissionException.class,
