@@ -2,7 +2,7 @@ package org.uniprot.api.async.download.messaging.result.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatProducer;
+import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatProducer;
 import org.uniprot.api.rest.output.context.FileType;
 
 import java.io.BufferedWriter;

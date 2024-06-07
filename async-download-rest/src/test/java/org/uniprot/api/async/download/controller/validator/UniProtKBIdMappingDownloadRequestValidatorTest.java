@@ -3,7 +3,7 @@ package org.uniprot.api.async.download.controller.validator;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.common.exception.InvalidRequestException;
 
 class UniProtKBIdMappingDownloadRequestValidatorTest {

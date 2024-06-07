@@ -4,8 +4,8 @@ import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadRequestToArrayConverter;
-import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.model.request.IdMappingDownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**

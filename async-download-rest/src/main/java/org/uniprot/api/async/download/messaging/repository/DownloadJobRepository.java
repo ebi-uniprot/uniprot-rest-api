@@ -1,7 +1,7 @@
 package org.uniprot.api.async.download.messaging.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 
 /**
  * @author sahmad

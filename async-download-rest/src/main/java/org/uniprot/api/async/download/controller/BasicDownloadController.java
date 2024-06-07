@@ -5,9 +5,8 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
+import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;

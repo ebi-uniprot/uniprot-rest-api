@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 
 import org.springframework.amqp.core.AmqpAdmin;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 public class RedisUtil {

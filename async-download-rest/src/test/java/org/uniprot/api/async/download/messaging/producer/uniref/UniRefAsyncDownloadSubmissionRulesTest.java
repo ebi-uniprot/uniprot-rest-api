@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRulesTest;
-import org.uniprot.api.async.download.model.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.refactor.request.uniref.UniRefDownloadRequest;
-import org.uniprot.api.async.download.refactor.service.uniref.UniRefJobService;
+import org.uniprot.api.async.download.messaging.producer.AsyncDownloadSubmissionRulesTest;
+import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
+import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 
 @ExtendWith(MockitoExtension.class)
 class UniRefAsyncDownloadSubmissionRulesTest extends AsyncDownloadSubmissionRulesTest<UniRefDownloadRequest, UniRefDownloadJob> {

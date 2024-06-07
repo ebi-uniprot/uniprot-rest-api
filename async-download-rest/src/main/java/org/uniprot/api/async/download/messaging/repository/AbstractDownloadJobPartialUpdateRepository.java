@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.uniprot.api.async.download.model.common.DownloadJob;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 
 public class AbstractDownloadJobPartialUpdateRepository<T extends DownloadJob>
         implements DownloadJobPartialUpdateRepository {

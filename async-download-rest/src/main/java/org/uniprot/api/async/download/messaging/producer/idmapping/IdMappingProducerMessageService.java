@@ -1,0 +1,54 @@
+package org.uniprot.api.async.download.messaging.producer.idmapping;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
+import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.request.HashGenerator;
+
+import java.time.LocalDateTime;
+
+@Component
+@Slf4j
+public class IdMappingProducerMessageService
+        extends ProducerMessageService<IdMappingDownloadRequest, IdMappingDownloadJob> {
+    private final IdMappingJobService jobService;
+
+    protected IdMappingProducerMessageService(
+            IdMappingJobService jobService,
+            MessageConverter messageConverter,
+            IdMappingMessagingService messagingService,
+            HashGenerator<IdMappingDownloadRequest> hashGenerator,
+            IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler,
+            IdMappingAsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+        super(
+                jobService,
+                messageConverter,
+                messagingService,
+                hashGenerator,
+                asyncDownloadFileHandler,
+                asyncDownloadSubmissionRules);
+        this.jobService = jobService;
+    }
+
+    @Override
+    protected void createDownloadJob(String jobId, IdMappingDownloadRequest request) {
+        IdMappingDownloadJob.IdMappingDownloadJobBuilder jobBuilder =
+                IdMappingDownloadJob.builder();
+        LocalDateTime now = LocalDateTime.now();
+        jobBuilder.id(jobId).status(JobStatus.NEW);
+        jobBuilder
+                .fields(request.getFields())
+                .format(request.getFormat())
+                .created(now)
+                .updated(now);
+        this.jobService.save(jobBuilder.build());
+        log.info("Job with jobId {} created in redis", jobId);
+    }
+}

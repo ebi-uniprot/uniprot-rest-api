@@ -2,11 +2,11 @@ package org.uniprot.api.async.download.messaging.producer.idmapping;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
-import org.uniprot.api.async.download.model.common.JobSubmitFeedback;
-import org.uniprot.api.async.download.model.idmapping.IdMappingDownloadJob;
-import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.refactor.service.idmapping.IdMappingJobService;
+import org.uniprot.api.async.download.messaging.producer.AsyncDownloadSubmissionRules;
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
+import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 

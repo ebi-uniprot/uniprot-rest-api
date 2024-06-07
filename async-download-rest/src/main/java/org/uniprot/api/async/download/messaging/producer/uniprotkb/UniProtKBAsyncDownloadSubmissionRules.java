@@ -2,10 +2,10 @@ package org.uniprot.api.async.download.messaging.producer.uniprotkb;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.producer.common.AsyncDownloadSubmissionRules;
-import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
-import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
-import org.uniprot.api.async.download.refactor.service.uniprotkb.UniProtKBJobService;
+import org.uniprot.api.async.download.messaging.producer.AsyncDownloadSubmissionRules;
+import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 
 @Component
 public class UniProtKBAsyncDownloadSubmissionRules extends AsyncDownloadSubmissionRules<UniProtKBDownloadRequest, UniProtKBDownloadJob> {

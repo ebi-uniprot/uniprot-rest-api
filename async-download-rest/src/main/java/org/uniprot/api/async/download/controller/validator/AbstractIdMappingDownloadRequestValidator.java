@@ -3,7 +3,7 @@ package org.uniprot.api.async.download.controller.validator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.uniprot.api.async.download.refactor.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 

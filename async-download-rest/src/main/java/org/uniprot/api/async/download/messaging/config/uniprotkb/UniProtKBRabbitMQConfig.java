@@ -7,10 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
-import org.uniprot.api.async.download.model.common.DownloadRequest;
-import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
-import org.uniprot.api.async.download.refactor.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.refactor.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.messaging.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -102,12 +101,6 @@ public class UniProtKBRabbitMQConfig {
             UniProtKBAsyncDownloadQueueConfigProperties configProps) {
         return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
                 connectionFactory, uniProtKBMessageConsumer, configProps);
-    }
-
-    @Bean //TODO: We need to remove it
-    public HashGenerator<DownloadRequest> uniProtKBHashGenerator(
-            @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
-        return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
     }
 
     @Bean
