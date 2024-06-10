@@ -61,4 +61,35 @@ class UniprotKBMappingRepositoryTest {
 
         assertThrows(QueryRetrievalException.class, () -> repository.getDeletedEntry("P21802"));
     }
+
+    @Test
+    void getDeletedEntryForMergedMappedEntrySuccess() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+        UniprotKBMappingRepository repository = new UniprotKBMappingRepository(solrClient);
+        SolrDocument mergedDocument = new SolrDocument();
+        mergedDocument.put("accession_id", "A0A2T1ATI5");
+        mergedDocument.put("id", "INACTIVE_DROME");
+        mergedDocument.put("active", false);
+        mergedDocument.put("inactive_reason", "MERGED:A0A0D5V897");
+        Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("A0A2T1ATI5")))
+                .thenReturn(mergedDocument);
+
+        SolrDocument deletedDocument = new SolrDocument();
+        deletedDocument.put("accession_id", "A0A0D5V897");
+        deletedDocument.put("id", "INACTIVE_A0A0D5V897");
+        deletedDocument.put("active", false);
+        deletedDocument.put("inactive_reason", "DELETED:PROTEOME_REDUNDANCY");
+        Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("A0A0D5V897")))
+                .thenReturn(deletedDocument);
+
+        UniProtKBEntry result = repository.getDeletedEntry("A0A2T1ATI5");
+        assertNotNull(result);
+        assertEquals("A0A0D5V897", result.getPrimaryAccession().getValue());
+        assertEquals("INACTIVE_A0A0D5V897", result.getUniProtkbId().getValue());
+        assertEquals(UniProtKBEntryType.INACTIVE, result.getEntryType());
+        assertEquals(
+                InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
+        assertEquals(
+                DeletedReason.PROTEOME_REDUNDANCY, result.getInactiveReason().getDeletedReason());
+    }
 }

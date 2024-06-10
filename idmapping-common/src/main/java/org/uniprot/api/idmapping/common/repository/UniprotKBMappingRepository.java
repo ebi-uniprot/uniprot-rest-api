@@ -44,8 +44,12 @@ public class UniprotKBMappingRepository {
                     if (Utils.notNullNotEmpty(document.inactiveReason)) {
                         String[] inactiveReason = document.inactiveReason.split(":");
                         if (inactiveReason.length == 2) {
-                            inactiveReasonBuilder.deletedReason(
-                                    DeletedReason.valueOf(inactiveReason[1].strip()));
+                            if (inactiveReason[0].equals(InactiveReasonType.DELETED.toString())) {
+                                inactiveReasonBuilder.deletedReason(
+                                        DeletedReason.valueOf(inactiveReason[1].strip()));
+                            } else {
+                                return getDeletedEntry(inactiveReason[1].strip());
+                            }
                         }
                     }
                     String id = "";
