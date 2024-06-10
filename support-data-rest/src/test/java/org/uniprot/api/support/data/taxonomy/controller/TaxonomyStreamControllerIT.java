@@ -100,7 +100,7 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
                         .build();
         storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, inactiveDoc);
 
-        return numberOfEntries;
+        return numberOfEntries + 1;
     }
 
     @Override
@@ -175,7 +175,7 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
     }
 
     @Test
-    void inactiveQueryEmptyResults() throws Exception {
+    void inactiveQueryReturnsResults() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
@@ -190,7 +190,8 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].taxonId", is(9999)));
     }
 
     @Test
@@ -210,11 +211,11 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(jsonPath("$.results.size()", is(13)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.taxonId",
-                                contains(9, 8, 7, 6, 5, 4, 3, 2, 12, 11, 10, 1)));
+                                contains(9, 8, 7, 6, 5, 4, 3, 2, 12, 11, 10, 1, 9999)));
     }
 
     @Test
@@ -234,7 +235,7 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(jsonPath("$.results.size()", is(13)))
                 .andExpect(jsonPath("$.results.*.taxonId").exists())
                 .andExpect(jsonPath("$.results.*.mnemonic").exists())
                 .andExpect(jsonPath("$.results.*.rank").exists())
