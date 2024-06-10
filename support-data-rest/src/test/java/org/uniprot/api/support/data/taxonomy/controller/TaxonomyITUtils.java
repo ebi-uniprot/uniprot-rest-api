@@ -44,7 +44,7 @@ public class TaxonomyITUtils {
                         .strainsAdd(new TaxonomyStrainBuilder().name("str name").build())
                         .hostsAdd(new TaxonomyBuilder().taxonId(taxId + 2).build())
                         .linksAdd("link value")
-                        .active(true)
+                        .active(facet)
                         .inactiveReason(new TaxonomyInactiveReasonBuilder().build())
                         .build();
 

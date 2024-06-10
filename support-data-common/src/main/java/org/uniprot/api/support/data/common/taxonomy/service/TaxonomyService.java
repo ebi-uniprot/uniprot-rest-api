@@ -3,16 +3,12 @@ package org.uniprot.api.support.data.common.taxonomy.service;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.rest.request.BasicRequest;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
-import org.uniprot.api.support.data.common.taxonomy.request.GetByTaxonIdsRequest;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -22,7 +18,6 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @Import(TaxonomySolrQueryConfig.class)
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     public static final String TAXONOMY_ID_FIELD = "id";
-    private static final String ACTIVE_FIELD = "active";
     private final UniProtQueryProcessorConfig taxonomyQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RdfStreamer rdfStreamer;
@@ -44,26 +39,6 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
         this.searchFieldConfig = taxonomySearchFieldConfig;
         this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
-    }
-
-    @Override
-    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request,
-            AbstractSolrSortClause solrSortClause,
-            SolrQueryConfig queryBoosts) {
-        SolrRequest.SolrRequestBuilder builder =
-                super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
-
-        if (!(request instanceof GetByTaxonIdsRequest)) {
-            // We do not add active filter query for get by Taxon Ids
-            // Because this endpoint need to return excluded taxon ids
-            builder.filterQuery(getActiveTaxonomyFilterQuery());
-        }
-        return builder;
-    }
-
-    private String getActiveTaxonomyFilterQuery() {
-        return ACTIVE_FIELD + ":true";
     }
 
     public TaxonomyEntry findById(final long taxId) {
