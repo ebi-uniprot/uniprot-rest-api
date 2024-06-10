@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.PathNotFoundException;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.ExtraOptions;
@@ -121,7 +122,11 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                     Object filteredItems = referenceJson.read(filterPath);
 
                     JsonPath setPath = JsonPath.compile(PATH_PREFIX + field.getKey());
-                    referenceJson = referenceJson.set(setPath, filteredItems);
+                    try {
+                        referenceJson = referenceJson.set(setPath, filteredItems);
+                    } catch (PathNotFoundException pnfe) {
+                        logger.debug("Unable to set path " + setPath.getPath());
+                    }
                 }
                 filteredJson = referenceJson.jsonString();
             }
