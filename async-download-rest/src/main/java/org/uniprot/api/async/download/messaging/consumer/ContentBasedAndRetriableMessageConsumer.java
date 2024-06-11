@@ -1,6 +1,11 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -13,15 +18,11 @@ import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.uniprot.api.rest.download.model.JobStatus.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class ContentBasedAndRetriableMessageConsumer<
-        T extends DownloadRequest, R extends DownloadJob>
+                T extends DownloadRequest, R extends DownloadJob>
         implements MessageListener {
     protected static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
@@ -78,7 +79,8 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                     T request = (T) this.messageConverter.fromMessage(message);
                     request.setId(id);
                     requestProcessor.process(request);
-                    if (!UniProtMediaType.HDF5_MEDIA_TYPE.equals(UniProtMediaType.valueOf(request.getFormat()))) {
+                    if (!UniProtMediaType.HDF5_MEDIA_TYPE.equals(
+                            UniProtMediaType.valueOf(request.getFormat()))) {
                         jobService.update(id, Map.of(STATUS, FINISHED, RESULT_FILE, id));
                     }
                     log.info("Message with jobId {} processed successfully", id);
@@ -89,12 +91,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                 log.error("Download job id {} failed with error {}", id, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
-                        id,
-                        Map.of(
-                                RETRY_COUNT,
-                                getRetryCount(updatedMessage),
-                                STATUS,
-                                ERROR));
+                        id, Map.of(RETRY_COUNT, getRetryCount(updatedMessage), STATUS, ERROR));
                 log.warn("Sending message for jobId {} to retry queue", id);
                 messagingService.sendToRetry(updatedMessage);
             } else {
@@ -135,10 +132,10 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
         MessageBuilder builder = MessageBuilder.fromMessage(message);
         int retryCount =
                 (Integer)
-                        Optional.ofNullable(
-                                        message.getMessageProperties()
-                                                .getHeader(CURRENT_RETRIED_COUNT_HEADER))
-                                .orElse(0)
+                                Optional.ofNullable(
+                                                message.getMessageProperties()
+                                                        .getHeader(CURRENT_RETRIED_COUNT_HEADER))
+                                        .orElse(0)
                         + 1;
 
         String stackTrace =

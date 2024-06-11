@@ -44,11 +44,9 @@ public class UniRefProducerMessageServiceIT
 
     @Autowired private UniRefAsyncDownloadFileHandler fileHandler;
 
-    @Autowired
-    private UniRefJobService uniRefJobService;
+    @Autowired private UniRefJobService uniRefJobService;
 
-    @Autowired
-    private UniRefAsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules;
+    @Autowired private UniRefAsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules;
 
     @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
 

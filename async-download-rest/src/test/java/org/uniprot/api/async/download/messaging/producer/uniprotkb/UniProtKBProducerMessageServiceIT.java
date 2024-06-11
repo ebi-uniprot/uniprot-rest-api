@@ -39,11 +39,9 @@ class UniProtKBProducerMessageServiceIT
 
     @Autowired private UniProtKBProducerMessageService service;
 
-    @Autowired
-    private UniProtKBJobService uniProtKBJobService;
+    @Autowired private UniProtKBJobService uniProtKBJobService;
 
-    @Autowired
-    private UniProtKBAsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
+    @Autowired private UniProtKBAsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
 
     @Autowired private UniProtKBDownloadJobRepository jobRepository;
 

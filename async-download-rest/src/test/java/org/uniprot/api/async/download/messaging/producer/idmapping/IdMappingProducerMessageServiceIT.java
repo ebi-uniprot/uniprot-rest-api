@@ -28,20 +28,18 @@ import org.uniprot.api.idmapping.common.service.config.IdMappingConfig;
 @Import({
     IdMappingProducerMessageServiceIT.IdMappingProducerTestConfig.class,
     IdMappingRabbitMQConfig.class,
-    RedisConfigTest.class, IdMappingConfig.class
+    RedisConfigTest.class,
+    IdMappingConfig.class
 })
 class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     @Autowired private IdMappingProducerMessageService service;
 
-    @Autowired
-    private IdMappingJobService idMappingJobService;
+    @Autowired private IdMappingJobService idMappingJobService;
 
-    @Autowired
-    private IdMappingJobCacheService idMappingJobCacheService;
+    @Autowired private IdMappingJobCacheService idMappingJobCacheService;
 
-    @Autowired
-    private IdMappingAsyncDownloadSubmissionRules idMappingAsyncDownloadSubmissionRules;
+    @Autowired private IdMappingAsyncDownloadSubmissionRules idMappingAsyncDownloadSubmissionRules;
 
     @Autowired private IdMappingDownloadJobRepository jobRepository;
 

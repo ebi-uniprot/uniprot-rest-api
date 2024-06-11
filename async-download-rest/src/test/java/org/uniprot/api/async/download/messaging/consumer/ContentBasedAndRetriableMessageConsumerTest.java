@@ -1,5 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.*;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
+import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -15,16 +25,6 @@ import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.*;
-import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
-import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
-
 public abstract class ContentBasedAndRetriableMessageConsumerTest<
         T extends DownloadRequest, R extends DownloadJob> {
     private static final String ID = "someId";
@@ -37,12 +37,9 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
     protected JobService<R> jobService;
     protected MessageConverter messageConverter;
     protected ContentBasedAndRetriableMessageConsumer<T, R> messageConsumer;
-    @Mock
-    private LocalDateTime dateTime;
-    @Mock
-    protected Message message;
-    @Mock
-    private MessageProperties messageProperties;
+    @Mock private LocalDateTime dateTime;
+    @Mock protected Message message;
+    @Mock private MessageProperties messageProperties;
     protected R downloadJob;
     protected T downloadRequest;
 
