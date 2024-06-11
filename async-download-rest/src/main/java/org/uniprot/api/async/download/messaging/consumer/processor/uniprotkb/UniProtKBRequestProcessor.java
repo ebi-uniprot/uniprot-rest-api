@@ -6,29 +6,39 @@ import org.uniprot.api.async.download.messaging.consumer.processor.RequestProces
 import org.uniprot.api.async.download.messaging.consumer.processor.composite.uniprotkb.UniProtKBCompositeRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.id.uniprotkb.UniProtKBSolrIdHD5RequestProcessor;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.rest.output.UniProtMediaType;
+
+import java.util.Map;
+
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Component
 public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDownloadRequest> {
-
+    protected static final String RESULT_FILE = "resultFile";
+    protected static final String STATUS = "status";
     private final UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor;
     private final UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor;
+    private final UniProtKBJobService jobService;
 
     public UniProtKBRequestProcessor(
             UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor,
-            UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor) {
+            UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor, UniProtKBJobService jobService) {
         this.uniProtKBSolrIdHD5RequestProcessor = uniProtKBSolrIdHD5RequestProcessor;
         this.uniProtKBCompositeRequestProcessor = uniProtKBCompositeRequestProcessor;
+        this.jobService = jobService;
     }
 
     @Override
     public void process(UniProtKBDownloadRequest request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
+        jobService.update(request.getId(), Map.of(STATUS, RUNNING));
 
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
             uniProtKBSolrIdHD5RequestProcessor.process(request);
         } else {
             uniProtKBCompositeRequestProcessor.process(request);
+            jobService.update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
         }
     }
 }

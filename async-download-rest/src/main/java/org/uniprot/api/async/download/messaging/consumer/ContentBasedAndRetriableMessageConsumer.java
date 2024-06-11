@@ -1,11 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
-import static org.uniprot.api.rest.download.model.JobStatus.*;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -16,9 +11,13 @@ import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
-import org.uniprot.api.rest.output.UniProtMediaType;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
+import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
 @Slf4j
 public abstract class ContentBasedAndRetriableMessageConsumer<
@@ -75,14 +74,9 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                     }
                 } else {
                     cleanIfNecessary(downloadJob);
-                    jobService.update(id, Map.of(STATUS, RUNNING));
                     T request = (T) this.messageConverter.fromMessage(message);
                     request.setId(id);
                     requestProcessor.process(request);
-                    if (!UniProtMediaType.HDF5_MEDIA_TYPE.equals(
-                            UniProtMediaType.valueOf(request.getFormat()))) {
-                        jobService.update(id, Map.of(STATUS, FINISHED, RESULT_FILE, id));
-                    }
                     log.info("Message with jobId {} processed successfully", id);
                 }
             }

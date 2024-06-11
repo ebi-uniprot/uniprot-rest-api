@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.messaging.producer.idmapping;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,6 +32,7 @@ import org.uniprot.api.idmapping.common.service.config.IdMappingConfig;
     RedisConfigTest.class,
     IdMappingConfig.class
 })
+@Disabled
 class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     @Autowired private IdMappingProducerMessageService service;

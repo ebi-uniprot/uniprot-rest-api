@@ -119,15 +119,12 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(0);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
         when(messageConverter.fromMessage(message)).thenReturn(downloadRequest);
-        when(downloadRequest.getFormat()).thenReturn("application/json");
 
         messageConsumer.onMessage(message);
 
         InOrder inOrder = inOrder(jobService, downloadRequest, requestProcessor);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, RUNNING));
         inOrder.verify(downloadRequest).setId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED, RESULT_FILE, ID));
     }
 
     @Test
@@ -138,7 +135,6 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         when(downloadJob.getRetried()).thenReturn(RETRIES);
         when(downloadJob.getId()).thenReturn(ID);
         when(messageConverter.fromMessage(message)).thenReturn(downloadRequest);
-        when(downloadRequest.getFormat()).thenReturn("application/json");
         MockedStatic<LocalDateTime> localTimeMockedStatic = mockStatic(LocalDateTime.class);
         localTimeMockedStatic.when(LocalDateTime::now).thenReturn(dateTime);
 
@@ -150,10 +146,8 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         inOrder.verify(jobService)
                 .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
         inOrder.verify(asyncDownloadFileHandler).deleteAllFiles(ID);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, RUNNING));
         inOrder.verify(downloadRequest).setId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED, RESULT_FILE, ID));
 
         localTimeMockedStatic.reset();
         localTimeMockedStatic.close();
