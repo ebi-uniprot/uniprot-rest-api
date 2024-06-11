@@ -1,15 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping;
 
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+
+import java.util.Map;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
-
-import java.util.Map;
-
-import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Component
 public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDownloadRequest> {
@@ -22,7 +22,8 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
 
     public IdMappingRequestProcessor(
             IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory,
-            IdMappingJobCacheService idMappingJobCacheService, IdMappingJobService jobService) {
+            IdMappingJobCacheService idMappingJobCacheService,
+            IdMappingJobService jobService) {
         this.idMappingResultRequestProcessorFactory = idMappingResultRequestProcessorFactory;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.jobService = jobService;
@@ -31,7 +32,13 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
     @Override
     public void process(IdMappingDownloadRequest request) {
         IdMappingJob idMappingJob = idMappingJobCacheService.get(request.getJobId());
-        jobService.update(request.getId(), Map.of(STATUS, RUNNING,TOTAL_ENTRIES, (long)(idMappingJob.getIdMappingResult().getMappedIds().size())));
+        jobService.update(
+                request.getId(),
+                Map.of(
+                        STATUS,
+                        RUNNING,
+                        TOTAL_ENTRIES,
+                        (long) (idMappingJob.getIdMappingResult().getMappedIds().size())));
         idMappingResultRequestProcessorFactory
                 .getRequestProcessor(idMappingJob.getIdMappingRequest().getTo())
                 .process(request);

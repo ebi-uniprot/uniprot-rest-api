@@ -1,6 +1,12 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
+import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -12,12 +18,7 @@ import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
-import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class ContentBasedAndRetriableMessageConsumer<

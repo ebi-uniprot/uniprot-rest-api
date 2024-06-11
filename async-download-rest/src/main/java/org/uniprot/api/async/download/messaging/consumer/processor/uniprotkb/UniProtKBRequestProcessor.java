@@ -1,5 +1,9 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.uniprotkb;
 
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+
+import java.util.Map;
+
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
@@ -8,10 +12,6 @@ import org.uniprot.api.async.download.messaging.consumer.processor.id.uniprotkb.
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.rest.output.UniProtMediaType;
-
-import java.util.Map;
-
-import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Component
 public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDownloadRequest> {
@@ -23,7 +23,8 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
 
     public UniProtKBRequestProcessor(
             UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor,
-            UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor, UniProtKBJobService jobService) {
+            UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor,
+            UniProtKBJobService jobService) {
         this.uniProtKBSolrIdHD5RequestProcessor = uniProtKBSolrIdHD5RequestProcessor;
         this.uniProtKBCompositeRequestProcessor = uniProtKBCompositeRequestProcessor;
         this.jobService = jobService;
@@ -38,7 +39,8 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
             uniProtKBSolrIdHD5RequestProcessor.process(request);
         } else {
             uniProtKBCompositeRequestProcessor.process(request);
-            jobService.update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+            jobService.update(
+                    request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
         }
     }
 }

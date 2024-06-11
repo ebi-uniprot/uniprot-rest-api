@@ -1,5 +1,13 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping;
 
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping.IdMappingRequestProcessor.*;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
+import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,40 +23,22 @@ import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping.IdMappingRequestProcessor.*;
-import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
-import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
-
 @ExtendWith(MockitoExtension.class)
 class IdMappingRequestProcessorTest {
     private static final String JOB_ID = "someJobId";
     private static final String TO = "to";
     private static final String ID = "id";
     private static final int SIZE = 5;
-    @Mock
-    private IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory;
-    @Mock
-    private IdMappingJobCacheService idMappingJobCacheService;
-    @Mock
-    private IdMappingJobService idMappingJobService;
-    @InjectMocks
-    private IdMappingRequestProcessor idMappingRequestProcessor;
-    @Mock
-    private IdMappingJob idMappingJob;
-    @Mock
-    private IdMappingDownloadRequest request;
-    @Mock
-    private IdMappingJobRequest idMappingRequest;
-    @Mock
-    private IdMappingResultRequestProcessor requestProcessor;
-    @Mock
-    private IdMappingResult idMappingResult;
-    @Mock
-    private List<IdMappingStringPair> mappedIds;
+    @Mock private IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory;
+    @Mock private IdMappingJobCacheService idMappingJobCacheService;
+    @Mock private IdMappingJobService idMappingJobService;
+    @InjectMocks private IdMappingRequestProcessor idMappingRequestProcessor;
+    @Mock private IdMappingJob idMappingJob;
+    @Mock private IdMappingDownloadRequest request;
+    @Mock private IdMappingJobRequest idMappingRequest;
+    @Mock private IdMappingResultRequestProcessor requestProcessor;
+    @Mock private IdMappingResult idMappingResult;
+    @Mock private List<IdMappingStringPair> mappedIds;
 
     @Test
     void process() {
@@ -66,8 +56,10 @@ class IdMappingRequestProcessorTest {
         idMappingRequestProcessor.process(request);
 
         InOrderImpl inOrder = new InOrderImpl(List.of(idMappingJobService, requestProcessor));
-        inOrder.verify(idMappingJobService).update(ID, Map.of(STATUS, RUNNING,TOTAL_ENTRIES, (long)SIZE));
+        inOrder.verify(idMappingJobService)
+                .update(ID, Map.of(STATUS, RUNNING, TOTAL_ENTRIES, (long) SIZE));
         inOrder.verify(requestProcessor).process(request);
-        inOrder.verify(idMappingJobService).update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+        inOrder.verify(idMappingJobService)
+                .update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
     }
 }
