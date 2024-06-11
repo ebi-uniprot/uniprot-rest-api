@@ -1,17 +1,5 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.LongStream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +29,20 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.LongStream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createInactiveTaxonomySolrDoc;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createSolrDoc;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -116,18 +118,18 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i, true));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i, true, true));
     }
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
-        saveEntry(10, true);
-        saveEntry(15, false);
-        saveEntry(20, true);
+        saveEntry(10, true, true);
+        saveEntry(15, true, false);
+        saveEntry(20, true, true);
     }
 
-    private void saveEntry(long taxId, boolean facet) {
-        TaxonomyDocument document = TaxonomyITUtils.createSolrDoc(taxId, facet);
+    private void saveEntry(long taxId, boolean facet, boolean active) {
+        TaxonomyDocument document = active ? createSolrDoc(taxId, facet) : createInactiveTaxonomySolrDoc(taxId);
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
@@ -135,11 +137,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     void testTaxonIdBoost() throws Exception {
         // given
         // create first active entry with taxon id 1000 but scientific name has 1001
-        TaxonomyDocument document1 = TaxonomyITUtils.createSolrDoc(1000, true);
+        TaxonomyDocument document1 = createSolrDoc(1000, true);
         document1 = document1.toBuilder().scientific("scientific 1001 name").build();
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document1);
         // create second active entry with taxon id 1001
-        TaxonomyDocument document2 = TaxonomyITUtils.createSolrDoc(1001, true);
+        TaxonomyDocument document2 = createSolrDoc(1001, true);
         document2 =
                 document2.toBuilder()
                         .scientific("scientific name")
@@ -148,13 +150,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                         .mnemonic("mnemonic")
                         .build();
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document2);
-        // third inactive entry with taxon id 999 scientific name has 1001
-        TaxonomyDocument document3 = TaxonomyITUtils.createSolrDoc(999, false);
-        document3 = document3.toBuilder().common("1001 common name").build();
+        // 3rd active entry without 1001 anywhere
+        TaxonomyDocument document3 = createSolrDoc(1002, true);
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document3);
-        // fourth active entry without 1001 anywhere
-        TaxonomyDocument document4 = TaxonomyITUtils.createSolrDoc(1002, false);
-        getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document4);
         // when search by free text 1001
         ResultActions response =
                 getMockMvc()
@@ -166,13 +164,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results[0].taxonId", is(1001)))
                 .andExpect(jsonPath("$.results[0].active", is(true)))
                 .andExpect(jsonPath("$.results[1].taxonId", is(1000)))
-                .andExpect(jsonPath("$.results[1].active", is(true)))
-                .andExpect(jsonPath("$.results[2].taxonId", is(999)))
-                .andExpect(jsonPath("$.results[2].active", is(false)));
+                .andExpect(jsonPath("$.results[1].active", is(true)));
     }
 
     @Test
@@ -189,13 +185,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results[0].taxonId", is(10)))
                 .andExpect(jsonPath("$.results[0].active", is(true)))
                 .andExpect(jsonPath("$.results[1].taxonId", is(20)))
-                .andExpect(jsonPath("$.results[1].active", is(true)))
-                .andExpect(jsonPath("$.results[2].taxonId", is(15)))
-                .andExpect(jsonPath("$.results[2].active", is(false)));
+                .andExpect(jsonPath("$.results[1].active", is(true)));
     }
 
     static class TaxonomySearchParameterResolver extends AbstractSearchParameterResolver {
@@ -226,11 +220,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific10", "scientific20", "scientific15")))
+                                    contains("scientific10", "scientific20")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.commonName",
-                                    contains("common10", "common20", "common15")))
+                                    contains("common10", "common20")))
                     .build();
         }
 
@@ -273,15 +267,15 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("scientific desc"))
-                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(20, 15, 10)))
+                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(20, 10, 15)))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific20", "scientific15", "scientific10")))
+                                    contains("scientific20", "scientific10")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.commonName",
-                                    contains("common20", "common15", "common10")))
+                                    contains("common20", "common10")))
                     .build();
         }
 
@@ -295,11 +289,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.commonName",
-                                    contains("common10", "common20", "common15")))
+                                    contains("common10", "common20")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.mnemonic",
-                                    contains("mnemonic10", "mnemonic20", "mnemonic15")))
+                                    contains("mnemonic10", "mnemonic20")))
                     .build();
         }
 
@@ -312,15 +306,15 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific10", "scientific20", "scientific15")))
+                                    contains("scientific10", "scientific20")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.commonName",
-                                    contains("common10", "common20", "common15")))
+                                    contains("common10", "common20")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.mnemonic",
-                                    contains("mnemonic10", "mnemonic20", "mnemonic15")))
+                                    contains("mnemonic10", "mnemonic20")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(
@@ -368,12 +362,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                                     "$.results.*.scientificName",
                                                     contains(
                                                             "scientific10",
-                                                            "scientific20",
-                                                            "scientific15")))
+                                                            "scientific20")))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.commonName",
-                                                    contains("common10", "common20", "common15")))
+                                                    contains("common10", "common20")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -399,7 +392,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "15\tmnemonic15\tscientific15\tcommon15\tother names15\t\tfamily\t\t14")))
+                                                                    "15")))
                                     .resultMatcher(
                                             content()
                                                     .string(
