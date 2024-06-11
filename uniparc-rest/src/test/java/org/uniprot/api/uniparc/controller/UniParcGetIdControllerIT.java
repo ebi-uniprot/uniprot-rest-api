@@ -3,19 +3,25 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -31,6 +37,11 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
+import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.xml.jaxb.uniparc.Entry;
+import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
 /**
  * @author jluo
@@ -69,6 +80,32 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
     void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
+
+    @Test
+    void testGetByUniParcIdWithFieldsThatDoesNotHaveValuesInEntry() throws Exception {
+        // given
+        UniParcEntryConverter converter = new UniParcEntryConverter();
+        UniParcEntry simpleEntry = UniParcEntryMocker.createSimpleEntry(2, "UPI0000083D");
+        String uniparcId = simpleEntry.getUniParcId().getValue();
+        Entry simpleXmlEntry = converter.toXml(simpleEntry);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, simpleXmlEntry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, simpleEntry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(getIdRequestPath(), uniparcId)
+                                        .param("fields", "CDD"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.uniParcId", equalTo(uniparcId)))
+                .andExpect(jsonPath("$.sequenceFeatures").doesNotExist());
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -176,10 +213,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -193,10 +231,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -211,10 +250,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
