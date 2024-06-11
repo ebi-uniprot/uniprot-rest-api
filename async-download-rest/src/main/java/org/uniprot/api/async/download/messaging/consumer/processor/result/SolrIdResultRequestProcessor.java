@@ -23,7 +23,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
-public abstract class SolrIdResultRequestProcessor<T extends DownloadRequest, R extends DownloadJob, S>
+public abstract class SolrIdResultRequestProcessor<
+                T extends DownloadRequest, R extends DownloadJob, S>
         implements RequestProcessor<T> {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;

@@ -1,16 +1,17 @@
 package org.uniprot.api.async.download.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
-import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.messaging.producer.uniref.UniRefProducerMessageService;
+import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -18,12 +19,12 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author tibrahim
@@ -41,7 +42,8 @@ public class UniRefDownloadController extends BasicDownloadController {
 
     public UniRefDownloadController(
             UniRefProducerMessageService uniRefRabbitProducerMessageService,
-            HeartbeatConfig heartbeatConfig, UniRefJobService jobService) {
+            HeartbeatConfig heartbeatConfig,
+            UniRefJobService jobService) {
         super(heartbeatConfig);
         this.messageService = uniRefRabbitProducerMessageService;
         this.jobService = jobService;
@@ -80,8 +82,13 @@ public class UniRefDownloadController extends BasicDownloadController {
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId) {
 
-        UniRefDownloadJob job = this.jobService.find(jobId).orElseThrow(
-                () -> new ResourceNotFoundException("jobId " + jobId + " doesn't exist"));
+        UniRefDownloadJob job =
+                this.jobService
+                        .find(jobId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "jobId " + jobId + " doesn't exist"));
         return getAsyncDownloadStatus(job);
     }
 
@@ -105,8 +112,13 @@ public class UniRefDownloadController extends BasicDownloadController {
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
 
-        UniRefDownloadJob job = this.jobService.find(jobId).orElseThrow(
-                () -> new ResourceNotFoundException("jobId " + jobId + " doesn't exist"));
+        UniRefDownloadJob job =
+                this.jobService
+                        .find(jobId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "jobId " + jobId + " doesn't exist"));
         String requestURL = servletRequest.getRequestURL().toString();
 
         return getDownloadJobDetails(requestURL, job);

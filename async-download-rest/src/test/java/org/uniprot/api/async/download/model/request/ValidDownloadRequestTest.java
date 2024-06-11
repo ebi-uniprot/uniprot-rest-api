@@ -73,7 +73,5 @@ class ValidDownloadRequestTest {
                 String format, ConstraintValidatorContextImpl contextImpl) {
             this.errorMessage = format;
         }
-
-
     }
 }

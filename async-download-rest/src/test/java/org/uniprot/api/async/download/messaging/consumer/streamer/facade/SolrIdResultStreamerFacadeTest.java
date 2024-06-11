@@ -1,5 +1,14 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.facade;
 
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,16 +21,6 @@ import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 
 public abstract class SolrIdResultStreamerFacadeTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
@@ -37,14 +36,10 @@ public abstract class SolrIdResultStreamerFacadeTest<
     protected T downloadRequest;
     protected Stream<S> entryStream;
     private MockedStatic<Files> filesMockedStatic;
-    @Mock
-    private Stream<String> ids;
-    @Mock
-    private Stream<String> rdfStream;
-    @Mock
-    private Stream<String> listStream;
-    @Mock
-    private Path path;
+    @Mock private Stream<String> ids;
+    @Mock private Stream<String> rdfStream;
+    @Mock private Stream<String> listStream;
+    @Mock private Path path;
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
@@ -91,7 +86,8 @@ public abstract class SolrIdResultStreamerFacadeTest<
     @Test
     void getConvertedResult() {
         when(downloadRequest.getFormat()).thenReturn("application/json");
-        when(converterContextFactory.get(solrIdResultStreamerFacade.getResource(), APPLICATION_JSON))
+        when(converterContextFactory.get(
+                        solrIdResultStreamerFacade.getResource(), APPLICATION_JSON))
                 .thenReturn(messageConverterContext);
         when(solrIdBatchResultStreamer.stream(downloadRequest, ids)).thenReturn(entryStream);
 

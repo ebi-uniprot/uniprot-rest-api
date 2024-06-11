@@ -1,5 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -10,24 +20,12 @@ import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.when;
-
 public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>> {
     private static final String ID = "someId";
     protected IdMappingJobService jobService;
     protected IdMappingHeartbeatProducer heartbeatProducer;
-    @Mock
-    private IdMappingDownloadJob job;
-    @Mock
-    private IdMappingDownloadRequest request;
+    @Mock private IdMappingDownloadJob job;
+    @Mock private IdMappingDownloadRequest request;
     protected IdMappingBatchResultStreamer<Q, P> idMappingBatchResultStreamer;
 
     @Test
@@ -35,10 +33,16 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
         mockBatch();
         when(request.getId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
-        List<IdMappingStringPair> idMappingStringPairList = List.of(new IdMappingStringPair("from1", "to1"), new IdMappingStringPair("from2", "to2"), new IdMappingStringPair("from3", "to3"));
+        List<IdMappingStringPair> idMappingStringPairList =
+                List.of(
+                        new IdMappingStringPair("from1", "to1"),
+                        new IdMappingStringPair("from2", "to2"),
+                        new IdMappingStringPair("from3", "to3"));
         Stream<IdMappingStringPair> idMappingPairs = idMappingStringPairList.stream();
 
-        List<P> result = idMappingBatchResultStreamer.stream(request, idMappingPairs).collect(Collectors.toList());
+        List<P> result =
+                idMappingBatchResultStreamer.stream(request, idMappingPairs)
+                        .collect(Collectors.toList());
 
         assertThat(result).hasSameElementsAs(getEntryList());
         InOrder inOrder = inOrder(heartbeatProducer);

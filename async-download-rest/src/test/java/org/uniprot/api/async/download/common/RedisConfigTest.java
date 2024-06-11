@@ -10,10 +10,14 @@ import org.springframework.context.annotation.Bean;
 public class RedisConfigTest {
 
     @Bean(destroyMethod = "shutdown")
-    RedissonClient redisson() {
+    RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://"+System.getProperty("uniprot.redis.host")+":"+System.getProperty("uniprot.redis.port"));
+                .setAddress(
+                        "redis://"
+                                + System.getProperty("uniprot.redis.host")
+                                + ":"
+                                + System.getProperty("uniprot.redis.port"));
         return Redisson.create(config);
     }
 }

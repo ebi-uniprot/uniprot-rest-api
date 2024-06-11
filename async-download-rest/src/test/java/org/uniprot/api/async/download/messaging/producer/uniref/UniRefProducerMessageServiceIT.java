@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.producer.uniref;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -8,52 +10,70 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitMQConfig;
 import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
+import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.common.RedisConfigTest;
-import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
-import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import java.time.LocalDateTime;
-
 @ExtendWith(SpringExtension.class)
-@Import({UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class, UniRefRabbitMQConfig.class, RedisConfigTest.class})
+@Import({
+    UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class,
+    UniRefRabbitMQConfig.class,
+    RedisConfigTest.class
+})
 @EnableConfigurationProperties({UniRefDownloadConfigProperties.class})
-public class UniRefProducerMessageServiceIT extends SolrProducerMessageServiceIT<UniRefDownloadRequest, UniRefDownloadJob> {
+public class UniRefProducerMessageServiceIT
+        extends SolrProducerMessageServiceIT<UniRefDownloadRequest, UniRefDownloadJob> {
+
+    @Autowired private UniRefProducerMessageService service;
+
+    @Autowired private UniRefDownloadJobRepository jobRepository;
+
+    @Autowired private UniRefAsyncDownloadFileHandler fileHandler;
 
     @Autowired
-    private UniRefProducerMessageService service;
+    private UniRefJobService uniRefJobService;
 
     @Autowired
-    UniRefDownloadJobRepository jobRepository;
+    private UniRefAsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules;
 
-    @Autowired
-    UniRefAsyncDownloadFileHandler fileHandler;
+    @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
 
-    @Autowired
-    UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
+    @MockBean private UniRefContentBasedAndRetriableMessageConsumer uniRefConsumer;
 
-    @MockBean
-    private UniRefContentBasedAndRetriableMessageConsumer uniRefConsumer;
-
-    @MockBean
-    private UniProtKBHeartbeatProducer heartBeat;
-
+    @MockBean private UniProtKBHeartbeatProducer heartBeat;
 
     @Override
-    protected UniRefDownloadJob getDownloadJob(String jobId, LocalDateTime idleSince, UniRefDownloadRequest request) {
-        return new UniRefDownloadJob(jobId, JobStatus.RUNNING, null, idleSince, null, 0,request.getQuery(), request.getFields(), request.getSort(),null, request.getFormat(), 100, 10, 1);
+    protected UniRefDownloadJob getDownloadJob(
+            String jobId, LocalDateTime idleSince, UniRefDownloadRequest request) {
+        return new UniRefDownloadJob(
+                jobId,
+                JobStatus.RUNNING,
+                null,
+                idleSince,
+                null,
+                0,
+                request.getQuery(),
+                request.getFields(),
+                request.getSort(),
+                null,
+                request.getFormat(),
+                100,
+                10,
+                1);
     }
 
     @Override
@@ -62,7 +82,8 @@ public class UniRefProducerMessageServiceIT extends SolrProducerMessageServiceIT
     }
 
     @Override
-    protected ContentBasedAndRetriableMessageConsumer<UniRefDownloadRequest, UniRefDownloadJob> getConsumer() {
+    protected ContentBasedAndRetriableMessageConsumer<UniRefDownloadRequest, UniRefDownloadJob>
+            getConsumer() {
         return uniRefConsumer;
     }
 
@@ -117,17 +138,17 @@ public class UniRefProducerMessageServiceIT extends SolrProducerMessageServiceIT
         return uniRefDownloadConfigProperties;
     }
 
-
     @TestConfiguration
-    @ComponentScan({"org.uniprot.api.async.download.messaging.producer.uniref",
-            "org.uniprot.api.async.download.refactor.mq.uniref",
-            "org.uniprot.api.async.download.refactor.service.uniref",
-            "org.uniprot.api.async.download.messaging.consumer.uniref",
-            "org.uniprot.api.async.download.messaging.config.uniref",
-            "org.uniprot.api.async.download.messaging.result.uniref",
-            "org.uniprot.api.async.download.messaging.consumer.common",
-            "org.uniprot.api.async.download.messaging.consumer.heartbeat.uniref",
-            "org.uniprot.api.async.download.messaging.producer.uniref"})
-    static class UniRefProducerTestConfig {
-    }
+    @ComponentScan({
+        "org.uniprot.api.async.download.messaging.producer.uniref",
+        "org.uniprot.api.async.download.mq.uniref",
+        "org.uniprot.api.async.download.service.uniref",
+        "org.uniprot.api.async.download.messaging.consumer.uniref",
+        "org.uniprot.api.async.download.messaging.config.uniref",
+        "org.uniprot.api.async.download.messaging.result.uniref",
+        "org.uniprot.api.async.download.messaging.consumer.common",
+        "org.uniprot.api.async.download.messaging.consumer.heartbeat.uniref",
+        "org.uniprot.api.async.download.messaging.producer.uniref"
+    })
+    static class UniRefProducerTestConfig {}
 }

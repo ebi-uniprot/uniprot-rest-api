@@ -8,9 +8,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
  * @author sahmad
  * @created 22/11/2022
  */
-
 public class QueueConsumerConfigUtils {
-
 
     public static SimpleMessageListenerContainer getSimpleMessageListenerContainer(
             ConnectionFactory connectionFactory,

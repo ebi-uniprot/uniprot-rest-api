@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
+import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.Page;
@@ -66,10 +66,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
 
         verify(uniProtKBMessagingService)
                 .send(
-                        argThat(
-                                msg ->
-                                        ID.equals(
-                                                msg.getMessageProperties().getHeader("jobId"))),
+                        argThat(msg -> ID.equals(msg.getMessageProperties().getHeader("jobId"))),
                         eq(EMBEDDINGS_EXCHANGE),
                         eq(EMBEDDINGS_ROUTING_KEY));
         verify(uniProtKBJobService).update(ID, Map.of(STATUS, UNFINISHED));

@@ -1,5 +1,17 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPOutputStream;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -16,28 +28,15 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.GZIPOutputStream;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-
 public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair<Q>> {
     public static final String CONTENT_TYPE = "application/json";
     public static final String ID = "someId";
     public static final String RESULT_FOLDER = "resultFolder";
-    @Mock
-    protected IdMappingDownloadRequest request;
+    @Mock protected IdMappingDownloadRequest request;
     protected IdMappingDownloadConfigProperties downloadConfigProperties;
     protected IdMappingHeartbeatProducer heartbeatProducer;
-    protected IdMappingResultStreamerFacade<Q,P> solrIdResultStreamerFacade;
-    protected IdMappingResultRequestProcessor<Q,P> solrIdResultRequestProcessor;
+    protected IdMappingResultStreamerFacade<Q, P> solrIdResultStreamerFacade;
+    protected IdMappingResultRequestProcessor<Q, P> solrIdResultRequestProcessor;
     protected UUWMessageConverterFactory messageConverterFactory;
     @Mock private AbstractUUWHttpMessageConverter outputWriter;
     @Mock private MessageConverterContext<P> context;
@@ -102,7 +101,8 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(
-                ResultProcessingException.class, () -> solrIdResultRequestProcessor.process(request));
+                ResultProcessingException.class,
+                () -> solrIdResultRequestProcessor.process(request));
 
         verify(heartbeatProducer).stop(ID);
     }

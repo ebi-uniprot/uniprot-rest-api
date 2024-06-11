@@ -20,7 +20,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @ExtendWith(MockitoExtension.class)
 class UniProtKBSolrIdResultStreamerFacadeTest
         extends SolrIdResultStreamerFacadeTest<
-                                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     @Mock private Stream<UniProtKBEntry> uniProtKBEntryStream;
     @Mock private MessageConverterContext<UniProtKBEntry> uniProtKBEntryMessageConverterContext;
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
@@ -45,7 +45,8 @@ class UniProtKBSolrIdResultStreamerFacadeTest
                         uniProtKBRDFResultStreamer,
                         uniProtKBListResultStreamer,
                         uniProtKBBatchResultStreamer,
-                        uniProtKBConverterContextFactory, uniProtKBAsyncDownloadFileHandler);
+                        uniProtKBConverterContextFactory,
+                        uniProtKBAsyncDownloadFileHandler);
         mock();
     }
 }

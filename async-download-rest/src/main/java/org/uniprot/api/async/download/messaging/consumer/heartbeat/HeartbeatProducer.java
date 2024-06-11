@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.function.LongConsumer;
 
 import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.async.download.service.JobService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-import org.uniprot.api.async.download.service.JobService;
 
 @Slf4j
 public class HeartbeatProducer {
@@ -28,7 +28,8 @@ public class HeartbeatProducer {
     private final HeartbeatConfig heartbeatConfig;
     private final JobService<? extends DownloadJob> jobService;
 
-    public HeartbeatProducer(HeartbeatConfig heartbeatConfig, JobService<? extends DownloadJob> jobRepository) {
+    public HeartbeatProducer(
+            HeartbeatConfig heartbeatConfig, JobService<? extends DownloadJob> jobRepository) {
         this.heartbeatConfig = heartbeatConfig;
         this.jobService = jobRepository;
         this.retryPolicy =

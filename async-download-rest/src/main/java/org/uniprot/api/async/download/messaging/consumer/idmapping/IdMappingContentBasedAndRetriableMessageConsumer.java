@@ -6,13 +6,14 @@ import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriabl
 import org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping.IdMappingRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 
 @Component
 public class IdMappingContentBasedAndRetriableMessageConsumer
-        extends ContentBasedAndRetriableMessageConsumer<IdMappingDownloadRequest, IdMappingDownloadJob> {
+        extends ContentBasedAndRetriableMessageConsumer<
+                IdMappingDownloadRequest, IdMappingDownloadJob> {
     public IdMappingContentBasedAndRetriableMessageConsumer(
             IdMappingMessagingService messagingService,
             IdMappingRequestProcessor requestProcessor,

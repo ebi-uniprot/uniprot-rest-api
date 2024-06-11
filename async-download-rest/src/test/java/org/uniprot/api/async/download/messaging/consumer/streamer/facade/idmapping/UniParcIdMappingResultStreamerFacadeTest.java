@@ -14,17 +14,17 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniparc.UniParcEntry;
 
 @ExtendWith(MockitoExtension.class)
-public class UniParcIdMappingResultStreamerFacadeTest extends IdMappingResultStreamerFacadeTest<UniParcEntry, UniParcEntryPair> {
+public class UniParcIdMappingResultStreamerFacadeTest
+        extends IdMappingResultStreamerFacadeTest<UniParcEntry, UniParcEntryPair> {
+    @Mock private UniParcIdMappingRDFResultStreamer rdfResultStreamer;
+    @Mock private IdMappingListResultStreamer listResultStreamer;
+
     @Mock
-    private UniParcIdMappingRDFResultStreamer rdfResultStreamer;
-    @Mock
-    private IdMappingListResultStreamer listResultStreamer;
-    @Mock
-    private IdMappingBatchResultStreamer<UniParcEntry, UniParcEntryPair> uniParcIdMappingBatchResultStreamer;
-    @Mock
-    private MessageConverterContextFactory<UniParcEntryPair> uniParcConverterContextFactory;
-    @Mock
-    private IdMappingJobCacheService idMappingJobCacheService;
+    private IdMappingBatchResultStreamer<UniParcEntry, UniParcEntryPair>
+            uniParcIdMappingBatchResultStreamer;
+
+    @Mock private MessageConverterContextFactory<UniParcEntryPair> uniParcConverterContextFactory;
+    @Mock private IdMappingJobCacheService idMappingJobCacheService;
 
     @BeforeEach
     void setUp() {
@@ -33,9 +33,13 @@ public class UniParcIdMappingResultStreamerFacadeTest extends IdMappingResultStr
         super.idMappingJobCacheService = idMappingJobCacheService;
         converterContextFactory = uniParcConverterContextFactory;
         idMappingBatchResultStreamer = uniParcIdMappingBatchResultStreamer;
-        idMappingResultStreamerFacade = new UniParcIdMappingResultStreamerFacade(rdfResultStreamer, listResultStreamer, uniParcIdMappingBatchResultStreamer, uniParcConverterContextFactory, idMappingJobCacheService);
+        idMappingResultStreamerFacade =
+                new UniParcIdMappingResultStreamerFacade(
+                        rdfResultStreamer,
+                        listResultStreamer,
+                        uniParcIdMappingBatchResultStreamer,
+                        uniParcConverterContextFactory,
+                        idMappingJobCacheService);
         mock();
     }
-
-
 }

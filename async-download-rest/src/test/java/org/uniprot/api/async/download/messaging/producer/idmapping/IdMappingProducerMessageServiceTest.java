@@ -13,12 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.request.HashGenerator;
 

@@ -18,7 +18,8 @@ import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-public abstract class SolrIdResultStreamerFacade<T extends DownloadRequest, R extends DownloadJob, S> {
+public abstract class SolrIdResultStreamerFacade<
+        T extends DownloadRequest, R extends DownloadJob, S> {
     private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
@@ -35,7 +36,8 @@ public abstract class SolrIdResultStreamerFacade<T extends DownloadRequest, R ex
             RDFResultStreamer<T, R> rdfResultStreamer,
             ListResultStreamer<T, R> listResultStreamer,
             SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer,
-            MessageConverterContextFactory<S> converterContextFactory, AsyncDownloadFileHandler fileHandler) {
+            MessageConverterContextFactory<S> converterContextFactory,
+            AsyncDownloadFileHandler fileHandler) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
         this.solrIdBatchResultStreamer = solrIdBatchResultStreamer;

@@ -20,7 +20,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @ExtendWith(MockitoExtension.class)
 class UniRefSolrIdResultStreamerFacadeTest
         extends SolrIdResultStreamerFacadeTest<
-                                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     @Mock private Stream<UniRefEntryLight> uniRefEntryLightStream;
     @Mock private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;

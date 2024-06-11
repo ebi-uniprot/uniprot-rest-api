@@ -13,9 +13,9 @@ import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBIdMappingResultRequestProcessorTest extends IdMappingResultRequestProcessorTest<UniProtKBEntry, UniProtKBEntryPair> {
-    @Mock
-    private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
+public class UniProtKBIdMappingResultRequestProcessorTest
+        extends IdMappingResultRequestProcessorTest<UniProtKBEntry, UniProtKBEntryPair> {
+    @Mock private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
     @Mock private IdMappingHeartbeatProducer idMappingHeartbeatProducer;
     @Mock private UniProtKBIdMappingResultStreamerFacade uniProtKBIdMappingResultStreamerFacade;
     @Mock private UUWMessageConverterFactory uuwMessageConverterFactory;

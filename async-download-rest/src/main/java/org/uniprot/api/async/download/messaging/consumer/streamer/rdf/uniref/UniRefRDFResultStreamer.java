@@ -16,8 +16,8 @@ public class UniRefRDFResultStreamer
     public UniRefRDFResultStreamer(
             UniRefHeartbeatProducer heartbeatProducer,
             UniRefJobService jobService,
-            RdfStreamer uniProtRdfStreamer) {
-        super(heartbeatProducer, jobService, uniProtRdfStreamer);
+            RdfStreamer uniRefRdfStreamer) {
+        super(heartbeatProducer, jobService, uniRefRdfStreamer);
     }
 
     @Override

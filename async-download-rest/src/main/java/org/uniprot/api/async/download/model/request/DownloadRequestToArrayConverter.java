@@ -3,7 +3,8 @@ package org.uniprot.api.async.download.model.request;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class DownloadRequestToArrayConverter<T extends SolrStreamDownloadRequest> implements Function<T, char[]> {
+public class DownloadRequestToArrayConverter<T extends SolrStreamDownloadRequest>
+        implements Function<T, char[]> {
 
     @Override
     public char[] apply(T request) {

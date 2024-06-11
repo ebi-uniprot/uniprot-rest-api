@@ -1,39 +1,10 @@
 package org.uniprot.api.async.download.controller;
 
-import static java.util.function.Predicate.isEqual;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,11 +69,38 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.jayway.jsonpath.JsonPath;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.isEqual;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {TestConfig.class, AsyncDownloadRestApp.class})
@@ -522,7 +520,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("fields", "accession")
                                 .param("force", "true"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))
@@ -548,7 +546,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("fields", "accession")
                                 .param("force", "true"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))
@@ -573,7 +571,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("fields", "accession")
                                 .param("force", "true"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))
@@ -603,7 +601,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("fields", "accession")
                                 .param("force", "true"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))
@@ -633,7 +631,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("fields", "accession")
                                 .param("force", "true"));
 
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))

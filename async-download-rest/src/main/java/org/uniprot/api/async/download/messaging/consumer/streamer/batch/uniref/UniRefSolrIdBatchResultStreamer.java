@@ -15,7 +15,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @Component
 public class UniRefSolrIdBatchResultStreamer
         extends SolrIdBatchResultStreamer<
-                        UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private final StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig;
 
     public UniRefSolrIdBatchResultStreamer(

@@ -1,5 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result;
 
+import java.io.OutputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPOutputStream;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatProducer;
@@ -12,16 +22,6 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-
-import java.io.OutputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.GZIPOutputStream;
 
 public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
         implements RequestProcessor<IdMappingDownloadRequest> {
@@ -59,7 +59,8 @@ public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
                             StandardOpenOption.TRUNCATE_EXISTING);
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
 
-            MessageConverterContext<P> context = solrIdResultStreamerFacade.getConvertedResult(request);
+            MessageConverterContext<P> context =
+                    solrIdResultStreamerFacade.getConvertedResult(request);
             AbstractUUWHttpMessageConverter<P, Q> outputWriter =
                     (AbstractUUWHttpMessageConverter<P, Q>)
                             uuwMessageConverterFactory.getOutputWriter(contentType, getType());

@@ -80,7 +80,7 @@ public class IdMappingRabbitMQConfig {
                 .with(idMappingUndeliveredQueue.getName());
     }
 
-    //TODO: We need to configure IdMappingConsumer
+    // TODO: We need to configure IdMappingConsumer
     /*@Bean
     public MessageListenerContainer idMappingMessageListenerContainer(
             ConnectionFactory connectionFactory,

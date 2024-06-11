@@ -34,11 +34,7 @@ public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R ext
                         entityCollection ->
                                 heartbeatProducer.createForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
-                .onClose(
-                        () ->
-                                log.info(
-                                        "Finished streaming entries for job {}",
-                                        request.getId()));
+                .onClose(() -> log.info("Finished streaming entries for job {}", request.getId()));
     }
 
     protected abstract Iterable<Collection<P>> getBatchStoreIterable(

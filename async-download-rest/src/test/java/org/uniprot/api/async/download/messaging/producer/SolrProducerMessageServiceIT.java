@@ -1,6 +1,14 @@
 package org.uniprot.api.async.download.messaging.producer;
 
-import junit.framework.AssertionFailedError;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,26 +28,18 @@ import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
+import junit.framework.AssertionFailedError;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadRequest, R extends DownloadJob> extends BasicProducerMessageServiceIT{
+public abstract class SolrProducerMessageServiceIT<
+                T extends SolrStreamDownloadRequest, R extends DownloadJob>
+        extends BasicProducerMessageServiceIT {
 
-    @Autowired
-    MessageConverter converter;
+    @Autowired MessageConverter converter;
 
-    @Captor
-    ArgumentCaptor<Message> messageCaptor;
+    @Captor ArgumentCaptor<Message> messageCaptor;
 
-    @TempDir
-    private Path tempDir;
+    @TempDir private Path tempDir;
 
     @Test
     void sendMessage_withSuccess() {
@@ -48,18 +48,19 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         String jobId = getService().sendMessage(request);
 
         assertEquals("1a9848044d4910bc55dccdaa673f4713d5ab091e", jobId);
-        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
+                .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
-        //Validate cached data
-        DownloadJob downloadJob = getJobRepository().findById(jobId)
-                .orElseThrow(AssertionFailedError::new);
+        // Validate cached data
+        DownloadJob downloadJob =
+                getJobRepository().findById(jobId).orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
     }
 
     @Test
-    void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception{
+    void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         T request = getSuccessDownloadRequestWithForce();
         String jobId = "60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f";
 
@@ -72,21 +73,21 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         String jobIdResult = getService().sendMessage(request);
         assertEquals(jobIdResult, jobId);
 
-        //Validate message received in Listener
-        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        // Validate message received in Listener
+        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
+                .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
-        //Validate cached data is a new Job
-        DownloadJob downloadJob = getJobRepository().findById(jobId)
-                .orElseThrow(AssertionFailedError::new);
+        // Validate cached data is a new Job
+        DownloadJob downloadJob =
+                getJobRepository().findById(jobId).orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
 
-        //Validate idle job files were deleted
+        // Validate idle job files were deleted
         assertFalse(getFileHandler().isIdFileExist(jobId));
         assertFalse(getFileHandler().isResultFileExist(jobId));
     }
-
 
     protected abstract R getDownloadJob(String jobId, LocalDateTime idleSince, T request);
 
@@ -98,8 +99,13 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         R runningJob = getDownloadJob(jobId, LocalDateTime.now(), request);
         getJobRepository().save(runningJob);
 
-        IllegalDownloadJobSubmissionException submitionError = assertThrows(IllegalDownloadJobSubmissionException.class, () -> getService().sendMessage(request));
-        assertEquals("Job with id "+ jobId +" has already been submitted", submitionError.getMessage());
+        IllegalDownloadJobSubmissionException submitionError =
+                assertThrows(
+                        IllegalDownloadJobSubmissionException.class,
+                        () -> getService().sendMessage(request));
+        assertEquals(
+                "Job with id " + jobId + " has already been submitted",
+                submitionError.getMessage());
     }
 
     @Test
@@ -111,14 +117,15 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         assertEquals(jobId, resultJobId);
         request.setFormat("json");
 
-        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
+                .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
     }
 
     protected abstract DownloadJobRepository<R> getJobRepository();
 
-    protected abstract ContentBasedAndRetriableMessageConsumer<T,R> getConsumer();
+    protected abstract ContentBasedAndRetriableMessageConsumer<T, R> getConsumer();
 
     protected abstract T getSuccessDownloadRequest();
 
@@ -128,13 +135,14 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
 
     protected abstract T getWithoutFormatRequest();
 
-    protected abstract SolrProducerMessageService<T,R> getService();
+    protected abstract SolrProducerMessageService<T, R> getService();
 
     protected abstract AsyncDownloadFileHandler getFileHandler();
 
     protected abstract DownloadConfigProperties getDownloadConfigProperties();
 
-    protected static void validateDownloadJob(String jobId, DownloadJob downloadJob, SolrStreamDownloadRequest request) {
+    protected static void validateDownloadJob(
+            String jobId, DownloadJob downloadJob, SolrStreamDownloadRequest request) {
         assertEquals(jobId, downloadJob.getId());
         assertEquals(JobStatus.NEW, downloadJob.getStatus());
         assertNotNull(downloadJob.getCreated());
@@ -151,7 +159,8 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         assertEquals(0, downloadJob.getUpdateCount());
     }
 
-    protected void validateMessage(Message message, String jobId, SolrStreamDownloadRequest request) {
+    protected void validateMessage(
+            Message message, String jobId, SolrStreamDownloadRequest request) {
         assertNotNull(message);
         assertNotNull(message.getMessageProperties());
         MessageProperties messageValues = message.getMessageProperties();
@@ -159,22 +168,30 @@ public abstract class SolrProducerMessageServiceIT<T extends SolrStreamDownloadR
         assertEquals("UTF-8", messageValues.getContentEncoding());
         assertNotNull(messageValues.getHeaders().get("jobId"));
 
-        //Validate Message Header data
+        // Validate Message Header data
         String jobFromHeader = (String) messageValues.getHeaders().get("jobId");
         assertEquals(jobId, jobFromHeader);
 
-        //Validate received UniProtKBDownloadRequest from Message
-        SolrStreamDownloadRequest submittedRequest = (SolrStreamDownloadRequest) converter.fromMessage(message);
+        // Validate received UniProtKBDownloadRequest from Message
+        SolrStreamDownloadRequest submittedRequest =
+                (SolrStreamDownloadRequest) converter.fromMessage(message);
         assertEquals(request, submittedRequest);
     }
 
     protected void createJobFiles(String jobId) throws IOException {
-        getDownloadConfigProperties().setIdFilesFolder(tempDir + File.separator + getDownloadConfigProperties().getIdFilesFolder());
-        getDownloadConfigProperties().setResultFilesFolder(tempDir + File.separator +  getDownloadConfigProperties().getResultFilesFolder());
+        getDownloadConfigProperties()
+                .setIdFilesFolder(
+                        tempDir
+                                + File.separator
+                                + getDownloadConfigProperties().getIdFilesFolder());
+        getDownloadConfigProperties()
+                .setResultFilesFolder(
+                        tempDir
+                                + File.separator
+                                + getDownloadConfigProperties().getResultFilesFolder());
         Files.createDirectories(Path.of(getDownloadConfigProperties().getIdFilesFolder()));
         Files.createDirectories(Path.of(getDownloadConfigProperties().getResultFilesFolder()));
         assertTrue(getFileHandler().getIdFile(jobId).toFile().createNewFile());
         assertTrue(getFileHandler().getResultFile(jobId).toFile().createNewFile());
     }
-
 }

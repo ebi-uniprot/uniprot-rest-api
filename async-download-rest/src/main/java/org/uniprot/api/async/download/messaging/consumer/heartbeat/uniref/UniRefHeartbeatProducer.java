@@ -7,8 +7,7 @@ import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 
 @Component
 public class UniRefHeartbeatProducer extends HeartbeatProducer {
-    public UniRefHeartbeatProducer(
-            HeartbeatConfig heartbeatConfig, UniRefJobService jobService) {
+    public UniRefHeartbeatProducer(HeartbeatConfig heartbeatConfig, UniRefJobService jobService) {
         super(heartbeatConfig, jobService);
     }
 }

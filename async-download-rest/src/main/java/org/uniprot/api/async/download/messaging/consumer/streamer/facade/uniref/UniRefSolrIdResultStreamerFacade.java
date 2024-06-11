@@ -16,14 +16,21 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 public class UniRefSolrIdResultStreamerFacade
-        extends SolrIdResultStreamerFacade<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+        extends SolrIdResultStreamerFacade<
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
 
     public UniRefSolrIdResultStreamerFacade(
             UniRefRDFResultStreamer rdfResultStreamer,
             UniRefListResultStreamer listResultStreamer,
             UniRefSolrIdBatchResultStreamer batchResultStreamer,
-            MessageConverterContextFactory<UniRefEntryLight> converterContextFactory, UniRefAsyncDownloadFileHandler fileHandler) {
-        super(rdfResultStreamer, listResultStreamer, batchResultStreamer, converterContextFactory, fileHandler);
+            MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
+            UniRefAsyncDownloadFileHandler fileHandler) {
+        super(
+                rdfResultStreamer,
+                listResultStreamer,
+                batchResultStreamer,
+                converterContextFactory,
+                fileHandler);
     }
 
     @Override

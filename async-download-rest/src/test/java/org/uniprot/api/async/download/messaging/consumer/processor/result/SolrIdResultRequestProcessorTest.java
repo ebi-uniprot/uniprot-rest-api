@@ -1,5 +1,17 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPOutputStream;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -15,18 +27,6 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.zip.GZIPOutputStream;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 public abstract class SolrIdResultRequestProcessorTest<
         T extends DownloadRequest, R extends DownloadJob, S> {
@@ -102,7 +102,8 @@ public abstract class SolrIdResultRequestProcessorTest<
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(
-                ResultProcessingException.class, () -> solrIdResultRequestProcessor.process(request));
+                ResultProcessingException.class,
+                () -> solrIdResultRequestProcessor.process(request));
 
         verify(heartbeatProducer).stop(ID);
     }

@@ -52,9 +52,7 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
 
     public MessageConverterContext<P> getConvertedResult(IdMappingDownloadRequest request) {
         IdMappingJob idMappingJobInput =
-                Optional.ofNullable(
-                                idMappingJobCacheService.getJobAsResource(
-                                        request.getJobId()))
+                Optional.ofNullable(idMappingJobCacheService.getJobAsResource(request.getJobId()))
                         .orElseThrow(
                                 () ->
                                         new IllegalArgumentException(

@@ -8,7 +8,8 @@ import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 
 @Component
-public class UniRefAsyncDownloadSubmissionRules extends AsyncDownloadSubmissionRules<UniRefDownloadRequest, UniRefDownloadJob> {
+public class UniRefAsyncDownloadSubmissionRules
+        extends AsyncDownloadSubmissionRules<UniRefDownloadRequest, UniRefDownloadJob> {
     public UniRefAsyncDownloadSubmissionRules(
             @Value("${async.download.uniref.retryMaxCount}") int maxRetryCount,
             @Value("${async.download.uniref.waitingMaxTime}") int maxWaitingTime,

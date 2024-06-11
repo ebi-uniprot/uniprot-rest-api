@@ -1,20 +1,21 @@
 package org.uniprot.api.async.download.messaging.producer;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.model.JobSubmitFeedback;
-import org.uniprot.api.async.download.model.request.DownloadRequest;
-import org.uniprot.api.async.download.service.JobService;
-import org.uniprot.api.rest.download.model.JobStatus;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-public abstract class AsyncDownloadSubmissionRulesTest<T extends DownloadRequest, R extends DownloadJob> {
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
+import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.service.JobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+public abstract class AsyncDownloadSubmissionRulesTest<
+        T extends DownloadRequest, R extends DownloadJob> {
     protected static final int MAX_RETRY_COUNT = 3;
     protected static final int MAX_WAITING_TIME = 10;
     protected static final String ID = "someId";

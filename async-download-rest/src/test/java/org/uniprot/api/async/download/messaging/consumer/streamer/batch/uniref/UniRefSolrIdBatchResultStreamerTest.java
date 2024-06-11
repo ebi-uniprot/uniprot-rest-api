@@ -26,7 +26,7 @@ import net.jodah.failsafe.RetryPolicy;
 @ExtendWith(MockitoExtension.class)
 public class UniRefSolrIdBatchResultStreamerTest
         extends SolrIdBatchResultStreamerTest<
-                        UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private static final int BATCH_SIZE = 2;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
     @Mock private UniRefDownloadJob uniRefDownloadJob;

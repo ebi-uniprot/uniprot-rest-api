@@ -135,9 +135,7 @@ class HeartbeatProducerTest {
     void createForResults_whenExceptionsOccurs() {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getResultsInterval()).thenReturn(50L);
-        doThrow(RuntimeException.class)
-                .when(jobService)
-                .update(any(String.class), any(Map.class));
+        doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
         assertDoesNotThrow(() -> heartBeatProducer.createForResults(downloadJob, 70));
@@ -177,9 +175,7 @@ class HeartbeatProducerTest {
     void createForIds_whenExceptionsOccurs() {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
-        doThrow(RuntimeException.class)
-                .when(jobService)
-                .update(any(String.class), any(Map.class));
+        doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
         assertDoesNotThrow(() -> heartBeatProducer.createForIds(downloadJob));

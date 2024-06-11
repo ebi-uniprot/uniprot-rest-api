@@ -8,7 +8,8 @@ import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadR
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 
 @Component
-public class UniProtKBAsyncDownloadSubmissionRules extends AsyncDownloadSubmissionRules<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+public class UniProtKBAsyncDownloadSubmissionRules
+        extends AsyncDownloadSubmissionRules<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     public UniProtKBAsyncDownloadSubmissionRules(
             @Value("${async.download.uniprotkb.retryMaxCount}") int maxRetryCount,
             @Value("${async.download.uniprotkb.waitingMaxTime}") int maxWaitingTime,

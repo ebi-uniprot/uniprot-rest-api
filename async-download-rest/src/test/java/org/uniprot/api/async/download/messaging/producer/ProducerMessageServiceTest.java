@@ -11,10 +11,10 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
-import org.uniprot.api.async.download.mq.MessagingService;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -29,7 +29,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     protected MessageConverter messageConverter;
     protected MessagingService messagingService;
     protected AsyncDownloadFileHandler asyncDownloadFileHandler;
-    protected AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules;
+    protected AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules;
     protected ProducerMessageService<T, R> producerMessageService;
 
     @Test

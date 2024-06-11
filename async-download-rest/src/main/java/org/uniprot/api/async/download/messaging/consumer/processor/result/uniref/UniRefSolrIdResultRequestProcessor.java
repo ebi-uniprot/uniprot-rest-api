@@ -16,7 +16,8 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 public class UniRefSolrIdResultRequestProcessor
-        extends SolrIdResultRequestProcessor<UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+        extends SolrIdResultRequestProcessor<
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     private static final Type type =
             (new ParameterizedTypeReference<MessageConverterContext<UniRefEntryLight>>() {})
                     .getType();

@@ -1,7 +1,6 @@
 package org.uniprot.api.async.download.model.request;
 
 import lombok.Data;
-import org.uniprot.api.async.download.model.request.DownloadRequest;
 
 @Data
 public class FakeDownloadRequest implements DownloadRequest {

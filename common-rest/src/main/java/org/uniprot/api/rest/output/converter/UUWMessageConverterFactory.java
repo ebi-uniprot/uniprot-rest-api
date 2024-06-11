@@ -6,14 +6,15 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
 @Component
 public class UUWMessageConverterFactory {
     private final List<HttpMessageConverter<?>> messageConverters;
 
-    public UUWMessageConverterFactory(List<HttpMessageConverter<?>> messageConverters) {
-        this.messageConverters = messageConverters;
+    public UUWMessageConverterFactory(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        this.messageConverters = requestMappingHandlerAdapter.getMessageConverters();
     }
 
     public AbstractUUWHttpMessageConverter<?, ?> getOutputWriter(MediaType contentType, Type type) {

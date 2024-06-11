@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping;
 
+import java.lang.reflect.Type;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
@@ -11,17 +13,24 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniparc.UniParcEntry;
 
-import java.lang.reflect.Type;
-
 @Component
-public class UniParcIdMappingResultRequestProcessor extends IdMappingResultRequestProcessor<UniParcEntry, UniParcEntryPair> {
-    protected UniParcIdMappingResultRequestProcessor(IdMappingDownloadConfigProperties downloadConfigProperties, IdMappingHeartbeatProducer heartbeatProducer, UniParcIdMappingResultStreamerFacade resultStreamerFacade, UUWMessageConverterFactory uuwMessageConverterFactory) {
-        super(downloadConfigProperties, heartbeatProducer, resultStreamerFacade, uuwMessageConverterFactory);
+public class UniParcIdMappingResultRequestProcessor
+        extends IdMappingResultRequestProcessor<UniParcEntry, UniParcEntryPair> {
+    protected UniParcIdMappingResultRequestProcessor(
+            IdMappingDownloadConfigProperties downloadConfigProperties,
+            IdMappingHeartbeatProducer heartbeatProducer,
+            UniParcIdMappingResultStreamerFacade resultStreamerFacade,
+            UUWMessageConverterFactory uuwMessageConverterFactory) {
+        super(
+                downloadConfigProperties,
+                heartbeatProducer,
+                resultStreamerFacade,
+                uuwMessageConverterFactory);
     }
 
     @Override
     protected Type getType() {
-        return new ParameterizedTypeReference<MessageConverterContext<UniParcEntryPair>>() {
-        }.getType();
+        return new ParameterizedTypeReference<
+                MessageConverterContext<UniParcEntryPair>>() {}.getType();
     }
 }

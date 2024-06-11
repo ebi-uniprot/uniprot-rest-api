@@ -1,5 +1,11 @@
 package org.uniprot.api.async.download.messaging.producer;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.nio.file.Path;
+
+import javax.annotation.PreDestroy;
+
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,11 +23,6 @@ import org.uniprot.api.async.download.messaging.config.common.RabbitMQConfigs;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
 
-import javax.annotation.PreDestroy;
-import java.nio.file.Path;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import({MessageProducerConfig.class, RedisConfiguration.class, RabbitMQConfigs.class})
 @EnableConfigurationProperties({HeartbeatConfig.class})
@@ -31,8 +32,7 @@ public abstract class BasicProducerMessageServiceIT {
     private static final String REDIS_IMAGE_VERSION = "redis:6-alpine";
     private static final String RABBITMQ_IMAGE_VERSION = "rabbitmq:3-management";
 
-    @TempDir
-    private Path tempDir;
+    @TempDir private Path tempDir;
 
     @Container
     private static GenericContainer redisServer =
@@ -58,8 +58,7 @@ public abstract class BasicProducerMessageServiceIT {
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
         propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
         System.setProperty("uniprot.redis.host", redisServer.getHost());
-        System.setProperty(
-                "uniprot.redis.port", String.valueOf(redisServer.getFirstMappedPort()));
+        System.setProperty("uniprot.redis.port", String.valueOf(redisServer.getFirstMappedPort()));
         propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
     }
 }

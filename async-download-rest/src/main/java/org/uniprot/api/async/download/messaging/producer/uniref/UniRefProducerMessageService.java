@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
-import org.uniprot.api.async.download.mq.uniref.UniRefMessagingService;
-import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.mq.uniref.UniRefMessagingService;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.HashGenerator;

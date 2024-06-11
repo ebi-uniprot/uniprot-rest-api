@@ -9,10 +9,10 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
-import org.uniprot.api.async.download.mq.MessagingService;
+import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -27,7 +27,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     private final MessagingService messagingService;
     private final HashGenerator<T> hashGenerator;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
-    private final AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules;
+    private final AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules;
 
     protected ProducerMessageService(
             JobService<R> jobService,
@@ -35,7 +35,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
             MessagingService messagingService,
             HashGenerator<T> hashGenerator,
             AsyncDownloadFileHandler asyncDownloadFileHandler,
-            AsyncDownloadSubmissionRules<T,R> asyncDownloadSubmissionRules) {
+            AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules) {
         this.jobService = jobService;
         this.messageConverter = messageConverter;
         this.messagingService = messagingService;

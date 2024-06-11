@@ -17,7 +17,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Component
 public class UniProtKBSolrIdResultRequestProcessor
         extends SolrIdResultRequestProcessor<
-                                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private static final Type type =
             (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {})
                     .getType();

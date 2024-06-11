@@ -14,17 +14,17 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 @ExtendWith(MockitoExtension.class)
-public class UniRefIdMappingResultStreamerFacadeTest extends IdMappingResultStreamerFacadeTest<UniRefEntryLight, UniRefEntryPair> {
+public class UniRefIdMappingResultStreamerFacadeTest
+        extends IdMappingResultStreamerFacadeTest<UniRefEntryLight, UniRefEntryPair> {
+    @Mock private UniRefIdMappingRDFResultStreamer rdfResultStreamer;
+    @Mock private IdMappingListResultStreamer listResultStreamer;
+
     @Mock
-    private UniRefIdMappingRDFResultStreamer rdfResultStreamer;
-    @Mock
-    private IdMappingListResultStreamer listResultStreamer;
-    @Mock
-    private IdMappingBatchResultStreamer<UniRefEntryLight, UniRefEntryPair> uniRefIdMappingBatchResultStreamer;
-    @Mock
-    private MessageConverterContextFactory<UniRefEntryPair> uniRefConverterContextFactory;
-    @Mock
-    private IdMappingJobCacheService idMappingJobCacheService;
+    private IdMappingBatchResultStreamer<UniRefEntryLight, UniRefEntryPair>
+            uniRefIdMappingBatchResultStreamer;
+
+    @Mock private MessageConverterContextFactory<UniRefEntryPair> uniRefConverterContextFactory;
+    @Mock private IdMappingJobCacheService idMappingJobCacheService;
 
     @BeforeEach
     void setUp() {
@@ -33,9 +33,13 @@ public class UniRefIdMappingResultStreamerFacadeTest extends IdMappingResultStre
         super.idMappingJobCacheService = idMappingJobCacheService;
         converterContextFactory = uniRefConverterContextFactory;
         idMappingBatchResultStreamer = uniRefIdMappingBatchResultStreamer;
-        idMappingResultStreamerFacade = new UniRefIdMappingResultStreamerFacade(rdfResultStreamer, listResultStreamer, uniRefIdMappingBatchResultStreamer, uniRefConverterContextFactory, idMappingJobCacheService);
+        idMappingResultStreamerFacade =
+                new UniRefIdMappingResultStreamerFacade(
+                        rdfResultStreamer,
+                        listResultStreamer,
+                        uniRefIdMappingBatchResultStreamer,
+                        uniRefConverterContextFactory,
+                        idMappingJobCacheService);
         mock();
     }
-
-
 }

@@ -1,6 +1,11 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch.idmapping;
 
-import net.jodah.failsafe.RetryPolicy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,31 +20,20 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryIdBuilder;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
-import java.util.List;
-import java.util.stream.StreamSupport;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-class UniRefIdMappingBatchResultStreamerTest extends IdMappingBatchResultStreamerTest<UniRefEntryLight, UniRefEntryPair> {
+class UniRefIdMappingBatchResultStreamerTest
+        extends IdMappingBatchResultStreamerTest<UniRefEntryLight, UniRefEntryPair> {
     public static final int BATCH_SIZE = 2;
-    @Mock
-    private StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig;
-    @Mock
-    private UniRefEntryLight uniRef1;
-    @Mock
-    private UniRefEntryLight uniRef2;
-    @Mock
-    private UniRefEntryLight uniRef3;
-    @Mock
-    private StreamerConfigProperties streamerConfigProperties;
-    @Mock
-    private UniProtStoreClient<UniRefEntryLight> storeClient;
-    @Mock
-    protected IdMappingJobService idMappingJobService;
-    @Mock
-    protected IdMappingHeartbeatProducer idMappingHeartbeatProducer;
+    @Mock private StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig;
+    @Mock private UniRefEntryLight uniRef1;
+    @Mock private UniRefEntryLight uniRef2;
+    @Mock private UniRefEntryLight uniRef3;
+    @Mock private StreamerConfigProperties streamerConfigProperties;
+    @Mock private UniProtStoreClient<UniRefEntryLight> storeClient;
+    @Mock protected IdMappingJobService idMappingJobService;
+    @Mock protected IdMappingHeartbeatProducer idMappingHeartbeatProducer;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +46,10 @@ class UniRefIdMappingBatchResultStreamerTest extends IdMappingBatchResultStreame
 
     @Override
     protected Iterable<UniRefEntryPair> getEntryList() {
-        return List.of(UniRefEntryPair.builder().from("from1").to(uniRef1).build(), UniRefEntryPair.builder().from("from2").to(uniRef2).build(), UniRefEntryPair.builder().from("from3").to(uniRef3).build());
+        return List.of(
+                UniRefEntryPair.builder().from("from1").to(uniRef1).build(),
+                UniRefEntryPair.builder().from("from2").to(uniRef2).build(),
+                UniRefEntryPair.builder().from("from3").to(uniRef3).build());
     }
 
     @Override
@@ -68,7 +65,8 @@ class UniRefIdMappingBatchResultStreamerTest extends IdMappingBatchResultStreame
                 .thenAnswer(
                         inv -> {
                             Iterable<String> strings = inv.getArgument(0);
-                            List<String> args = StreamSupport.stream(strings.spliterator(), false).toList();
+                            List<String> args =
+                                    StreamSupport.stream(strings.spliterator(), false).toList();
                             if (List.of("to1", "to2").containsAll(args) && args.size() == 2) {
                                 return List.of(uniRef1, uniRef2);
                             }

@@ -1,9 +1,9 @@
 package org.uniprot.api.async.download.model.request;
 
-import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-
 import java.util.Objects;
 import java.util.function.Function;
+
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 
 public class IdMappingDownloadRequestToArrayConverter
         implements Function<IdMappingDownloadRequest, char[]> {

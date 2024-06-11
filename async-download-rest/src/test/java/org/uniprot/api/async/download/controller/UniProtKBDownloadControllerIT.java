@@ -43,8 +43,8 @@ import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -160,8 +160,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String errMsg =
                 String.format(
                         "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
-                        this.maxEntryCount,
-                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
+                        this.maxEntryCount, UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         String query = "key:value";
         DownloadJob job =
                 builder.id(jobId)
@@ -202,8 +201,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String errMsg =
                 String.format(
                         "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
-                        this.maxEntryCount,
-                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
+                        this.maxEntryCount, UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         DownloadJob job =
                 builder.id(jobId)
                         .status(JobStatus.ABORTED)

@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.facade.idmapping;
 
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappingBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.IdMappingResultStreamerFacade;
@@ -10,13 +12,23 @@ import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
-
 @Component
-public class UniProtKBIdMappingResultStreamerFacade extends IdMappingResultStreamerFacade<UniProtKBEntry, UniProtKBEntryPair> {
+public class UniProtKBIdMappingResultStreamerFacade
+        extends IdMappingResultStreamerFacade<UniProtKBEntry, UniProtKBEntryPair> {
 
-    protected UniProtKBIdMappingResultStreamerFacade(UniProtKBIdMappingRDFResultStreamer idMappingRdfStreamer, IdMappingListResultStreamer listResultStreamer, IdMappingBatchResultStreamer<UniProtKBEntry, UniProtKBEntryPair> solrIdBatchResultStreamer, MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory, IdMappingJobCacheService idMappingJobCacheService) {
-        super(idMappingRdfStreamer, listResultStreamer, solrIdBatchResultStreamer, converterContextFactory, idMappingJobCacheService);
+    protected UniProtKBIdMappingResultStreamerFacade(
+            UniProtKBIdMappingRDFResultStreamer idMappingRdfStreamer,
+            IdMappingListResultStreamer listResultStreamer,
+            IdMappingBatchResultStreamer<UniProtKBEntry, UniProtKBEntryPair>
+                    solrIdBatchResultStreamer,
+            MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
+            IdMappingJobCacheService idMappingJobCacheService) {
+        super(
+                idMappingRdfStreamer,
+                listResultStreamer,
+                solrIdBatchResultStreamer,
+                converterContextFactory,
+                idMappingJobCacheService);
     }
 
     @Override

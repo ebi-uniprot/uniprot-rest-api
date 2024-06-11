@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
-import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 

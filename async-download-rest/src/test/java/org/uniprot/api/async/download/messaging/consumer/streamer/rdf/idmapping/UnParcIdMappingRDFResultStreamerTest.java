@@ -25,6 +25,7 @@ class UnParcIdMappingRDFResultStreamerTest
         heartbeatProducer = idMappingHeartbeatProducer;
         jobService = idMappingJobService;
         rdfResultStreamer =
-                new UniParcIdMappingRDFResultStreamer(idMappingHeartbeatProducer, idMappingJobService, rdfStreamer);
+                new UniParcIdMappingRDFResultStreamer(
+                        idMappingHeartbeatProducer, idMappingJobService, rdfStreamer);
     }
 }

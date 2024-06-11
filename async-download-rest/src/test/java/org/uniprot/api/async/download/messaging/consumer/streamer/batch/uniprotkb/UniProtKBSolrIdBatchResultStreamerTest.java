@@ -29,7 +29,7 @@ import net.jodah.failsafe.RetryPolicy;
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBSolrIdBatchResultStreamerTest
         extends SolrIdBatchResultStreamerTest<
-                        UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private static final int BATCH_SIZE = 2;
     public static final boolean ADD_LINEAGE = false;
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;

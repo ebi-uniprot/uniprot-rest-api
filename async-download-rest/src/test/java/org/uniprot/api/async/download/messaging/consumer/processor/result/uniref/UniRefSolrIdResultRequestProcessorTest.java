@@ -16,7 +16,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @ExtendWith(MockitoExtension.class)
 public class UniRefSolrIdResultRequestProcessorTest
         extends SolrIdResultRequestProcessorTest<
-                                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
+                UniRefDownloadRequest, UniRefDownloadJob, UniRefEntryLight> {
     @Mock private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
     @Mock private UniRefHeartbeatProducer uniRefHeartbeatProducer;
     @Mock private UniRefSolrIdResultStreamerFacade uniRefResultStreamerFacade;

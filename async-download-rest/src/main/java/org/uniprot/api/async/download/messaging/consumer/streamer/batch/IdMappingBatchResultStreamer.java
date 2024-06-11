@@ -1,6 +1,10 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.ResultStreamer;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
@@ -10,10 +14,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.store.BatchStoreEntryPairIterable;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class IdMappingBatchResultStreamer<Q, P extends EntryPair<Q>>
@@ -34,14 +35,10 @@ public abstract class IdMappingBatchResultStreamer<Q, P extends EntryPair<Q>>
                 getBatchStoreEntryPairIterable(ids.iterator(), request);
         return StreamSupport.stream(batchStoreEntryPairIterable.spliterator(), false)
                 .peek(
-                        entityCollection -> heartbeatProducer.createForResults(
-                                job, entityCollection.size()))
+                        entityCollection ->
+                                heartbeatProducer.createForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
-                .onClose(
-                        () ->
-                                log.info(
-                                        "Finished streaming entries for job {}",
-                                        request.getId()));
+                .onClose(() -> log.info("Finished streaming entries for job {}", request.getId()));
     }
 
     protected abstract BatchStoreEntryPairIterable<P, Q> getBatchStoreEntryPairIterable(

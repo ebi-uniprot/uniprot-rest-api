@@ -1,6 +1,11 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch.idmapping;
 
-import net.jodah.failsafe.RetryPolicy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,35 +22,22 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBAccessionBuilder;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
-import java.util.List;
-import java.util.stream.StreamSupport;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBIdMappingBatchResultStreamerTest extends IdMappingBatchResultStreamerTest<UniProtKBEntry, UniProtKBEntryPair> {
+class UniProtKBIdMappingBatchResultStreamerTest
+        extends IdMappingBatchResultStreamerTest<UniProtKBEntry, UniProtKBEntryPair> {
     public static final int BATCH_SIZE = 2;
-    @Mock
-    private StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;
-    @Mock
-    private UniProtKBEntry uniProtKB1;
-    @Mock
-    private UniProtKBEntry uniProtKB2;
-    @Mock
-    private UniProtKBEntry uniProtKB3;
-    @Mock
-    private StreamerConfigProperties streamerConfigProperties;
-    @Mock
-    private UniProtStoreClient<UniProtKBEntry> storeClient;
-    @Mock
-    protected IdMappingJobService idMappingJobService;
-    @Mock
-    protected IdMappingHeartbeatProducer idMappingHeartbeatProducer;
-    @Mock
-    private TaxonomyLineageService lineageService;
-    @Mock
-    private UniprotKBMappingRepository uniprotKBMappingRepository;
+    @Mock private StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;
+    @Mock private UniProtKBEntry uniProtKB1;
+    @Mock private UniProtKBEntry uniProtKB2;
+    @Mock private UniProtKBEntry uniProtKB3;
+    @Mock private StreamerConfigProperties streamerConfigProperties;
+    @Mock private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Mock protected IdMappingJobService idMappingJobService;
+    @Mock protected IdMappingHeartbeatProducer idMappingHeartbeatProducer;
+    @Mock private TaxonomyLineageService lineageService;
+    @Mock private UniprotKBMappingRepository uniprotKBMappingRepository;
 
     @BeforeEach
     void setUp() {
@@ -53,19 +45,29 @@ class UniProtKBIdMappingBatchResultStreamerTest extends IdMappingBatchResultStre
         jobService = idMappingJobService;
         idMappingBatchResultStreamer =
                 new UniProtKBIdMappingBatchResultStreamer(
-                        idMappingHeartbeatProducer, idMappingJobService, storeStreamerConfig, lineageService, uniprotKBMappingRepository);
+                        idMappingHeartbeatProducer,
+                        idMappingJobService,
+                        storeStreamerConfig,
+                        lineageService,
+                        uniprotKBMappingRepository);
     }
 
     @Override
     protected Iterable<UniProtKBEntryPair> getEntryList() {
-        return List.of(UniProtKBEntryPair.builder().from("from1").to(uniProtKB1).build(), UniProtKBEntryPair.builder().from("from2").to(uniProtKB2).build(), UniProtKBEntryPair.builder().from("from3").to(uniProtKB3).build());
+        return List.of(
+                UniProtKBEntryPair.builder().from("from1").to(uniProtKB1).build(),
+                UniProtKBEntryPair.builder().from("from2").to(uniProtKB2).build(),
+                UniProtKBEntryPair.builder().from("from3").to(uniProtKB3).build());
     }
 
     @Override
     protected void mockBatch() {
-        when(uniProtKB1.getPrimaryAccession()).thenReturn(new UniProtKBAccessionBuilder("to1").build());
-        when(uniProtKB2.getPrimaryAccession()).thenReturn(new UniProtKBAccessionBuilder("to2").build());
-        when(uniProtKB3.getPrimaryAccession()).thenReturn(new UniProtKBAccessionBuilder("to3").build());
+        when(uniProtKB1.getPrimaryAccession())
+                .thenReturn(new UniProtKBAccessionBuilder("to1").build());
+        when(uniProtKB2.getPrimaryAccession())
+                .thenReturn(new UniProtKBAccessionBuilder("to2").build());
+        when(uniProtKB3.getPrimaryAccession())
+                .thenReturn(new UniProtKBAccessionBuilder("to3").build());
         when(storeStreamerConfig.getStreamConfig()).thenReturn(streamerConfigProperties);
         when(streamerConfigProperties.getStoreBatchSize()).thenReturn(BATCH_SIZE);
         when(storeStreamerConfig.getStoreFetchRetryPolicy()).thenReturn(new RetryPolicy<>());
@@ -74,7 +76,8 @@ class UniProtKBIdMappingBatchResultStreamerTest extends IdMappingBatchResultStre
                 .thenAnswer(
                         inv -> {
                             Iterable<String> strings = inv.getArgument(0);
-                            List<String> args = StreamSupport.stream(strings.spliterator(), false).toList();
+                            List<String> args =
+                                    StreamSupport.stream(strings.spliterator(), false).toList();
                             if (List.of("to1", "to2").containsAll(args) && args.size() == 2) {
                                 return List.of(uniProtKB1, uniProtKB2);
                             }

@@ -16,7 +16,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBSolrIdResultRequestProcessorTest
         extends SolrIdResultRequestProcessorTest<
-                                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     @Mock private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
     @Mock private UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer;
     @Mock private UniProtKBSolrIdResultStreamerFacade uniProtKBResultStreamerFacade;

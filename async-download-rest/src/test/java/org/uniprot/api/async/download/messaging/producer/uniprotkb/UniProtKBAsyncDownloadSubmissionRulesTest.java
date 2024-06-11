@@ -10,13 +10,11 @@ import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadR
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBAsyncDownloadSubmissionRulesTest extends AsyncDownloadSubmissionRulesTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    @Mock
-    private UniProtKBJobService uniProtKBJobService;
-    @Mock
-    private UniProtKBDownloadJob uniProtKBDownloadJob;
-    @Mock
-    private UniProtKBDownloadRequest uniProtKBDownloadRequest;
+class UniProtKBAsyncDownloadSubmissionRulesTest
+        extends AsyncDownloadSubmissionRulesTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
+    @Mock private UniProtKBJobService uniProtKBJobService;
+    @Mock private UniProtKBDownloadJob uniProtKBDownloadJob;
+    @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
 
     @BeforeEach
     void setUp() {

@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.service.JobService;
 
 public abstract class JobServiceTest<T extends DownloadJob> {
     public static final String ID = "id";

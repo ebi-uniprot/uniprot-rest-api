@@ -10,13 +10,11 @@ import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 
 @ExtendWith(MockitoExtension.class)
-class UniRefAsyncDownloadSubmissionRulesTest extends AsyncDownloadSubmissionRulesTest<UniRefDownloadRequest, UniRefDownloadJob> {
-    @Mock
-    private UniRefJobService uniRefJobService;
-    @Mock
-    private UniRefDownloadJob uniRefDownloadJob;
-    @Mock
-    private UniRefDownloadRequest uniRefDownloadRequest;
+class UniRefAsyncDownloadSubmissionRulesTest
+        extends AsyncDownloadSubmissionRulesTest<UniRefDownloadRequest, UniRefDownloadJob> {
+    @Mock private UniRefJobService uniRefJobService;
+    @Mock private UniRefDownloadJob uniRefDownloadJob;
+    @Mock private UniRefDownloadRequest uniRefDownloadRequest;
 
     @BeforeEach
     void setUp() {

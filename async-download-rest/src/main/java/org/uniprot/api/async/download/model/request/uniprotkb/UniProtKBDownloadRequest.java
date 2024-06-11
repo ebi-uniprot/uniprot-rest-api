@@ -5,8 +5,8 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_EXA
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
+import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;

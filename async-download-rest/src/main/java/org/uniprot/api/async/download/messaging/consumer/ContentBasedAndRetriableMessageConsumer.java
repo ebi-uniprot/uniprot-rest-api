@@ -8,14 +8,16 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
-import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.output.UniProtMediaType;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Slf4j
 public abstract class ContentBasedAndRetriableMessageConsumer<
@@ -29,6 +31,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
     protected static final String PROCESSED_ENTRIES = "processedEntries";
     protected static final String STATUS = "status";
     protected static final String RETRY_COUNT = "retryCount";
+    public static final String RESULT_FILE = "resultFile";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
@@ -60,24 +63,24 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
             } else {
                 String error = "Unable to find jobId " + id + " in db";
                 DownloadJob downloadJob =
-                        jobService
-                                .find(id)
-                                .orElseThrow(() -> new MessageConsumerException(error));
+                        jobService.find(id).orElseThrow(() -> new MessageConsumerException(error));
 
                 // run the job only if it has errored out
-                if (isJobSeenBefore(id) && JobStatus.ERROR != downloadJob.getStatus()) {
-                    if (downloadJob.getStatus() == JobStatus.RUNNING) {
+                if (isJobSeenBefore(id) && ERROR != downloadJob.getStatus()) {
+                    if (downloadJob.getStatus() == RUNNING) {
                         log.warn("The job {} is running by other thread", id);
                     } else {
                         log.info("The job {} is already processed", id);
                     }
                 } else {
                     cleanIfNecessary(downloadJob);
-                    jobService.update(id, Map.of(STATUS, JobStatus.RUNNING));
+                    jobService.update(id, Map.of(STATUS, RUNNING));
                     T request = (T) this.messageConverter.fromMessage(message);
                     request.setId(id);
                     requestProcessor.process(request);
-                    jobService.update(id, Map.of(STATUS, JobStatus.FINISHED));
+                    if (!UniProtMediaType.HDF5_MEDIA_TYPE.equals(UniProtMediaType.valueOf(request.getFormat()))) {
+                        jobService.update(id, Map.of(STATUS, FINISHED, RESULT_FILE, id));
+                    }
                     log.info("Message with jobId {} processed successfully", id);
                 }
             }
@@ -91,7 +94,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                                 RETRY_COUNT,
                                 getRetryCount(updatedMessage),
                                 STATUS,
-                                JobStatus.ERROR));
+                                ERROR));
                 log.warn("Sending message for jobId {} to retry queue", id);
                 messagingService.sendToRetry(updatedMessage);
             } else {
@@ -130,7 +133,13 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
 
     private Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
-        int retryCount = (Integer) Optional.ofNullable(message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER)).orElse(0) + 1;
+        int retryCount =
+                (Integer)
+                        Optional.ofNullable(
+                                        message.getMessageProperties()
+                                                .getHeader(CURRENT_RETRIED_COUNT_HEADER))
+                                .orElse(0)
+                        + 1;
 
         String stackTrace =
                 Arrays.stream(ex.getStackTrace())

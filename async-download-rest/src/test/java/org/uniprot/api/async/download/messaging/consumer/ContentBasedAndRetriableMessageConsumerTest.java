@@ -10,8 +10,8 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -25,7 +25,8 @@ import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndR
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
-public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends DownloadRequest, R extends DownloadJob> {
+public abstract class ContentBasedAndRetriableMessageConsumerTest<
+        T extends DownloadRequest, R extends DownloadJob> {
     private static final String ID = "someId";
     private static final int RETRIES = 7;
     private static final int RETRIES_EXCEEDED = 17;
@@ -54,19 +55,16 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends Down
     @Test
     void onMessage_maxRetriesDone() {
         when(messageProperties.getHeader(JOB_ID_HEADER)).thenReturn(ID);
-        when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(RETRIES_EXCEEDED);
+        when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER))
+                .thenReturn(RETRIES_EXCEEDED);
         MockedStatic<LocalDateTime> localTimeMockedStatic = mockStatic(LocalDateTime.class);
         localTimeMockedStatic.when(LocalDateTime::now).thenReturn(dateTime);
 
         messageConsumer.onMessage(message);
 
         verify(messagingService).sendToRejected(message);
-        verify(jobService).update(ID, Map.of(
-                UPDATE_COUNT,
-                0L,
-                UPDATED,
-                dateTime,
-                PROCESSED_ENTRIES, 0L));
+        verify(jobService)
+                .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
         verify(asyncDownloadFileHandler).deleteAllFiles(ID);
 
         localTimeMockedStatic.reset();
@@ -108,12 +106,14 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends Down
 
         messageConsumer.onMessage(message);
 
-        verify(jobService).update(ID, Map.of(
-                RETRY_COUNT,
-                8,
-                STATUS,
-                JobStatus.ERROR));
-        verify(messagingService).sendToRetry(argThat(msg -> msg.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER).equals(RETRIES + 1)));
+        verify(jobService).update(ID, Map.of(RETRY_COUNT, 8, STATUS, JobStatus.ERROR));
+        verify(messagingService)
+                .sendToRetry(
+                        argThat(
+                                msg ->
+                                        msg.getMessageProperties()
+                                                .getHeader(CURRENT_RETRIED_COUNT_HEADER)
+                                                .equals(RETRIES + 1)));
     }
 
     @Test
@@ -122,6 +122,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends Down
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(0);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
         when(messageConverter.fromMessage(message)).thenReturn(downloadRequest);
+        when(downloadRequest.getFormat()).thenReturn("application/json");
 
         messageConsumer.onMessage(message);
 
@@ -129,7 +130,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends Down
         inOrder.verify(jobService).update(ID, Map.of(STATUS, RUNNING));
         inOrder.verify(downloadRequest).setId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED));
+        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED, RESULT_FILE, ID));
     }
 
     @Test
@@ -140,28 +141,24 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<T extends Down
         when(downloadJob.getRetried()).thenReturn(RETRIES);
         when(downloadJob.getId()).thenReturn(ID);
         when(messageConverter.fromMessage(message)).thenReturn(downloadRequest);
+        when(downloadRequest.getFormat()).thenReturn("application/json");
         MockedStatic<LocalDateTime> localTimeMockedStatic = mockStatic(LocalDateTime.class);
         localTimeMockedStatic.when(LocalDateTime::now).thenReturn(dateTime);
 
         messageConsumer.onMessage(message);
 
-        InOrder inOrder = inOrder(jobService, asyncDownloadFileHandler, downloadRequest, requestProcessor);
+        InOrder inOrder =
+                inOrder(jobService, asyncDownloadFileHandler, downloadRequest, requestProcessor);
         inOrder.verify(jobService).find(ID);
-        inOrder.verify(jobService).update(ID, Map.of(
-                UPDATE_COUNT,
-                0L,
-                UPDATED,
-                dateTime,
-                PROCESSED_ENTRIES, 0L));
+        inOrder.verify(jobService)
+                .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
         inOrder.verify(asyncDownloadFileHandler).deleteAllFiles(ID);
         inOrder.verify(jobService).update(ID, Map.of(STATUS, RUNNING));
         inOrder.verify(downloadRequest).setId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
-        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED));
+        inOrder.verify(jobService).update(ID, Map.of(STATUS, JobStatus.FINISHED, RESULT_FILE, ID));
 
         localTimeMockedStatic.reset();
         localTimeMockedStatic.close();
     }
-
-
 }

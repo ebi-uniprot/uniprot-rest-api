@@ -11,7 +11,9 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
     private final IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory;
     private final IdMappingJobCacheService idMappingJobCacheService;
 
-    public IdMappingRequestProcessor(IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory, IdMappingJobCacheService idMappingJobCacheService) {
+    public IdMappingRequestProcessor(
+            IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory,
+            IdMappingJobCacheService idMappingJobCacheService) {
         this.idMappingResultRequestProcessorFactory = idMappingResultRequestProcessorFactory;
         this.idMappingJobCacheService = idMappingJobCacheService;
     }
@@ -19,6 +21,8 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
     @Override
     public void process(IdMappingDownloadRequest request) {
         IdMappingJob idMappingJob = idMappingJobCacheService.get(request.getJobId());
-        idMappingResultRequestProcessorFactory.getRequestProcessor(idMappingJob.getIdMappingRequest().getTo()).process(request);
+        idMappingResultRequestProcessorFactory
+                .getRequestProcessor(idMappingJob.getIdMappingRequest().getTo())
+                .process(request);
     }
 }

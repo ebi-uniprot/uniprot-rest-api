@@ -1,16 +1,17 @@
 package org.uniprot.api.async.download.messaging.producer;
 
-import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.model.JobSubmitFeedback;
-import org.uniprot.api.async.download.model.request.DownloadRequest;
-import org.uniprot.api.async.download.service.JobService;
-import org.uniprot.api.rest.download.model.JobStatus;
-
 import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public abstract class AsyncDownloadSubmissionRules<T extends DownloadRequest, R extends DownloadJob> {
+import org.uniprot.api.async.download.model.JobSubmitFeedback;
+import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.service.JobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+public abstract class AsyncDownloadSubmissionRules<
+        T extends DownloadRequest, R extends DownloadJob> {
     private final int maxRetryCount;
     private final int maxWaitingTime;
     private final JobService<R> downloadJobRepository;
@@ -35,8 +36,7 @@ public abstract class AsyncDownloadSubmissionRules<T extends DownloadRequest, R 
 
                 if (EnumSet.of(JobStatus.NEW, JobStatus.UNFINISHED).contains(downloadJobStatus)) {
                     return new JobSubmitFeedback(
-                            false,
-                            String.format("Job with id %s has already been submitted", id));
+                            false, String.format("Job with id %s has already been submitted", id));
                 }
                 if (JobStatus.ABORTED.equals(downloadJobStatus)) {
                     return new JobSubmitFeedback(
@@ -49,8 +49,7 @@ public abstract class AsyncDownloadSubmissionRules<T extends DownloadRequest, R 
                     return new JobSubmitFeedback(
                             false,
                             String.format(
-                                    "Job with id %s has already been finished successfully.",
-                                    id));
+                                    "Job with id %s has already been finished successfully.", id));
                 }
                 if (JobStatus.ERROR.equals(downloadJobStatus)
                         && maxRetryCountNotFinished(downloadJob)) {
@@ -60,8 +59,7 @@ public abstract class AsyncDownloadSubmissionRules<T extends DownloadRequest, R 
                 if (EnumSet.of(JobStatus.RUNNING, JobStatus.PROCESSING).contains(downloadJobStatus)
                         && maxWaitingTimeNotElapsed(downloadJob)) {
                     return new JobSubmitFeedback(
-                            false,
-                            String.format("Job with id %s is already running and live", id));
+                            false, String.format("Job with id %s is already running and live", id));
                 }
             }
         }

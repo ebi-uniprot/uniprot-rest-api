@@ -18,7 +18,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Component
 public class UniProtKBSolrIdBatchResultStreamer
         extends SolrIdBatchResultStreamer<
-                        UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
     private final UniProtEntryService service;
     private final TaxonomyLineageService lineageService;
     private final StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;

@@ -17,14 +17,20 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Component
 public class UniProtKBSolrIdResultStreamerFacade
         extends SolrIdResultStreamerFacade<
-                                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
+                UniProtKBDownloadRequest, UniProtKBDownloadJob, UniProtKBEntry> {
 
     public UniProtKBSolrIdResultStreamerFacade(
             UniProtKBRDFResultStreamer rdfResultStreamer,
             UniProtKBListResultStreamer listResultStreamer,
             UniProtKBSolrIdBatchResultStreamer batchResultStreamer,
-            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory, UniProtKBAsyncDownloadFileHandler fileHandler) {
-        super(rdfResultStreamer, listResultStreamer, batchResultStreamer, converterContextFactory, fileHandler);
+            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
+            UniProtKBAsyncDownloadFileHandler fileHandler) {
+        super(
+                rdfResultStreamer,
+                listResultStreamer,
+                batchResultStreamer,
+                converterContextFactory,
+                fileHandler);
     }
 
     @Override
