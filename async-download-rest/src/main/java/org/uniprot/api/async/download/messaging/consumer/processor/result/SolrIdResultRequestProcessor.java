@@ -24,17 +24,17 @@ import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
 public abstract class SolrIdResultRequestProcessor<
-                T extends DownloadRequest, R extends DownloadJob, S>
+                T extends DownloadRequest, R extends DownloadJob, U>
         implements RequestProcessor<T> {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
-    private final SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
+    private final SolrIdResultStreamerFacade<T, R, U> solrIdResultStreamerFacade;
     private final UUWMessageConverterFactory uuwMessageConverterFactory;
 
     protected SolrIdResultRequestProcessor(
             DownloadConfigProperties downloadConfigProperties,
             HeartbeatProducer heartbeatProducer,
-            SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade,
+            SolrIdResultStreamerFacade<T, R, U> solrIdResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.heartbeatProducer = heartbeatProducer;
@@ -60,10 +60,10 @@ public abstract class SolrIdResultRequestProcessor<
                             StandardOpenOption.TRUNCATE_EXISTING);
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
 
-            MessageConverterContext<S> context =
+            MessageConverterContext<U> context =
                     solrIdResultStreamerFacade.getConvertedResult(request);
-            AbstractUUWHttpMessageConverter<S, S> outputWriter =
-                    (AbstractUUWHttpMessageConverter<S, S>)
+            AbstractUUWHttpMessageConverter<U, U> outputWriter =
+                    (AbstractUUWHttpMessageConverter<U, U>)
                             uuwMessageConverterFactory.getOutputWriter(contentType, getType());
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());

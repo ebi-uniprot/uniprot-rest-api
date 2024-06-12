@@ -23,17 +23,17 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 
-public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
+public abstract class IdMappingResultRequestProcessor<U, V extends EntryPair<U>>
         implements RequestProcessor<IdMappingDownloadRequest> {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
-    private final IdMappingResultStreamerFacade<Q, P> solrIdResultStreamerFacade;
+    private final IdMappingResultStreamerFacade<U, V> solrIdResultStreamerFacade;
     private final UUWMessageConverterFactory uuwMessageConverterFactory;
 
     protected IdMappingResultRequestProcessor(
             DownloadConfigProperties downloadConfigProperties,
             HeartbeatProducer heartbeatProducer,
-            IdMappingResultStreamerFacade<Q, P> solrIdResultStreamerFacade,
+            IdMappingResultStreamerFacade<U, V> solrIdResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.heartbeatProducer = heartbeatProducer;
@@ -59,10 +59,10 @@ public abstract class IdMappingResultRequestProcessor<Q, P extends EntryPair<Q>>
                             StandardOpenOption.TRUNCATE_EXISTING);
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream);
 
-            MessageConverterContext<P> context =
+            MessageConverterContext<V> context =
                     solrIdResultStreamerFacade.getConvertedResult(request);
-            AbstractUUWHttpMessageConverter<P, Q> outputWriter =
-                    (AbstractUUWHttpMessageConverter<P, Q>)
+            AbstractUUWHttpMessageConverter<V, U> outputWriter =
+                    (AbstractUUWHttpMessageConverter<V, U>)
                             uuwMessageConverterFactory.getOutputWriter(contentType, getType());
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());

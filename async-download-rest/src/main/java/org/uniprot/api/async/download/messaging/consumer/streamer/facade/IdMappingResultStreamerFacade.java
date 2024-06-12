@@ -24,18 +24,18 @@ import static org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDF
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
-public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
+public abstract class IdMappingResultStreamerFacade<U, V extends EntryPair<U>> {
     private final IdMappingRDFStreamer rdfResultStreamer;
     private final IdMappingListResultStreamer listResultStreamer;
-    private final IdMappingBatchResultStreamer<Q, P> idMappingBatchResultStreamer;
-    private final MessageConverterContextFactory<P> converterContextFactory;
+    private final IdMappingBatchResultStreamer<U, V> idMappingBatchResultStreamer;
+    private final MessageConverterContextFactory<V> converterContextFactory;
     private final IdMappingJobCacheService idMappingJobCacheService;
 
     protected IdMappingResultStreamerFacade(
             IdMappingRDFStreamer rdfResultStreamer,
             IdMappingListResultStreamer listResultStreamer,
-            IdMappingBatchResultStreamer<Q, P> idMappingBatchResultStreamer,
-            MessageConverterContextFactory<P> converterContextFactory,
+            IdMappingBatchResultStreamer<U, V> idMappingBatchResultStreamer,
+            MessageConverterContextFactory<V> converterContextFactory,
             IdMappingJobCacheService idMappingJobCacheService) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
@@ -44,7 +44,7 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
         this.idMappingJobCacheService = idMappingJobCacheService;
     }
 
-    public MessageConverterContext<P> getConvertedResult(IdMappingDownloadRequest request) {
+    public MessageConverterContext<V> getConvertedResult(IdMappingDownloadRequest request) {
         IdMappingJob idMappingJobInput =
                 Optional.ofNullable(idMappingJobCacheService.getJobAsResource(request.getJobId()))
                         .orElseThrow(
@@ -53,7 +53,7 @@ public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
                                                 "Invalid Job Id " + request.getJobId()));
         IdMappingResult idMappingResult = idMappingJobInput.getIdMappingResult();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        MessageConverterContext<P> context =
+        MessageConverterContext<V> context =
                 converterContextFactory.get(getResource(), contentType);
         ExtraOptions extraOptions = IdMappingServiceUtils.getExtraOptions(idMappingResult);
         context.setExtraOptions(extraOptions);

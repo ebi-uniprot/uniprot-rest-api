@@ -20,18 +20,18 @@ import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
 public abstract class SolrIdResultStreamerFacade<
-        T extends DownloadRequest, R extends DownloadJob, S> {
+        T extends DownloadRequest, R extends DownloadJob, U> {
     private final RDFResultStreamer<T, R> rdfResultStreamer;
     private final ListResultStreamer<T, R> listResultStreamer;
-    private final SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
-    private final MessageConverterContextFactory<S> converterContextFactory;
+    private final SolrIdBatchResultStreamer<T, R, U> solrIdBatchResultStreamer;
+    private final MessageConverterContextFactory<U> converterContextFactory;
     private final AsyncDownloadFileHandler fileHandler;
 
     protected SolrIdResultStreamerFacade(
             RDFResultStreamer<T, R> rdfResultStreamer,
             ListResultStreamer<T, R> listResultStreamer,
-            SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer,
-            MessageConverterContextFactory<S> converterContextFactory,
+            SolrIdBatchResultStreamer<T, R, U> solrIdBatchResultStreamer,
+            MessageConverterContextFactory<U> converterContextFactory,
             AsyncDownloadFileHandler fileHandler) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
@@ -40,9 +40,9 @@ public abstract class SolrIdResultStreamerFacade<
         this.fileHandler = fileHandler;
     }
 
-    public MessageConverterContext<S> getConvertedResult(T request) {
+    public MessageConverterContext<U> getConvertedResult(T request) {
         MediaType contentType = valueOf(request.getFormat());
-        MessageConverterContext<S> context =
+        MessageConverterContext<U> context =
                 converterContextFactory.get(getResource(), contentType);
         context.setFields(request.getFields());
         context.setContentType(contentType);
