@@ -17,12 +17,11 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 public abstract class RDFResultStreamer<T extends DownloadRequest, R extends DownloadJob>
         extends IdIdResultStreamer<T, R> {
 
-    private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
+    public static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
                     N_TRIPLES_MEDIA_TYPE, "nt");
-    // todo using common, look at T,R, S naming convention
     private final HeartbeatProducer heartbeatProducer;
     private final RdfStreamer rdfStreamer;
 

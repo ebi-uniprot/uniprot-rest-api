@@ -1,13 +1,5 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.facade;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappingBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.idmapping.IdMappingListResultStreamer;
@@ -24,13 +16,15 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDFResultStreamer.SUPPORTED_RDF_TYPES;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
+
 public abstract class IdMappingResultStreamerFacade<Q, P extends EntryPair<Q>> {
-    protected static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
-            Map.of(
-                    RDF_MEDIA_TYPE, "rdf",
-                    TURTLE_MEDIA_TYPE, "ttl",
-                    N_TRIPLES_MEDIA_TYPE, "nt");
-    // todo resuse the existing or create common
     private final IdMappingRDFStreamer rdfResultStreamer;
     private final IdMappingListResultStreamer listResultStreamer;
     private final IdMappingBatchResultStreamer<Q, P> idMappingBatchResultStreamer;
