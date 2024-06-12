@@ -143,7 +143,6 @@ class UniProtKBProducerMessageServiceIT
         "org.uniprot.api.async.download.messaging.consumer.uniprotkb",
         "org.uniprot.api.async.download.messaging.config.uniprotkb",
         "org.uniprot.api.async.download.messaging.result.uniprotkb",
-        "org.uniprot.api.async.download.messaging.consumer.common",
         "org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb",
         "org.uniprot.api.async.download.messaging.producer.uniprotkb"
     })

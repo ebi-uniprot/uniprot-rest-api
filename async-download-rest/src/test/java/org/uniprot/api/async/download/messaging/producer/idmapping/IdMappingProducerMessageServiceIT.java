@@ -20,6 +20,7 @@ import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingCont
 import org.uniprot.api.async.download.messaging.producer.BasicProducerMessageServiceIT;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.config.IdMappingConfig;
@@ -47,7 +48,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     @Autowired private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
 
-    @MockBean private IdMappingContentBasedAndRetriableMessageConsumer idMappingConsumer;
+    @MockBean private IdMappingContentBasedAndRetriableMessageConsumer idMappingMessageConsumer;
 
     @Captor ArgumentCaptor<Message> messageCaptor;
 
@@ -148,7 +149,6 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         "org.uniprot.api.async.download.service.idmapping",
         "org.uniprot.api.async.download.messaging.config.idmapping",
         "org.uniprot.api.async.download.messaging.result.idmapping",
-        "org.uniprot.api.async.download.messaging.consumer.common",
         "org.uniprot.api.async.download.messaging.consumer.heartbeat.idmapping",
         "org.uniprot.api.async.download.messaging.producer.idmapping"
     })

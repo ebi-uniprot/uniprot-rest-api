@@ -1,9 +1,13 @@
 package org.uniprot.api.async.download.messaging.config.idmapping;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
+import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.model.request.IdMappingDownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -80,15 +84,14 @@ public class IdMappingRabbitMQConfig {
                 .with(idMappingUndeliveredQueue.getName());
     }
 
-    // TODO: We need to configure IdMappingConsumer
-    /*@Bean
+    @Bean
     public MessageListenerContainer idMappingMessageListenerContainer(
             ConnectionFactory connectionFactory,
-            IdMappingMessageListener idMappingMessageListener,
+            IdMappingContentBasedAndRetriableMessageConsumer idMappingMessageConsumer,
             IdMappingAsyncDownloadQueueConfigProperties configProps) {
         return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
-                connectionFactory, idMappingMessageListener, configProps);
-    }*/
+                connectionFactory, idMappingMessageConsumer, configProps);
+    }
 
     @Bean
     public HashGenerator<IdMappingDownloadRequest> asyncIdMappingHashGenerator(

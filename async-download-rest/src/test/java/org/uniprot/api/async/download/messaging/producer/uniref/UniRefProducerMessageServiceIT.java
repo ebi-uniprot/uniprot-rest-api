@@ -144,7 +144,6 @@ public class UniRefProducerMessageServiceIT
         "org.uniprot.api.async.download.messaging.consumer.uniref",
         "org.uniprot.api.async.download.messaging.config.uniref",
         "org.uniprot.api.async.download.messaging.result.uniref",
-        "org.uniprot.api.async.download.messaging.consumer.common",
         "org.uniprot.api.async.download.messaging.consumer.heartbeat.uniref",
         "org.uniprot.api.async.download.messaging.producer.uniref"
     })
