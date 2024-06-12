@@ -159,6 +159,27 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    void streamCanReturnLowercaseAccessionSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "p00001");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P00001")));
+    }
+
+    @Test
     void streamCanReturnIncludeIsoforms() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =

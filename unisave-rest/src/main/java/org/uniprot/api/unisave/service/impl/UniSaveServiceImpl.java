@@ -252,8 +252,11 @@ public class UniSaveServiceImpl implements UniSaveService {
             String reasonId = "0";
             if (event.getDeletionReasonId() != null) {
                 reasonId = String.valueOf(event.getDeletionReasonId());
+                DeletedReason deletedReason = DeletedReason.fromId(reasonId);
+                if (deletedReason != DeletedReason.UNKNOWN) {
+                    buider.deletedReason(deletedReason.getName());
+                }
             }
-            buider.deletedReason(DeletedReason.fromId(reasonId).getName());
         }
         return buider.build();
     }

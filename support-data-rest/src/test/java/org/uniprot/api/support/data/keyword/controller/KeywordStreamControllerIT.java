@@ -122,6 +122,26 @@ class KeywordStreamControllerIT extends AbstractRdfStreamControllerIT {
     }
 
     @Test
+    void keywordLowercaseIdWorks() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", searchAccession.toLowerCase());
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].keyword.id", is(searchAccession)));
+    }
+
+    @Test
     void keywordQFQueryWorks() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =

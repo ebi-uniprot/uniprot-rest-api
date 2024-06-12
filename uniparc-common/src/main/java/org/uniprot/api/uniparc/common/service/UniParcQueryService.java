@@ -1,9 +1,12 @@
 package org.uniprot.api.uniparc.common.service;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +22,9 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -28,14 +33,7 @@ import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConve
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -65,6 +63,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryResultConverter entryConverter;
     private final SolrQueryConfig solrQueryConfig;
     private final RdfStreamer rdfStreamer;
+
+    private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
 
     @Autowired
     public UniParcQueryService(
@@ -221,6 +221,22 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         UniParcEntryBuilder builder = new UniParcEntryBuilder();
         builder.uniParcId(uniParcId);
         return builder.build();
+    }
+
+    @Override
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        if (request instanceof UniParcBasicRequest uniParcBasicRequest) {
+            String cleanQuery =
+                    CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+            if (UNIPARC_UPI_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
+                uniParcBasicRequest.setQuery(cleanQuery.toUpperCase());
+            }
+            return super.createSolrRequestBuilder(uniParcBasicRequest, solrSortClause, queryBoosts);
+        }
+        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

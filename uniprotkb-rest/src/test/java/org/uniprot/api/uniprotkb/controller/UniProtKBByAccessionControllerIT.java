@@ -492,7 +492,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     @Test
-    void searchForDeletedInactiveEntriesReturnItself() throws Exception {
+    void searchForDeletedInactiveEntriesReturnItselfWithoutDeletedReason() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -525,10 +525,47 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DELETED")))
+                .andExpect(jsonPath("$.inactiveReason.deletedReason").doesNotExist());
+    }
+
+    @Test
+    void searchForDeletedInactiveEntriesReturnItselfWithDeletedReason() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> deletedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "I8FBX1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("I8FBX1")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.inactiveReasonType", is("DELETED")))
                 .andExpect(
                         jsonPath(
                                 "$.inactiveReason.deletedReason",
-                                is(DeletedReason.SOURCE_DELETION.getName())));
+                                is(DeletedReason.PROTEOME_REDUNDANCY.getDisplayName())));
     }
 
     @Test

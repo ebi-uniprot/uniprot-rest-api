@@ -271,6 +271,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
         uniProtDocument.goIds = gos;
         uniProtDocument.organismTaxId = Integer.parseInt(organismId);
         uniProtDocument.taxLineageIds = List.of(Integer.parseInt(organismId));
+        uniProtDocument.chebi.add(CHEBI_ID);
         save(uniProtDocument);
     }
 
