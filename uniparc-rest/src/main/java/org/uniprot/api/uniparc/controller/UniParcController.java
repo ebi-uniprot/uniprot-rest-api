@@ -378,6 +378,56 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     }
 
     @GetMapping(
+            value = "/proteome/{upId}/stream",
+            produces = {
+                APPLICATION_JSON_VALUE,
+                APPLICATION_XML_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = PROTEOME_UPID_UNIPARC_STREAM_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> streamByProteomeId(
+            @Valid @ModelAttribute UniParcGetByProteomeIdStreamRequest streamRequest,
+            HttpServletRequest request) {
+        setBasicRequestFormat(streamRequest, request);
+        return super.stream(
+                () -> queryService.streamByFieldId(streamRequest),
+                streamRequest,
+                getAcceptHeader(request),
+                request,
+                streamRequest.getUpId());
+    }
+
+    @GetMapping(
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
     @Operation(

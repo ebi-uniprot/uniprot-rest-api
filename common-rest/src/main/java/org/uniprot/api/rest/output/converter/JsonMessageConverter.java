@@ -26,8 +26,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.github.bohnman.squiggly.context.provider.SimpleSquigglyContextProvider;
 import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
 import com.github.bohnman.squiggly.parser.SquigglyParser;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.*;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -121,7 +120,11 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                     Object filteredItems = referenceJson.read(filterPath);
 
                     JsonPath setPath = JsonPath.compile(PATH_PREFIX + field.getKey());
-                    referenceJson = referenceJson.set(setPath, filteredItems);
+                    try {
+                        referenceJson = referenceJson.set(setPath, filteredItems);
+                    } catch (PathNotFoundException pnfe) {
+                        logger.debug("Unable to set path " + setPath.getPath());
+                    }
                 }
                 filteredJson = referenceJson.jsonString();
             }

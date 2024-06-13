@@ -214,12 +214,21 @@ public abstract class BasicSearchController<T> {
             StreamRequest streamRequest,
             MediaType contentType,
             HttpServletRequest request) {
+        return stream(resultSupplier, streamRequest, contentType, request, null);
+    }
+
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
+            Supplier<Stream<T>> resultSupplier,
+            StreamRequest streamRequest,
+            MediaType contentType,
+            HttpServletRequest request,
+            String proteomeId) {
         Supplier<MessageConverterContext<T>> contextSupplier =
                 () -> {
                     MessageConverterContext<T> context =
                             createStreamContext(streamRequest, contentType, request);
                     context.setFields(streamRequest.getFields());
-
+                    context.setProteomeId(proteomeId);
                     Stream<T> results = resultSupplier.get();
                     if (contentType.equals(LIST_MEDIA_TYPE)) {
                         context.setEntityIds(results.map(this::getEntityId));

@@ -145,6 +145,11 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 .build();
     }
 
+    public Stream<UniParcEntry> streamByFieldId(UniParcGetByIdStreamRequest streamRequest) {
+        Stream<UniParcEntry> uniParcEntryStream = super.stream(streamRequest);
+        return filterUniParcStream(uniParcEntryStream, streamRequest);
+    }
+
     public Stream<String> streamRdf(
             UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =

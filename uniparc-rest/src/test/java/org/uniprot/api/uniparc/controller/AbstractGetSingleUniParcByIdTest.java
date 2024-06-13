@@ -76,6 +76,11 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         Entry xmlEntry = converter.toXml(updatedEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
+
+        UniParcEntry simpleEntry = UniParcEntryMocker.createSimpleEntry(2, UPI_PREF);
+        Entry simpleXmlEntry = converter.toXml(simpleEntry);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, simpleXmlEntry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, simpleEntry);
     }
 
     @BeforeAll
