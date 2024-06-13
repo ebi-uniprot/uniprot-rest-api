@@ -1,5 +1,19 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createInactiveTaxonomySolrDoc;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createSolrDoc;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.LongStream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +43,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.LongStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createInactiveTaxonomySolrDoc;
-import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createSolrDoc;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -129,7 +129,8 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     private void saveEntry(long taxId, boolean facet, boolean active) {
-        TaxonomyDocument document = active ? createSolrDoc(taxId, facet) : createInactiveTaxonomySolrDoc(taxId);
+        TaxonomyDocument document =
+                active ? createSolrDoc(taxId, facet) : createInactiveTaxonomySolrDoc(taxId);
         getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
@@ -222,9 +223,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.results.*.scientificName",
                                     contains("scientific10", "scientific20")))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.commonName",
-                                    contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
                     .build();
         }
 
@@ -273,9 +272,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.results.*.scientificName",
                                     contains("scientific20", "scientific10")))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.commonName",
-                                    contains("common20", "common10")))
+                            jsonPath("$.results.*.commonName", contains("common20", "common10")))
                     .build();
         }
 
@@ -287,13 +284,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 20, 15)))
                     .resultMatcher(jsonPath("$.results.*.scientificName").doesNotExist())
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.commonName",
-                                    contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.mnemonic",
-                                    contains("mnemonic10", "mnemonic20")))
+                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
                     .build();
         }
 
@@ -308,13 +301,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.results.*.scientificName",
                                     contains("scientific10", "scientific20")))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.commonName",
-                                    contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results.*.mnemonic",
-                                    contains("mnemonic10", "mnemonic20")))
+                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(
@@ -360,9 +349,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.scientificName",
-                                                    contains(
-                                                            "scientific10",
-                                                            "scientific20")))
+                                                    contains("scientific10", "scientific20")))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.commonName",
@@ -388,11 +375,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                                     .string(
                                                             containsString(
                                                                     "10\tmnemonic10\tscientific10\tcommon10\tother names10\t\tfamily\t\t9")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "15")))
+                                    .resultMatcher(content().string(containsString("15")))
                                     .resultMatcher(
                                             content()
                                                     .string(
