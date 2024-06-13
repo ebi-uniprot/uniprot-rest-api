@@ -3,6 +3,9 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -213,10 +216,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -230,10 +234,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -248,10 +253,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                                    """
+                                                                                <sample>text</sample>
+                                                                                <anotherSample>text2</anotherSample>
+                                                                                <someMore>text3</someMore>
+                                                                            </rdf:RDF>""")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

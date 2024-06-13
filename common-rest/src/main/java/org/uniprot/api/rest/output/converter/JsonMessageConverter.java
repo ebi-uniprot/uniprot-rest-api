@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.PathNotFoundException;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.ExtraOptions;

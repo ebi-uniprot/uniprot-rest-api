@@ -1,20 +1,15 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
-import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
-import org.uniprot.core.taxonomy.impl.TaxonomyInactiveReasonBuilder;
-import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
-import org.uniprot.core.taxonomy.impl.TaxonomyStatisticsBuilder;
-import org.uniprot.core.taxonomy.impl.TaxonomyStrainBuilder;
+import org.uniprot.core.taxonomy.impl.*;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author sahmad
@@ -22,7 +17,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class TaxonomyITUtils {
     public static TaxonomyDocument createSolrDoc(long taxId, boolean facet) {
-
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry =
                 entryBuilder
@@ -62,8 +56,8 @@ public class TaxonomyITUtils {
                         .strain(Collections.singletonList("strain"))
                         .host(Collections.singletonList(10L))
                         .ancestor(Collections.singletonList(10L + 1L))
-                        .linked(facet)
-                        .active(facet)
+                        .linked(true)
+                        .active(true)
                         .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
         if (facet) {
             docBuilder.taxonomiesWith(
@@ -84,5 +78,21 @@ public class TaxonomyITUtils {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
+    }
+
+    public static TaxonomyDocument createInactiveTaxonomySolrDoc(long taxId){
+        TaxonomyEntry inactiveEntry =
+                new TaxonomyEntryBuilder()
+                        .taxonId(taxId)
+                        .active(false)
+                        .build();
+        TaxonomyDocument inactiveDoc =
+                TaxonomyDocument.builder()
+                        .id(String.valueOf(taxId))
+                        .taxId(taxId)
+                        .active(false)
+                        .taxonomyObj(getTaxonomyBinary(inactiveEntry))
+                        .build();
+        return inactiveDoc;
     }
 }
