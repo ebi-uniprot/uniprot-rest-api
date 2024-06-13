@@ -1,6 +1,8 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.Collections;
+import java.util.List;
+
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
@@ -8,8 +10,7 @@ import org.uniprot.core.taxonomy.impl.*;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
-import java.util.Collections;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author sahmad
@@ -80,12 +81,9 @@ public class TaxonomyITUtils {
         }
     }
 
-    public static TaxonomyDocument createInactiveTaxonomySolrDoc(long taxId){
+    public static TaxonomyDocument createInactiveTaxonomySolrDoc(long taxId) {
         TaxonomyEntry inactiveEntry =
-                new TaxonomyEntryBuilder()
-                        .taxonId(taxId)
-                        .active(false)
-                        .build();
+                new TaxonomyEntryBuilder().taxonId(taxId).active(false).build();
         TaxonomyDocument inactiveDoc =
                 TaxonomyDocument.builder()
                         .id(String.valueOf(taxId))

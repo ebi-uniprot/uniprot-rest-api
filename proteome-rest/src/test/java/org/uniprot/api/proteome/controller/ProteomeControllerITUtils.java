@@ -15,7 +15,7 @@ import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.core.xml.proteome.ProteomeConverter;
-import org.uniprot.store.indexer.proteome.ProteomeDocumentConverter;
+import org.uniprot.store.indexer.converters.ProteomeDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 

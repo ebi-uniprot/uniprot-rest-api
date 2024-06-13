@@ -65,8 +65,8 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.converters.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 

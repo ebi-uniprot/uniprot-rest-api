@@ -62,7 +62,7 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
