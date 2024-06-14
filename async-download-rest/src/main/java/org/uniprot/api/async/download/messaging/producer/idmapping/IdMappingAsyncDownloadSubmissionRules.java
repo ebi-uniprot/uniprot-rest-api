@@ -1,7 +1,6 @@
 package org.uniprot.api.async.download.messaging.producer.idmapping;
 
 import java.text.MessageFormat;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,7 @@ public class IdMappingAsyncDownloadSubmissionRules
         IdMappingJob idMappingJob = idMappingJobCacheService.get(idMappingJobId);
         String message;
         if (idMappingJob != null) {
-            if(JobStatus.FINISHED.equals(idMappingJob.getJobStatus())) {
+            if (JobStatus.FINISHED.equals(idMappingJob.getJobStatus())) {
                 return super.submit(request);
             } else {
                 message = "ID Mapping Job id {0} not yet finished";
@@ -42,8 +41,6 @@ public class IdMappingAsyncDownloadSubmissionRules
         } else {
             message = "ID Mapping Job id {0} not found";
         }
-        return new JobSubmitFeedback(
-                false,
-                MessageFormat.format(message, idMappingJobId));
+        return new JobSubmitFeedback(false, MessageFormat.format(message, idMappingJobId));
     }
 }

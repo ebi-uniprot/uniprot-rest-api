@@ -3,6 +3,10 @@ package org.uniprot.api.async.download.messaging.producer.idmapping;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,6 +24,8 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -36,16 +42,13 @@ import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadR
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
-
-import junit.framework.AssertionFailedError;
 import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import junit.framework.AssertionFailedError;
 
+@ActiveProfiles(profiles = {"producerIT"})
 @ExtendWith(SpringExtension.class)
 @Import({
     IdMappingProducerMessageServiceIT.IdMappingProducerTestConfig.class,
@@ -54,7 +57,7 @@ import java.util.Map;
 })
 class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
-    private  static final String ID_MAPPING_JOB_ID_VALUE = "idMappingJobIdValue";
+    private static final String ID_MAPPING_JOB_ID_VALUE = "idMappingJobIdValue";
 
     @Autowired private IdMappingProducerMessageService service;
 
@@ -93,7 +96,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     }
 
     @Test
-    void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception{
+    void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("json");
@@ -103,25 +106,41 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         createIDMappingJob(JobStatus.FINISHED);
         // Reproduce Idle Job in Running Status in and files created
         createJobFiles(jobId);
-        //Validate idle job files were deleted
+        // Validate idle job files were deleted
         LocalDateTime idleSince = LocalDateTime.now().minusMinutes(20);
-        IdMappingDownloadJob idleJob = new IdMappingDownloadJob(jobId, JobStatus.RUNNING, null, idleSince, null, 0,null, null, null,null, request.getFormat(), 100, 10, 1);
+        IdMappingDownloadJob idleJob =
+                new IdMappingDownloadJob(
+                        jobId,
+                        JobStatus.RUNNING,
+                        null,
+                        idleSince,
+                        null,
+                        0,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.getFormat(),
+                        100,
+                        10,
+                        1);
         jobRepository.save(idleJob);
 
         String jobIdResult = service.sendMessage(request);
         assertEquals(jobIdResult, jobId);
 
-        //Validate message received in Listener
-        Mockito.verify(idMappingMessageConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        // Validate message received in Listener
+        Mockito.verify(idMappingMessageConsumer, Mockito.timeout(1000).times(1))
+                .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
 
-        //Validate cached data is a new Job
-        DownloadJob downloadJob = jobRepository.findById(jobId)
-                .orElseThrow(AssertionFailedError::new);
+        // Validate cached data is a new Job
+        DownloadJob downloadJob =
+                jobRepository.findById(jobId).orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
 
-        //Validate idle job files were deleted
+        // Validate idle job files were deleted
         assertFalse(fileHandler.isIdFileExist(jobId));
         assertFalse(fileHandler.isResultFileExist(jobId));
     }
@@ -133,11 +152,31 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         request.setFormat("json");
         String jobId = "6ce47574dc980c6c4d49e62483eaee999fb51f60";
         createIDMappingJob(JobStatus.FINISHED);
-        IdMappingDownloadJob runningJob = new IdMappingDownloadJob(jobId, JobStatus.RUNNING, LocalDateTime.now(), LocalDateTime.now(), null, 0,null, request.getFields(), null, null, request.getFormat(), 0, 0, 0);
+        IdMappingDownloadJob runningJob =
+                new IdMappingDownloadJob(
+                        jobId,
+                        JobStatus.RUNNING,
+                        LocalDateTime.now(),
+                        LocalDateTime.now(),
+                        null,
+                        0,
+                        null,
+                        request.getFields(),
+                        null,
+                        null,
+                        request.getFormat(),
+                        0,
+                        0,
+                        0);
         jobRepository.save(runningJob);
 
-        IllegalDownloadJobSubmissionException submitionError = assertThrows(IllegalDownloadJobSubmissionException.class, () -> service.sendMessage(request));
-        assertEquals("Job with id "+ jobId +" has already been submitted", submitionError.getMessage());
+        IllegalDownloadJobSubmissionException submitionError =
+                assertThrows(
+                        IllegalDownloadJobSubmissionException.class,
+                        () -> service.sendMessage(request));
+        assertEquals(
+                "Job with id " + jobId + " has already been submitted",
+                submitionError.getMessage());
     }
 
     @Test
@@ -148,8 +187,13 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
         createIDMappingJob(JobStatus.RUNNING);
 
-        IllegalDownloadJobSubmissionException submitionError = assertThrows(IllegalDownloadJobSubmissionException.class, () -> service.sendMessage(request));
-        assertEquals("ID Mapping Job id "+ ID_MAPPING_JOB_ID_VALUE +" not yet finished", submitionError.getMessage());
+        IllegalDownloadJobSubmissionException submitionError =
+                assertThrows(
+                        IllegalDownloadJobSubmissionException.class,
+                        () -> service.sendMessage(request));
+        assertEquals(
+                "ID Mapping Job id " + ID_MAPPING_JOB_ID_VALUE + " not yet finished",
+                submitionError.getMessage());
     }
 
     @Test
@@ -159,8 +203,13 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         request.setJobId(idMappingNotValid);
         request.setFormat("json");
 
-        IllegalDownloadJobSubmissionException submitionError = assertThrows(IllegalDownloadJobSubmissionException.class, () -> service.sendMessage(request));
-        assertEquals("ID Mapping Job id "+ idMappingNotValid +" not found", submitionError.getMessage());
+        IllegalDownloadJobSubmissionException submitionError =
+                assertThrows(
+                        IllegalDownloadJobSubmissionException.class,
+                        () -> service.sendMessage(request));
+        assertEquals(
+                "ID Mapping Job id " + idMappingNotValid + " not found",
+                submitionError.getMessage());
     }
 
     @Test
@@ -174,12 +223,14 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         assertEquals(jobId, resultJobId);
         request.setFormat("json");
 
-        Mockito.verify(idMappingMessageConsumer, Mockito.timeout(1000).times(1)).onMessage(messageCaptor.capture());
+        Mockito.verify(idMappingMessageConsumer, Mockito.timeout(1000).times(1))
+                .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
     }
 
-    private void validateDownloadJob(String jobId, DownloadJob downloadJob, IdMappingDownloadRequest request) {
+    private void validateDownloadJob(
+            String jobId, DownloadJob downloadJob, IdMappingDownloadRequest request) {
         validateDownloadJob(jobId, downloadJob);
         assertNull(downloadJob.getQuery());
         assertNull(downloadJob.getSort());
@@ -196,7 +247,12 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     private void createIDMappingJob(JobStatus jobStatus) {
         idMappingJobCacheService.put(
-                ID_MAPPING_JOB_ID_VALUE, IdMappingJob.builder().jobId(ID_MAPPING_JOB_ID_VALUE).jobStatus(jobStatus).idMappingResult(IdMappingResult.builder().build()).build());
+                ID_MAPPING_JOB_ID_VALUE,
+                IdMappingJob.builder()
+                        .jobId(ID_MAPPING_JOB_ID_VALUE)
+                        .jobStatus(jobStatus)
+                        .idMappingResult(IdMappingResult.builder().build())
+                        .build());
     }
 
     @Override
@@ -220,6 +276,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         "org.uniprot.api.async.download.messaging.producer.idmapping"
     })
     static class IdMappingProducerTestConfig {
+        @Profile("producerIT")
         @Bean
         public IdMappingJobCacheService idMappingJobCacheService(RedissonClient redissonClient) {
             Map<String, CacheConfig> config = new HashMap<>();
@@ -228,6 +285,5 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
             Cache mappingCache = cacheManager.getCache("testMap");
             return new RedisCacheMappingJobService(mappingCache);
         }
-
     }
 }

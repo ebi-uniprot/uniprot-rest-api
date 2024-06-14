@@ -3,29 +3,18 @@ package org.uniprot.api.async.download.messaging.producer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
-import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
 import junit.framework.AssertionFailedError;
@@ -132,7 +121,6 @@ public abstract class SolrProducerMessageServiceIT<
     protected abstract T getWithoutFormatRequest();
 
     protected abstract SolrProducerMessageService<T, R> getService();
-
 
     protected static void validateDownloadJob(
             String jobId, DownloadJob downloadJob, SolrStreamDownloadRequest request) {
