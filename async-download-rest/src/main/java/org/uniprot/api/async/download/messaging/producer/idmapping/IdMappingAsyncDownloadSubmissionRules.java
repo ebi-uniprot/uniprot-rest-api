@@ -12,6 +12,7 @@ import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadR
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 @Component
 public class IdMappingAsyncDownloadSubmissionRules
@@ -30,17 +31,19 @@ public class IdMappingAsyncDownloadSubmissionRules
     @Override
     public JobSubmitFeedback submit(IdMappingDownloadRequest request) {
         String idMappingJobId = request.getJobId();
-        IdMappingJob idMappingJob =
-                Optional.ofNullable(idMappingJobCacheService.get(idMappingJobId))
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Invalid job id: %s".formatted(idMappingJobId)));
-        if (idMappingJob.getIdMappingResult() != null) {
-            return super.submit(request);
+        IdMappingJob idMappingJob = idMappingJobCacheService.get(idMappingJobId);
+        String message;
+        if (idMappingJob != null) {
+            if(JobStatus.FINISHED.equals(idMappingJob.getJobStatus())) {
+                return super.submit(request);
+            } else {
+                message = "ID Mapping Job id {0} not yet finished";
+            }
+        } else {
+            message = "ID Mapping Job id {0} not found";
         }
         return new JobSubmitFeedback(
                 false,
-                MessageFormat.format("ID Mapping Job {0} id not yet finished", idMappingJobId));
+                MessageFormat.format(message, idMappingJobId));
     }
 }

@@ -1,5 +1,14 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.facade;
 
+import static org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDFResultStreamer.SUPPORTED_RDF_TYPES;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.stream.Stream;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.ListResultStreamer;
@@ -9,15 +18,6 @@ import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.stream.Stream;
-
-import static org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDFResultStreamer.SUPPORTED_RDF_TYPES;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource;
 
 public abstract class SolrIdResultStreamerFacade<
         T extends DownloadRequest, R extends DownloadJob, U> {
