@@ -297,7 +297,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String query = "*:*";
         String fields = "accession,rhea";
         ResultActions resultActions =
-                callPostJobStatus(query, fields, null, format.toString(), false);
+                callPostJobStatus(query, fields, null, format.toString(), false, false);
         resultActions
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
@@ -351,7 +351,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform)
+            String query, String fields, String sort, String format, boolean includeIsoform, boolean force)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post(getDownloadAPIsBasePath() + "/run")
@@ -360,7 +360,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                         .param("fields", fields)
                         .param("sort", sort)
                         .param("format", Objects.isNull(format) ? null : format)
-                        .param("includeIsoform", String.valueOf(includeIsoform));
+                        .param("includeIsoform", String.valueOf(includeIsoform))
+                        .param("force", String.valueOf(force));
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }
@@ -524,7 +525,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
             String sort,
             String fields,
             JobStatus jobStatus,
-            String format) {
+            String format,
+            int retried) {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         UniProtKBDownloadJob job =
                 builder.id(jobId)
@@ -534,6 +536,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                         .query(query)
                         .sort(sort)
                         .fields(fields)
+                        .retried(retried)
                         .build();
         return job;
     }

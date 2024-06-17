@@ -147,7 +147,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform)
+            String query, String fields, String sort, String format, boolean includeIsoform, boolean force)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
@@ -155,7 +155,8 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
-                        .param("format", Objects.isNull(format) ? null : format);
+                        .param("format", Objects.isNull(format) ? null : format)
+                        .param("force", String.valueOf(force));
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }
@@ -325,7 +326,8 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
             String sort,
             String fields,
             JobStatus jobStatus,
-            String format) {
+            String format,
+            int retried) {
         UniRefDownloadJob.UniRefDownloadJobBuilder builder = UniRefDownloadJob.builder();
         UniRefDownloadJob job =
                 builder.id(jobId)
@@ -335,6 +337,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
                         .query(query)
                         .sort(sort)
                         .fields(fields)
+                        .retried(retried)
                         .build();
         return job;
     }
