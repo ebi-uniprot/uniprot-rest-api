@@ -351,7 +351,12 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform, boolean force)
+            String query,
+            String fields,
+            String sort,
+            String format,
+            boolean includeIsoform,
+            boolean force)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post(getDownloadAPIsBasePath() + "/run")

@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
-import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -74,7 +72,6 @@ import org.uniprot.api.async.download.controller.validator.UniParcIdMappingDownl
 import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
-import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
@@ -87,7 +84,6 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
@@ -320,7 +316,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @AfterEach
-    void cleanUpRedisAndFiles() throws IOException{
+    void cleanUpRedisAndFiles() throws IOException {
         cleanUpFolder(idMappingAsyncConfig.getIdsFolder());
         cleanUpFolder(idMappingAsyncConfig.getResultFolder());
         downloadJobRepository.deleteAll();
@@ -1356,7 +1352,8 @@ public class IdMappingDownloadControllerIT {
         }
     }
 
-    private void validateSuccessIdMappingResult(String asyncJobId, Path resultFilePath, List<String> unMappedIds) throws IOException {
+    private void validateSuccessIdMappingResult(
+            String asyncJobId, Path resultFilePath, List<String> unMappedIds) throws IOException {
         await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =

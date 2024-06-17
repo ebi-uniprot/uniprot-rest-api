@@ -54,7 +54,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected abstract MockMvc getMockMvcObject();
 
     @AfterEach
-    void afterEach() throws IOException{
+    void afterEach() throws IOException {
         FileUtils.cleanDirectory(new File(getTestAsyncConfig().getIdsFolder()));
         FileUtils.cleanDirectory(new File(getTestAsyncConfig().getResultFolder()));
         getDownloadJobRepository().deleteAll();
@@ -63,7 +63,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     @Test
     protected void submitJobWithoutQueryFailure() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString(), false, false);
+        ResultActions resultActions =
+                callPostJobStatus(null, null, null, format.toString(), false, false);
         resultActions
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -189,7 +190,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         // when
         MediaType format = getUnsupportedFormat();
         String query = submitJobWithQuery();
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, null, null, format.toString(), false, false);
 
         // then
         response.andDo(log())
@@ -204,7 +206,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void submitJobWithBadQuery() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "random:field";
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, null, null, format.toString(), false, false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -219,7 +222,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         String query = submitJobWithQuery();
         String fields = "something,else";
 
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, fields, null, format.toString(), false, false);
 
         // then
         response.andDo(log())
@@ -239,7 +243,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         String query = submitJobWithQuery();
         String sort = "something desc";
 
-        ResultActions response = callPostJobStatus(query, null, sort, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, null, sort, format.toString(), false, false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -261,7 +266,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                         jobId, null, query, null, null, JobStatus.FINISHED, format.toString(), 0);
         getDownloadJobRepository().save(job);
 
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, null, null, format.toString(), false, false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -274,17 +280,26 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     }
 
     @Test
-    protected void resubmit_withForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() throws Exception {
+    protected void resubmit_withForceOnFailedJobBeforeMaxRetryWillReturnJobRunning()
+            throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "retryingAgain";
         String jobId = "cc050edd11308a8d3c8d0b714a4855caf16d2c8c";
 
         DownloadJob job =
                 getDownloadJob(
-                        jobId, "retry running", query, null, null, JobStatus.ERROR, format.toString(), 2);
+                        jobId,
+                        "retry running",
+                        query,
+                        null,
+                        null,
+                        JobStatus.ERROR,
+                        format.toString(),
+                        2);
         getDownloadJobRepository().save(job);
 
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, false);
+        ResultActions response =
+                callPostJobStatus(query, null, null, format.toString(), false, false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -302,7 +317,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         String query = "*:*";
         String jobId = "03fb6db0be39c4646f28bf6f83bcd600d79cab13";
 
-        //Create Error Job in Redis
+        // Create Error Job in Redis
         DownloadJob job =
                 getDownloadJob(
                         jobId,
@@ -316,13 +331,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         getDownloadJobRepository().save(job);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
 
-        //Create Files (Reproducing and Incomplete result file still in the file system)
+        // Create Files (Reproducing and Incomplete result file still in the file system)
         Path idsFilePath = Path.of(getTestAsyncConfig().getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(idsFilePath.toFile().createNewFile());
         Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId + ".gz");
         Assertions.assertTrue(resultFilePath.toFile().createNewFile());
 
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, true);
+        ResultActions response =
+                callPostJobStatus(query, null, null, format.toString(), false, true);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -339,11 +355,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(12)))
@@ -634,7 +650,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
             String query, String fields, String sort, String format, boolean includeIsoform)
             throws Exception {
 
-        ResultActions response = callPostJobStatus(query, fields, sort, format, includeIsoform, false);
+        ResultActions response =
+                callPostJobStatus(query, fields, sort, format, includeIsoform, false);
 
         // then
         response.andDo(log())
@@ -669,7 +686,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     }
 
     protected abstract ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform, boolean force)
+            String query,
+            String fields,
+            String sort,
+            String format,
+            boolean includeIsoform,
+            boolean force)
             throws Exception;
 
     protected abstract void verifyIdsAndResultFiles(String jobId) throws IOException;
