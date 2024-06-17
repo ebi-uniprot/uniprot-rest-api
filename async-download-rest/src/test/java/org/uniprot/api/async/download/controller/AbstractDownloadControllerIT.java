@@ -274,7 +274,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     }
 
     @Test
-    protected void resubmitJobWithMaxRetryErrorWillRunAgain() throws Exception {
+    protected void resubmit_withForceOnFailedJobAfterMaxRetryWillRunAgain() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "*:*";
         String jobId = "03fb6db0be39c4646f28bf6f83bcd600d79cab13";

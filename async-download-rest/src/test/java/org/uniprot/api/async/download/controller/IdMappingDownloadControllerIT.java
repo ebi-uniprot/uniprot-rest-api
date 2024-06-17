@@ -315,11 +315,15 @@ public class IdMappingDownloadControllerIT {
         uniRefStoreClient.saveEntry(entryLight);
     }
 
-    @AfterAll
-    public void cleanUpData() throws Exception {
+    @AfterEach
+    void cleanUpRedisAndFiles() throws IOException{
         cleanUpFolder(idMappingAsyncConfig.getIdsFolder());
         cleanUpFolder(idMappingAsyncConfig.getResultFolder());
         downloadJobRepository.deleteAll();
+    }
+
+    @AfterAll
+    public void cleanUpData() {
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRejectedQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getDownloadQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRetryQueue(), true);
