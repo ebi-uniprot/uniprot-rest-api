@@ -274,6 +274,29 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     }
 
     @Test
+    protected void resubmit_withForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() throws Exception {
+        MediaType format = MediaType.APPLICATION_JSON;
+        String query = "retryingAgain";
+        String jobId = "cc050edd11308a8d3c8d0b714a4855caf16d2c8c";
+
+        DownloadJob job =
+                getDownloadJob(
+                        jobId, "retry running", query, null, null, JobStatus.ERROR, format.toString(), 2);
+        getDownloadJobRepository().save(job);
+
+        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false, false);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(jobId)))
+                .andExpect(
+                        jsonPath(
+                                "$.message",
+                                is("Job with id " + jobId + " has already been submitted")));
+    }
+
+    @Test
     protected void resubmit_withForceOnFailedJobAfterMaxRetryWillRunAgain() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "*:*";
