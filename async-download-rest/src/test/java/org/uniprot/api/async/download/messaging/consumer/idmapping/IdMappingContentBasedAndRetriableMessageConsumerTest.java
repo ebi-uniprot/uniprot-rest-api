@@ -13,6 +13,8 @@ import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadR
 import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class IdMappingContentBasedAndRetriableMessageConsumerTest
         extends ContentBasedAndRetriableMessageConsumerTest<
@@ -42,5 +44,10 @@ class IdMappingContentBasedAndRetriableMessageConsumerTest
                         idMappingJobService,
                         idMappingMessageConverter);
         mockCommon();
+    }
+
+    @Override
+    protected void mockFileExistence() {
+        when(asyncDownloadFileHandler.isIdFileExist(ID)).thenReturn(true);
     }
 }

@@ -31,8 +31,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
     protected static final String UPDATED = "updated";
     protected static final String PROCESSED_ENTRIES = "processedEntries";
     protected static final String STATUS = "status";
-    protected static final String RETRY_COUNT = "retryCount";
-    public static final String RESULT_FILE = "resultFile";
+    protected static final String RETRIED = "retried";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
     private final AsyncDownloadFileHandler asyncDownloadFileHandler;
@@ -59,15 +58,15 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
             id = message.getMessageProperties().getHeader(JOB_ID_HEADER);
             log.info("Received job {} in listener", id);
 
-            if (isMaxRetriedReached(message)) {
+            if (isMaxRetriesReached(message)) {
                 rejectMessage(message, id);
             } else {
                 String error = "Unable to find jobId " + id + " in db";
-                DownloadJob downloadJob =
+                R downloadJob =
                         jobService.find(id).orElseThrow(() -> new MessageConsumerException(error));
 
                 // run the job only if it has errored out
-                if (isJobSeenBefore(id) && ERROR != downloadJob.getStatus()) {
+                if (hasJobConsumedBefore(downloadJob)) {
                     if (downloadJob.getStatus() == RUNNING) {
                         log.warn("The job {} is running by other thread", id);
                     } else {
@@ -86,7 +85,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                 log.error("Download job id {} failed with error {}", id, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
-                        id, Map.of(RETRY_COUNT, getRetryCount(updatedMessage), STATUS, ERROR));
+                        id, Map.of(RETRIED, getRetryCount(updatedMessage), STATUS, ERROR));
                 log.warn("Sending message for jobId {} to retry queue", id);
                 messagingService.sendToRetry(updatedMessage);
             } else {
@@ -100,8 +99,8 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
         }
     }
 
-    private boolean isJobSeenBefore(String jobId) {
-        return asyncDownloadFileHandler.areAllFilesExist(jobId);
+    protected boolean hasJobConsumedBefore(R downloadJob) {
+        return asyncDownloadFileHandler.areAllFilesExist(downloadJob.getId()) && ERROR != downloadJob.getStatus();
     }
 
     private void cleanIfNecessary(DownloadJob downloadJob) {
@@ -142,7 +141,7 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
         return builder.build();
     }
 
-    private boolean isMaxRetriedReached(Message message) {
+    private boolean isMaxRetriesReached(Message message) {
         return getRetryCount(message) >= messagingService.getMaxRetryCount();
     }
 

@@ -27,7 +27,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 
 public abstract class ContentBasedAndRetriableMessageConsumerTest<
         T extends DownloadRequest, R extends DownloadJob> {
-    private static final String ID = "someId";
+    protected static final String ID = "someId";
     private static final int RETRIES = 7;
     private static final int RETRIES_EXCEEDED = 17;
     private static final int MAX_RETRIES = 10;
@@ -73,7 +73,8 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         when(messageProperties.getHeader(JOB_ID_HEADER)).thenReturn(ID);
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(RETRIES);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
-        when(asyncDownloadFileHandler.areAllFilesExist(ID)).thenReturn(true);
+        when(downloadJob.getId()).thenReturn(ID);
+        mockFileExistence();
         when(downloadJob.getStatus()).thenReturn(RUNNING);
 
         messageConsumer.onMessage(message);
@@ -81,12 +82,17 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         verifyNoInteractions(requestProcessor);
     }
 
+    protected void mockFileExistence() {
+        when(asyncDownloadFileHandler.areAllFilesExist(ID)).thenReturn(true);
+    }
+
     @Test
     void onMessage_CompletedJob() {
         when(messageProperties.getHeader(JOB_ID_HEADER)).thenReturn(ID);
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(RETRIES);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
-        when(asyncDownloadFileHandler.areAllFilesExist(ID)).thenReturn(true);
+        when(downloadJob.getId()).thenReturn(ID);
+        mockFileExistence();
         when(downloadJob.getStatus()).thenReturn(FINISHED);
 
         messageConsumer.onMessage(message);
@@ -103,7 +109,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
 
         messageConsumer.onMessage(message);
 
-        verify(jobService).update(ID, Map.of(RETRY_COUNT, 8, STATUS, JobStatus.ERROR));
+        verify(jobService).update(ID, Map.of(ContentBasedAndRetriableMessageConsumer.RETRIED, 8, STATUS, JobStatus.ERROR));
         verify(messagingService)
                 .sendToRetry(
                         argThat(

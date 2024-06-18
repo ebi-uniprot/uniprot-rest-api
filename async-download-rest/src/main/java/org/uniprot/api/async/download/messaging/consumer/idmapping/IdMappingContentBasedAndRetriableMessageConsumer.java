@@ -9,11 +9,16 @@ import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 @Component
 public class IdMappingContentBasedAndRetriableMessageConsumer
         extends ContentBasedAndRetriableMessageConsumer<
                 IdMappingDownloadRequest, IdMappingDownloadJob> {
+    private final IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler;
+
     public IdMappingContentBasedAndRetriableMessageConsumer(
             IdMappingMessagingService messagingService,
             IdMappingRequestProcessor requestProcessor,
@@ -26,5 +31,11 @@ public class IdMappingContentBasedAndRetriableMessageConsumer
                 asyncDownloadFileHandler,
                 jobService,
                 messageConverter);
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
+    }
+
+    @Override
+    protected boolean hasJobConsumedBefore(IdMappingDownloadJob downloadJob) {
+        return asyncDownloadFileHandler.isResultFileExist(downloadJob.getId()) && ERROR!=downloadJob.getStatus();
     }
 }
