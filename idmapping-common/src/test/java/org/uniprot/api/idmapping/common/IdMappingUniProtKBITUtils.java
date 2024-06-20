@@ -99,6 +99,7 @@ public class IdMappingUniProtKBITUtils {
         inactiveDoc.id.add("INACTIVE_DROME");
         inactiveDoc.idInactive = "INACTIVE_DROME";
         inactiveDoc.inactiveReason = "DELETED:PROTEOME_EXCLUSION";
+        inactiveDoc.uniparcDeleted = "UPI0001661588";
         inactiveDoc.active = false;
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), inactiveDoc);
         cloudSolrClient.commit(SolrCollection.uniprot.name());

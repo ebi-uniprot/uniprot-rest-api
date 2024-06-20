@@ -119,6 +119,10 @@ class UniProtEntryQueryResultsConverter {
 
         UniProtKBEntryBuilder entryBuilder =
                 new UniProtKBEntryBuilder(accession, uniProtkbId, inactiveReason);
+        if (Utils.notNull(doc.uniparcDeleted)) {
+            entryBuilder.extraAttributesAdd(
+                    UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, doc.uniparcDeleted);
+        }
         return Optional.of(entryBuilder.build());
     }
 

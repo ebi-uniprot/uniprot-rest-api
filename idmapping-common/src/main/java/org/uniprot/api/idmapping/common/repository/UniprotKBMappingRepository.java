@@ -56,9 +56,13 @@ public class UniprotKBMappingRepository {
                     if (Utils.notNullNotEmpty(document.id)) {
                         id = document.id.get(0);
                     }
-                    result =
-                            new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build())
-                                    .build();
+                    UniProtKBEntryBuilder builder =
+                            new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build());
+                    if (Utils.notNull(document.uniparcDeleted)) {
+                        builder.extraAttributesAdd(
+                                UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, document.uniparcDeleted);
+                    }
+                    result = builder.build();
                 }
             }
         } catch (SolrServerException | IOException e) {
