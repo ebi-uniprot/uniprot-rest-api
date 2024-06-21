@@ -1,6 +1,16 @@
 package org.uniprot.api.async.download.messaging.consumer.uniref;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,55 +49,44 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(
         classes = {
-                TestConfig.class,
-                UniRefDataStoreTestConfig.class,
-                UniProtKBDataStoreTestConfig.class,
-                AsyncDownloadRestApp.class,
-                ErrorHandlerConfig.class,
-                RedisConfiguration.class
+            TestConfig.class,
+            UniRefDataStoreTestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadRestApp.class,
+            ErrorHandlerConfig.class,
+            RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniRefDownloadRequest, UniRefDownloadJob> {
-    @Autowired
-    private UniRefContentBasedAndRetriableMessageConsumer uniRefMessageConsumer;
-    @Autowired
-    private UniRefQueryRepository uniRefQueryRepository;
-    @Autowired
-    private SolrClient solrClient;
+    @Autowired private UniRefContentBasedAndRetriableMessageConsumer uniRefMessageConsumer;
+    @Autowired private UniRefQueryRepository uniRefQueryRepository;
+    @Autowired private SolrClient solrClient;
+
     @Autowired()
     @Qualifier("uniRefLightStoreClient")
     private UniProtStoreClient<UniRefEntryLight> storeClient;
-    @Autowired
-    private UniRefAsyncConfig uniRefAsyncConfig;
-    @Autowired
-    private UniRefDownloadJobRepository uniRefDownloadJobRepository;
-    @Autowired
-    private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
-    @Autowired
-    private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
+
+    @Autowired private UniRefAsyncConfig uniRefAsyncConfig;
+    @Autowired private UniRefDownloadJobRepository uniRefDownloadJobRepository;
+    @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
+    @Autowired private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
+
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired
     private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
     @Autowired
     @Qualifier("uniRefTupleStreamTemplate")
     private TupleStreamTemplate tupleStreamTemplate;
+
     @MockBean(name = "uniRefRdfRestTemplate")
     private RestTemplate restTemplate;
 
@@ -185,11 +184,20 @@ class UniRefMessageConsumerIT
     }
 
     @Override
-    protected void saveDownloadJob(String id, int retryCount, JobStatus jobStatus, long updateCount, long processedEntries) {
+    protected void saveDownloadJob(
+            String id,
+            int retryCount,
+            JobStatus jobStatus,
+            long updateCount,
+            long processedEntries) {
         uniRefDownloadJobRepository.save(
-                UniRefDownloadJob.builder().id(id).status(jobStatus).updateCount(updateCount)
+                UniRefDownloadJob.builder()
+                        .id(id)
+                        .status(jobStatus)
+                        .updateCount(updateCount)
                         .processedEntries(processedEntries)
-                        .retried(retryCount).build());
+                        .retried(retryCount)
+                        .build());
         System.out.println();
     }
 

@@ -109,7 +109,14 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
 
         messageConsumer.onMessage(message);
 
-        verify(jobService).update(ID, Map.of(ContentBasedAndRetriableMessageConsumer.RETRIED, 8, STATUS, JobStatus.ERROR));
+        verify(jobService)
+                .update(
+                        ID,
+                        Map.of(
+                                ContentBasedAndRetriableMessageConsumer.RETRIED,
+                                8,
+                                STATUS,
+                                JobStatus.ERROR));
         verify(messagingService)
                 .sendToRetry(
                         argThat(

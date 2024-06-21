@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class ContentBasedAndRetriableMessageConsumer<
                 T extends DownloadRequest, R extends DownloadJob>
         implements MessageListener {
-    protected static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
+    public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     protected static final String JOB_ID_HEADER = "jobId";
     protected static final String UPDATE_COUNT = "updateCount";
@@ -100,7 +100,8 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
     }
 
     protected boolean hasJobConsumedBefore(R downloadJob) {
-        return asyncDownloadFileHandler.areAllFilesExist(downloadJob.getId()) && ERROR != downloadJob.getStatus();
+        return asyncDownloadFileHandler.areAllFilesExist(downloadJob.getId())
+                && ERROR != downloadJob.getStatus();
     }
 
     private void cleanIfNecessary(DownloadJob downloadJob) {

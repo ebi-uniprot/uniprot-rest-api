@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.idmapping;
 
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -12,8 +14,6 @@ import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IdMappingContentBasedAndRetriableMessageConsumerTest

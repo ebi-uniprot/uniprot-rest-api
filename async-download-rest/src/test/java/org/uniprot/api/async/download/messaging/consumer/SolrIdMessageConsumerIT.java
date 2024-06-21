@@ -1,5 +1,24 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
+
+import java.io.BufferedWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -20,30 +39,11 @@ import org.uniprot.api.common.repository.stream.rdf.RdfEntryCountProvider;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 
-import java.io.BufferedWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.rest.download.model.JobStatus.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class SolrIdMessageConsumerIT<
-        T extends SolrStreamDownloadRequest, R extends DownloadJob>
+                T extends SolrStreamDownloadRequest, R extends DownloadJob>
         extends BasicMessageConsumerIT {
-    public static final String ID = "someId";
+    protected static final String ID = "someId";
     protected static final String JOB_ID_HEADER = "jobId";
     public static final int MAX_RETRY_COUNT = 3;
     public static final long UPDATE_COUNT = 10;
@@ -53,10 +53,8 @@ public abstract class SolrIdMessageConsumerIT<
     protected AsyncDownloadFileHandler asyncDownloadFileHandler;
     protected DownloadConfigProperties downloadConfigProperties;
     protected T downloadRequest;
-    @Autowired
-    protected MessageConverter messageConverter;
-    @MockBean
-    protected RdfEntryCountProvider rdfEntryCountProvider;
+    @Autowired protected MessageConverter messageConverter;
+    @MockBean protected RdfEntryCountProvider rdfEntryCountProvider;
 
     @AfterEach
     void tearDown() {
@@ -146,7 +144,8 @@ public abstract class SolrIdMessageConsumerIT<
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
         saveDownloadJob(ID, 0, NEW, 0, 0);
         if (isRdfType(format)) {
-            when(rdfEntryCountProvider.getEntryCount(anyString(), anyString(), anyString())).thenReturn(12);
+            when(rdfEntryCountProvider.getEntryCount(anyString(), anyString(), anyString()))
+                    .thenReturn(12);
         }
 
         messageConsumer.onMessage(message);
@@ -157,7 +156,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
         assertJobSpecifics(job, format);
         verifyIdsFiles(ID);
-        if (Objects.equals(format,"json")) {
+        if (Objects.equals(format, "json")) {
             verifyResultFile(ID);
         }
     }
@@ -169,7 +168,10 @@ public abstract class SolrIdMessageConsumerIT<
     protected abstract void assertJobSpecifics(R job, String format);
 
     protected boolean isRdfType(String format) {
-        return SUPPORTED_RDF_MEDIA_TYPES.keySet().stream().map(Objects::toString).collect(Collectors.toSet()).contains(format);
+        return SUPPORTED_RDF_MEDIA_TYPES.keySet().stream()
+                .map(Objects::toString)
+                .collect(Collectors.toSet())
+                .contains(format);
     }
 
     @Test
@@ -231,10 +233,17 @@ public abstract class SolrIdMessageConsumerIT<
     }
 
     private void createResultFile(String jobId) throws Exception {
-        createFile(downloadConfigProperties.getResultFilesFolder(), jobId + "." + FileType.GZIP.getExtension());
+        createFile(
+                downloadConfigProperties.getResultFilesFolder(),
+                jobId + "." + FileType.GZIP.getExtension());
     }
 
-    protected abstract void saveDownloadJob(String id, int retryCount, JobStatus jobStatus, long updateCount, long processedEntries);
+    protected abstract void saveDownloadJob(
+            String id,
+            int retryCount,
+            JobStatus jobStatus,
+            long updateCount,
+            long processedEntries);
 
     protected abstract Stream<Arguments> getSupportedFormats();
 }

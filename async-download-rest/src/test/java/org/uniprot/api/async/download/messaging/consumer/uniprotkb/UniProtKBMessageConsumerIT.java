@@ -1,6 +1,17 @@
 package org.uniprot.api.async.download.messaging.consumer.uniprotkb;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,27 +54,17 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.download.model.JobStatus.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(
         classes = {
-                TestConfig.class,
-                UniProtKBDataStoreTestConfig.class,
-                UniProtKBDataStoreTestConfig.class,
-                AsyncDownloadRestApp.class,
-                ErrorHandlerConfig.class,
-                RedisConfiguration.class
+            TestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadRestApp.class,
+            ErrorHandlerConfig.class,
+            RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
@@ -71,35 +72,32 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 class UniProtKBMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     public static final int MAX_ENTRY_COUNT = 15;
-    @Autowired
-    private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBMessageConsumer;
-    @Autowired
-    private UniprotQueryRepository uniProtKBQueryRepository;
-    @Autowired
-    private SolrClient solrClient;
+    @Autowired private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBMessageConsumer;
+    @Autowired private UniprotQueryRepository uniProtKBQueryRepository;
+    @Autowired private SolrClient solrClient;
+
     @Autowired()
     @Qualifier("uniProtStoreClient")
     private UniProtStoreClient<UniProtKBEntry> storeClient;
-    @Autowired
-    private UniProtKBAsyncConfig uniProtKBAsyncConfig;
-    @Autowired
-    private UniProtKBDownloadJobRepository uniProtKBDownloadJobRepository;
-    @Autowired
-    private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
-    @Autowired
-    private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+
+    @Autowired private UniProtKBAsyncConfig uniProtKBAsyncConfig;
+    @Autowired private UniProtKBDownloadJobRepository uniProtKBDownloadJobRepository;
+    @Autowired private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
+    @Autowired private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+
     @Qualifier("uniProtKBFacetTupleStreamTemplate")
     @Autowired
     private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
     @Autowired
     @Qualifier("uniProtKBTupleStream")
     private TupleStreamTemplate tupleStreamTemplate;
+
     @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
-    @Autowired
-    private TaxonomyLineageRepository taxRepository;
-    @Autowired
-    private EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
+
+    @Autowired private TaxonomyLineageRepository taxRepository;
+    @Autowired private EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
 
     @BeforeAll
     void beforeAll() throws Exception {
@@ -236,7 +234,11 @@ class UniProtKBMessageConsumerIT
 
     @Override
     protected void assertJobSpecifics(UniProtKBDownloadJob job, String format) {
-        assertEquals(Objects.equals(format, LIST_MEDIA_TYPE_VALUE) ? 12 : isRdfType(format) ? 7 : isH5Format(format) ? 6 : 8, job.getUpdateCount());
+        assertEquals(
+                Objects.equals(format, LIST_MEDIA_TYPE_VALUE)
+                        ? 12
+                        : isRdfType(format) ? 7 : isH5Format(format) ? 6 : 8,
+                job.getUpdateCount());
         assertEquals(isH5Format(format) ? UNFINISHED : FINISHED, job.getStatus());
         assertEquals(isH5Format(format) ? 0 : 12, job.getProcessedEntries());
     }
@@ -246,11 +248,20 @@ class UniProtKBMessageConsumerIT
     }
 
     @Override
-    protected void saveDownloadJob(String id, int retryCount, JobStatus jobStatus, long updateCount, long processedEntries) {
+    protected void saveDownloadJob(
+            String id,
+            int retryCount,
+            JobStatus jobStatus,
+            long updateCount,
+            long processedEntries) {
         uniProtKBDownloadJobRepository.save(
-                UniProtKBDownloadJob.builder().id(id).status(jobStatus).updateCount(updateCount)
+                UniProtKBDownloadJob.builder()
+                        .id(id)
+                        .status(jobStatus)
+                        .updateCount(updateCount)
                         .processedEntries(processedEntries)
-                        .retried(retryCount).build());
+                        .retried(retryCount)
+                        .build());
         System.out.println();
     }
 
