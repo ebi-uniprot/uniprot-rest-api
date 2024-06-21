@@ -315,11 +315,15 @@ public class IdMappingDownloadControllerIT {
         uniRefStoreClient.saveEntry(entryLight);
     }
 
-    @AfterAll
-    public void cleanUpData() throws Exception {
+    @AfterEach
+    void cleanUpRedisAndFiles() throws IOException {
         cleanUpFolder(idMappingAsyncConfig.getIdsFolder());
         cleanUpFolder(idMappingAsyncConfig.getResultFolder());
         downloadJobRepository.deleteAll();
+    }
+
+    @AfterAll
+    public void cleanUpData() {
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRejectedQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getDownloadQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRetryQueue(), true);
@@ -581,10 +585,15 @@ public class IdMappingDownloadControllerIT {
 
     @Test
     void resubmit_withForceOnAlreadyFailedJobAfterMaxRetry() throws Exception {
-        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String idMappingJobId = "JOB_ID_DETAILS_RETRY";
+        String asyncJobId = "1ae9841545d7e36f7106ae4e4f0965e4cb8d125d";
 
-        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        List<IdMappingStringPair> mappedIds = new ArrayList<>();
+        mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
+        mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
+        List<String> unMappedIds = List.of("UPI0000283100", "UPI0000283200");
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, mappedIds, unMappedIds);
         IdMappingDownloadJob downloadJob =
                 IdMappingDownloadJob.builder()
                         .id(asyncJobId)
@@ -592,6 +601,14 @@ public class IdMappingDownloadControllerIT {
                         .status(JobStatus.ERROR)
                         .build();
         downloadJobRepository.save(downloadJob);
+
+        Path resultFilePath =
+                Path.of(
+                        idMappingAsyncConfig.getResultFolder()
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
+        Assertions.assertTrue(resultFilePath.toFile().createNewFile());
 
         ResultActions response =
                 mockMvc.perform(
@@ -607,6 +624,8 @@ public class IdMappingDownloadControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)))
                 .andExpect(jsonPath("$.message").doesNotExist());
+
+        validateSuccessIdMappingResult(asyncJobId, resultFilePath, unMappedIds);
     }
 
     @Test
@@ -799,40 +818,14 @@ public class IdMappingDownloadControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(asyncJobId)));
 
-        await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
                 Path.of(
                         idMappingAsyncConfig.getResultFolder()
                                 + File.separator
                                 + asyncJobId
                                 + FileType.GZIP.getExtension());
-        assertTrue(Files.exists(resultFilePath));
-        JsonNode jsonResult =
-                MAPPER.readTree(
-                        new GzipCompressorInputStream(
-                                new FileInputStream(resultFilePath.toFile())));
-        ArrayNode results = (ArrayNode) jsonResult.findPath("results");
-        assertEquals(2, results.size());
-        assertTrue(results.findValuesAsText("from").containsAll(List.of("P10001", "P10002")));
 
-        List<JsonNode> to = results.findValues("to");
-        assertTrue(
-                to.stream()
-                        .map(node -> node.findValue("uniParcId").asText())
-                        .collect(Collectors.toSet())
-                        .containsAll(List.of("UPI0000283A01", "UPI0000283A02")));
-
-        assertTrue(
-                to.stream()
-                        .map(node -> node.findPath("sequence"))
-                        .filter(node -> !(node instanceof MissingNode))
-                        .collect(Collectors.toSet())
-                        .isEmpty());
-
-        ArrayNode failed = (ArrayNode) jsonResult.findPath("failedIds");
-        List<String> failedIds = new ArrayList<>();
-        failed.forEach(node -> failedIds.add(node.asText()));
-        assertEquals(unMappedIds, failedIds);
+        validateSuccessIdMappingResult(asyncJobId, resultFilePath, unMappedIds);
     }
 
     @ParameterizedTest(name = "[{index}] with format {0}")
@@ -1357,5 +1350,37 @@ public class IdMappingDownloadControllerIT {
             default:
                 fail("Invalid SUPPORTED_RDF_MEDIA_TYPES");
         }
+    }
+
+    private void validateSuccessIdMappingResult(
+            String asyncJobId, Path resultFilePath, List<String> unMappedIds) throws IOException {
+        await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
+        assertTrue(Files.exists(resultFilePath));
+        JsonNode jsonResult =
+                MAPPER.readTree(
+                        new GzipCompressorInputStream(
+                                new FileInputStream(resultFilePath.toFile())));
+        ArrayNode results = (ArrayNode) jsonResult.findPath("results");
+        assertEquals(2, results.size());
+        assertTrue(results.findValuesAsText("from").containsAll(List.of("P10001", "P10002")));
+
+        List<JsonNode> to = results.findValues("to");
+        assertTrue(
+                to.stream()
+                        .map(node -> node.findValue("uniParcId").asText())
+                        .collect(Collectors.toSet())
+                        .containsAll(List.of("UPI0000283A01", "UPI0000283A02")));
+
+        assertTrue(
+                to.stream()
+                        .map(node -> node.findPath("sequence"))
+                        .filter(node -> !(node instanceof MissingNode))
+                        .collect(Collectors.toSet())
+                        .isEmpty());
+
+        ArrayNode failed = (ArrayNode) jsonResult.findPath("failedIds");
+        List<String> failedIds = new ArrayList<>();
+        failed.forEach(node -> failedIds.add(node.asText()));
+        assertEquals(unMappedIds, failedIds);
     }
 }

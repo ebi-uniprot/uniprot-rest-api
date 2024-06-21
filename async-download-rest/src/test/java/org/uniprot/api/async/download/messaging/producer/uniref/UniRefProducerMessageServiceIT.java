@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -29,11 +29,12 @@ import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(SpringExtension.class)
-@Import({
-    UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class,
-    UniRefRabbitMQConfig.class,
-    RedisConfigTest.class
-})
+@ContextConfiguration(
+        classes = {
+            UniRefProducerMessageServiceIT.UniRefProducerTestConfig.class,
+            UniRefRabbitMQConfig.class,
+            RedisConfigTest.class
+        })
 @EnableConfigurationProperties({UniRefDownloadConfigProperties.class})
 public class UniRefProducerMessageServiceIT
         extends SolrProducerMessageServiceIT<UniRefDownloadRequest, UniRefDownloadJob> {

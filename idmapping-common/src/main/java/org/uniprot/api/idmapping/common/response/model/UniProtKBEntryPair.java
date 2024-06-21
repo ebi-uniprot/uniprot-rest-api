@@ -1,10 +1,10 @@
 package org.uniprot.api.idmapping.common.response.model;
 
-import lombok.EqualsAndHashCode;
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**

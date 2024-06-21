@@ -1,6 +1,5 @@
 package org.uniprot.api.async.download.messaging.producer.idmapping;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.lenient;
@@ -19,6 +18,7 @@ import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(MockitoExtension.class)
 class IdMappingAsyncDownloadSubmissionRulesTest
@@ -43,6 +43,7 @@ class IdMappingAsyncDownloadSubmissionRulesTest
                         idMappingJobService,
                         idMappingJobCacheService);
         when(downloadRequest.getJobId()).thenReturn(JOB_ID);
+        lenient().when(idMappingJob.getJobStatus()).thenReturn(JobStatus.FINISHED);
         when(idMappingJobCacheService.get(JOB_ID)).thenReturn(idMappingJob);
         lenient().when(idMappingJob.getIdMappingResult()).thenReturn(idMappingResult);
         mock();
@@ -52,19 +53,21 @@ class IdMappingAsyncDownloadSubmissionRulesTest
     void submit_whenIdMappingJobIsNotPresent() {
         when(idMappingJobCacheService.get(JOB_ID)).thenReturn(null);
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> asyncDownloadSubmissionRules.submit(idMappingDownloadRequest));
+        JobSubmitFeedback jobSubmitFeedback =
+                asyncDownloadSubmissionRules.submit(idMappingDownloadRequest);
+
+        assertFalse(jobSubmitFeedback.isAllowed());
+        assertEquals("ID Mapping Job id jobId not found", jobSubmitFeedback.getMessage());
     }
 
     @Test
     void submit_whenIdMappingJobResultIsNotReady() {
-        when(idMappingJob.getIdMappingResult()).thenReturn(null);
+        when(idMappingJob.getJobStatus()).thenReturn(JobStatus.RUNNING);
 
         JobSubmitFeedback jobSubmitFeedback =
                 asyncDownloadSubmissionRules.submit(idMappingDownloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("ID Mapping Job jobId id not yet finished", jobSubmitFeedback.getMessage());
+        assertEquals("ID Mapping Job id jobId not yet finished", jobSubmitFeedback.getMessage());
     }
 }
