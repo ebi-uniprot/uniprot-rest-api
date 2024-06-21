@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
 
 import java.util.List;
 import java.util.Optional;
@@ -73,9 +74,7 @@ class UniProtEntryQueryResultsConverterTest {
         EntryInactiveReason inactiveReason = entry.getInactiveReason();
         assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
         assertEquals(DeletedReason.SOURCE_DELETION_EMBL, inactiveReason.getDeletedReason());
-        assertEquals(
-                uniParcDeleted,
-                entry.getExtraAttributeValue(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB));
+        assertEquals(uniParcDeleted, entry.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 
     @Test
@@ -93,9 +92,7 @@ class UniProtEntryQueryResultsConverterTest {
         EntryInactiveReason inactiveReason = entry.getInactiveReason();
         assertEquals(InactiveReasonType.DELETED, inactiveReason.getInactiveReasonType());
         assertNull(inactiveReason.getDeletedReason());
-        assertEquals(
-                uniParcDeleted,
-                entry.getExtraAttributeValue(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB));
+        assertEquals(uniParcDeleted, entry.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 
     @Test
@@ -112,7 +109,7 @@ class UniProtEntryQueryResultsConverterTest {
         EntryInactiveReason inactiveReason = entry.getInactiveReason();
         assertEquals(InactiveReasonType.MERGED, inactiveReason.getInactiveReasonType());
         assertEquals(List.of("P21802"), inactiveReason.getMergeDemergeTos());
-        assertNull(entry.getExtraAttributeValue(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB));
+        assertNull(entry.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 
     @Test

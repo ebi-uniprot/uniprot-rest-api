@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.common.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
 
 import java.io.IOException;
 
@@ -13,7 +14,6 @@ import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
-import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 
 class UniprotKBMappingRepositoryTest {
 
@@ -39,9 +39,7 @@ class UniprotKBMappingRepositoryTest {
                 InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
         assertEquals(
                 DeletedReason.SWISSPROT_DELETION, result.getInactiveReason().getDeletedReason());
-        assertEquals(
-                "UPI000031CDF9",
-                result.getExtraAttributeValue(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB));
+        assertEquals("UPI000031CDF9", result.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 
     @Test
@@ -97,8 +95,6 @@ class UniprotKBMappingRepositoryTest {
                 InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
         assertEquals(
                 DeletedReason.PROTEOME_REDUNDANCY, result.getInactiveReason().getDeletedReason());
-        assertEquals(
-                "UPI000031CDF9",
-                result.getExtraAttributeValue(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB));
+        assertEquals("UPI000031CDF9", result.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 }

@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.common.repository;
 
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
+
 import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -59,8 +61,7 @@ public class UniprotKBMappingRepository {
                     UniProtKBEntryBuilder builder =
                             new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build());
                     if (Utils.notNull(document.uniparcDeleted)) {
-                        builder.extraAttributesAdd(
-                                UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, document.uniparcDeleted);
+                        builder.extraAttributesAdd(UNIPARC_ID_ATTRIB, document.uniparcDeleted);
                     }
                     result = builder.build();
                 }

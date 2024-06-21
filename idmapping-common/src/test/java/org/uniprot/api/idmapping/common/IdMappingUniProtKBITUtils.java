@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.common;
 
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -159,7 +161,7 @@ public class IdMappingUniProtKBITUtils {
             UniProtKBEntryBuilder entryBuilder)
             throws IOException, SolrServerException {
         List<Comment> comments = createAllComments();
-        entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
+        entryBuilder.extraAttributesAdd(UNIPARC_ID_ATTRIB, "UP1234567890");
         entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
         entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
         Gene gene =

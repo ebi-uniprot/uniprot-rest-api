@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
@@ -120,8 +122,7 @@ class UniProtEntryQueryResultsConverter {
         UniProtKBEntryBuilder entryBuilder =
                 new UniProtKBEntryBuilder(accession, uniProtkbId, inactiveReason);
         if (Utils.notNull(doc.uniparcDeleted)) {
-            entryBuilder.extraAttributesAdd(
-                    UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, doc.uniparcDeleted);
+            entryBuilder.extraAttributesAdd(UNIPARC_ID_ATTRIB, doc.uniparcDeleted);
         }
         return Optional.of(entryBuilder.build());
     }

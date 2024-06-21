@@ -316,8 +316,9 @@ class JsonMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\",\"extraAttributes\":{\"uniParcId\":\"UP1234567890\"}},\n"
-                        + "{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\",\"extraAttributes\":{\"uniParcId\":\"UP1234567890\"}}]}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}},
+                        {"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}]}""",
                 result);
     }
 
@@ -345,7 +346,8 @@ class JsonMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\",\"extraAttributes\":{\"uniParcId\":\"UP1234567890\"}}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}],\"obsoleteCount\":10}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}],"failedIds":["id1"],"suggestedIds":[{"from":"fromid2","to":"toid2"}],"obsoleteCount":10}""",
                 result);
     }
 
