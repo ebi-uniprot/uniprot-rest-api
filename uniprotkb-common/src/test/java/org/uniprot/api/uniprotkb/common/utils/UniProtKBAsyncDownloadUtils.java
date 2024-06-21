@@ -114,7 +114,12 @@ public class UniProtKBAsyncDownloadUtils {
         for (int i = 0; i < 2; i++) {
             InactiveUniProtEntry inactiveEntry =
                     InactiveUniProtEntry.from(
-                            "I8FBX" + i, "INACTIVE_DROME", DELETED, null, "SOURCE_DELETION_EMBL");
+                            "I8FBX" + i,
+                            "INACTIVE_DROME",
+                            DELETED,
+                            "UPI000012CEB" + i,
+                            null,
+                            "SOURCE_DELETION_EMBL");
             storeManager.saveEntriesInSolr(
                     DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
         }

@@ -363,6 +363,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.extraAttributes.uniParcId")
+                                .doesNotExist())
+                .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("MERGED")))
                 .andExpect(
@@ -392,7 +395,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         // ... inactive entry that was merged into 'activeAcc' entry
         InactiveUniProtEntry inactiveEntry =
                 InactiveUniProtEntry.from(
-                        inactiveAcc, "I8FBX0_MYCAB", InactiveEntryMocker.MERGED, activeAcc, null);
+                        inactiveAcc,
+                        "I8FBX0_MYCAB",
+                        InactiveEntryMocker.MERGED,
+                        "UPI0001661588",
+                        activeAcc,
+                        null);
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
 
@@ -484,6 +492,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("Q00007")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.extraAttributes.uniParcId")
+                                .doesNotExist())
+                .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DEMERGED")))
                 .andExpect(
@@ -524,6 +535,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBB")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DELETED")))
                 .andExpect(jsonPath("$.inactiveReason.deletedReason").doesNotExist());
     }
@@ -559,6 +573,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                 .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("I8FBX1")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI00000DCD3D")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DELETED")))
