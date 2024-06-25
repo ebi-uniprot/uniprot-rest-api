@@ -48,6 +48,6 @@ class IdMappingContentBasedAndRetriableMessageConsumerTest
 
     @Override
     protected void mockFileExistence() {
-        when(asyncDownloadFileHandler.isIdFileExist(ID)).thenReturn(true);
+        when(asyncDownloadFileHandler.isResultFileExist(ID)).thenReturn(true);
     }
 }
