@@ -253,7 +253,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                         content()
                                 .string(
                                         containsString(
-                                                "From\tCluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                                "From\tCluster ID\tCluster Name\tCommon taxon\tSize\tDate of last update")))
                 .andExpect(
                         content()
                                 .string(

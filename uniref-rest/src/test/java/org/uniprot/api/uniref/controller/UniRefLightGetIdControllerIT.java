@@ -304,7 +304,7 @@ class UniRefLightGetIdControllerIT {
                         content()
                                 .string(
                                         containsString(
-                                                "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                                "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of last update")))
                 .andExpect(
                         content()
                                 .string(

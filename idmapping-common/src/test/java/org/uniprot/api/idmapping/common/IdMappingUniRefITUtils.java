@@ -47,7 +47,7 @@ public class IdMappingUniRefITUtils {
             case "length":
                 value = "[10 TO 500]";
                 break;
-            case "created":
+            case "updated":
                 value = "[2000-01-01 TO *]";
                 break;
         }
