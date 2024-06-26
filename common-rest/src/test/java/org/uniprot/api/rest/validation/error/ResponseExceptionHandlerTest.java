@@ -212,7 +212,7 @@ class ResponseExceptionHandlerTest {
         assertNotNull(responseEntity.getBody());
         JobSubmitResponse body = responseEntity.getBody();
         assertSame(jobId, body.getJobId());
-        assertSame(message, body.getMessage());
+        assertEquals("%s%nsee 'status/%s' for more details".formatted(message, jobId), body.getMessage());
     }
 
     @Test

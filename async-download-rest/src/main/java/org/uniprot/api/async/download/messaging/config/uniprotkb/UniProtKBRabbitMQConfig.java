@@ -1,11 +1,15 @@
 package org.uniprot.api.async.download.messaging.config.uniprotkb;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.uniprot.api.async.download.model.common.DownloadRequest;
-import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
+import org.uniprot.api.async.download.messaging.consumer.uniprotkb.UniProtKBMessageConsumer;
+import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -91,8 +95,17 @@ public class UniProtKBRabbitMQConfig {
     }
 
     @Bean
-    public HashGenerator<DownloadRequest> uniProtKBHashGenerator(
+    public MessageListenerContainer uniProtKBMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            UniProtKBMessageConsumer uniProtKBMessageConsumer,
+            UniProtKBAsyncDownloadQueueConfigProperties configProps) {
+        return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
+                connectionFactory, uniProtKBMessageConsumer, configProps);
+    }
+
+    @Bean
+    public HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadHashGenerator(
             @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
-        return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
+        return new HashGenerator<>(new DownloadRequestToArrayConverter<>(), hashSalt);
     }
 }

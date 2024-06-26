@@ -4,6 +4,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.uniparc.UniParcEntry;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -12,6 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@EqualsAndHashCode
 public class UniParcEntryPair implements EntryPair<UniParcEntry> {
     private final String from;
     private final UniParcEntry to;

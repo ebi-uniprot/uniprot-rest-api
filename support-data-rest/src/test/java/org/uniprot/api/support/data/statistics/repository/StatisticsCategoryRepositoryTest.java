@@ -17,13 +17,18 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@Import({HttpCommonHeaderConfig.class, RequestMappingHandlerMapping.class})
+@Import({
+    HttpCommonHeaderConfig.class,
+    RequestMappingHandlerMapping.class,
+    RequestMappingHandlerAdapter.class
+})
 class StatisticsCategoryRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 

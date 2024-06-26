@@ -42,7 +42,7 @@ public class RdfEntryCountProvider {
                             Pattern.compile(
                                     "<http://purl.uniprot.org/uniprot/(UniRef100|UniRef90|UniRef50)_([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])(-[0-9]+)?> <http://purl.uniprot.org/core/reviewed>")));
 
-    int getEntryCount(String response, String dataType, String format) {
+    public int getEntryCount(String response, String dataType, String format) {
         return (int)
                 Arrays.stream(response.split("\n"))
                         .map(String::trim)
