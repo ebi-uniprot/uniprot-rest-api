@@ -31,11 +31,11 @@ import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.BasicProducerMessageServiceIT;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
@@ -65,18 +65,18 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
     @Autowired private IdMappingDownloadJobRepository jobRepository;
 
-    @Autowired private IdMappingAsyncDownloadFileHandler fileHandler;
+    @Autowired private IdMappingFileHandler fileHandler;
 
     @Autowired private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
 
-    @MockBean private IdMappingContentBasedAndRetriableMessageConsumer idMappingMessageConsumer;
+    @MockBean private IdMappingMessageConsumer idMappingMessageConsumer;
 
     @Captor ArgumentCaptor<Message> messageCaptor;
 
     @Test
     void sendMessage_withSuccess() {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(ID_MAPPING_JOB_ID_VALUE);
+        request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("fasta");
         request.setFields("accession,gene");
         createIDMappingJob(JobStatus.FINISHED);
@@ -98,7 +98,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     @Test
     void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(ID_MAPPING_JOB_ID_VALUE);
+        request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("json");
         request.setFields("accession,gene");
         request.setForce(true);
@@ -141,14 +141,14 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         validateDownloadJob(jobId, downloadJob, request);
 
         // Validate idle job files were deleted
-        assertFalse(fileHandler.isIdFileExist(jobId));
-        assertFalse(fileHandler.isResultFileExist(jobId));
+        assertFalse(fileHandler.isIdFilePresent(jobId));
+        assertFalse(fileHandler.isResultFilePresent(jobId));
     }
 
     @Test
     void sendMessage_jobAlreadyRunningAndNotAllowed() {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(ID_MAPPING_JOB_ID_VALUE);
+        request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("json");
         String jobId = "6ce47574dc980c6c4d49e62483eaee999fb51f60";
         createIDMappingJob(JobStatus.FINISHED);
@@ -182,7 +182,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     @Test
     void sendMessage_IdMappingNotFinishedNotAllowed() {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(ID_MAPPING_JOB_ID_VALUE);
+        request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("json");
 
         createIDMappingJob(JobStatus.RUNNING);
@@ -200,7 +200,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     void sendMessage_IdMappingNotFoundNotAllowed() {
         String idMappingNotValid = "INVALID";
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(idMappingNotValid);
+        request.setIdMappingJobId(idMappingNotValid);
         request.setFormat("json");
 
         IllegalDownloadJobSubmissionException submitionError =
@@ -215,7 +215,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     @Test
     void sendMessage_WithoutFormatDefaultToJson() {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId(ID_MAPPING_JOB_ID_VALUE);
+        request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         createIDMappingJob(JobStatus.FINISHED);
 
         String jobId = "6ce47574dc980c6c4d49e62483eaee999fb51f60";
@@ -261,7 +261,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     }
 
     @Override
-    protected AsyncDownloadFileHandler getFileHandler() {
+    protected FileHandler getFileHandler() {
         return fileHandler;
     }
 

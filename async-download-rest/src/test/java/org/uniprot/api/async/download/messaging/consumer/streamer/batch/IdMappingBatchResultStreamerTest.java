@@ -31,7 +31,7 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
     @Test
     void stream() {
         mockBatch();
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         List<IdMappingStringPair> idMappingStringPairList =
                 List.of(
@@ -46,8 +46,8 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
 
         assertThat(result).hasSameElementsAs(getEntryList());
         InOrder inOrder = inOrder(heartbeatProducer);
-        inOrder.verify(heartbeatProducer).createForResults(job, 2);
-        inOrder.verify(heartbeatProducer).createForResults(job, 1);
+        inOrder.verify(heartbeatProducer).generateForResults(job, 2);
+        inOrder.verify(heartbeatProducer).generateForResults(job, 1);
     }
 
     protected abstract Iterable<P> getEntryList();
@@ -56,7 +56,7 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(

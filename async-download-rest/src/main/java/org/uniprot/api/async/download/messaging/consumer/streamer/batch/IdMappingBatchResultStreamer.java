@@ -36,9 +36,13 @@ public abstract class IdMappingBatchResultStreamer<Q, P extends EntryPair<Q>>
         return StreamSupport.stream(batchStoreEntryPairIterable.spliterator(), false)
                 .peek(
                         entityCollection ->
-                                heartbeatProducer.createForResults(job, entityCollection.size()))
+                                heartbeatProducer.generateForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
-                .onClose(() -> log.info("Finished streaming entries for job {}", request.getId()));
+                .onClose(
+                        () ->
+                                log.info(
+                                        "Finished streaming entries for job {}",
+                                        request.getDownloadJobId()));
     }
 
     protected abstract BatchStoreEntryPairIterable<P, Q> getBatchStoreEntryPairIterable(

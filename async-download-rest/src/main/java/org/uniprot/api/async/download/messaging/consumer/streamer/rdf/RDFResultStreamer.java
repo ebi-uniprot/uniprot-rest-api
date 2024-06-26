@@ -41,7 +41,7 @@ public abstract class RDFResultStreamer<T extends DownloadRequest, R extends Dow
                 ids,
                 getDataType(),
                 SUPPORTED_RDF_TYPES.get(UniProtMediaType.valueOf(request.getFormat())),
-                entries -> heartbeatProducer.createForResults(job, entries));
+                entries -> heartbeatProducer.generateForResults(job, entries));
     }
 
     protected abstract String getDataType();

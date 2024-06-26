@@ -276,7 +276,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andExpect(
                         jsonPath(
                                 "$.message",
-                                is("Job with id " + jobId + " has already been submitted")));
+                                containsString(
+                                        "Job with id " + jobId + " has already been submitted")));
     }
 
     @Test
@@ -308,7 +309,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andExpect(
                         jsonPath(
                                 "$.message",
-                                is("Job with id " + jobId + " has already been submitted")));
+                                containsString(
+                                        "Job with id " + jobId + " has already been submitted")));
     }
 
     @Test

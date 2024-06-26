@@ -1,7 +1,7 @@
 package org.uniprot.api.async.download.messaging.producer;
 
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
@@ -17,15 +17,15 @@ public abstract class SolrProducerMessageService<
             MessageConverter messageConverter,
             MessagingService messagingService,
             HashGenerator<T> hashGenerator,
-            AsyncDownloadFileHandler asyncDownloadFileHandler,
-            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            FileHandler fileHandler,
+            JobSubmissionRules jobSubmissionRules) {
         super(
                 jobService,
                 messageConverter,
                 messagingService,
                 hashGenerator,
-                asyncDownloadFileHandler,
-                asyncDownloadSubmissionRules);
+                fileHandler,
+                jobSubmissionRules);
     }
 
     @Override

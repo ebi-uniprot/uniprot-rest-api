@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.producer.AsyncDownloadSubmissionRules;
+import org.uniprot.api.async.download.messaging.producer.JobSubmissionRules;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
@@ -14,11 +14,11 @@ import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @Component
-public class IdMappingAsyncDownloadSubmissionRules
-        extends AsyncDownloadSubmissionRules<IdMappingDownloadRequest, IdMappingDownloadJob> {
+public class IdMappingJobSubmissionRules
+        extends JobSubmissionRules<IdMappingDownloadRequest, IdMappingDownloadJob> {
     private final IdMappingJobCacheService idMappingJobCacheService;
 
-    public IdMappingAsyncDownloadSubmissionRules(
+    public IdMappingJobSubmissionRules(
             @Value("${async.download.idmapping.retryMaxCount}") int maxRetryCount,
             @Value("${async.download.idmapping.waitingMaxTime}") int maxWaitingTime,
             IdMappingJobService jobService,
@@ -29,7 +29,7 @@ public class IdMappingAsyncDownloadSubmissionRules
 
     @Override
     public JobSubmitFeedback submit(IdMappingDownloadRequest request) {
-        String idMappingJobId = request.getJobId();
+        String idMappingJobId = request.getIdMappingJobId();
         IdMappingJob idMappingJob = idMappingJobCacheService.get(idMappingJobId);
         String message;
         if (idMappingJob != null) {

@@ -39,13 +39,17 @@ public class HeartbeatProducer {
                         .withDelay(Duration.ofMillis(heartbeatConfig.getRetryDelayInMillis()));
     }
 
-    public void createForIds(String id) {
-        createForIds(jobService.find(id).get());
+    public void generateForIds(String jobId) {
+        generateForIds(
+                jobService
+                        .find(jobId)
+                        .orElseThrow(
+                                () -> new IllegalArgumentException("Invalid job id: " + jobId)));
     }
 
-    public void createForIds(DownloadJob downloadJob) {
+    public void generateForIds(DownloadJob downloadJob) {
         try {
-            createIfEligible(
+            generateIfEligible(
                     downloadJob,
                     1,
                     heartbeatConfig.getIdsInterval(),
@@ -86,7 +90,7 @@ public class HeartbeatProducer {
         }
     }
 
-    private void createIfEligible(
+    private void generateIfEligible(
             DownloadJob downloadJob, long size, long interval, LongConsumer consumer) {
         if (heartbeatConfig.isEnabled()) {
             String jobId = downloadJob.getId();
@@ -115,9 +119,9 @@ public class HeartbeatProducer {
         return totalNumberOfProcessedEntries >= Math.min(totalEntries, nextCheckPoint);
     }
 
-    public void createForResults(DownloadJob downloadJob, long increase) {
+    public void generateForResults(DownloadJob downloadJob, long increase) {
         try {
-            createIfEligible(
+            generateIfEligible(
                     downloadJob,
                     increase,
                     heartbeatConfig.getResultsInterval(),

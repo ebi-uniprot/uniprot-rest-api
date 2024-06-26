@@ -24,7 +24,7 @@ public abstract class ListResultStreamerTest<T extends DownloadRequest, R extend
 
     @Test
     void stream() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         List<String> idList = List.of("id1", "id2", "id3");
         Stream<String> ids = idList.stream();
@@ -32,12 +32,12 @@ public abstract class ListResultStreamerTest<T extends DownloadRequest, R extend
         Stream<String> result = listResultStreamer.stream(request, ids);
 
         assertThat(result).hasSameElementsAs(idList);
-        verify(heartbeatProducer, times(3)).createForResults(job, 1L);
+        verify(heartbeatProducer, times(3)).generateForResults(job, 1L);
     }
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(

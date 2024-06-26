@@ -14,14 +14,14 @@ import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
-import org.uniprot.api.async.download.messaging.consumer.uniprotkb.UniProtKBContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.uniprotkb.UniProtKBMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
@@ -42,15 +42,15 @@ class UniProtKBProducerMessageServiceIT
 
     @Autowired private UniProtKBJobService uniProtKBJobService;
 
-    @Autowired private UniProtKBAsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
+    @Autowired private UniProtKBJobSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
 
     @Autowired private UniProtKBDownloadJobRepository jobRepository;
 
-    @Autowired private UniProtKBAsyncDownloadFileHandler fileHandler;
+    @Autowired private UniProtKBFileHandler fileHandler;
 
     @Autowired private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
 
-    @MockBean private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBConsumer;
+    @MockBean private UniProtKBMessageConsumer uniProtKBConsumer;
 
     @Override
     protected UniProtKBDownloadJob getDownloadJob(
@@ -78,9 +78,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected ContentBasedAndRetriableMessageConsumer<
-                    UniProtKBDownloadRequest, UniProtKBDownloadJob>
-            getConsumer() {
+    protected MessageConsumer<UniProtKBDownloadRequest, UniProtKBDownloadJob> getConsumer() {
         return uniProtKBConsumer;
     }
 
@@ -127,7 +125,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected AsyncDownloadFileHandler getFileHandler() {
+    protected FileHandler getFileHandler() {
         return fileHandler;
     }
 

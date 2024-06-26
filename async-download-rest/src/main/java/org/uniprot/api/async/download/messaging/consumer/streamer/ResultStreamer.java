@@ -16,10 +16,10 @@ public abstract class ResultStreamer<T extends DownloadRequest, R extends Downlo
     public abstract Stream<U> stream(T request, Stream<S> ids);
 
     protected R getJob(T request) {
-        String id = request.getId();
+        String jobId = request.getDownloadJobId();
         return jobService
-                .find(id)
+                .find(jobId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("job id %s not found".formatted(id)));
+                        () -> new IllegalArgumentException("job id %s not found".formatted(jobId)));
     }
 }

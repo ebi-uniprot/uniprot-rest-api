@@ -6,9 +6,11 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappingBatchResultStreamerTest;
@@ -61,19 +63,19 @@ class UniParcIdMappingBatchResultStreamerTest
         when(streamerConfigProperties.getStoreBatchSize()).thenReturn(BATCH_SIZE);
         when(storeStreamerConfig.getStoreFetchRetryPolicy()).thenReturn(new RetryPolicy<>());
         when(storeStreamerConfig.getStoreClient()).thenReturn(storeClient);
-        when(storeClient.getEntries(any()))
-                .thenAnswer(
-                        inv -> {
-                            Iterable<String> strings = inv.getArgument(0);
-                            List<String> args =
-                                    StreamSupport.stream(strings.spliterator(), false).toList();
-                            if (List.of("to1", "to2").containsAll(args) && args.size() == 2) {
-                                return List.of(uniParc1, uniParc2);
-                            }
-                            if (List.of("to3").containsAll(args) && args.size() == 1) {
-                                return List.of(uniParc3);
-                            }
-                            throw new IllegalArgumentException();
-                        });
+        when(storeClient.getEntries(any())).thenAnswer(this::getUniParcEntries);
+    }
+
+    @NotNull
+    private List<UniParcEntry> getUniParcEntries(InvocationOnMock inv) {
+        Iterable<String> strings = inv.getArgument(0);
+        List<String> args = StreamSupport.stream(strings.spliterator(), false).toList();
+        if (List.of("to1", "to2").containsAll(args) && args.size() == 2) {
+            return List.of(uniParc1, uniParc2);
+        }
+        if (List.of("to3").containsAll(args) && args.size() == 1) {
+            return List.of(uniParc3);
+        }
+        throw new IllegalArgumentException();
     }
 }

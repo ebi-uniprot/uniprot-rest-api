@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 
-public class JobService<T extends DownloadJob> {
-    private final DownloadJobRepository<T> downloadJobRepository;
+public class JobService<R extends DownloadJob> {
+    private final DownloadJobRepository<R> downloadJobRepository;
 
-    public JobService(DownloadJobRepository<T> downloadJobRepository) {
+    public JobService(DownloadJobRepository<R> downloadJobRepository) {
         this.downloadJobRepository = downloadJobRepository;
     }
 
-    public T save(T downloadJob) {
+    public R save(R downloadJob) {
         return downloadJobRepository.save(downloadJob);
     }
 
@@ -25,7 +25,7 @@ public class JobService<T extends DownloadJob> {
         downloadJobRepository.deleteById(id);
     }
 
-    public Optional<T> find(String id) {
+    public Optional<R> find(String id) {
         return downloadJobRepository.findById(id);
     }
 

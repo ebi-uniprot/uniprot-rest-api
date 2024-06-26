@@ -8,7 +8,7 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniprotk
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.uniprotkb.UniProtKBListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.uniprotkb.UniProtKBRDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -24,7 +24,7 @@ public class UniProtKBSolrIdResultStreamerFacade
             UniProtKBListResultStreamer listResultStreamer,
             UniProtKBSolrIdBatchResultStreamer batchResultStreamer,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
-            UniProtKBAsyncDownloadFileHandler fileHandler) {
+            UniProtKBFileHandler fileHandler) {
         super(
                 rdfResultStreamer,
                 listResultStreamer,

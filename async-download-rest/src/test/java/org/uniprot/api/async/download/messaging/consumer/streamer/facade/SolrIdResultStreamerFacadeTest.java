@@ -16,7 +16,7 @@ import org.mockito.MockedStatic;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.ListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -32,7 +32,7 @@ public abstract class SolrIdResultStreamerFacadeTest<
     protected SolrIdBatchResultStreamer<T, R, S> solrIdBatchResultStreamer;
     protected MessageConverterContextFactory<S> converterContextFactory;
     protected SolrIdResultStreamerFacade<T, R, S> solrIdResultStreamerFacade;
-    protected AsyncDownloadFileHandler fileHandler;
+    protected FileHandler fileHandler;
     protected T downloadRequest;
     protected Stream<S> entryStream;
     private MockedStatic<Files> filesMockedStatic;
@@ -43,7 +43,7 @@ public abstract class SolrIdResultStreamerFacadeTest<
 
     protected void mock() {
         when(downloadRequest.getFields()).thenReturn(FIELDS);
-        when(downloadRequest.getId()).thenReturn(ID);
+        when(downloadRequest.getDownloadJobId()).thenReturn(ID);
         when(fileHandler.getIdFile(ID)).thenReturn(path);
         filesMockedStatic = mockStatic(Files.class);
         filesMockedStatic.when(() -> Files.lines(path)).thenReturn(ids);

@@ -1,9 +1,9 @@
 package org.uniprot.api.async.download.model.request;
 
 public interface DownloadRequest {
-    void setId(String id);
+    void setDownloadJobId(String jobId);
 
-    String getId();
+    String getDownloadJobId();
 
     String getFormat();
 

@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.mq.uniref.UniRefMessagingService;
@@ -34,8 +34,8 @@ class UniRefProducerMessageServiceTest
     @Mock private HashGenerator<UniRefDownloadRequest> uniRefDownloadRequestHashGenerator;
     @Mock private MessageConverter uniRefMessageConverter;
     @Mock private UniRefMessagingService uniRefMessagingService;
-    @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
-    @Mock private UniRefAsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules;
+    @Mock private UniRefFileHandler uniRefAsyncDownloadFileHandler;
+    @Mock private UniRefJobSubmissionRules uniRefAsyncDownloadSubmissionRules;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +44,8 @@ class UniRefProducerMessageServiceTest
         this.hashGenerator = uniRefDownloadRequestHashGenerator;
         this.messageConverter = uniRefMessageConverter;
         this.messagingService = uniRefMessagingService;
-        this.asyncDownloadFileHandler = uniRefAsyncDownloadFileHandler;
-        this.asyncDownloadSubmissionRules = uniRefAsyncDownloadSubmissionRules;
+        this.fileHandler = uniRefAsyncDownloadFileHandler;
+        this.jobSubmissionRules = uniRefAsyncDownloadSubmissionRules;
 
         this.producerMessageService =
                 new UniRefProducerMessageService(

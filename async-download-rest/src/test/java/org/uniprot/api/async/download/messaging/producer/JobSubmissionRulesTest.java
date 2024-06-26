@@ -14,25 +14,24 @@ import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-public abstract class AsyncDownloadSubmissionRulesTest<
-        T extends DownloadRequest, R extends DownloadJob> {
+public abstract class JobSubmissionRulesTest<T extends DownloadRequest, R extends DownloadJob> {
     protected static final int MAX_RETRY_COUNT = 3;
     protected static final int MAX_WAITING_TIME = 10;
     protected static final String ID = "someId";
     protected JobService<R> jobService;
     protected R downloadJob;
     protected T downloadRequest;
-    protected AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules;
+    protected JobSubmissionRules<T, R> jobSubmissionRules;
 
     protected void mock() {
-        lenient().when(downloadRequest.getId()).thenReturn(ID);
+        lenient().when(downloadRequest.getDownloadJobId()).thenReturn(ID);
     }
 
     @Test
     void submit_whenJobWithSameIdIsNotPresentAndWithoutForce() {
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertTrue(jobSubmitFeedback.isAllowed());
         assertNull(jobSubmitFeedback.getMessage());
@@ -42,7 +41,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
     void submit_whenJobWithSameIdIsPresentAndWithoutForce() {
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -53,7 +52,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
     void submit_whenJobWithSameIdIsNotPresentAndWithForce() {
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertTrue(jobSubmitFeedback.isAllowed());
         assertNull(jobSubmitFeedback.getMessage());
@@ -65,7 +64,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getStatus()).thenReturn(JobStatus.UNFINISHED);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -78,7 +77,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getStatus()).thenReturn(JobStatus.ABORTED);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -92,7 +91,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getStatus()).thenReturn(JobStatus.FINISHED);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -106,7 +105,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getStatus()).thenReturn(JobStatus.NEW);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -120,7 +119,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getRetried()).thenReturn(10);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertTrue(jobSubmitFeedback.isAllowed());
         assertNull(jobSubmitFeedback.getMessage());
@@ -133,7 +132,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getRetried()).thenReturn(1);
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals("Job with id someId is already being retried", jobSubmitFeedback.getMessage());
@@ -146,7 +145,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getUpdated()).thenReturn(LocalDateTime.now().minusMinutes(1));
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -160,7 +159,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getUpdated()).thenReturn(LocalDateTime.now().minusMinutes(1));
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertFalse(jobSubmitFeedback.isAllowed());
         assertEquals(
@@ -174,7 +173,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getUpdated()).thenReturn(LocalDateTime.now().minusMinutes(20));
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertTrue(jobSubmitFeedback.isAllowed());
         assertNull(jobSubmitFeedback.getMessage());
@@ -187,7 +186,7 @@ public abstract class AsyncDownloadSubmissionRulesTest<
         when(downloadJob.getUpdated()).thenReturn(LocalDateTime.now().minusMinutes(20));
         when(downloadRequest.isForce()).thenReturn(true);
 
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(downloadRequest);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(downloadRequest);
 
         assertTrue(jobSubmitFeedback.isAllowed());
         assertNull(jobSubmitFeedback.getMessage());

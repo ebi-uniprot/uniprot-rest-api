@@ -12,8 +12,8 @@ public class IdMappingDownloadRequestToArrayConverter
     public char[] apply(IdMappingDownloadRequest request) {
         StringBuilder builder = new StringBuilder();
 
-        if (Objects.nonNull(request.getJobId())) {
-            builder.append(request.getJobId().strip().toLowerCase());
+        if (Objects.nonNull(request.getIdMappingJobId())) {
+            builder.append(request.getIdMappingJobId().strip().toLowerCase());
         }
         if (Objects.nonNull(request.getFormat())) {
             builder.append(request.getFormat().strip().toLowerCase());

@@ -60,7 +60,7 @@ public abstract class IdMappingResultStreamerFacadeTest<Q, P extends EntryPair<Q
     @Mock private ExtraOptions extraOptions;
 
     protected void mock() {
-        when(downloadRequest.getJobId()).thenReturn(JOB_ID);
+        when(downloadRequest.getIdMappingJobId()).thenReturn(JOB_ID);
         when(idMappingJobCacheService.getJobAsResource(JOB_ID)).thenReturn(idMappingJob);
         when(idMappingJob.getIdMappingResult()).thenReturn(idMappingResult);
         when(idMappingResult.getMappedIds())

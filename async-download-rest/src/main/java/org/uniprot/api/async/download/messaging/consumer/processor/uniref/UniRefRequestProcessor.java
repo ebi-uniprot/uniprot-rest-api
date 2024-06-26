@@ -27,8 +27,10 @@ public class UniRefRequestProcessor implements RequestProcessor<UniRefDownloadRe
 
     @Override
     public void process(UniRefDownloadRequest request) {
-        jobService.update(request.getId(), Map.of(STATUS, RUNNING));
+        jobService.update(request.getDownloadJobId(), Map.of(STATUS, RUNNING));
         uniRefCompositeRequestProcessor.process(request);
-        jobService.update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+        jobService.update(
+                request.getDownloadJobId(),
+                Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
     }
 }

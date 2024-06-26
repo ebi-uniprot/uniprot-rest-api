@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
@@ -35,7 +35,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
     private static final String INCLUDE_ISOFORMS = "false";
     protected static final long SOLR_HITS = 98L;
     private static final long MAX_ENTRY_COUNT = 1000L;
-    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+    @Mock private UniProtKBFileHandler uniProtKBAsyncDownloadFileHandler;
     @Mock private UniProtKBJobService uniProtKBJobService;
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
     @Mock private UniProtEntryService uniProtEntryService;
@@ -73,7 +73,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
     }
 
     private void mock(long solrHits) {
-        when(uniProtKBDownloadRequest.getId()).thenReturn(ID);
+        when(uniProtKBDownloadRequest.getDownloadJobId()).thenReturn(ID);
         when(embeddingsQueueConfigProperties.getMaxEntryCount()).thenReturn(MAX_ENTRY_COUNT);
         when(uniProtKBDownloadRequest.getQuery()).thenReturn(QUERY);
         when(uniProtKBDownloadRequest.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORMS);

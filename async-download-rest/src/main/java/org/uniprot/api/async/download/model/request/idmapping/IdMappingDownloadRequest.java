@@ -9,6 +9,8 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 
@@ -17,8 +19,9 @@ import lombok.Data;
 public class IdMappingDownloadRequest implements DownloadRequest {
 
     @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION)
-    @NotNull(message = "{search.required}")
-    private String jobId;
+    @NotNull(message = "'jobId' is a required parameter")
+    @JsonProperty("jobId")
+    private String idMappingJobId;
 
     @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     @NotNull(message = "{search.required}")
@@ -31,10 +34,14 @@ public class IdMappingDownloadRequest implements DownloadRequest {
     private boolean force;
 
     @Parameter(hidden = true)
-    private String id;
+    private String downloadJobId;
 
     @Override
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);
+    }
+
+    public void setJobId(String jobId) {
+        this.idMappingJobId = jobId;
     }
 }

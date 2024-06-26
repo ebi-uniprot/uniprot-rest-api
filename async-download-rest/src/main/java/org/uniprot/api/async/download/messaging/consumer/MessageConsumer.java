@@ -12,7 +12,7 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
@@ -21,8 +21,7 @@ import org.uniprot.api.async.download.service.JobService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class ContentBasedAndRetriableMessageConsumer<
-                T extends DownloadRequest, R extends DownloadJob>
+public abstract class MessageConsumer<T extends DownloadRequest, R extends DownloadJob>
         implements MessageListener {
     public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
@@ -34,73 +33,75 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
     protected static final String RETRIED = "retried";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
-    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
+    private final FileHandler fileHandler;
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
 
-    protected ContentBasedAndRetriableMessageConsumer(
+    protected MessageConsumer(
             MessagingService messagingService,
             RequestProcessor<T> requestProcessor,
-            AsyncDownloadFileHandler asyncDownloadFileHandler,
+            FileHandler fileHandler,
             JobService<R> jobService,
             MessageConverter messageConverter) {
         this.messagingService = messagingService;
         this.requestProcessor = requestProcessor;
-        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
+        this.fileHandler = fileHandler;
         this.jobService = jobService;
         this.messageConverter = messageConverter;
     }
 
     @Override
     public void onMessage(Message message) {
-        String id = null;
+        String jobId = null;
         try {
-            id = message.getMessageProperties().getHeader(JOB_ID_HEADER);
-            log.info("Received job {} in listener", id);
+            jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
+            log.info("Received job {} in listener", jobId);
 
             if (isMaxRetriesReached(message)) {
-                rejectMessage(message, id);
+                rejectMessage(message, jobId);
             } else {
-                String error = "Unable to find jobId " + id + " in db";
+                String error = "Unable to find jobId " + jobId + " in db";
                 R downloadJob =
-                        jobService.find(id).orElseThrow(() -> new MessageConsumerException(error));
+                        jobService
+                                .find(jobId)
+                                .orElseThrow(() -> new MessageConsumerException(error));
 
                 // run the job only if it has errored out
-                if (hasJobConsumedBefore(downloadJob)) {
+                if (isConsumedBefore(downloadJob)) {
                     if (downloadJob.getStatus() == RUNNING) {
-                        log.warn("The job {} is running by other thread", id);
+                        log.warn("The job {} is running by other thread", jobId);
                     } else {
-                        log.info("The job {} is already processed", id);
+                        log.info("The job {} is already processed", jobId);
                     }
                 } else {
                     cleanIfNecessary(downloadJob);
                     T request = (T) this.messageConverter.fromMessage(message);
-                    request.setId(id);
+                    request.setDownloadJobId(jobId);
                     requestProcessor.process(request);
-                    log.info("Message with jobId {} processed successfully", id);
+                    log.info("Message with jobId {} processed successfully", jobId);
                 }
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= messagingService.getMaxRetryCount()) {
-                log.error("Download job id {} failed with error {}", id, ex.getMessage());
+                log.error("Download job id {} failed with error {}", jobId, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
-                        id, Map.of(RETRIED, getRetryCount(updatedMessage), STATUS, ERROR));
-                log.warn("Sending message for jobId {} to retry queue", id);
+                        jobId, Map.of(RETRIED, getRetryCount(updatedMessage), STATUS, ERROR));
+                log.warn("Sending message for jobId {} to retry queue", jobId);
                 messagingService.sendToRetry(updatedMessage);
             } else {
                 // the flow should not come here, letting the flow complete without rethrowing
                 // exception to avoid poison message
                 log.error(
                         "Message with jobId {} failed due to error {} which is not handled",
-                        id,
+                        jobId,
                         ex);
             }
         }
     }
 
-    protected boolean hasJobConsumedBefore(R downloadJob) {
-        return asyncDownloadFileHandler.areAllFilesExist(downloadJob.getId())
+    protected boolean isConsumedBefore(R downloadJob) {
+        return fileHandler.areAllFilesPresent(downloadJob.getId())
                 && ERROR != downloadJob.getStatus();
     }
 
@@ -186,6 +187,6 @@ public abstract class ContentBasedAndRetriableMessageConsumer<
                         UPDATE_COUNT, 0L,
                         UPDATED, LocalDateTime.now(),
                         PROCESSED_ENTRIES, 0L));
-        asyncDownloadFileHandler.deleteAllFiles(jobId);
+        fileHandler.deleteAllFiles(jobId);
     }
 }

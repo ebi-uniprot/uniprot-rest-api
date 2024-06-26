@@ -15,10 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -31,9 +31,9 @@ class IdMappingProducerMessageServiceTest
     @Mock private IdMappingJobService idMappingJobService;
     @Mock private HashGenerator<IdMappingDownloadRequest> idMappingDownloadRequestHashGenerator;
     @Mock private MessageConverter idMappingMessageConverter;
-    @Mock private IdMappingMessagingService idMappingMessagingService;
-    @Mock private IdMappingAsyncDownloadFileHandler idMappingAsyncDownloadFileHandler;
-    @Mock private IdMappingAsyncDownloadSubmissionRules idMappingAsyncDownloadSubmissionRules;
+    @Mock private IdMappingRabbitMQMessagingService idMappingMessagingService;
+    @Mock private IdMappingFileHandler idMappingAsyncDownloadFileHandler;
+    @Mock private IdMappingJobSubmissionRules idMappingAsyncDownloadSubmissionRules;
 
     @BeforeEach
     void setUp() {
@@ -42,8 +42,8 @@ class IdMappingProducerMessageServiceTest
         this.hashGenerator = idMappingDownloadRequestHashGenerator;
         this.messageConverter = idMappingMessageConverter;
         this.messagingService = idMappingMessagingService;
-        this.asyncDownloadFileHandler = idMappingAsyncDownloadFileHandler;
-        this.asyncDownloadSubmissionRules = idMappingAsyncDownloadSubmissionRules;
+        this.fileHandler = idMappingAsyncDownloadFileHandler;
+        this.jobSubmissionRules = idMappingAsyncDownloadSubmissionRules;
 
         this.producerMessageService =
                 new IdMappingProducerMessageService(

@@ -28,7 +28,7 @@ public abstract class SolrIdBatchResultStreamerTest<
     @Test
     void stream() {
         mockBatch();
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         List<String> idList = List.of("id1", "id2", "id3");
         Stream<String> ids = idList.stream();
@@ -37,13 +37,13 @@ public abstract class SolrIdBatchResultStreamerTest<
 
         assertThat(result).hasSameElementsAs(getEntryList());
         InOrder inOrder = inOrder(heartbeatProducer);
-        inOrder.verify(heartbeatProducer).createForResults(job, 2);
-        inOrder.verify(heartbeatProducer).createForResults(job, 1);
+        inOrder.verify(heartbeatProducer).generateForResults(job, 2);
+        inOrder.verify(heartbeatProducer).generateForResults(job, 1);
     }
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(

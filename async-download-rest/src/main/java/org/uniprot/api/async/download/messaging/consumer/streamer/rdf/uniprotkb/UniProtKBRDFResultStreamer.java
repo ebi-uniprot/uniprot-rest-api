@@ -11,7 +11,7 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 @Component
 public class UniProtKBRDFResultStreamer
         extends RDFResultStreamer<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    private static final String UNI_PROT_KB_DATA_TYPE = "uniprotkb";
+    private static final String UNIPROTKB_DATA_TYPE = "uniprotkb";
 
     public UniProtKBRDFResultStreamer(
             UniProtKBHeartbeatProducer heartbeatProducer,
@@ -22,6 +22,6 @@ public class UniProtKBRDFResultStreamer
 
     @Override
     protected String getDataType() {
-        return UNI_PROT_KB_DATA_TYPE;
+        return UNIPROTKB_DATA_TYPE;
     }
 }

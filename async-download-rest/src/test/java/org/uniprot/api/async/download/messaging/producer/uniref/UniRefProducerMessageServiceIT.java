@@ -14,15 +14,15 @@ import org.uniprot.api.async.download.common.RedisConfigTest;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitMQConfig;
-import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
-import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
@@ -43,15 +43,15 @@ public class UniRefProducerMessageServiceIT
 
     @Autowired private UniRefDownloadJobRepository jobRepository;
 
-    @Autowired private UniRefAsyncDownloadFileHandler fileHandler;
+    @Autowired private UniRefFileHandler fileHandler;
 
     @Autowired private UniRefJobService uniRefJobService;
 
-    @Autowired private UniRefAsyncDownloadSubmissionRules uniRefAsyncDownloadSubmissionRules;
+    @Autowired private UniRefJobSubmissionRules uniRefAsyncDownloadSubmissionRules;
 
     @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
 
-    @MockBean private UniRefContentBasedAndRetriableMessageConsumer uniRefConsumer;
+    @MockBean private UniRefMessageConsumer uniRefConsumer;
 
     @MockBean private UniProtKBHeartbeatProducer heartBeat;
 
@@ -81,8 +81,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected ContentBasedAndRetriableMessageConsumer<UniRefDownloadRequest, UniRefDownloadJob>
-            getConsumer() {
+    protected MessageConsumer<UniRefDownloadRequest, UniRefDownloadJob> getConsumer() {
         return uniRefConsumer;
     }
 
@@ -128,7 +127,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected AsyncDownloadFileHandler getFileHandler() {
+    protected FileHandler getFileHandler() {
         return fileHandler;
     }
 

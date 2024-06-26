@@ -39,7 +39,7 @@ public class UniRefDownloadRequest extends UniRefStreamRequest
     private boolean force;
 
     @Parameter(hidden = true)
-    private String id;
+    private String downloadJobId;
 
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);

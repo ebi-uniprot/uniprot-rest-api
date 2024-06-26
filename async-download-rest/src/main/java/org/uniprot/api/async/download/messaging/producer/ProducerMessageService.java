@@ -8,7 +8,7 @@ import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
@@ -26,41 +26,41 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     private final MessageConverter messageConverter;
     private final MessagingService messagingService;
     private final HashGenerator<T> hashGenerator;
-    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
-    private final AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules;
+    private final FileHandler fileHandler;
+    private final JobSubmissionRules<T, R> jobSubmissionRules;
 
     protected ProducerMessageService(
             JobService<R> jobService,
             MessageConverter messageConverter,
             MessagingService messagingService,
             HashGenerator<T> hashGenerator,
-            AsyncDownloadFileHandler asyncDownloadFileHandler,
-            AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules) {
+            FileHandler fileHandler,
+            JobSubmissionRules<T, R> jobSubmissionRules) {
         this.jobService = jobService;
         this.messageConverter = messageConverter;
         this.messagingService = messagingService;
         this.hashGenerator = hashGenerator;
-        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
-        this.asyncDownloadSubmissionRules = asyncDownloadSubmissionRules;
+        this.fileHandler = fileHandler;
+        this.jobSubmissionRules = jobSubmissionRules;
     }
 
     public String sendMessage(T request) {
         preprocess(request);
 
-        String id = this.hashGenerator.generateHash(request);
-        request.setId(id);
-        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(request);
+        String jobId = this.hashGenerator.generateHash(request);
+        request.setDownloadJobId(jobId);
+        JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(request);
 
         if (jobSubmitFeedback.isAllowed()) {
-            cleanIfNecessary(id, request.isForce());
-            createDownloadJob(id, request);
-            sendMessage(id, request);
+            cleanIfNecessary(jobId, request.isForce());
+            createDownloadJob(jobId, request);
+            sendMessage(jobId, request);
         } else {
-            log.info("Job is either being processed or already processed {}", id);
-            throw new IllegalDownloadJobSubmissionException(id, jobSubmitFeedback.getMessage());
+            log.info("Job is either being processed or already processed {}", jobId);
+            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getMessage());
         }
 
-        return id;
+        return jobId;
     }
 
     protected void preprocess(T request) {
@@ -72,7 +72,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     private void cleanIfNecessary(String jobId, boolean force) {
         if (force) {
             jobService.delete(jobId);
-            asyncDownloadFileHandler.deleteAllFiles(jobId);
+            fileHandler.deleteAllFiles(jobId);
             log.info("Message with jobId {} is ready to resubmit", jobId);
         }
     }

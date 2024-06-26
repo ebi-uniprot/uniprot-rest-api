@@ -10,7 +10,7 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniref.U
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacadeTest;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.uniref.UniRefListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.uniref.UniRefRDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -28,7 +28,7 @@ class UniRefSolrIdResultStreamerFacadeTest
     @Mock private UniRefListResultStreamer uniRefListResultStreamer;
     @Mock private UniRefSolrIdBatchResultStreamer uniRefBatchResultStreamer;
     @Mock private MessageConverterContextFactory<UniRefEntryLight> uniRefConverterContextFactory;
-    @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
+    @Mock private UniRefFileHandler uniRefAsyncDownloadFileHandler;
 
     @BeforeEach
     void setUp() {

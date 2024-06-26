@@ -15,11 +15,11 @@ import org.uniprot.api.rest.output.context.FileType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AsyncDownloadFileHandler {
+public abstract class FileHandler {
     private final DownloadConfigProperties downloadConfigProperties;
     private final HeartbeatProducer heartbeatProducer;
 
-    protected AsyncDownloadFileHandler(
+    protected FileHandler(
             DownloadConfigProperties downloadConfigProperties,
             HeartbeatProducer heartbeatProducer) {
         this.downloadConfigProperties = downloadConfigProperties;
@@ -35,7 +35,7 @@ public abstract class AsyncDownloadFileHandler {
             for (String id : iterator) {
                 writer.append(id);
                 writer.newLine();
-                heartbeatProducer.createForIds(jobId);
+                heartbeatProducer.generateForIds(jobId);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -44,16 +44,16 @@ public abstract class AsyncDownloadFileHandler {
         }
     }
 
-    public boolean isIdFileExist(String jobId) {
+    public boolean isIdFilePresent(String jobId) {
         return Files.exists(getIdFile(jobId));
     }
 
-    public boolean isResultFileExist(String jobId) {
+    public boolean isResultFilePresent(String jobId) {
         return Files.exists(getResultFile(jobId));
     }
 
-    public boolean areAllFilesExist(String jobId) {
-        return isIdFileExist(jobId) && isResultFileExist(jobId);
+    public boolean areAllFilesPresent(String jobId) {
+        return isIdFilePresent(jobId) && isResultFilePresent(jobId);
     }
 
     public Path getIdFile(String jobId) {

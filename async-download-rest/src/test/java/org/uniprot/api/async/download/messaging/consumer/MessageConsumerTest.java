@@ -2,7 +2,7 @@ package org.uniprot.api.async.download.messaging.consumer;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.*;
+import static org.uniprot.api.async.download.messaging.consumer.MessageConsumer.*;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -18,25 +18,24 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-public abstract class ContentBasedAndRetriableMessageConsumerTest<
-        T extends DownloadRequest, R extends DownloadJob> {
+public abstract class MessageConsumerTest<T extends DownloadRequest, R extends DownloadJob> {
     protected static final String ID = "someId";
     private static final int RETRIES = 7;
     private static final int RETRIES_EXCEEDED = 17;
     private static final int MAX_RETRIES = 10;
     protected MessagingService messagingService;
     protected RequestProcessor<T> requestProcessor;
-    protected AsyncDownloadFileHandler asyncDownloadFileHandler;
+    protected FileHandler fileHandler;
     protected JobService<R> jobService;
     protected MessageConverter messageConverter;
-    protected ContentBasedAndRetriableMessageConsumer<T, R> messageConsumer;
+    protected MessageConsumer<T, R> messageConsumer;
     @Mock private LocalDateTime dateTime;
     @Mock protected Message message;
     @Mock private MessageProperties messageProperties;
@@ -62,7 +61,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         verify(messagingService).sendToRejected(message);
         verify(jobService)
                 .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
-        verify(asyncDownloadFileHandler).deleteAllFiles(ID);
+        verify(fileHandler).deleteAllFiles(ID);
 
         localTimeMockedStatic.reset();
         localTimeMockedStatic.close();
@@ -83,7 +82,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
     }
 
     protected void mockFileExistence() {
-        when(asyncDownloadFileHandler.areAllFilesExist(ID)).thenReturn(true);
+        when(fileHandler.areAllFilesPresent(ID)).thenReturn(true);
     }
 
     @Test
@@ -109,14 +108,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
 
         messageConsumer.onMessage(message);
 
-        verify(jobService)
-                .update(
-                        ID,
-                        Map.of(
-                                ContentBasedAndRetriableMessageConsumer.RETRIED,
-                                8,
-                                STATUS,
-                                JobStatus.ERROR));
+        verify(jobService).update(ID, Map.of(MessageConsumer.RETRIED, 8, STATUS, JobStatus.ERROR));
         verify(messagingService)
                 .sendToRetry(
                         argThat(
@@ -136,7 +128,7 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
         messageConsumer.onMessage(message);
 
         InOrder inOrder = inOrder(jobService, downloadRequest, requestProcessor);
-        inOrder.verify(downloadRequest).setId(ID);
+        inOrder.verify(downloadRequest).setDownloadJobId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
     }
 
@@ -153,13 +145,12 @@ public abstract class ContentBasedAndRetriableMessageConsumerTest<
 
         messageConsumer.onMessage(message);
 
-        InOrder inOrder =
-                inOrder(jobService, asyncDownloadFileHandler, downloadRequest, requestProcessor);
+        InOrder inOrder = inOrder(jobService, fileHandler, downloadRequest, requestProcessor);
         inOrder.verify(jobService).find(ID);
         inOrder.verify(jobService)
                 .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
-        inOrder.verify(asyncDownloadFileHandler).deleteAllFiles(ID);
-        inOrder.verify(downloadRequest).setId(ID);
+        inOrder.verify(fileHandler).deleteAllFiles(ID);
+        inOrder.verify(downloadRequest).setDownloadJobId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
 
         localTimeMockedStatic.reset();

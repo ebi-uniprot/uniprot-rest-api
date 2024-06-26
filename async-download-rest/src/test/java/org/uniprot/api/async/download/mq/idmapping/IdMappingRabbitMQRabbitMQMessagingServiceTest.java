@@ -6,10 +6,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingRabbitTemplate;
-import org.uniprot.api.async.download.mq.MessagingServiceTest;
+import org.uniprot.api.async.download.mq.RabbitMQMessagingServiceTest;
 
 @ExtendWith(MockitoExtension.class)
-class IdMappingMessagingServiceTest extends MessagingServiceTest {
+class IdMappingRabbitMQRabbitMQMessagingServiceTest extends RabbitMQMessagingServiceTest {
     @Mock
     private IdMappingAsyncDownloadQueueConfigProperties idMappingAsyncDownloadQueueConfigProperties;
 
@@ -20,7 +20,7 @@ class IdMappingMessagingServiceTest extends MessagingServiceTest {
         queueConfigProperties = idMappingAsyncDownloadQueueConfigProperties;
         rabbitTemplate = idMappingRabbitTemplate;
         messagingService =
-                new IdMappingMessagingService(
+                new IdMappingRabbitMQMessagingService(
                         idMappingAsyncDownloadQueueConfigProperties, idMappingRabbitTemplate);
     }
 }

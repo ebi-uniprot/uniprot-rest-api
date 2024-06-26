@@ -46,11 +46,13 @@ public abstract class IdMappingResultStreamerFacade<U, V extends EntryPair<U>> {
 
     public MessageConverterContext<V> getConvertedResult(IdMappingDownloadRequest request) {
         IdMappingJob idMappingJobInput =
-                Optional.ofNullable(idMappingJobCacheService.getJobAsResource(request.getJobId()))
+                Optional.ofNullable(
+                                idMappingJobCacheService.getJobAsResource(
+                                        request.getIdMappingJobId()))
                         .orElseThrow(
                                 () ->
                                         new IllegalArgumentException(
-                                                "Invalid Job Id " + request.getJobId()));
+                                                "Invalid Job Id " + request.getIdMappingJobId()));
         IdMappingResult idMappingResult = idMappingJobInput.getIdMappingResult();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         MessageConverterContext<V> context =

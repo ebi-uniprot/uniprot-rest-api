@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 
-public abstract class JobServiceTest<T extends DownloadJob> {
+public abstract class JobServiceTest<R extends DownloadJob> {
     public static final String ID = "id";
-    protected T downloadJob;
-    protected Optional<T> downloadJobOpt;
-    protected DownloadJobRepository<T> downloadJobRepository;
-    protected JobService<T> jobService;
+    protected R downloadJob;
+    protected Optional<R> downloadJobOpt;
+    protected DownloadJobRepository<R> downloadJobRepository;
+    protected JobService<R> jobService;
 
     @Test
     void create() {

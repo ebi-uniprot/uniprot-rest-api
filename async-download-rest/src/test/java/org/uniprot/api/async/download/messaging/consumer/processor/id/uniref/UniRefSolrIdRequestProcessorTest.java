@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.processor.id.SolrIdRequestProcessorTest;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
@@ -24,14 +24,14 @@ class UniRefSolrIdRequestProcessorTest
     private static final String QUERY = "uniRefQuery";
     @Mock private QueryResult<UniRefEntryLight> searchResults;
     @Mock private UniRefEntryLightService uniRefEntryLightService;
-    @Mock private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
+    @Mock private UniRefFileHandler uniRefAsyncDownloadFileHandler;
     @Mock private UniRefJobService uniRefJobService;
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
     @Mock private Page page;
 
     @BeforeEach
     void setUp() {
-        asyncDownloadFileHandler = uniRefAsyncDownloadFileHandler;
+        fileHandler = uniRefAsyncDownloadFileHandler;
         jobService = uniRefJobService;
         downloadRequest = uniRefDownloadRequest;
         requestProcessor =

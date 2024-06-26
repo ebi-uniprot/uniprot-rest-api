@@ -10,13 +10,12 @@ import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-public abstract class AsyncDownloadSubmissionRules<
-        T extends DownloadRequest, R extends DownloadJob> {
+public abstract class JobSubmissionRules<T extends DownloadRequest, R extends DownloadJob> {
     private final int maxRetryCount;
     private final int maxWaitingTime;
     private final JobService<R> downloadJobRepository;
 
-    protected AsyncDownloadSubmissionRules(
+    protected JobSubmissionRules(
             int maxRetryCount, int maxWaitingTime, JobService<R> downloadJobRepository) {
         this.maxRetryCount = maxRetryCount;
         this.maxWaitingTime = maxWaitingTime;
@@ -24,42 +23,44 @@ public abstract class AsyncDownloadSubmissionRules<
     }
 
     public JobSubmitFeedback submit(T request) {
-        String id = request.getId();
-        Optional<? extends DownloadJob> downloadJobOpt = downloadJobRepository.find(id);
+        String jobId = request.getDownloadJobId();
+        Optional<? extends DownloadJob> downloadJobOpt = downloadJobRepository.find(jobId);
         if (downloadJobOpt.isPresent()) {
             DownloadJob downloadJob = downloadJobOpt.get();
+            JobStatus downloadJobStatus = downloadJob.getStatus();
             if (!request.isForce()) {
                 return new JobSubmitFeedback(
-                        false, String.format("Job with id %s has already been submitted", id));
+                        false, String.format("Job with id %s has already been submitted", jobId));
             } else {
-                JobStatus downloadJobStatus = downloadJob.getStatus();
-
                 if (EnumSet.of(JobStatus.NEW, JobStatus.UNFINISHED).contains(downloadJobStatus)) {
                     return new JobSubmitFeedback(
-                            false, String.format("Job with id %s has already been submitted", id));
+                            false,
+                            String.format("Job with id %s has already been submitted", jobId));
                 }
                 if (JobStatus.ABORTED.equals(downloadJobStatus)) {
                     return new JobSubmitFeedback(
                             false,
                             String.format(
                                     "Job with id %s is already aborted for the excess size of results",
-                                    id));
+                                    jobId));
                 }
                 if (JobStatus.FINISHED.equals(downloadJobStatus)) {
                     return new JobSubmitFeedback(
                             false,
                             String.format(
-                                    "Job with id %s has already been finished successfully.", id));
+                                    "Job with id %s has already been finished successfully.",
+                                    jobId));
                 }
                 if (JobStatus.ERROR.equals(downloadJobStatus)
                         && maxRetryCountNotFinished(downloadJob)) {
                     return new JobSubmitFeedback(
-                            false, String.format("Job with id %s is already being retried", id));
+                            false, String.format("Job with id %s is already being retried", jobId));
                 }
                 if (EnumSet.of(JobStatus.RUNNING, JobStatus.PROCESSING).contains(downloadJobStatus)
                         && maxWaitingTimeNotElapsed(downloadJob)) {
                     return new JobSubmitFeedback(
-                            false, String.format("Job with id %s is already running and live", id));
+                            false,
+                            String.format("Job with id %s is already running and live", jobId));
                 }
             }
         }

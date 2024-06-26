@@ -32,9 +32,13 @@ public abstract class SolrIdBatchResultStreamer<T extends DownloadRequest, R ext
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .peek(
                         entityCollection ->
-                                heartbeatProducer.createForResults(job, entityCollection.size()))
+                                heartbeatProducer.generateForResults(job, entityCollection.size()))
                 .flatMap(Collection::stream)
-                .onClose(() -> log.info("Finished streaming entries for job {}", request.getId()));
+                .onClose(
+                        () ->
+                                log.info(
+                                        "Finished streaming entries for job {}",
+                                        request.getDownloadJobId()));
     }
 
     protected abstract Iterable<Collection<U>> getBatchStoreIterable(

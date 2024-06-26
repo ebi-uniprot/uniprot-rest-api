@@ -11,7 +11,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.uniprot.api.async.download.messaging.config.common.AsyncDownloadQueueConfigProperties;
 
-public abstract class MessagingServiceTest {
+public abstract class RabbitMQMessagingServiceTest {
     public static final String RETRY_QUEUE = "retryQueue";
     public static final String REJECTED_QUEUE = "rejectedQueue";
     public static final int MAX_RETRY = 7;
@@ -23,7 +23,7 @@ public abstract class MessagingServiceTest {
     @Mock private MessageProperties messageProperties;
     protected AsyncDownloadQueueConfigProperties queueConfigProperties;
     protected RabbitTemplate rabbitTemplate;
-    protected MessagingService messagingService;
+    protected RabbitMQMessagingService messagingService;
 
     @Test
     void send() {

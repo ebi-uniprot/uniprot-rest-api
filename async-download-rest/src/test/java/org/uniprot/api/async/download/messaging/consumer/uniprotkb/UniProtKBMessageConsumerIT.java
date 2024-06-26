@@ -37,7 +37,7 @@ import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBDownlo
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.SolrIdMessageConsumerIT;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -72,7 +72,7 @@ import com.jayway.jsonpath.JsonPath;
 class UniProtKBMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     public static final int MAX_ENTRY_COUNT = 15;
-    @Autowired private UniProtKBContentBasedAndRetriableMessageConsumer uniProtKBMessageConsumer;
+    @Autowired private UniProtKBMessageConsumer uniProtKBMessageConsumer;
     @Autowired private UniprotQueryRepository uniProtKBQueryRepository;
     @Autowired private SolrClient solrClient;
 
@@ -83,7 +83,7 @@ class UniProtKBMessageConsumerIT
     @Autowired private UniProtKBAsyncConfig uniProtKBAsyncConfig;
     @Autowired private UniProtKBDownloadJobRepository uniProtKBDownloadJobRepository;
     @Autowired private UniProtKBDownloadConfigProperties uniProtKBDownloadConfigProperties;
-    @Autowired private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+    @Autowired private UniProtKBFileHandler uniProtKBAsyncDownloadFileHandler;
 
     @Qualifier("uniProtKBFacetTupleStreamTemplate")
     @Autowired
@@ -108,7 +108,7 @@ class UniProtKBMessageConsumerIT
 
     @BeforeEach
     void setUp() {
-        asyncDownloadFileHandler = uniProtKBAsyncDownloadFileHandler;
+        fileHandler = uniProtKBAsyncDownloadFileHandler;
         downloadJobRepository = uniProtKBDownloadJobRepository;
         messageConsumer = uniProtKBMessageConsumer;
         downloadConfigProperties = uniProtKBDownloadConfigProperties;
@@ -134,7 +134,7 @@ class UniProtKBMessageConsumerIT
         UniProtKBDownloadJob job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(0, job.getTotalEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
         assertEquals(0, job.getUpdateCount());
         assertEquals(ABORTED, job.getStatus());
         assertEquals(0, job.getProcessedEntries());
@@ -154,7 +154,7 @@ class UniProtKBMessageConsumerIT
         UniProtKBDownloadJob job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(12, job.getTotalEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
         assertEquals(8, job.getUpdateCount());
         assertEquals(FINISHED, job.getStatus());
         assertEquals(12, job.getProcessedEntries());

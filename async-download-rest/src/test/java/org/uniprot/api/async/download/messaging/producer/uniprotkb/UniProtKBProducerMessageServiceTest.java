@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
@@ -34,8 +34,8 @@ class UniProtKBProducerMessageServiceTest
     @Mock private HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadRequestHashGenerator;
     @Mock private MessageConverter uniProtKBMessageConverter;
     @Mock private UniProtKBMessagingService uniProtKBMessagingService;
-    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
-    @Mock private UniProtKBAsyncDownloadSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
+    @Mock private UniProtKBFileHandler uniProtKBAsyncDownloadFileHandler;
+    @Mock private UniProtKBJobSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +44,8 @@ class UniProtKBProducerMessageServiceTest
         this.hashGenerator = uniProtKBDownloadRequestHashGenerator;
         this.messageConverter = uniProtKBMessageConverter;
         this.messagingService = uniProtKBMessagingService;
-        this.asyncDownloadFileHandler = uniProtKBAsyncDownloadFileHandler;
-        this.asyncDownloadSubmissionRules = uniProtKBAsyncDownloadSubmissionRules;
+        this.fileHandler = uniProtKBAsyncDownloadFileHandler;
+        this.jobSubmissionRules = uniProtKBAsyncDownloadSubmissionRules;
 
         this.producerMessageService =
                 new UniProtKBProducerMessageService(

@@ -4,24 +4,23 @@ import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
 import org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping.IdMappingRequestProcessor;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 
 @Component
-public class IdMappingContentBasedAndRetriableMessageConsumer
-        extends ContentBasedAndRetriableMessageConsumer<
-                IdMappingDownloadRequest, IdMappingDownloadJob> {
-    private final IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler;
+public class IdMappingMessageConsumer
+        extends MessageConsumer<IdMappingDownloadRequest, IdMappingDownloadJob> {
+    private final IdMappingFileHandler asyncDownloadFileHandler;
 
-    public IdMappingContentBasedAndRetriableMessageConsumer(
-            IdMappingMessagingService messagingService,
+    public IdMappingMessageConsumer(
+            IdMappingRabbitMQMessagingService messagingService,
             IdMappingRequestProcessor requestProcessor,
-            IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler,
+            IdMappingFileHandler asyncDownloadFileHandler,
             IdMappingJobService jobService,
             MessageConverter messageConverter) {
         super(
@@ -34,8 +33,8 @@ public class IdMappingContentBasedAndRetriableMessageConsumer
     }
 
     @Override
-    protected boolean hasJobConsumedBefore(IdMappingDownloadJob downloadJob) {
-        return asyncDownloadFileHandler.isResultFileExist(downloadJob.getId())
+    protected boolean isConsumedBefore(IdMappingDownloadJob downloadJob) {
+        return asyncDownloadFileHandler.isResultFilePresent(downloadJob.getId())
                 && ERROR != downloadJob.getStatus();
     }
 }

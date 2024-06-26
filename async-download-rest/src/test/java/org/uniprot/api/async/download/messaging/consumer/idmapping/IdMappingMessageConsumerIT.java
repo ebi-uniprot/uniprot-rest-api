@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.async.download.messaging.consumer.MessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
@@ -61,7 +61,7 @@ import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDow
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.repository.IdMappingDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
@@ -120,9 +120,9 @@ public class IdMappingMessageConsumerIT {
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
-    @Autowired private IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler;
+    @Autowired private IdMappingFileHandler asyncDownloadFileHandler;
 
-    @Autowired private IdMappingContentBasedAndRetriableMessageConsumer idMappingMessageConsumer;
+    @Autowired private IdMappingMessageConsumer idMappingMessageConsumer;
 
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
@@ -385,7 +385,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat("json");
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("upi,organism");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -438,7 +438,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat(format);
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("upi,organism");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -487,7 +487,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat("json");
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("id,name,common_taxon");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -540,7 +540,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat(format);
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("id,name,common_taxon");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -579,7 +579,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat("json");
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("accession,gene_names,organism_name");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -632,7 +632,7 @@ public class IdMappingMessageConsumerIT {
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         IdMappingDownloadRequest downloadRequest = new IdMappingDownloadRequest();
         downloadRequest.setFormat(format);
-        downloadRequest.setJobId(idMappingId);
+        downloadRequest.setIdMappingJobId(idMappingId);
         downloadRequest.setFields("accession,gene_names,organism_name");
         Message message = messageConverter.toMessage(downloadRequest, messageHeader);
 
@@ -674,7 +674,7 @@ public class IdMappingMessageConsumerIT {
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(asyncDownloadFileHandler.areAllFilesPresent(ID));
     }
 
     @Test
@@ -691,7 +691,7 @@ public class IdMappingMessageConsumerIT {
         assertEquals(RUNNING, job.getStatus());
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
-        assertTrue(asyncDownloadFileHandler.isResultFileExist(ID));
+        assertTrue(asyncDownloadFileHandler.isResultFilePresent(ID));
     }
 
     @Test
@@ -709,7 +709,7 @@ public class IdMappingMessageConsumerIT {
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
         assertEquals(PROCESSED_ENTRIES, job.getProcessedEntries());
-        assertTrue(asyncDownloadFileHandler.isResultFileExist(ID));
+        assertTrue(asyncDownloadFileHandler.isResultFilePresent(ID));
     }
 
     @Test
@@ -730,7 +730,7 @@ public class IdMappingMessageConsumerIT {
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.isResultFileExist(ID));
+        assertFalse(asyncDownloadFileHandler.isResultFilePresent(ID));
     }
 
     private Callable<Boolean> retryCount(String id, int maxRetryCount) {

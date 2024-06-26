@@ -11,5 +11,5 @@ public class FakeDownloadRequest implements DownloadRequest {
     private String format;
     private boolean isLargeSolrStreamRestricted;
     private boolean force;
-    private String id;
+    private String downloadJobId;
 }

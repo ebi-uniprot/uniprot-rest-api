@@ -23,7 +23,7 @@ public abstract class ListResultStreamer<T extends DownloadRequest, R extends Do
         R job = getJob(request);
         return ids.map(
                 id -> {
-                    heartbeatProducer.createForResults(job, 1);
+                    heartbeatProducer.generateForResults(job, 1);
                     return id;
                 });
     }

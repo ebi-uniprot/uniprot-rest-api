@@ -11,7 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
-import org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
@@ -70,8 +70,8 @@ public abstract class SolrProducerMessageServiceIT<
         validateDownloadJob(jobId, downloadJob, request);
 
         // Validate idle job files were deleted
-        assertFalse(getFileHandler().isIdFileExist(jobId));
-        assertFalse(getFileHandler().isResultFileExist(jobId));
+        assertFalse(getFileHandler().isIdFilePresent(jobId));
+        assertFalse(getFileHandler().isResultFilePresent(jobId));
     }
 
     @Test
@@ -110,7 +110,7 @@ public abstract class SolrProducerMessageServiceIT<
 
     protected abstract DownloadJobRepository<R> getJobRepository();
 
-    protected abstract ContentBasedAndRetriableMessageConsumer<T, R> getConsumer();
+    protected abstract MessageConsumer<T, R> getConsumer();
 
     protected abstract T getSuccessDownloadRequest();
 

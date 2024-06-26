@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingMessagingService;
+import org.uniprot.api.async.download.mq.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -24,10 +24,10 @@ public class IdMappingProducerMessageService
     protected IdMappingProducerMessageService(
             IdMappingJobService jobService,
             MessageConverter messageConverter,
-            IdMappingMessagingService messagingService,
+            IdMappingRabbitMQMessagingService messagingService,
             HashGenerator<IdMappingDownloadRequest> hashGenerator,
-            IdMappingAsyncDownloadFileHandler asyncDownloadFileHandler,
-            IdMappingAsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            IdMappingFileHandler asyncDownloadFileHandler,
+            IdMappingJobSubmissionRules asyncDownloadSubmissionRules) {
         super(
                 jobService,
                 messageConverter,

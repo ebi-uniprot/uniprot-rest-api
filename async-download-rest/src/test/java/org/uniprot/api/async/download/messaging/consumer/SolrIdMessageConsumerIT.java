@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.async.download.messaging.consumer.ContentBasedAndRetriableMessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.async.download.messaging.consumer.MessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
 import org.uniprot.api.common.repository.stream.rdf.RdfEntryCountProvider;
@@ -48,9 +48,9 @@ public abstract class SolrIdMessageConsumerIT<
     public static final int MAX_RETRY_COUNT = 3;
     public static final long UPDATE_COUNT = 10;
     private static final long PROCESSED_ENTRIES = 23;
-    protected ContentBasedAndRetriableMessageConsumer<T, R> messageConsumer;
+    protected MessageConsumer<T, R> messageConsumer;
     protected DownloadJobRepository<R> downloadJobRepository;
-    protected AsyncDownloadFileHandler asyncDownloadFileHandler;
+    protected FileHandler fileHandler;
     protected DownloadConfigProperties downloadConfigProperties;
     protected T downloadRequest;
     @Autowired protected MessageConverter messageConverter;
@@ -58,7 +58,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @AfterEach
     void tearDown() {
-        asyncDownloadFileHandler.deleteAllFiles(ID);
+        fileHandler.deleteAllFiles(ID);
     }
 
     @Test
@@ -76,7 +76,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
     }
 
     @Test
@@ -93,7 +93,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(RUNNING, job.getStatus());
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
-        assertTrue(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertTrue(fileHandler.areAllFilesPresent(ID));
     }
 
     @Test
@@ -111,7 +111,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
         assertEquals(PROCESSED_ENTRIES, job.getProcessedEntries());
-        assertTrue(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertTrue(fileHandler.areAllFilesPresent(ID));
     }
 
     @Test
@@ -132,7 +132,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
@@ -153,7 +153,7 @@ public abstract class SolrIdMessageConsumerIT<
         R job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(12, job.getTotalEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
         assertJobSpecifics(job, format);
         verifyIdsFiles(ID);
         if (Objects.equals(format, "json")) {
@@ -190,7 +190,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(1, job.getRetried());
         assertEquals(12, job.getTotalEntries());
         assertEquals(12, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesExist(ID));
+        assertFalse(fileHandler.areAllFilesPresent(ID));
         assertJobSpecifics(job, "json");
     }
 

@@ -10,7 +10,7 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniprotk
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacadeTest;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.uniprotkb.UniProtKBListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.uniprotkb.UniProtKBRDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -28,7 +28,7 @@ class UniProtKBSolrIdResultStreamerFacadeTest
     @Mock private UniProtKBListResultStreamer uniProtKBListResultStreamer;
     @Mock private UniProtKBSolrIdBatchResultStreamer uniProtKBBatchResultStreamer;
     @Mock private MessageConverterContextFactory<UniProtKBEntry> uniProtKBConverterContextFactory;
-    @Mock private UniProtKBAsyncDownloadFileHandler uniProtKBAsyncDownloadFileHandler;
+    @Mock private UniProtKBFileHandler uniProtKBAsyncDownloadFileHandler;
 
     @BeforeEach
     void setUp() {

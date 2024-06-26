@@ -47,7 +47,7 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
     @Test
     void process() throws Exception {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(messageConverterFactory.getOutputWriter(
                         MediaType.APPLICATION_JSON, solrIdResultRequestProcessor.getType()))
                 .thenReturn(outputWriter);
@@ -97,7 +97,7 @@ public abstract class IdMappingResultRequestProcessorTest<Q, P extends EntryPair
     @Test
     void onMessage_whenExceptionOccurred() {
         when(request.getFormat()).thenReturn(CONTENT_TYPE);
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(downloadConfigProperties.getResultFilesFolder()).thenThrow(new RuntimeException());
 
         assertThrows(

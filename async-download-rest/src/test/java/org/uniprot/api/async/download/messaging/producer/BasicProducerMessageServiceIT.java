@@ -31,7 +31,7 @@ import org.uniprot.api.async.download.messaging.config.common.MessageProducerCon
 import org.uniprot.api.async.download.messaging.config.common.RabbitMQConfigs;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -118,11 +118,11 @@ public abstract class BasicProducerMessageServiceIT {
         Files.createDirectories(Path.of(getDownloadConfigProperties().getResultFilesFolder()));
         assertTrue(getFileHandler().getIdFile(jobId).toFile().createNewFile());
         assertTrue(getFileHandler().getResultFile(jobId).toFile().createNewFile());
-        assertTrue(getFileHandler().isIdFileExist(jobId));
-        assertTrue(getFileHandler().isResultFileExist(jobId));
+        assertTrue(getFileHandler().isIdFilePresent(jobId));
+        assertTrue(getFileHandler().isResultFilePresent(jobId));
     }
 
     protected abstract DownloadConfigProperties getDownloadConfigProperties();
 
-    protected abstract AsyncDownloadFileHandler getFileHandler();
+    protected abstract FileHandler getFileHandler();
 }

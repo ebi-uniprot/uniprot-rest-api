@@ -33,14 +33,15 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
     @Override
     public void process(UniProtKBDownloadRequest request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        jobService.update(request.getId(), Map.of(STATUS, RUNNING));
+        jobService.update(request.getDownloadJobId(), Map.of(STATUS, RUNNING));
 
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
             uniProtKBSolrIdHD5RequestProcessor.process(request);
         } else {
             uniProtKBCompositeRequestProcessor.process(request);
             jobService.update(
-                    request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+                    request.getDownloadJobId(),
+                    Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
         }
     }
 }

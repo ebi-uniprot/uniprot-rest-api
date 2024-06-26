@@ -20,6 +20,10 @@ public abstract class BasicDownloadController {
         this.heartbeatConfig = heartbeatConfig;
     }
 
+    protected static String getDownloadJobNotExistMessage(String jobId) {
+        return "jobId " + jobId + " doesn't exist";
+    }
+
     protected ResponseEntity<JobStatusResponse> getAsyncDownloadStatus(DownloadJob job) {
         ResponseEntity<JobStatusResponse> response;
         switch (job.getStatus()) {

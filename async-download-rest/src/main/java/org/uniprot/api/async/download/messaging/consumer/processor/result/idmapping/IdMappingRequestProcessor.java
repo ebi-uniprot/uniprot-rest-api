@@ -31,9 +31,9 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
 
     @Override
     public void process(IdMappingDownloadRequest request) {
-        IdMappingJob idMappingJob = idMappingJobCacheService.get(request.getJobId());
+        IdMappingJob idMappingJob = idMappingJobCacheService.get(request.getIdMappingJobId());
         jobService.update(
-                request.getId(),
+                request.getDownloadJobId(),
                 Map.of(
                         STATUS,
                         RUNNING,
@@ -42,6 +42,8 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
         idMappingResultRequestProcessorFactory
                 .getRequestProcessor(idMappingJob.getIdMappingRequest().getTo())
                 .process(request);
-        jobService.update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+        jobService.update(
+                request.getDownloadJobId(),
+                Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
     }
 }

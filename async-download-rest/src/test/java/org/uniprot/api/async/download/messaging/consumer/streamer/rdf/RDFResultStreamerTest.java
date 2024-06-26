@@ -31,7 +31,7 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
 
     @Test
     void stream() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         when(request.getFormat()).thenReturn(APPLICATION_RDF_XML);
         Stream<String> ids = Stream.of("id1", "id2", "id3");
@@ -51,7 +51,7 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
 
     @Test
     void stream_incorrectJobId() {
-        when(request.getId()).thenReturn(ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.empty());
 
         assertThrows(

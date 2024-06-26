@@ -93,14 +93,15 @@ public class IdMappingDownloadController extends BasicDownloadController {
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId) {
-        IdMappingDownloadJob job =
-                this.idMappingJobService
-                        .find(jobId)
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "jobId " + jobId + " doesn't exist"));
+        IdMappingDownloadJob job = getDownloadJob(jobId);
         return getAsyncDownloadStatus(job);
+    }
+
+    private IdMappingDownloadJob getDownloadJob(String jobId) {
+        return this.idMappingJobService
+                .find(jobId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(getDownloadJobNotExistMessage(jobId)));
     }
 
     @GetMapping(
@@ -123,13 +124,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
 
-        IdMappingDownloadJob job =
-                this.idMappingJobService
-                        .find(jobId)
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "jobId " + jobId + " doesn't exist"));
+        IdMappingDownloadJob job = getDownloadJob(jobId);
 
         DownloadJobDetailResponse detailResponse = new DownloadJobDetailResponse();
         detailResponse.setFields(job.getFields());
@@ -148,7 +143,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
     }
 
     private void validateRequest(IdMappingDownloadRequest request) {
-        String jobId = request.getJobId();
+        String jobId = request.getIdMappingJobId();
         IdMappingJob idMappingJob = idMappingJobCacheService.getJobAsResource(jobId);
         if (idMappingJob.getJobStatus() != FINISHED) {
             throw new InvalidRequestException(

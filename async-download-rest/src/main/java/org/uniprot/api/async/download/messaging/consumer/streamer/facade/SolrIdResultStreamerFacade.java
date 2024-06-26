@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.ListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.RDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -25,14 +25,14 @@ public abstract class SolrIdResultStreamerFacade<
     private final ListResultStreamer<T, R> listResultStreamer;
     private final SolrIdBatchResultStreamer<T, R, U> solrIdBatchResultStreamer;
     private final MessageConverterContextFactory<U> converterContextFactory;
-    private final AsyncDownloadFileHandler fileHandler;
+    private final FileHandler fileHandler;
 
     protected SolrIdResultStreamerFacade(
             RDFResultStreamer<T, R> rdfResultStreamer,
             ListResultStreamer<T, R> listResultStreamer,
             SolrIdBatchResultStreamer<T, R, U> solrIdBatchResultStreamer,
             MessageConverterContextFactory<U> converterContextFactory,
-            AsyncDownloadFileHandler fileHandler) {
+            FileHandler fileHandler) {
         this.rdfResultStreamer = rdfResultStreamer;
         this.listResultStreamer = listResultStreamer;
         this.solrIdBatchResultStreamer = solrIdBatchResultStreamer;
@@ -61,7 +61,7 @@ public abstract class SolrIdResultStreamerFacade<
 
     private Stream<String> getIds(T request) {
         try {
-            return Files.lines(fileHandler.getIdFile(request.getId()));
+            return Files.lines(fileHandler.getIdFile(request.getDownloadJobId()));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -81,14 +81,15 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @Parameter(description = JOB_ID_DESCRIPTION) @PathVariable String jobId) {
-        UniProtKBDownloadJob job =
-                this.jobService
-                        .find(jobId)
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "jobId " + jobId + " doesn't exist"));
+        UniProtKBDownloadJob job = getDownloadJob(jobId);
         return getAsyncDownloadStatus(job);
+    }
+
+    private UniProtKBDownloadJob getDownloadJob(String jobId) {
+        return this.jobService
+                .find(jobId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(getDownloadJobNotExistMessage(jobId)));
     }
 
     @GetMapping(
@@ -110,13 +111,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
             @Parameter(description = JOB_ID_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
-        UniProtKBDownloadJob job =
-                this.jobService
-                        .find(jobId)
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "jobId " + jobId + " doesn't exist"));
+        UniProtKBDownloadJob job = getDownloadJob(jobId);
         String requestURL = servletRequest.getRequestURL().toString();
 
         return getDownloadJobDetails(requestURL, job);

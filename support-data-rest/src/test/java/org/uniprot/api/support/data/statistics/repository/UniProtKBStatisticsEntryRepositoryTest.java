@@ -33,7 +33,7 @@ import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
     RequestMappingHandlerAdapter.class
 })
 @ActiveProfiles(profiles = "offline")
-class UniprotKBStatisticsEntryRepositoryTest {
+class UniProtKBStatisticsEntryRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 
     @Autowired private UniprotKBStatisticsEntryRepository entryRepository;

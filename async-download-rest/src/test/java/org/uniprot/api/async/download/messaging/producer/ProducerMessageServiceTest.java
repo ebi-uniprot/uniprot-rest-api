@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
@@ -28,8 +28,8 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     protected HashGenerator<T> hashGenerator;
     protected MessageConverter messageConverter;
     protected MessagingService messagingService;
-    protected AsyncDownloadFileHandler asyncDownloadFileHandler;
-    protected AsyncDownloadSubmissionRules<T, R> asyncDownloadSubmissionRules;
+    protected FileHandler fileHandler;
+    protected JobSubmissionRules<T, R> jobSubmissionRules;
     protected ProducerMessageService<T, R> producerMessageService;
 
     @Test
@@ -38,7 +38,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(true);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -55,7 +55,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -71,7 +71,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         String jobId = producerMessageService.sendMessage(downloadRequest);
 
@@ -88,7 +88,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         when(feedback.isAllowed()).thenReturn(true);
         when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
-        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
         doThrow(AmqpException.class).when(messagingService).send(message);
 
         assertThrows(
@@ -105,7 +105,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_whenNotAllowed() {
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(feedback.isAllowed()).thenReturn(false);
-        when(asyncDownloadSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
         assertThrows(
                 IllegalDownloadJobSubmissionException.class,
@@ -124,7 +124,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
 
     private void verifyClean() {
         verify(jobService).delete(JOB_ID);
-        verify(asyncDownloadFileHandler).deleteAllFiles(JOB_ID);
+        verify(fileHandler).deleteAllFiles(JOB_ID);
     }
 
     private void verifyMessageSent() {

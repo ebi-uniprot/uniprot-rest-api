@@ -34,7 +34,7 @@ class UniProtKBRequestProcessorTest {
 
     @BeforeEach
     void setUp() {
-        when(uniProtKBDownloadRequest.getId()).thenReturn(ID);
+        when(uniProtKBDownloadRequest.getDownloadJobId()).thenReturn(ID);
     }
 
     @Test

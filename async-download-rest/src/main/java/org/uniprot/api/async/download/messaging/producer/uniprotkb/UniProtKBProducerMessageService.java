@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
@@ -26,8 +26,8 @@ public class UniProtKBProducerMessageService
             MessageConverter messageConverter,
             UniProtKBMessagingService messagingService,
             HashGenerator<UniProtKBDownloadRequest> uniProtKBDownloadHashGenerator,
-            UniProtKBAsyncDownloadFileHandler asyncDownloadFileHandler,
-            UniProtKBAsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            UniProtKBFileHandler asyncDownloadFileHandler,
+            UniProtKBJobSubmissionRules asyncDownloadSubmissionRules) {
         super(
                 jobService,
                 messageConverter,

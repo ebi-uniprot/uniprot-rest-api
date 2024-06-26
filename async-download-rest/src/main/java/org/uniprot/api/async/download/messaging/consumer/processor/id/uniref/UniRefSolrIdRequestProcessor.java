@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.processor.id.SolrIdRequestProcessor;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
@@ -19,7 +19,7 @@ public class UniRefSolrIdRequestProcessor
     private final UniRefEntryLightService uniRefEntryLightService;
 
     protected UniRefSolrIdRequestProcessor(
-            UniRefAsyncDownloadFileHandler downloadFileHandler,
+            UniRefFileHandler downloadFileHandler,
             UniRefJobService jobService,
             UniRefEntryLightService uniRefEntryLightService) {
         super(downloadFileHandler, jobService);

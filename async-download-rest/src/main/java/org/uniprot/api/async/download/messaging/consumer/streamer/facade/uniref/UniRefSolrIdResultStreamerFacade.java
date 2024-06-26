@@ -8,7 +8,7 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniref.U
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.uniref.UniRefListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.uniref.UniRefRDFResultStreamer;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -24,7 +24,7 @@ public class UniRefSolrIdResultStreamerFacade
             UniRefListResultStreamer listResultStreamer,
             UniRefSolrIdBatchResultStreamer batchResultStreamer,
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
-            UniRefAsyncDownloadFileHandler fileHandler) {
+            UniRefFileHandler fileHandler) {
         super(
                 rdfResultStreamer,
                 listResultStreamer,

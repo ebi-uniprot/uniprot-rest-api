@@ -29,7 +29,7 @@ class UniRefRequestProcessorTest {
 
     @Test
     void process() {
-        when(unirefDownloadRequest.getId()).thenReturn(ID);
+        when(unirefDownloadRequest.getDownloadJobId()).thenReturn(ID);
 
         unirefRequestProcessor.process(unirefDownloadRequest);
 

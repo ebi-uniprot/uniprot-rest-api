@@ -12,7 +12,7 @@ class IdMappingDownloadRequestToArrayConverterTest {
     void canConvertFullRequest() {
         var converter = new IdMappingDownloadRequestToArrayConverter();
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
-        request.setJobId("JOBID ");
+        request.setIdMappingJobId("JOBID ");
         request.setFormat(" format");
         request.setFields(" fieldValue ");
         char[] result = converter.apply(request);

@@ -45,8 +45,8 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.getResultsInterval()).thenReturn(100L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
 
         verifySavedJob(140L);
     }
@@ -67,11 +67,11 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
 
         verifySavedJob(70L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
 
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
@@ -89,11 +89,11 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForResults(downloadJob, 50);
+        heartBeatProducer.generateForResults(downloadJob, 50);
 
         verifySavedJob(50L);
 
-        heartBeatProducer.createForResults(downloadJob, 50);
+        heartBeatProducer.generateForResults(downloadJob, 50);
 
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
@@ -111,8 +111,8 @@ class HeartbeatProducerTest {
 
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
 
         verify(jobService, never()).save(any());
         verify(jobService, never()).update(any(), any());
@@ -125,8 +125,8 @@ class HeartbeatProducerTest {
         downloadJob.setTotalEntries(130L);
         downloadJob.setProcessedEntries(100L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
-        heartBeatProducer.createForResults(downloadJob, 60);
+        heartBeatProducer.generateForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 60);
 
         verifySavedJob(130L);
     }
@@ -138,7 +138,7 @@ class HeartbeatProducerTest {
         doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.createForResults(downloadJob, 70));
+        assertDoesNotThrow(() -> heartBeatProducer.generateForResults(downloadJob, 70));
     }
 
     @Test
@@ -147,13 +147,13 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForIds(downloadJob);
-        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
 
         verifySavedJob(null);
 
-        heartBeatProducer.createForIds(downloadJob);
-        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
         verify(jobService, times(2)).update(eq(JOB_ID), any(Map.class));
     }
 
@@ -164,8 +164,8 @@ class HeartbeatProducerTest {
 
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createForIds(downloadJob);
-        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
 
         verify(jobService, never()).save(any());
         verify(jobService, never()).update(any(), any());
@@ -178,7 +178,7 @@ class HeartbeatProducerTest {
         doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.createForIds(downloadJob));
+        assertDoesNotThrow(() -> heartBeatProducer.generateForIds(downloadJob));
     }
 
     @Test
@@ -187,10 +187,10 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(130L);
 
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
         downloadJob.setProcessedEntries(0);
         heartBeatProducer.stop(JOB_ID);
-        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.generateForResults(downloadJob, 70);
 
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();

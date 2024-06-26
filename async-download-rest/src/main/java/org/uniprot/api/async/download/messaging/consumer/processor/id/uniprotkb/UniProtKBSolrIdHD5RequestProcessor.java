@@ -9,7 +9,7 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.processor.id.IdRequestProcessor;
-import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
@@ -29,7 +29,7 @@ public class UniProtKBSolrIdHD5RequestProcessor
     private final UniProtKBSolrIdRequestProcessor uniProtKBSolrIdRequestProcessor;
 
     public UniProtKBSolrIdHD5RequestProcessor(
-            UniProtKBAsyncDownloadFileHandler downloadFileHandler,
+            UniProtKBFileHandler downloadFileHandler,
             UniProtKBJobService jobService,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
             UniProtKBMessagingService messagingService,
@@ -49,12 +49,12 @@ public class UniProtKBSolrIdHD5RequestProcessor
 
         if (solrHits <= maxEntryCount) {
             uniProtKBSolrIdRequestProcessor.process(request);
-            sendMessageToEmbeddingsQueue(request.getId());
-            jobService.update(request.getId(), Map.of(STATUS, UNFINISHED));
+            sendMessageToEmbeddingsQueue(request.getDownloadJobId());
+            jobService.update(request.getDownloadJobId(), Map.of(STATUS, UNFINISHED));
         } else {
             log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
             jobService.update(
-                    request.getId(),
+                    request.getDownloadJobId(),
                     Map.of(
                             STATUS,
                             ABORTED,

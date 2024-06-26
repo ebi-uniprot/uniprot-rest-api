@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
-import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingContentBasedAndRetriableMessageConsumer;
+import org.uniprot.api.async.download.messaging.consumer.idmapping.IdMappingMessageConsumer;
 import org.uniprot.api.async.download.model.request.IdMappingDownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
@@ -87,7 +87,7 @@ public class IdMappingRabbitMQConfig {
     @Bean
     public MessageListenerContainer idMappingMessageListenerContainer(
             ConnectionFactory connectionFactory,
-            IdMappingContentBasedAndRetriableMessageConsumer idMappingMessageConsumer,
+            IdMappingMessageConsumer idMappingMessageConsumer,
             IdMappingAsyncDownloadQueueConfigProperties configProps) {
         return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
                 connectionFactory, idMappingMessageConsumer, configProps);

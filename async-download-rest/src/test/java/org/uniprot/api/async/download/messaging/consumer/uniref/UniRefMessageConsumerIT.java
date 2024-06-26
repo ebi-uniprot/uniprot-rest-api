@@ -33,7 +33,7 @@ import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.SolrIdMessageConsumerIT;
 import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefAsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -66,7 +66,7 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniRefDownloadRequest, UniRefDownloadJob> {
-    @Autowired private UniRefContentBasedAndRetriableMessageConsumer uniRefMessageConsumer;
+    @Autowired private UniRefMessageConsumer uniRefMessageConsumer;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private SolrClient solrClient;
 
@@ -77,7 +77,7 @@ class UniRefMessageConsumerIT
     @Autowired private UniRefAsyncConfig uniRefAsyncConfig;
     @Autowired private UniRefDownloadJobRepository uniRefDownloadJobRepository;
     @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
-    @Autowired private UniRefAsyncDownloadFileHandler uniRefAsyncDownloadFileHandler;
+    @Autowired private UniRefFileHandler uniRefAsyncDownloadFileHandler;
 
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired
@@ -99,7 +99,7 @@ class UniRefMessageConsumerIT
 
     @BeforeEach
     void setUp() {
-        asyncDownloadFileHandler = uniRefAsyncDownloadFileHandler;
+        fileHandler = uniRefAsyncDownloadFileHandler;
         downloadJobRepository = uniRefDownloadJobRepository;
         messageConsumer = uniRefMessageConsumer;
         downloadConfigProperties = uniRefDownloadConfigProperties;

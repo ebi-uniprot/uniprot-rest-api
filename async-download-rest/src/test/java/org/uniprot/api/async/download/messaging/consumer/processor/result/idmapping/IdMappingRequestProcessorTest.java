@@ -43,8 +43,8 @@ class IdMappingRequestProcessorTest {
     @Test
     void process() {
         when(idMappingJobCacheService.get(JOB_ID)).thenReturn(idMappingJob);
-        when(request.getJobId()).thenReturn(JOB_ID);
-        when(request.getId()).thenReturn(ID);
+        when(request.getIdMappingJobId()).thenReturn(JOB_ID);
+        when(request.getDownloadJobId()).thenReturn(ID);
         when(idMappingJob.getIdMappingRequest()).thenReturn(idMappingRequest);
         when(idMappingJob.getIdMappingResult()).thenReturn(idMappingResult);
         when(idMappingResult.getMappedIds()).thenReturn(mappedIds);
@@ -60,6 +60,8 @@ class IdMappingRequestProcessorTest {
                 .update(ID, Map.of(STATUS, RUNNING, TOTAL_ENTRIES, (long) SIZE));
         inOrder.verify(requestProcessor).process(request);
         inOrder.verify(idMappingJobService)
-                .update(request.getId(), Map.of(STATUS, FINISHED, RESULT_FILE, request.getId()));
+                .update(
+                        request.getDownloadJobId(),
+                        Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
     }
 }

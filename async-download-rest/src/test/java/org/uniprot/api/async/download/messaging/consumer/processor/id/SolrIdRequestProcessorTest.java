@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.uniprot.api.async.download.messaging.result.common.AsyncDownloadFileHandler;
+import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
 import org.uniprot.api.async.download.service.JobService;
@@ -19,18 +19,18 @@ public abstract class SolrIdRequestProcessorTest<
     protected static final long SOLR_HITS = 98L;
     protected static final String ID = "someId";
     @Mock protected Stream<String> idStream;
-    protected AsyncDownloadFileHandler asyncDownloadFileHandler;
+    protected FileHandler fileHandler;
     protected JobService<R> jobService;
     protected T downloadRequest;
     protected SolrIdRequestProcessor<T, R> requestProcessor;
 
     @Test
     void process() {
-        when(downloadRequest.getId()).thenReturn(ID);
+        when(downloadRequest.getDownloadJobId()).thenReturn(ID);
 
         requestProcessor.process(downloadRequest);
 
         verify(jobService).update(ID, Map.of(TOTAL_ENTRIES, SOLR_HITS));
-        verify(asyncDownloadFileHandler).writeIds(ID, idStream);
+        verify(fileHandler).writeIds(ID, idStream);
     }
 }

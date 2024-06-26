@@ -11,7 +11,7 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 @Component
 public class UniRefRDFResultStreamer
         extends RDFResultStreamer<UniRefDownloadRequest, UniRefDownloadJob> {
-    private static final String UNI_REF_DATA_TYPE = "uniref";
+    private static final String UNIREF_DATA_TYPE = "uniref";
 
     public UniRefRDFResultStreamer(
             UniRefHeartbeatProducer heartbeatProducer,
@@ -22,6 +22,6 @@ public class UniRefRDFResultStreamer
 
     @Override
     protected String getDataType() {
-        return UNI_REF_DATA_TYPE;
+        return UNIREF_DATA_TYPE;
     }
 }
