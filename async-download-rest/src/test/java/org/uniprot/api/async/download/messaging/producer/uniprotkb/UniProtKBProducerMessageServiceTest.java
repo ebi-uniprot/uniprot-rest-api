@@ -25,9 +25,9 @@ import org.uniprot.api.rest.request.HashGenerator;
 @ExtendWith(MockitoExtension.class)
 class UniProtKBProducerMessageServiceTest
         extends ProducerMessageServiceTest<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
-    public static final String UNI_PROT_KB_FIELDS = "uniProtKBFields";
-    public static final String UNI_PROT_KB_SORT = "uniProtKBSort";
-    public static final String UNI_PROT_KB_FORMAT = "uniProtKBFormat";
+    public static final String UNIPROTKB_FIELDS = "uniProtKBFields";
+    public static final String UNIPROTKB_SORT = "uniProtKBSort";
+    public static final String UNIPROTKB_FORMAT = "uniProtKBFormat";
     protected final String UNI_PROT_KB_QUERY = "uniProtKBQuery";
     @Mock private UniProtKBDownloadRequest uniProtKBDownloadRequest;
     @Mock private UniProtKBJobService uniProtKBJobService;
@@ -65,7 +65,7 @@ class UniProtKBProducerMessageServiceTest
     @Override
     protected void mockDownloadRequest() {
         mockDownloadRequestWithoutFormat();
-        when(uniProtKBDownloadRequest.getFormat()).thenReturn(UNI_PROT_KB_FORMAT);
+        when(uniProtKBDownloadRequest.getFormat()).thenReturn(UNIPROTKB_FORMAT);
     }
 
     @Override
@@ -75,8 +75,8 @@ class UniProtKBProducerMessageServiceTest
                         argThat(mh -> JOB_ID.equals(mh.getHeader(ProducerMessageService.JOB_ID)))))
                 .thenReturn(message);
         when(uniProtKBDownloadRequest.getQuery()).thenReturn(UNI_PROT_KB_QUERY);
-        when(uniProtKBDownloadRequest.getFields()).thenReturn(UNI_PROT_KB_FIELDS);
-        when(uniProtKBDownloadRequest.getSort()).thenReturn(UNI_PROT_KB_SORT);
+        when(uniProtKBDownloadRequest.getFields()).thenReturn(UNIPROTKB_FIELDS);
+        when(uniProtKBDownloadRequest.getSort()).thenReturn(UNIPROTKB_SORT);
     }
 
     @Override
