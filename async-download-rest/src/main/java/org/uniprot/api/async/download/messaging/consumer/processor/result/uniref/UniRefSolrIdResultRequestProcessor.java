@@ -25,12 +25,12 @@ public class UniRefSolrIdResultRequestProcessor
     public UniRefSolrIdResultRequestProcessor(
             UniRefDownloadConfigProperties downloadConfigProperties,
             UniRefHeartbeatProducer heartbeatProducer,
-            UniRefSolrIdResultStreamerFacade uniProtKBResultStreamerFacade,
+            UniRefSolrIdResultStreamerFacade uniRefSolrIdResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(
                 downloadConfigProperties,
                 heartbeatProducer,
-                uniProtKBResultStreamerFacade,
+                uniRefSolrIdResultStreamerFacade,
                 uuwMessageConverterFactory);
     }
 

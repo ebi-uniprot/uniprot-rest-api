@@ -8,6 +8,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
@@ -656,7 +657,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 callPostJobStatus(query, fields, sort, format, includeIsoform, false);
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
