@@ -8,7 +8,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.common.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
 import static org.uniprot.api.idmapping.common.IdMappingUniRefITUtils.saveEntries;
@@ -216,6 +215,31 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
     }
 
     @Test
+    void testIdMappingWithInvalidCompleteValue() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation().createAndPutJobInCache(AbstractJobOperation.DEFAULT_IDS_COUNT);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", "*")
+                                        .param("complete", "INVALID")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains(
+                                        "'complete' parameter value has invalid format. It should be true or false.")));
+    }
+
+    @Test
     void testIdMappingWithSuccessComplete() throws Exception {
         // when
         IdMappingJob job =
@@ -231,7 +255,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(5)))
@@ -283,7 +307,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(5)))
