@@ -9,15 +9,21 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.idmapping.common.request.uniref.UniRefIdMappingSearchRequest;
+import org.uniprot.api.idmapping.common.request.uniref.UniRefIdMappingStreamRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.response.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.common.service.BasicIdService;
 import org.uniprot.api.idmapping.common.service.store.impl.UniRefBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
+import org.uniprot.api.uniref.common.service.light.UniRefEntryLightUtils;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -54,6 +60,33 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     }
 
     @Override
+    protected Stream<UniRefEntryPair> getPagedEntries(
+            List<IdMappingStringPair> mappedIdPairs,
+            CursorPage cursorPage,
+            SearchRequest searchRequest) {
+        Stream<UniRefEntryPair> entryPairStream =
+                super.getPagedEntries(mappedIdPairs, cursorPage, searchRequest);
+        UniRefIdMappingSearchRequest request = (UniRefIdMappingSearchRequest) searchRequest;
+
+        if (request.isComplete()) {
+            return entryPairStream.map(this::mapCompleteEntryPair);
+        } else {
+            return entryPairStream.map(this::mapLimitedEntryPair);
+        }
+    }
+
+    private UniRefEntryPair mapCompleteEntryPair(UniRefEntryPair uniRefEntryPair) {
+        UniRefEntryLight cleanEntry = UniRefEntryLightUtils.cleanMemberId(uniRefEntryPair.getTo());
+        return UniRefEntryPair.builder().from(uniRefEntryPair.getFrom()).to(cleanEntry).build();
+    }
+
+    private UniRefEntryPair mapLimitedEntryPair(UniRefEntryPair uniRefEntryPair) {
+        UniRefEntryLight cleanEntry =
+                UniRefEntryLightUtils.removeOverLimitAndCleanMemberId(uniRefEntryPair.getTo());
+        return UniRefEntryPair.builder().from(uniRefEntryPair.getFrom()).to(cleanEntry).build();
+    }
+
+    @Override
     protected UniRefEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniRefEntryLight> idEntryMap) {
         return UniRefEntryPair.builder()
@@ -81,13 +114,15 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
 
     @Override
     protected Stream<UniRefEntryPair> streamEntries(
-            List<IdMappingStringPair> mappedIds, String fields) {
+            List<IdMappingStringPair> mappedIds, StreamRequest streamRequest) {
+        UniRefIdMappingStreamRequest request = (UniRefIdMappingStreamRequest) streamRequest;
         UniRefBatchStoreEntryPairIterable batchIterable =
                 new UniRefBatchStoreEntryPairIterable(
                         mappedIds,
                         streamConfig.getStoreBatchSize(),
                         storeClient,
-                        storeFetchRetryPolicy);
+                        storeFetchRetryPolicy,
+                        request.isComplete());
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 }

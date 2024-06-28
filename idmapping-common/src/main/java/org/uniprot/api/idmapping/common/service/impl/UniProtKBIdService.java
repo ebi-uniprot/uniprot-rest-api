@@ -147,7 +147,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     protected Stream<UniProtKBEntryPair> streamEntries(
-            List<IdMappingStringPair> mappedIds, String fields) {
+            List<IdMappingStringPair> mappedIds, StreamRequest streamRequest) {
         UniProtKBBatchStoreEntryPairIterable batchIterable =
                 new UniProtKBBatchStoreEntryPairIterable(
                         mappedIds,
@@ -156,7 +156,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                         storeFetchRetryPolicy,
                         lineageService,
                         repository,
-                        isLineageAllowed(fields, returnFieldConfig));
+                        isLineageAllowed(streamRequest.getFields(), returnFieldConfig));
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 
