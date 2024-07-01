@@ -233,6 +233,52 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                 .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")));
     }
 
+    @Test
+    void returnFieldsWithAlias_returnsSuccess() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "UniRef50_P03911")
+                                        .param("fields", "id,created")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03911")))
+                .andExpect(jsonPath("$.results[*].updated", contains("2019-08-27")));
+    }
+
+    @Test
+    void searchWithAlias_returnsSuccess() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "created:[2019-08-26 TO *]")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        jsonPath("$.results[*].id", contains("UniRef50_P03911", "UniRef50_P03920")))
+                .andExpect(jsonPath("$.results[*].updated", contains("2019-08-27", "2019-08-27")));
+    }
+
     @Override
     protected List<Triple<String, String, List<String>>> getTriplets() {
         return List.of(
@@ -296,6 +342,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
             case "uniprot_id":
                 value = ACC_PREF + 11;
                 break;
+            case "updated":
             case "created":
                 value = "[2000-01-01 TO *]";
                 break;
@@ -429,11 +476,13 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,name"))
+                    .queryParam("fields", Collections.singletonList("id,name,updated"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].id",
                                     contains("UniRef50_P03911", "UniRef50_P03920")))
+                    .resultMatcher(
+                            jsonPath("$.results[*].updated", contains("2019-08-27", "2019-08-27")))
                     .resultMatcher(jsonPath("$.results[*].name").hasJsonPath())
                     .resultMatcher(jsonPath("$.results[*].members").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].representativeMember").doesNotExist())
@@ -483,7 +532,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of last update")))
                                     .resultMatcher(
                                             content()
                                                     .string(
