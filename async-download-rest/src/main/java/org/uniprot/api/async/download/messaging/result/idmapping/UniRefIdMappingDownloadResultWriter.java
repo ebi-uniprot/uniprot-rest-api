@@ -53,7 +53,8 @@ public class UniRefIdMappingDownloadResultWriter
                 mappedIds,
                 storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
                 storeStreamerConfig.getStoreClient(),
-                storeStreamerConfig.getStoreFetchRetryPolicy());
+                storeStreamerConfig.getStoreFetchRetryPolicy(),
+                true);
     }
 
     @Override

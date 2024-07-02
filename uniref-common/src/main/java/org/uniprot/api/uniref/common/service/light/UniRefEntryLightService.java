@@ -1,11 +1,10 @@
 package org.uniprot.api.uniref.common.service.light;
 
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.uniref.common.service.light.UniRefEntryLightUtils.*;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.response.converter.UniRefLightQueryResultConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
-import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
 import org.uniprot.store.config.UniProtDataType;
@@ -48,7 +46,6 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 public class UniRefEntryLightService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
     private final SolrQueryConfig solrQueryConfig;
-    private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
     private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
@@ -119,10 +116,12 @@ public class UniRefEntryLightService
                             .warnings(warnings);
             if (!unirefRequest.isComplete()) {
                 Stream<UniRefEntryLight> content =
-                        result.getContent().map(this::removeOverLimitAndCleanMemberId);
+                        result.getContent()
+                                .map(UniRefEntryLightUtils::removeOverLimitAndCleanMemberId);
                 builder.content(content);
             } else {
-                Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
+                Stream<UniRefEntryLight> content =
+                        result.getContent().map(UniRefEntryLightUtils::cleanMemberId);
                 builder.content(content);
             }
             result = builder.build();
@@ -136,9 +135,9 @@ public class UniRefEntryLightService
         Stream<UniRefEntryLight> result = super.stream(request);
         if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
             if (!uniRefRequest.isComplete()) {
-                result = result.map(this::removeOverLimitAndCleanMemberId);
+                result = result.map(UniRefEntryLightUtils::removeOverLimitAndCleanMemberId);
             } else {
-                result = result.map(this::cleanMemberId);
+                result = result.map(UniRefEntryLightUtils::cleanMemberId);
             }
         }
         return result;
@@ -160,7 +159,7 @@ public class UniRefEntryLightService
             UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
+        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
@@ -183,48 +182,5 @@ public class UniRefEntryLightService
     protected UniRefEntryLight mapToThinEntry(String uniRefId) {
         UniRefEntryLightBuilder builder = new UniRefEntryLightBuilder().id(uniRefId);
         return builder.build();
-    }
-
-    private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {
-        UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
-
-        List<String> members = removeMemberTypeFromMemberId(entry.getMembers());
-        builder.membersSet(members);
-
-        return builder.build();
-    }
-
-    private UniRefEntryLight removeOverLimitAndCleanMemberId(UniRefEntryLight entry) {
-        UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
-
-        List<String> members = entry.getMembers();
-        if (entry.getMembers().size() > ID_LIMIT) {
-            members = entry.getMembers().subList(0, ID_LIMIT);
-        }
-
-        members = removeMemberTypeFromMemberId(members);
-        builder.membersSet(members);
-
-        if (entry.getOrganisms().size() > ID_LIMIT) {
-            LinkedHashSet<Organism> organisms =
-                    entry.getOrganisms().stream()
-                            .limit(ID_LIMIT)
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
-            builder.organismsSet(organisms);
-        }
-        return builder.build();
-    }
-
-    /**
-     * This method remove MemberIdType from member list and return just memberId
-     *
-     * @param members List of members that are stored in Voldemort with format:
-     *     "memberId,MemberIdType"
-     * @return List of return clean member with the format "memberId"
-     */
-    private List<String> removeMemberTypeFromMemberId(List<String> members) {
-        return members.stream()
-                .map(memberId -> memberId.split(",")[0])
-                .collect(Collectors.toList());
     }
 }
