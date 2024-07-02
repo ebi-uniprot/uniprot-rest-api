@@ -267,10 +267,11 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                         .perform(
                                 get(getSearchRequestPath())
                                         .param("query", "created:[2019-08-26 TO *]")
+                                        .param("sort", "created desc")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
@@ -342,7 +343,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
             case "uniprot_id":
                 value = ACC_PREF + 11;
                 break;
-            case "updated":
+            case "date_modified":
             case "created":
                 value = "[2000-01-01 TO *]";
                 break;
@@ -476,7 +477,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("fields", Collections.singletonList("id,name,updated"))
+                    .queryParam("fields", Collections.singletonList("id,name,date_modified"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].id",
@@ -532,7 +533,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of last update")))
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate Modified")))
                                     .resultMatcher(
                                             content()
                                                     .string(

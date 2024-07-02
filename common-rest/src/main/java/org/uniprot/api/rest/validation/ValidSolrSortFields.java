@@ -4,11 +4,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -16,6 +18,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -57,7 +60,7 @@ public @interface ValidSolrSortFields {
             valueList =
                     searchFieldConfig.getSearchFieldItems().stream()
                             .filter(field -> field.getSortFieldId() != null)
-                            .map(SearchFieldItem::getFieldName)
+                            .flatMap(this::getFieldNameAndAliases)
                             .collect(Collectors.toList());
         }
 
@@ -123,6 +126,15 @@ public @interface ValidSolrSortFields {
             String errorMessage = "{search.invalid.sort.field}";
             contextImpl.addMessageParameter("0", sortField);
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
+        }
+
+        private Stream<String> getFieldNameAndAliases(SearchFieldItem searchFieldItem) {
+            List<String> result = new ArrayList<>();
+            result.add(searchFieldItem.getFieldName());
+            if (Utils.notNullNotEmpty(searchFieldItem.getAliases())) {
+                result.addAll(searchFieldItem.getAliases());
+            }
+            return result.stream();
         }
     }
 }
