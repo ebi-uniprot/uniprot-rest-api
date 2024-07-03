@@ -295,7 +295,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate Modified")))
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of last modification")))
                                     .resultMatcher(
                                             content()
                                                     .string(
