@@ -106,7 +106,7 @@ class BatchStoreEntryPairIterableTest {
     @Test
     void testLoggingUniRef() {
         BatchStoreEntryPairIterable<UniRefEntryPair, UniRefEntryLight> iterable =
-                new UniRefBatchStoreEntryPairIterable(List.of(), 10, null, null);
+                new UniRefBatchStoreEntryPairIterable(List.of(), 10, null, null, false);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }

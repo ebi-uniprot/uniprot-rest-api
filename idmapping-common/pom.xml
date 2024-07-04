@@ -36,6 +36,11 @@
 			<version>${uniprot-core.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>uniref-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
