@@ -15,7 +15,6 @@ import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProp
 import org.uniprot.api.async.download.messaging.config.uniparc.UniParcDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniparc.UniParcRabbitMQConfig;
 import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
-import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.uniparc.UniParcMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
@@ -25,7 +24,6 @@ import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandler;
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
-import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(SpringExtension.class)
@@ -45,15 +43,9 @@ public class UniParcProducerMessageServiceIT
 
     @Autowired private UniParcFileHandler fileHandler;
 
-    @Autowired private UniParcJobService uniParcJobService;
-
-    @Autowired private UniParcJobSubmissionRules uniParcAsyncDownloadSubmissionRules;
-
     @Autowired private UniParcDownloadConfigProperties uniParcDownloadConfigProperties;
 
     @MockBean private UniParcMessageConsumer uniParcConsumer;
-
-    @MockBean private UniProtKBHeartbeatProducer heartBeat;
 
     @Override
     protected UniParcDownloadJob getDownloadJob(

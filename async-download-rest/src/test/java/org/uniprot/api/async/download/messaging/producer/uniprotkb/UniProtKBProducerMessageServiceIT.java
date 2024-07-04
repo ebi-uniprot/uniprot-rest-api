@@ -24,7 +24,6 @@ import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
-import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(SpringExtension.class)
@@ -39,10 +38,6 @@ class UniProtKBProducerMessageServiceIT
         extends SolrProducerMessageServiceIT<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
 
     @Autowired private UniProtKBProducerMessageService service;
-
-    @Autowired private UniProtKBJobService uniProtKBJobService;
-
-    @Autowired private UniProtKBJobSubmissionRules uniProtKBAsyncDownloadSubmissionRules;
 
     @Autowired private UniProtKBDownloadJobRepository jobRepository;
 
