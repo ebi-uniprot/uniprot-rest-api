@@ -60,8 +60,8 @@ public class UniprotKBMappingRepository {
                     }
                     UniProtKBEntryBuilder builder =
                             new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build());
-                    if (Utils.notNull(document.uniparcDeleted)) {
-                        builder.extraAttributesAdd(UNIPARC_ID_ATTRIB, document.uniparcDeleted);
+                    if (Utils.notNull(document.deletedEntryUniParc)) {
+                        builder.extraAttributesAdd(UNIPARC_ID_ATTRIB, document.deletedEntryUniParc);
                     }
                     result = builder.build();
                 }

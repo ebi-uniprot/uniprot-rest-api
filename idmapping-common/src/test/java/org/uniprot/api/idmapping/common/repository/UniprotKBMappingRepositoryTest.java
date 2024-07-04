@@ -26,7 +26,7 @@ class UniprotKBMappingRepositoryTest {
         solrDocument.put("id", "INACTIVE_DROME");
         solrDocument.put("active", false);
         solrDocument.put("inactive_reason", "DELETED:SWISSPROT_DELETION");
-        solrDocument.put("uniparc_deleted", "UPI000031CDF9");
+        solrDocument.put("deleted_entry_uniparc", "UPI000031CDF9");
         Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(solrDocument);
 
@@ -82,7 +82,7 @@ class UniprotKBMappingRepositoryTest {
         deletedDocument.put("id", "INACTIVE_A0A0D5V897");
         deletedDocument.put("active", false);
         deletedDocument.put("inactive_reason", "DELETED:PROTEOME_REDUNDANCY");
-        deletedDocument.put("uniparc_deleted", "UPI000031CDF9");
+        deletedDocument.put("deleted_entry_uniparc", "UPI000031CDF9");
         Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("A0A0D5V897")))
                 .thenReturn(deletedDocument);
 
