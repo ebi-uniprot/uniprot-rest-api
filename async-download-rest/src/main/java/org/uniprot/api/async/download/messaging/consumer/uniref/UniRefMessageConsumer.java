@@ -16,13 +16,13 @@ public class UniRefMessageConsumer
     public UniRefMessageConsumer(
             UniRefMessagingService messagingService,
             UniRefRequestProcessor requestProcessor,
-            UniRefFileHandler asyncDownloadFileHandler,
+            UniRefFileHandler fileHandler,
             UniRefJobService jobService,
             MessageConverter messageConverter) {
         super(
                 messagingService,
                 requestProcessor,
-                asyncDownloadFileHandler,
+                fileHandler,
                 jobService,
                 messageConverter);
     }

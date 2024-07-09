@@ -12,11 +12,11 @@ public abstract class SolrIdRequestProcessor<
                 T extends SolrStreamDownloadRequest, R extends DownloadJob>
         implements IdRequestProcessor<T> {
     protected static final String TOTAL_ENTRIES = "totalEntries";
-    private final FileHandler downloadFileHandler;
+    private final FileHandler fileHandler;
     private final JobService<R> jobService;
 
-    protected SolrIdRequestProcessor(FileHandler downloadFileHandler, JobService<R> jobService) {
-        this.downloadFileHandler = downloadFileHandler;
+    protected SolrIdRequestProcessor(FileHandler fileHandler, JobService<R> jobService) {
+        this.fileHandler = fileHandler;
         this.jobService = jobService;
     }
 
@@ -33,7 +33,7 @@ public abstract class SolrIdRequestProcessor<
     protected abstract long getSolrHits(T downloadRequest);
 
     private void writeIdentifiers(T request, Stream<String> ids) {
-        downloadFileHandler.writeIds(request.getDownloadJobId(), ids);
+        fileHandler.writeIds(request.getDownloadJobId(), ids);
     }
 
     protected abstract Stream<String> streamIds(T downloadRequest);

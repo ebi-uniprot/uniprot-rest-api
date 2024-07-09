@@ -20,16 +20,16 @@ public class IdMappingMessageConsumer
     public IdMappingMessageConsumer(
             IdMappingRabbitMQMessagingService messagingService,
             IdMappingRequestProcessor requestProcessor,
-            IdMappingFileHandler asyncDownloadFileHandler,
+            IdMappingFileHandler fileHandler,
             IdMappingJobService jobService,
             MessageConverter messageConverter) {
         super(
                 messagingService,
                 requestProcessor,
-                asyncDownloadFileHandler,
+                fileHandler,
                 jobService,
                 messageConverter);
-        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
+        this.asyncDownloadFileHandler = fileHandler;
     }
 
     @Override

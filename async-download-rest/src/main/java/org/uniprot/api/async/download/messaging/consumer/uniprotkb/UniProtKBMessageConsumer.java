@@ -16,13 +16,13 @@ public class UniProtKBMessageConsumer
     public UniProtKBMessageConsumer(
             UniProtKBMessagingService messagingService,
             UniProtKBRequestProcessor requestProcessor,
-            UniProtKBFileHandler asyncDownloadFileHandler,
+            UniProtKBFileHandler fileHandler,
             UniProtKBJobService jobService,
             MessageConverter messageConverter) {
         super(
                 messagingService,
                 requestProcessor,
-                asyncDownloadFileHandler,
+                fileHandler,
                 jobService,
                 messageConverter);
     }
