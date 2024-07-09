@@ -15,7 +15,6 @@ import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProp
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniref.UniRefRabbitMQConfig;
 import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
-import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
@@ -25,7 +24,6 @@ import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
-import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(SpringExtension.class)
@@ -45,15 +43,9 @@ public class UniRefProducerMessageServiceIT
 
     @Autowired private UniRefFileHandler fileHandler;
 
-    @Autowired private UniRefJobService uniRefJobService;
-
-    @Autowired private UniRefJobSubmissionRules uniRefAsyncDownloadSubmissionRules;
-
     @Autowired private UniRefDownloadConfigProperties uniRefDownloadConfigProperties;
 
     @MockBean private UniRefMessageConsumer uniRefConsumer;
-
-    @MockBean private UniProtKBHeartbeatProducer heartBeat;
 
     @Override
     protected UniRefDownloadJob getDownloadJob(

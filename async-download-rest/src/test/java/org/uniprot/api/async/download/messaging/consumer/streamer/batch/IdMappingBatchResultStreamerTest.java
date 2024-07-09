@@ -32,7 +32,7 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
     void stream() {
         mockBatch();
         when(request.getDownloadJobId()).thenReturn(ID);
-        when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
+        when(jobService.find(ID)).thenReturn(Optional.of(job));
         List<IdMappingStringPair> idMappingStringPairList =
                 List.of(
                         new IdMappingStringPair("from1", "to1"),
@@ -44,7 +44,8 @@ public abstract class IdMappingBatchResultStreamerTest<Q, P extends EntryPair<Q>
                 idMappingBatchResultStreamer.stream(request, idMappingPairs)
                         .collect(Collectors.toList());
 
-        assertThat(result).hasSameElementsAs(getEntryList());
+        assertThat(result).hasSameSizeAs(getEntryList());
+        assertThat(result).hasOnlyElementsOfType(EntryPair.class);
         InOrder inOrder = inOrder(heartbeatProducer);
         inOrder.verify(heartbeatProducer).generateForResults(job, 2);
         inOrder.verify(heartbeatProducer).generateForResults(job, 1);

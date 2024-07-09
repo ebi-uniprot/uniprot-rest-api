@@ -47,7 +47,7 @@ public class IdMappingUniRefITUtils {
             case "length":
                 value = "[10 TO 500]";
                 break;
-            case "created":
+            case "date_modified":
                 value = "[2000-01-01 TO *]";
                 break;
         }
@@ -71,7 +71,7 @@ public class IdMappingUniRefITUtils {
             CloudSolrClient cloudSolrClient,
             UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
-        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(i, i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
