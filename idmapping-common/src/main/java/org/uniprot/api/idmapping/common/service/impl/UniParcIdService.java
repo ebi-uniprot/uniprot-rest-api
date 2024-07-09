@@ -17,6 +17,7 @@ import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.common.service.BasicIdService;
 import org.uniprot.api.idmapping.common.service.store.impl.UniParcBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -81,7 +82,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
 
     @Override
     public Stream<UniParcEntryPair> streamEntries(
-            List<IdMappingStringPair> mappedIds, String fields) {
+            List<IdMappingStringPair> mappedIds, StreamRequest streamRequest) {
         UniParcBatchStoreEntryPairIterable batchIterable =
                 new UniParcBatchStoreEntryPairIterable(
                         mappedIds,

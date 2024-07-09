@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.common.service.store.impl;
 
+import static org.uniprot.api.uniref.common.service.light.UniRefEntryLightUtils.*;
+import static org.uniprot.api.uniref.common.service.light.UniRefEntryLightUtils.cleanMemberId;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -20,29 +23,42 @@ import net.jodah.failsafe.RetryPolicy;
 public class UniRefBatchStoreEntryPairIterable
         extends BatchStoreEntryPairIterable<UniRefEntryPair, UniRefEntryLight> {
 
+    private final boolean complete;
+
     public UniRefBatchStoreEntryPairIterable(
             Iterable<IdMappingStringPair> sourceIterable,
             int batchSize,
             UniProtStoreClient<UniRefEntryLight> storeClient,
-            RetryPolicy<Object> retryPolicy) {
+            RetryPolicy<Object> retryPolicy,
+            boolean complete) {
         super(sourceIterable, batchSize, storeClient, retryPolicy);
+        this.complete = complete;
     }
 
     public UniRefBatchStoreEntryPairIterable(
             Iterator<IdMappingStringPair> sourceIterator,
             int batchSize,
             UniProtStoreClient<UniRefEntryLight> storeClient,
-            RetryPolicy<Object> retryPolicy) {
+            RetryPolicy<Object> retryPolicy,
+            boolean complete) {
         super(sourceIterator, batchSize, storeClient, retryPolicy);
+        this.complete = complete;
     }
 
     @Override
     protected UniRefEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniRefEntryLight> idEntryMap) {
-        return UniRefEntryPair.builder()
-                .from(mId.getFrom())
-                .to(idEntryMap.getOrDefault(mId.getTo(), null))
-                .build();
+        UniRefEntryPair.UniRefEntryPairBuilder builder = UniRefEntryPair.builder();
+        builder.from(mId.getFrom());
+        UniRefEntryLight to = idEntryMap.get(mId.getTo());
+        if (to != null) {
+            if (this.complete) {
+                builder.to(cleanMemberId(to));
+            } else {
+                builder.to(removeOverLimitAndCleanMemberId(to));
+            }
+        }
+        return builder.build();
     }
 
     @Override
