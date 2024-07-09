@@ -1,11 +1,15 @@
 package org.uniprot.api.async.download.messaging.config.uniref;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.uniprot.api.async.download.model.common.DownloadRequest;
-import org.uniprot.api.async.download.model.common.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
+import org.uniprot.api.async.download.messaging.consumer.uniref.UniRefMessageConsumer;
+import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -81,8 +85,18 @@ public class UniRefRabbitMQConfig {
     }
 
     @Bean
-    public HashGenerator<DownloadRequest> uniRefHashGenerator(
-            @Value("${async.download.uniref.hash.salt}") String hashSalt) {
-        return new HashGenerator<>(new DownloadRequestToArrayConverter(), hashSalt);
+    public MessageListenerContainer uniRefMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            UniRefMessageConsumer uniRefMessageConsumer,
+            UniRefAsyncDownloadQueueConfigProperties configProps) {
+
+        return QueueConsumerConfigUtils.getSimpleMessageListenerContainer(
+                connectionFactory, uniRefMessageConsumer, configProps);
+    }
+
+    @Bean
+    public HashGenerator<UniRefDownloadRequest> uniRefDownloadHashGenerator(
+            @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new DownloadRequestToArrayConverter<>(), hashSalt);
     }
 }

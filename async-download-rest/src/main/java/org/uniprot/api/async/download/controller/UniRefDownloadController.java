@@ -4,21 +4,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.async.download.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.async.download.messaging.listener.common.HeartbeatConfig;
-import org.uniprot.api.async.download.messaging.producer.common.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.producer.uniref.UniRefRabbitProducerMessageService;
-import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.repository.UniRefDownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.common.DownloadJobDetailResponse;
-import org.uniprot.api.async.download.model.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
+import org.uniprot.api.async.download.messaging.producer.uniref.UniRefProducerMessageService;
+import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
+import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.service.uniref.UniRefJobService;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -41,16 +37,16 @@ public class UniRefDownloadController extends BasicDownloadController {
 
     static final String UNIREF_RESOURCE = "/uniref";
     static final String DOWNLOAD_RESOURCE = UNIREF_RESOURCE + "/download";
-    private final ProducerMessageService messageService;
-    private final DownloadJobRepository jobRepository;
+    private final UniRefProducerMessageService messageService;
+    private final UniRefJobService jobService;
 
     public UniRefDownloadController(
-            UniRefRabbitProducerMessageService uniRefRabbitProducerMessageService,
-            UniRefDownloadJobRepository jobRepository,
-            HeartbeatConfig heartbeatConfig) {
+            UniRefProducerMessageService uniRefRabbitProducerMessageService,
+            HeartbeatConfig heartbeatConfig,
+            UniRefJobService jobService) {
         super(heartbeatConfig);
         this.messageService = uniRefRabbitProducerMessageService;
-        this.jobRepository = jobRepository;
+        this.jobService = jobService;
     }
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
@@ -85,9 +81,16 @@ public class UniRefDownloadController extends BasicDownloadController {
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId) {
-        Optional<DownloadJob> optJob = jobRepository.findById(jobId);
-        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+
+        UniRefDownloadJob job = getDownloadJob(jobId);
         return getAsyncDownloadStatus(job);
+    }
+
+    private UniRefDownloadJob getDownloadJob(String jobId) {
+        return this.jobService
+                .find(jobId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(getDownloadJobNotExistMessage(jobId)));
     }
 
     @GetMapping(
@@ -110,8 +113,7 @@ public class UniRefDownloadController extends BasicDownloadController {
             @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
 
-        Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
-        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+        UniRefDownloadJob job = getDownloadJob(jobId);
         String requestURL = servletRequest.getRequestURL().toString();
 
         return getDownloadJobDetails(requestURL, job);

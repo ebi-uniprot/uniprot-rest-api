@@ -485,6 +485,23 @@ public class OpenAPIConstants {
     public static final String CONFIG_UTIL_QUERY_DESCRIPTION = "Query string to be parsed.";
     public static final String CONFIG_UTIL_QUERY_EXAMPLE = " (gene:cdc7) AND (organism_id:9606)";
     // UniParc
+    public static final String FORMAT_UNIPARC_DESCRIPTION =
+            "The file format for download. <a href='https://rest.uniprot.org/configure/uniparc/formats'>Valid formats are listed here</a>";
+    public static final String FORMAT_UNIPARC_EXAMPLE = "json";
+    public static final String TAG_UNIPARC_JOB = "UniParc async download";
+    public static final String TAG_UNIPARC_JOB_DESC =
+            "UniParc asynchronous download jobs are different from synchronous downloads offered via stream API. "
+                    + "First, a job must be submitted for download. "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+    public static final String JOB_RUN_UNIPARC_OPERATION =
+            "Submit UniParc asynchronous download job.";
+    public static final String JOB_STATUS_UNIPARC_OPERATION =
+            "Get progress of UniParc asynchronous download job.";
+    public static final String JOB_ID_UNIPARC_DESCRIPTION = JOB_ID_DESCRIPTION;
+    public static final String JOB_DETAILS_UNIPARC_OPERATION =
+            "Get details of UniParc asynchronous download job.";
     public static final String TAG_UNIPARC = "UniParc";
     public static final String TAG_UNIPARC_DESC =
             "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
