@@ -96,7 +96,7 @@ public class UniParcRabbitMQConfig {
 
     @Bean
     public HashGenerator<UniParcDownloadRequest> uniParcDownloadHashGenerator(
-            @Value("${async.download.uniprotkb.hash.salt}") String hashSalt) {
+            @Value("${async.download.uniparc.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new DownloadRequestToArrayConverter<>(), hashSalt);
     }
 }

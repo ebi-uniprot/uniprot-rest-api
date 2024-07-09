@@ -14,7 +14,7 @@ public class UniParcCompositeRequestProcessor
 
     public UniParcCompositeRequestProcessor(
             UniParcSolrIdRequestProcessor uniParcSolrIdRequestProcessor,
-            UniParcSolrIdResultRequestProcessor uniParcSolrIdRequestProcessor1) {
-        super(List.of(uniParcSolrIdRequestProcessor, uniParcSolrIdRequestProcessor1));
+            UniParcSolrIdResultRequestProcessor uniParcSolrIdResultRequestProcessor) {
+        super(List.of(uniParcSolrIdRequestProcessor, uniParcSolrIdResultRequestProcessor));
     }
 }
