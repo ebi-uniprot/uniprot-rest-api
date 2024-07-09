@@ -25,10 +25,10 @@ import org.uniprot.api.rest.request.HashGenerator;
 @ExtendWith(MockitoExtension.class)
 class UniRefProducerMessageServiceTest
         extends ProducerMessageServiceTest<UniRefDownloadRequest, UniRefDownloadJob> {
-    public static final String UNI_REF_FIELDS = "uniRefFields";
-    public static final String UNI_REF_SORT = "uniRefSort";
-    public static final String UNI_REF_FORMAT = "uniRefFormat";
-    protected final String UNI_REF_QUERY = "uniRefQuery";
+    public static final String UNIREF_FIELDS = "uniRefFields";
+    public static final String UNIREF_SORT = "uniRefSort";
+    public static final String UNIREF_FORMAT = "uniRefFormat";
+    protected final String UNIREF_QUERY = "uniRefQuery";
     @Mock private UniRefDownloadRequest uniRefDownloadRequest;
     @Mock private UniRefJobService uniRefJobService;
     @Mock private HashGenerator<UniRefDownloadRequest> uniRefDownloadRequestHashGenerator;
@@ -65,7 +65,7 @@ class UniRefProducerMessageServiceTest
     @Override
     protected void mockDownloadRequest() {
         mockDownloadRequestWithoutFormat();
-        when(uniRefDownloadRequest.getFormat()).thenReturn(UNI_REF_FORMAT);
+        when(uniRefDownloadRequest.getFormat()).thenReturn(UNIREF_FORMAT);
     }
 
     @Override
@@ -74,9 +74,9 @@ class UniRefProducerMessageServiceTest
                         same(downloadRequest),
                         argThat(mh -> JOB_ID.equals(mh.getHeader(ProducerMessageService.JOB_ID)))))
                 .thenReturn(message);
-        when(uniRefDownloadRequest.getQuery()).thenReturn(UNI_REF_QUERY);
-        when(uniRefDownloadRequest.getFields()).thenReturn(UNI_REF_FIELDS);
-        when(uniRefDownloadRequest.getSort()).thenReturn(UNI_REF_SORT);
+        when(uniRefDownloadRequest.getQuery()).thenReturn(UNIREF_QUERY);
+        when(uniRefDownloadRequest.getFields()).thenReturn(UNIREF_FIELDS);
+        when(uniRefDownloadRequest.getSort()).thenReturn(UNIREF_SORT);
     }
 
     @Override

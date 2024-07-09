@@ -171,7 +171,11 @@ public class ResponseExceptionHandler {
         String jobId = exception.getJobId();
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new JobSubmitResponse(jobId, "%s%nsee 'status/%s' for more details".formatted(exception.getMessage(), jobId)));
+                .body(
+                        new JobSubmitResponse(
+                                jobId,
+                                "%s%nsee 'status/%s' for more details"
+                                        .formatted(exception.getMessage(), jobId)));
     }
 
     /**
