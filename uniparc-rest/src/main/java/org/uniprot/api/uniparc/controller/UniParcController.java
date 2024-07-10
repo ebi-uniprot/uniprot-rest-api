@@ -31,7 +31,6 @@ import org.uniprot.api.uniparc.common.service.UniParcQueryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.request.*;
@@ -58,7 +57,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     private static final String DATA_TYPE = "uniparc";
 
     private final UniParcQueryService queryService;
-    private static final int PREVIEW_SIZE = 10;
 
     @Autowired
     public UniParcController(
@@ -74,56 +72,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 UNIPARC,
                 downloadGatekeeper);
         this.queryService = queryService;
-    }
-
-    @GetMapping(
-            value = "/search",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FASTA_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
-            })
-    @Operation(
-            summary = SEARCH_UNIPARC_OPERATION,
-            responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
-                            @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation = Entry.class,
-                                                                    name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
-                        })
-            })
-    public ResponseEntity<MessageConverterContext<UniParcEntry>> search(
-            @Valid @ModelAttribute UniParcSearchRequest searchRequest,
-            @Parameter(hidden = true)
-                    @RequestParam(value = "preview", required = false, defaultValue = "false")
-                    boolean preview,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        setPreviewInfo(searchRequest, preview);
-        setBasicRequestFormat(searchRequest, request);
-        QueryResult<UniParcEntry> results = queryService.search(searchRequest);
-        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
     @GetMapping(
@@ -549,12 +497,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     protected Optional<String> getEntityRedirectId(
             UniParcEntry entity, HttpServletRequest request) {
         return Optional.empty();
-    }
-
-    private void setPreviewInfo(UniParcSearchRequest searchRequest, boolean preview) {
-        if (preview) {
-            searchRequest.setSize(PREVIEW_SIZE);
-        }
     }
 
     private ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpis(

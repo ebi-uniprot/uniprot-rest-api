@@ -15,13 +15,16 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniparc.common.response.converter.UniParcFastaMessageConverter;
+import org.uniprot.api.uniparc.common.response.converter.UniParcLightFastaMessageConverter;
 import org.uniprot.api.uniparc.common.response.converter.UniParcXmlMessageConverter;
 import org.uniprot.core.json.parser.uniparc.UniParcCrossRefJsonConfig;
+import org.uniprot.core.json.parser.uniparc.UniParcEntryLightJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryCrossRefValueMapper;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -100,6 +103,16 @@ public class UniParcMessageConverterConfig {
                                 uniParcCrossRefReturnField,
                                 new UniParcEntryCrossRefValueMapper(),
                                 downloadGatekeeper));
+                // ####################### UniParcLight ###################
+                converters.add(new UniParcLightFastaMessageConverter(downloadGatekeeper));
+
+                JsonMessageConverter<UniParcEntryLight> uniparcLightJsonConverter =
+                        new JsonMessageConverter<>(
+                                UniParcEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniParcEntryLight.class,
+                                returnFieldConfig,
+                                downloadGatekeeper);
+                converters.add(0, uniparcLightJsonConverter);
             }
         };
     }
@@ -125,6 +138,26 @@ public class UniParcMessageConverterConfig {
     }
 
     @Bean
+    public MessageConverterContextFactory<UniParcEntryLight>
+            uniparcLightMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniParcEntryLight> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(
+                        uniParcLightContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniParcLightContext(MediaType.APPLICATION_JSON),
+                        uniParcLightContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.XLS_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.RDF_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    @Bean
     public MessageConverterContextFactory<UniParcCrossReference>
             uniParcCrossReferenceMessageConverterContextFactory() {
         MessageConverterContextFactory<UniParcCrossReference> contextFactory =
@@ -140,6 +173,13 @@ public class UniParcMessageConverterConfig {
 
     private MessageConverterContext<UniParcEntry> uniParcContext(MediaType contentType) {
         return MessageConverterContext.<UniParcEntry>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIPARC)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<UniParcEntryLight> uniParcLightContext(MediaType contentType) {
+        return MessageConverterContext.<UniParcEntryLight>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPARC)
                 .contentType(contentType)
                 .build();

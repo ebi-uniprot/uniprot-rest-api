@@ -18,7 +18,7 @@ import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadReque
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
 
 import net.jodah.failsafe.RetryPolicy;

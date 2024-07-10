@@ -18,8 +18,10 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,35 @@ public class UniParcStreamConfig {
                         .withMaxRetries(uniParcStreamerConfigProperties.getStoreFetchMaxRetries());
         return StoreStreamerConfig.<UniParcEntry>builder()
                 .storeClient(uniParcClient)
+                .streamConfig(uniParcStreamerConfigProperties)
+                .tupleStreamTemplate(uniParcTupleStreamTemplate)
+                .storeFetchRetryPolicy(storeRetryPolicy)
+                .documentIdStream(uniParcTupleStreamDocumentIdStream)
+                .build();
+    }
+
+    @Bean
+    public StoreStreamer<UniParcEntryLight> uniParcEntryLightStoreStreamer(
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig) {
+        return new StoreStreamer<>(storeLightStreamerConfig);
+    }
+
+    @Bean
+    public StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig(
+            UniParcLightStoreClient uniParcLightClient,
+            TupleStreamTemplate uniParcTupleStreamTemplate,
+            StreamerConfigProperties uniParcStreamerConfigProperties,
+            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
+        RetryPolicy<Object> storeRetryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(
+                                Duration.ofMillis(
+                                        uniParcStreamerConfigProperties
+                                                .getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(uniParcStreamerConfigProperties.getStoreFetchMaxRetries());
+        return StoreStreamerConfig.<UniParcEntryLight>builder()
+                .storeClient(uniParcLightClient)
                 .streamConfig(uniParcStreamerConfigProperties)
                 .tupleStreamTemplate(uniParcTupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
