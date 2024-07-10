@@ -259,7 +259,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void submitJobAlreadyFinished() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "alreadyFinishedQuery";
-        String jobId = "950fcce1c0ffcc609ffe3c80f4cfc419b646e65d";
+        String jobId = "ffe6065308aaf065329b3eb4d0b7e4c64cbf6108";
 
         DownloadJob job =
                 getDownloadJob(
@@ -285,7 +285,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
             throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "retryingAgain";
-        String jobId = "cc050edd11308a8d3c8d0b714a4855caf16d2c8c";
+        String jobId = "adc348da40f5426ee9ed5456b1ca6aeefbe24a6c";
 
         DownloadJob job =
                 getDownloadJob(
@@ -317,7 +317,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void resubmit_withForceOnFailedJobAfterMaxRetryWillRunAgain() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "*:*";
-        String jobId = "03fb6db0be39c4646f28bf6f83bcd600d79cab13";
+        String jobId = "79e028f4feb1b97956152356aa92bb12aa95d8b7";
 
         // Create Error Job in Redis
         DownloadJob job =

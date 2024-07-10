@@ -19,11 +19,6 @@ public class UniProtKBMessageConsumer
             UniProtKBFileHandler fileHandler,
             UniProtKBJobService jobService,
             MessageConverter messageConverter) {
-        super(
-                messagingService,
-                requestProcessor,
-                fileHandler,
-                jobService,
-                messageConverter);
+        super(messagingService, requestProcessor, fileHandler, jobService, messageConverter);
     }
 }

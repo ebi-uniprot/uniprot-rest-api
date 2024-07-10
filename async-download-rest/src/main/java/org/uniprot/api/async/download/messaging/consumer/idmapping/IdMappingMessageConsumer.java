@@ -23,12 +23,7 @@ public class IdMappingMessageConsumer
             IdMappingFileHandler fileHandler,
             IdMappingJobService jobService,
             MessageConverter messageConverter) {
-        super(
-                messagingService,
-                requestProcessor,
-                fileHandler,
-                jobService,
-                messageConverter);
+        super(messagingService, requestProcessor, fileHandler, jobService, messageConverter);
         this.asyncDownloadFileHandler = fileHandler;
     }
 

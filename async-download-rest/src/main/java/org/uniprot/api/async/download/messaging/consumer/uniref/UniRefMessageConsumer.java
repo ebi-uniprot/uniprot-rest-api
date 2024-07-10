@@ -19,11 +19,6 @@ public class UniRefMessageConsumer
             UniRefFileHandler fileHandler,
             UniRefJobService jobService,
             MessageConverter messageConverter) {
-        super(
-                messagingService,
-                requestProcessor,
-                fileHandler,
-                jobService,
-                messageConverter);
+        super(messagingService, requestProcessor, fileHandler, jobService, messageConverter);
     }
 }

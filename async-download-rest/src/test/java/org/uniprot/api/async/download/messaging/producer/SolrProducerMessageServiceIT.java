@@ -32,7 +32,7 @@ public abstract class SolrProducerMessageServiceIT<
 
         String jobId = getService().sendMessage(request);
 
-        assertEquals("1a9848044d4910bc55dccdaa673f4713d5ab091e", jobId);
+        assertEquals("e0457b3cf8130f3d374bf4e889ef01586caf6a51", jobId);
         Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
                 .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
@@ -47,7 +47,7 @@ public abstract class SolrProducerMessageServiceIT<
     @Test
     void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         T request = getSuccessDownloadRequestWithForce();
-        String jobId = "60ba2e259320dcb5a23f2e432c8f6bc6d8ed417f";
+        String jobId = "f98973831cfe2ba1a41cfb08151047f0c1a0d4f9";
 
         // Reproduce Idle Job in Running Status in and files created
         createJobFiles(jobId);
@@ -56,7 +56,7 @@ public abstract class SolrProducerMessageServiceIT<
         getJobRepository().save(idleJob);
 
         String jobIdResult = getService().sendMessage(request);
-        assertEquals(jobIdResult, jobId);
+        assertEquals(jobId, jobIdResult);
 
         // Validate message received in Listener
         Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
@@ -78,24 +78,24 @@ public abstract class SolrProducerMessageServiceIT<
     void sendMessage_jobAlreadyRunningAndNotAllowed() {
         T request = getAlreadyRunningRequest();
 
-        String jobId = "a63c4f8dd0687bf13338a98e7115984bf3e1b52d";
+        String jobId = "bca57aa8e6ae2c6ab771633215666a23d725c738";
         R runningJob = getDownloadJob(jobId, LocalDateTime.now(), request);
         getJobRepository().save(runningJob);
 
-        IllegalDownloadJobSubmissionException submitionError =
+        IllegalDownloadJobSubmissionException submissionError =
                 assertThrows(
                         IllegalDownloadJobSubmissionException.class,
                         () -> getService().sendMessage(request));
         assertEquals(
                 "Job with id " + jobId + " has already been submitted",
-                submitionError.getMessage());
+                submissionError.getMessage());
     }
 
     @Test
     void sendMessage_WithoutFormatDefaultToJson() {
         T request = getWithoutFormatRequest();
 
-        String jobId = "712dc7afcd2514a178e887d68400421666cde5ed";
+        String jobId = "d93243dd48e4a179052fd42f8478a3e2b9902327";
         String resultJobId = getService().sendMessage(request);
         assertEquals(jobId, resultJobId);
         request.setFormat("json");
