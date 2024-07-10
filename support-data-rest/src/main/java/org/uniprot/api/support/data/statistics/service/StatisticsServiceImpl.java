@@ -1,5 +1,6 @@
 package org.uniprot.api.support.data.statistics.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,10 +10,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 import org.uniprot.api.support.data.statistics.mapper.StatisticsMapper;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategory;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategoryImpl;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
+import org.uniprot.api.support.data.statistics.model.*;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniprotKBStatisticsEntryRepository;
 
@@ -54,6 +52,11 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .stream()
                 .map(this::buildStatisticsModuleStatisticsCategory)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<StatisticsModuleStatisticsHistory> findAllByAttributeAndStatisticType(String attribute, String statisticType) {
+        return null;
     }
 
     private StatisticsModuleStatisticsCategoryImpl buildStatisticsModuleStatisticsCategory(

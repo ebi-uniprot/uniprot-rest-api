@@ -716,4 +716,6 @@ public class OpenAPIConstants {
             "One of the entry versions, whose contents is analysed in the diff.";
     public static final String VERSION2_UNISAVE_DESCRIPTION =
             "The other entry version, whose contents is analysed in the diff.";
+    public static final String RELEASE_NAME_ATTRIBUTE_DESCRIPTION = "attribute type";
+    public static final String RELEASE_NAME_ATTRIBUTE_EXAMPLE = "entry";
 }
