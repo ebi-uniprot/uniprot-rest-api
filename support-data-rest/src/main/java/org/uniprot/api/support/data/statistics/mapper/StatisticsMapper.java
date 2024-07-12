@@ -5,10 +5,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.support.data.statistics.StatisticsAttributeConfig;
 import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttributeImpl;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
+import org.uniprot.api.support.data.statistics.entity.UniProtKBStatisticsEntry;
+import org.uniprot.api.support.data.statistics.model.*;
 
 @Component
 public class StatisticsMapper {
@@ -41,7 +39,7 @@ public class StatisticsMapper {
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public StatisticsModuleStatisticsAttribute map(UniprotKBStatisticsEntry entry) {
+    public StatisticsModuleStatisticsAttribute map(UniProtKBStatisticsEntry entry) {
         return StatisticsModuleStatisticsAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
@@ -51,7 +49,17 @@ public class StatisticsMapper {
                 .build();
     }
 
-    private String getLabel(UniprotKBStatisticsEntry entry) {
+    public StatisticsModuleStatisticsHistory mapHistory(UniProtKBStatisticsEntry entry) {
+        return StatisticsModuleStatisticsHistoryImpl.builder()
+                .statisticsType(map(entry.getEntryType()))
+                .releaseName(entry.getReleaseName().getId())
+                .releaseDate(entry.getReleaseName().getDate())
+                .valueCount(entry.getValueCount())
+                .entryCount(entry.getEntryCount())
+                .build();
+    }
+
+    private String getLabel(UniProtKBStatisticsEntry entry) {
         return Optional.ofNullable(
                         statisticsAttributeConfig
                                 .getAttributes()

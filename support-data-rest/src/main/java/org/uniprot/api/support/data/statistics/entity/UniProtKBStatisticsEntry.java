@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "uniprotkb_statistics_entry")
-public class UniprotKBStatisticsEntry {
+public class UniProtKBStatisticsEntry {
     @Id private Long id;
     private String attributeName;
 
@@ -18,7 +18,10 @@ public class UniprotKBStatisticsEntry {
     private Long valueCount;
     private Long entryCount;
     private String description;
-    private String releaseName;
+
+    @ManyToOne
+    @JoinColumn(name = "release_name")
+    private UniProtRelease releaseName;
 
     @Enumerated(EnumType.STRING)
     private EntryType entryType;

@@ -130,6 +130,67 @@ class StatisticsControllerIT {
     }
 
     @Test
+    void getAllByAttributeAndStatisticsType() throws Exception {
+        this.mockMvc
+                .perform(get("/statistics/history/fungi?statisticType=reviewed"))
+                .andDo(log())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
+                .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
+                .andExpect(jsonPath("$.results[0].entryCount", is(35360)));
+    }
+
+    @Test
+    void getAllByAttributeAndStatisticsType_emptyResults() throws Exception {
+        this.mockMvc
+                .perform(get("/statistics/history/insecta?statisticType=unreviewed"))
+                .andDo(log())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
+    void getAllByAttributeAndStatisticsType_emptyResultsWithoutStatisticTypeSpecified()
+            throws Exception {
+        this.mockMvc
+                .perform(get("/statistics/history/random?statisticType=unreviewed"))
+                .andDo(log())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
+    void getAllByAttributeAndStatisticsType_wrongStatisticTypeSpecified() throws Exception {
+        this.mockMvc
+                .perform(get("/statistics/history/fungi?statisticType=random"))
+                .andDo(log())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.results").doesNotExist());
+    }
+
+    @Test
+    void getAllByAttributeAndAttributeType_withoutAttributeType() throws Exception {
+        this.mockMvc
+                .perform(get("/statistics/history/fungi"))
+                .andDo(log())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
+                .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
+                .andExpect(jsonPath("$.results[0].entryCount", is(35360)))
+                .andExpect(jsonPath("$.results[1].statisticsType", is("UNREVIEWED")))
+                .andExpect(jsonPath("$.results[1].releaseName", is("2021_03")))
+                .andExpect(jsonPath("$.results[1].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[1].valueCount", is(12793422)))
+                .andExpect(jsonPath("$.results[1].entryCount", is(12793422)));
+    }
+
+    @Test
     void getByReleaseAndTypeAndCategories_whenWrongStatisticTypeIsSpecified_returnsABadRequest()
             throws Exception {
         this.mockMvc

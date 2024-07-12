@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.statistics.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -11,5 +10,6 @@ public interface StatisticsService {
     List<StatisticsModuleStatisticsCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
             String version, String statisticType, Set<String> categories);
 
-    Collection<StatisticsModuleStatisticsHistory> findAllByAttributeAndStatisticType(String attribute, String statisticType);
+    List<StatisticsModuleStatisticsHistory> findAllByAttributeAndStatisticType(
+            String attribute, String statisticType);
 }

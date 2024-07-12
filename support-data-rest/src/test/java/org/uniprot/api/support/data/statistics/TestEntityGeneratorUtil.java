@@ -3,9 +3,14 @@ package org.uniprot.api.support.data.statistics;
 import static org.uniprot.api.support.data.statistics.entity.EntryType.SWISSPROT;
 import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.Set;
+
 import org.uniprot.api.support.data.statistics.entity.EntryType;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
-import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniProtKBStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
 
 public class TestEntityGeneratorUtil {
 
@@ -20,7 +25,7 @@ public class TestEntityGeneratorUtil {
     public static final String DB_TYPE = "dbType";
     public static final Long[] ENTRY_IDS = new Long[] {34L, 411L, 999L, 1L, 29L};
     public static final String[] ENTRY_NAMES =
-            new String[] {"name0", "name1", "name2", "name3", "name4"};
+            new String[] {"name0", "name1", "name0", "name0", "name1"};
     public static final int[] STAT_CATEGORY_IDS = new int[] {0, 0, 1, 1, 2};
     public static final Long[] VALUE_COUNTS = new Long[] {3L, 27L, 9999L, 500L, 87L};
     public static final Long[] ENTRY_COUNTS = new Long[] {31L, 25L, 188999L, 1098L, 510L};
@@ -31,7 +36,27 @@ public class TestEntityGeneratorUtil {
     public static final String[] SEARCH_FIELDS = new String[] {"sf0", "sf1", "sf2"};
     public static final String[] DESCRIPTIONS =
             new String[] {"des0", "des1", "des2", "des3", "des4"};
-    public static final String[] RELEASES = new String[] {"rel0", "rel0", "rel1", "rel0", "rel0"};
+    public static final String REL_0 = "rel0";
+    public static final String REL_1 = "rel1";
+    public static final String REL_2 = "rel2";
+    public static final Date[] DATES =
+            new Date[] {
+                Date.from(Instant.now()), Date.from(Instant.now()), Date.from(Instant.now())
+            };
+    public static final UniProtRelease[] RELEASES =
+            new UniProtRelease[] {
+                createRelease(REL_0, DATES[0]),
+                createRelease(REL_1, DATES[1]),
+                createRelease(REL_2, DATES[2])
+            };
+
+    private static UniProtRelease createRelease(String name, Date date) {
+        UniProtRelease release = new UniProtRelease();
+        release.setId(name);
+        release.setDate(date);
+        return release;
+    }
+
     public static final EntryType[] ENTRY_TYPES =
             new EntryType[] {SWISSPROT, SWISSPROT, TREMBL, SWISSPROT, SWISSPROT};
     public static final StatisticsCategory[] STATISTICS_CATEGORIES =
@@ -40,8 +65,8 @@ public class TestEntityGeneratorUtil {
                 createStatisticsCategory(1),
                 createStatisticsCategory(2)
             };
-    public static final UniprotKBStatisticsEntry[] STATISTICS_ENTRIES =
-            new UniprotKBStatisticsEntry[] {
+    public static final UniProtKBStatisticsEntry[] STATISTICS_ENTRIES =
+            new UniProtKBStatisticsEntry[] {
                 createStatisticsEntry(0),
                 createStatisticsEntry(1),
                 createStatisticsEntry(2),
@@ -49,8 +74,8 @@ public class TestEntityGeneratorUtil {
                 createStatisticsEntry(4)
             };
 
-    private static UniprotKBStatisticsEntry createStatisticsEntry(int index) {
-        UniprotKBStatisticsEntry uniprotkbStatisticsEntry = new UniprotKBStatisticsEntry();
+    private static UniProtKBStatisticsEntry createStatisticsEntry(int index) {
+        UniProtKBStatisticsEntry uniprotkbStatisticsEntry = new UniProtKBStatisticsEntry();
         uniprotkbStatisticsEntry.setId(ENTRY_IDS[index]);
         uniprotkbStatisticsEntry.setAttributeName(ENTRY_NAMES[index]);
         uniprotkbStatisticsEntry.setStatisticsCategory(
@@ -58,7 +83,8 @@ public class TestEntityGeneratorUtil {
         uniprotkbStatisticsEntry.setValueCount(VALUE_COUNTS[index]);
         uniprotkbStatisticsEntry.setEntryCount(ENTRY_COUNTS[index]);
         uniprotkbStatisticsEntry.setDescription(DESCRIPTIONS[index]);
-        uniprotkbStatisticsEntry.setReleaseName(RELEASES[index]);
+        uniprotkbStatisticsEntry.setReleaseName(
+                Set.of(0, 1, 3, 4).contains(index) ? RELEASES[0] : RELEASES[1]);
         uniprotkbStatisticsEntry.setEntryType(ENTRY_TYPES[index]);
         return uniprotkbStatisticsEntry;
     }
