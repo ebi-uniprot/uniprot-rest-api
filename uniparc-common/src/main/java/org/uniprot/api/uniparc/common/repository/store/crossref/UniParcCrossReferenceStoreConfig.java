@@ -1,0 +1,27 @@
+package org.uniprot.api.uniparc.common.repository.store.crossref;
+
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.store.datastore.voldemort.VoldemortClient;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortRemoteUniParcCrossReferenceStore;
+
+@Configuration
+@EnableConfigurationProperties({UniParcCrossReferenceStoreConfigProperties.class})
+public class UniParcCrossReferenceStoreConfig {
+
+    @Bean
+    @Profile("live")
+    public UniParcCrossReferenceStoreClient uniParcLightStoreClient(
+            UniParcCrossReferenceStoreConfigProperties configProperties) {
+        VoldemortClient<UniParcCrossReference> client =
+                new VoldemortRemoteUniParcCrossReferenceStore(
+                        configProperties.getNumberOfConnections(),
+                        configProperties.isBrotliEnabled(),
+                        configProperties.getStoreName(),
+                        configProperties.getHost());
+        return new UniParcCrossReferenceStoreClient(client, configProperties.getBatchSize());
+    }
+}

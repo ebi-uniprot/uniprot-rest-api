@@ -29,6 +29,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniparc.common.service.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -50,12 +51,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/uniparc")
 public class UniParcDatabaseController extends BasicSearchController<UniParcCrossReference> {
 
-    private final UniParcQueryService queryService;
+    private final UniParcLightQueryService queryService;
 
     @Autowired
     public UniParcDatabaseController(
             ApplicationEventPublisher eventPublisher,
-            UniParcQueryService queryService,
+            UniParcLightQueryService queryService,
             MessageConverterContextFactory<UniParcCrossReference> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
