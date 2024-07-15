@@ -8,12 +8,13 @@ public class UniParcCrossReferenceStoreClient extends UniProtStoreClient<UniParc
 
     private final int batchSize;
 
-    public UniParcCrossReferenceStoreClient(VoldemortClient<UniParcCrossReference> client, int batchSize) {
+    public UniParcCrossReferenceStoreClient(
+            VoldemortClient<UniParcCrossReference> client, int batchSize) {
         super(client);
         this.batchSize = batchSize;
     }
 
-    public int getBatchSize(){
+    public int getBatchSize() {
         return this.batchSize;
     }
 }

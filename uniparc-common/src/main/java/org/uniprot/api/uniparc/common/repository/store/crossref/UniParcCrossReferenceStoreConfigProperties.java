@@ -1,7 +1,8 @@
 package org.uniprot.api.uniparc.common.repository.store.crossref;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 @Data
 @ConfigurationProperties(prefix = "voldemort.cross.reference")

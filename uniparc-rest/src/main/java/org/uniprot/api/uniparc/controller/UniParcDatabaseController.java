@@ -28,8 +28,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniparc.common.service.UniParcQueryService;
-import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -51,16 +50,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/uniparc")
 public class UniParcDatabaseController extends BasicSearchController<UniParcCrossReference> {
 
-    private final UniParcLightQueryService queryService;
+    private final UniParcCrossReferenceService crossReferenceService;
 
     @Autowired
     public UniParcDatabaseController(
             ApplicationEventPublisher eventPublisher,
-            UniParcLightQueryService queryService,
+            UniParcCrossReferenceService crossReferenceService,
             MessageConverterContextFactory<UniParcCrossReference> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
-        this.queryService = queryService;
+        this.crossReferenceService = crossReferenceService;
     }
 
     @GetMapping(
@@ -92,7 +91,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniParcCrossReference> results =
-                queryService.getDatabasesByUniParcId(upi, databasesRequest);
+                this.crossReferenceService.getCrossReferencesByUniParcId(upi, databasesRequest);
         return super.getSearchResponse(results, databasesRequest.getFields(), request, response);
     }
 
