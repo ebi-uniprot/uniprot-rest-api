@@ -1,5 +1,17 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,18 +50,6 @@ import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInM
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-
 /**
  * @author sahmad
  * @date: 29 Mar 2021
@@ -87,18 +87,24 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         UniParcEntryLight entry = UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
         DataStoreManager manager = getStoreManager();
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entry);
-        List<PairImpl<String, UniParcCrossReference>> crossReferences = UniParcEntryMocker.getXrefPairs(entry.getUniParcId(), 1);
-        crossReferences.forEach(pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
+        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+                UniParcEntryMocker.getXrefPairs(entry.getUniParcId(), 1);
+        crossReferences.forEach(
+                pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
     }
 
     @BeforeAll
     void initDataStore() {
         super.initDataStore();
-        UniParcLightStoreClient uniParcLightStoreClient = new UniParcLightStoreClient(
-                VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
-        VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient = VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
-        UniParcCrossReferenceStoreClient crossRefStoreClient = new UniParcCrossReferenceStoreClient(xrefVDClient, 5);
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
+        UniParcLightStoreClient uniParcLightStoreClient =
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
+        UniParcCrossReferenceStoreClient crossRefStoreClient =
+                new UniParcCrossReferenceStoreClient(xrefVDClient, 5);
+        getStoreManager()
+                .addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
         getStoreManager().addStore(DataStoreManager.StoreType.CROSSREF, crossRefStoreClient);
     }
 

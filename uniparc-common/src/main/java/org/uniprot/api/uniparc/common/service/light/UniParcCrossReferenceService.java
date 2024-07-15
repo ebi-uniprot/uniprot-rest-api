@@ -107,7 +107,8 @@ public class UniParcCrossReferenceService {
             return true;
         }
 
-        return Objects.nonNull(xref.getDatabase()) && databases.contains(xref.getDatabase().getDisplayName().toLowerCase());
+        return Objects.nonNull(xref.getDatabase())
+                && databases.contains(xref.getDatabase().getDisplayName().toLowerCase());
     }
 
     private boolean filterByTaxonomyIds(UniParcCrossReference xref, List<String> taxonomyIds) {
@@ -115,7 +116,8 @@ public class UniParcCrossReferenceService {
             return true;
         }
 
-        return Objects.nonNull(xref.getOrganism()) && taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId()));
+        return Objects.nonNull(xref.getOrganism())
+                && taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId()));
     }
 
     private boolean filterByStatus(UniParcCrossReference xref, Boolean isActive) {

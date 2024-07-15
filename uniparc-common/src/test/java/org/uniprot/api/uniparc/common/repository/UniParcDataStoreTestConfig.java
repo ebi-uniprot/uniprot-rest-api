@@ -26,12 +26,14 @@ public class UniParcDataStoreTestConfig {
     @Bean
     @Profile("offline")
     public UniParcLightStoreClient uniParcLightStoreClient() {
-        return new UniParcLightStoreClient(VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        return new UniParcLightStoreClient(
+                VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
     }
 
     @Bean
     @Profile("offline")
     public UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient() {
-        return new UniParcCrossReferenceStoreClient(VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"), 5);
+        return new UniParcCrossReferenceStoreClient(
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"), 5);
     }
 }
