@@ -68,7 +68,10 @@ class StoreStreamerIT {
 
         assertThrows(
                 RetrievalException.class,
-                () -> storeStreamer.idsToStoreStream(solrRequest).collect(Collectors.toList()));
+                () ->
+                        storeStreamer
+                                .idsToStoreStream(solrRequest, StoreRequest.builder().build())
+                                .collect(Collectors.toList()));
     }
 
     @Test
@@ -84,7 +87,8 @@ class StoreStreamerIT {
     void canTransformSourceStreamWithUnaryBatchSize() {
         StoreStreamer<String> storeStreamer =
                 createSearchStoreStream(1, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
+        Stream<String> storeStream =
+                storeStreamer.idsToStoreStream(solrRequest, StoreRequest.builder().build());
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(
                 results,
@@ -100,7 +104,8 @@ class StoreStreamerIT {
     void canTransformSourceStreamWithIntermediateBatchSize() {
         StoreStreamer<String> storeStreamer =
                 createSearchStoreStream(3, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
+        Stream<String> storeStream =
+                storeStreamer.idsToStoreStream(solrRequest, StoreRequest.builder().build());
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(
                 results,
@@ -116,7 +121,8 @@ class StoreStreamerIT {
     void canTransformSourceStreamWithBiggerBatchSize() {
         StoreStreamer<String> storeStreamer =
                 createSearchStoreStream(4, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
+        Stream<String> storeStream =
+                storeStreamer.idsToStoreStream(solrRequest, StoreRequest.builder().build());
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(
                 results,
@@ -132,7 +138,8 @@ class StoreStreamerIT {
     void canTransformSourceStreamWithBatchSizeGreaterThanSourceElements() {
         StoreStreamer<String> storeStreamer =
                 createSearchStoreStream(10, tupleStream(asList("a", "b", "c", "d", "e")));
-        Stream<String> storeStream = storeStreamer.idsToStoreStream(solrRequest);
+        Stream<String> storeStream =
+                storeStreamer.idsToStoreStream(solrRequest, StoreRequest.builder().build());
         List<String> results = storeStream.collect(Collectors.toList());
         assertThat(
                 results,
@@ -153,7 +160,10 @@ class StoreStreamerIT {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> storeStreamer.idsToStoreStream(solrRequest).collect(Collectors.toList()));
+                () ->
+                        storeStreamer
+                                .idsToStoreStream(solrRequest, StoreRequest.builder().build())
+                                .collect(Collectors.toList()));
     }
 
     @Test

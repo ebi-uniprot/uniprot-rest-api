@@ -154,7 +154,7 @@ class UniParcQueryServiceTest {
                 entries.stream()
                         .map(e -> e.getUniParcId().getValue())
                         .collect(Collectors.toList()));
-        verify(storeStreamer, never()).idsToStoreStream(any());
+        verify(storeStreamer, never()).idsToStoreStream(any(), any());
     }
 
     @Test
@@ -171,7 +171,7 @@ class UniParcQueryServiceTest {
                 upis.stream().map(id -> new UniParcEntryBuilder().uniParcId(id).build());
         request.setQuery("field:value");
         request.setFormat(UniProtMediaType.FASTA_MEDIA_TYPE_VALUE);
-        when(storeStreamer.idsToStoreStream(any())).thenReturn(entriesStream);
+        when(storeStreamer.idsToStoreStream(any(), any())).thenReturn(entriesStream);
         Stream<UniParcEntry> result = service.stream(request);
         List<UniParcEntry> entries = result.collect(Collectors.toList());
         assertEquals(5, entries.size());
@@ -180,6 +180,6 @@ class UniParcQueryServiceTest {
                 entries.stream()
                         .map(e -> e.getUniParcId().getValue())
                         .collect(Collectors.toList()));
-        verify(storeStreamer, times(1)).idsToStoreStream(any());
+        verify(storeStreamer, times(1)).idsToStoreStream(any(), any());
     }
 }
