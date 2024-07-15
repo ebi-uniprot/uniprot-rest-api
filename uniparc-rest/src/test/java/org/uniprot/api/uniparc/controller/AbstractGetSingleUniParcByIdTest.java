@@ -45,7 +45,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
 
     @Autowired private UniParcQueryRepository repository;
 
-    private static final String UPI_PREF = "UPI0000083D";
+    protected static final String UPI_PREF = "UPI0000083D";
     protected static String ACCESSION = "P12301";
     protected static String UNIPARC_ID = "UPI0000083D01";
     private UniParcStoreClient storeClient;
