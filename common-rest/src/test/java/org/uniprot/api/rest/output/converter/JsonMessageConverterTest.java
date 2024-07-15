@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -67,7 +70,7 @@ class JsonMessageConverterTest {
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
@@ -83,17 +86,17 @@ class JsonMessageConverterTest {
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.facets")));
-        assertEquals(resultJson.read(JsonPath.compile("$.facets.size()")), new Integer(1));
+        assertEquals(resultJson.read(JsonPath.compile("$.facets.size()")), Integer.valueOf(1));
         assertEquals("My Facet", resultJson.read(JsonPath.compile("$.facets[0].label")));
 
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
-        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(0));
+        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), Integer.valueOf(0));
 
         assertThrows(
                 PathNotFoundException.class,
@@ -111,17 +114,18 @@ class JsonMessageConverterTest {
         writeBefore(messageContext, outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.matchedFields")));
-        assertEquals(resultJson.read(JsonPath.compile("$.matchedFields.size()")), new Integer(1));
+        assertEquals(
+                resultJson.read(JsonPath.compile("$.matchedFields.size()")), Integer.valueOf(1));
         assertEquals("fieldName", resultJson.read(JsonPath.compile("$.matchedFields[0].name")));
 
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
-        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(0));
+        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), Integer.valueOf(0));
 
         assertThrows(
                 PathNotFoundException.class, () -> resultJson.read(JsonPath.compile("$.facets")));
@@ -137,7 +141,7 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -145,6 +149,31 @@ class JsonMessageConverterTest {
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
         assertEquals("P00001", resultJson.read(JsonPath.compile("$.primaryAccession")));
+    }
+
+    @Test
+    void writeCanWriteEntityInvalidFieldPath() throws IOException {
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .entityOnly(true)
+                        .fields("accession,gene_synonym,cc_function")
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteEntity");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        UniProtKBEntry simpleEntry =
+                new UniProtKBEntryBuilder("P12345", "ID", UniProtKBEntryType.TREMBL).build();
+        jsonMessageConverter.writeEntity(simpleEntry, outputStream);
+        writeAfter(messageContext, outputStream);
+
+        String result = outputStream.toString(StandardCharsets.UTF_8);
+        log.debug(result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+
+        DocumentContext resultJson = JsonPath.parse(result);
+        assertNotNull(resultJson.read(JsonPath.compile("$.primaryAccession")));
+        assertEquals("P12345", resultJson.read(JsonPath.compile("$.primaryAccession")));
     }
 
     @Test
@@ -166,14 +195,14 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
-        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(10));
+        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), Integer.valueOf(10));
     }
 
     @Test
@@ -189,7 +218,7 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -221,7 +250,7 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -250,7 +279,7 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -284,11 +313,12 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 entities.stream(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"},\n"
-                        + "{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}]}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}},
+                        {"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}]}""",
                 result);
     }
 
@@ -313,10 +343,11 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 entities.stream(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}],\"obsoleteCount\":10}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}],"failedIds":["id1"],"suggestedIds":[{"from":"fromid2","to":"toid2"}],"obsoleteCount":10}""",
                 result);
     }
 
@@ -333,7 +364,7 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals("{\"results\":[],\"failedIds\":[\"id1\",\"id2\"]}", result);
     }
@@ -355,7 +386,7 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
                 "{\"results\":[],\"suggestedIds\":[{\"from\":\"fromid3\",\"to\":\"toid3\"},{\"from\":\"fromid4\",\"to\":\"toid4\"}]}",
@@ -377,7 +408,7 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
                 "{\"results\":[],\"suggestions\":[{\"query\":\"one\",\"hits\":1},{\"query\":\"one\",\"hits\":1}]}",
@@ -407,14 +438,14 @@ class JsonMessageConverterTest {
         writeEntity(outputStream);
         writeAfter(messageContext, outputStream);
 
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
-        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(10));
+        assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), Integer.valueOf(10));
     }
 
     @Test
@@ -442,7 +473,7 @@ class JsonMessageConverterTest {
                 () ->
                         errorJsonMessageConverter.writeContents(
                                 messageContext, outputStream, Instant.now(), new AtomicInteger(0)));
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
                 "{\"results\":[],\"error\":\"Error encountered when streaming data.\"}", result);
@@ -461,7 +492,7 @@ class JsonMessageConverterTest {
         jsonMessageConverter.writeEntities(
                 Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
         writeAfter(messageContext, outputStream);
-        String result = outputStream.toString("UTF-8");
+        String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals("{\"results\":[],\"obsoleteCount\":15}", result);
     }

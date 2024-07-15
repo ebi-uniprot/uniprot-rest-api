@@ -47,7 +47,7 @@ import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;

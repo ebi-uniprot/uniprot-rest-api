@@ -41,6 +41,7 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.common.AbstractJobOperation;
 import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
@@ -51,8 +52,8 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.converters.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -172,7 +173,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                 get(getIdMappingResultPath(), job.getJobId())
                                         .param("query", "identity:0.5")
                                         .param("facets", "identity")
-                                        .param("fields", "id,name,common_taxon,sequence")
+                                        .param("fields", "id,name,common_taxon,members")
                                         .param("sort", "id desc")
                                         .param("size", "6")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -203,8 +204,140 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                         "UniRef50_P03907",
                                         "UniRef50_P03906",
                                         "UniRef50_P03905")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].to.members",
+                                contains(
+                                        "P12310", "P32110", "P32102", "P32103", "P32104", "P32105",
+                                        "P32106", "P32107", "P32108", "P32109")))
                 .andExpect(jsonPath("$.results.*.to.commonTaxon").exists())
-                .andExpect(jsonPath("$.results.*.to.members").doesNotExist());
+                .andExpect(jsonPath("$.results.*.to.sequence").doesNotExist());
+    }
+
+    @Test
+    void testIdMappingWithInvalidCompleteValue() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation().createAndPutJobInCache(AbstractJobOperation.DEFAULT_IDS_COUNT);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", "*")
+                                        .param("complete", "INVALID")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains(
+                                        "'complete' parameter value has invalid format. It should be true or false.")));
+    }
+
+    @Test
+    void testIdMappingWithSuccessComplete() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation().createAndPutJobInCache(AbstractJobOperation.DEFAULT_IDS_COUNT);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", "*")
+                                        .param("complete", "true")
+                                        .param("sort", "id desc")
+                                        .param("size", "5")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                contains("Q00020", "Q00019", "Q00018", "Q00017", "Q00016")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.id",
+                                contains(
+                                        "UniRef50_P03920",
+                                        "UniRef50_P03919",
+                                        "UniRef50_P03918",
+                                        "UniRef50_P03917",
+                                        "UniRef50_P03916")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].to.members",
+                                contains(
+                                        "P12320", "P32120", "P32102", "P32103", "P32104", "P32105",
+                                        "P32106", "P32107", "P32108", "P32109", "P32110", "P32111",
+                                        "P32112", "P32113", "P32114", "P32115", "P32116", "P32117",
+                                        "P32118", "P32119")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].to.organisms.*.taxonId",
+                                contains(
+                                        9600, 9626, 9608, 9609, 9610, 9611, 9612, 9613, 9614, 9615,
+                                        9616, 9617, 9618, 9619, 9620, 9621, 9622, 9623, 9624,
+                                        9625)))
+                .andExpect(jsonPath("$.results.*.to.commonTaxon").exists())
+                .andExpect(jsonPath("$.results.*.to.representativeMember").exists());
+    }
+
+    @Test
+    void testIdMappingWithSuccessNotComplete() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation().createAndPutJobInCache(AbstractJobOperation.DEFAULT_IDS_COUNT);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", "*")
+                                        .param("complete", "false")
+                                        .param("sort", "id desc")
+                                        .param("size", "5")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                contains("Q00020", "Q00019", "Q00018", "Q00017", "Q00016")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.id",
+                                contains(
+                                        "UniRef50_P03920",
+                                        "UniRef50_P03919",
+                                        "UniRef50_P03918",
+                                        "UniRef50_P03917",
+                                        "UniRef50_P03916")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].to.members",
+                                contains(
+                                        "P12320", "P32120", "P32102", "P32103", "P32104", "P32105",
+                                        "P32106", "P32107", "P32108", "P32109")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].to.organisms.*.taxonId",
+                                contains(
+                                        9600, 9626, 9608, 9609, 9610, 9611, 9612, 9613, 9614,
+                                        9615)))
+                .andExpect(jsonPath("$.results.*.to.commonTaxon").exists())
+                .andExpect(jsonPath("$.results.*.to.representativeMember").exists());
     }
 
     @Test
@@ -253,16 +386,16 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                         content()
                                 .string(
                                         containsString(
-                                                "From\tCluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                                "From\tCluster ID\tCluster Name\tCommon taxon\tSize\tDate of last modification")))
                 .andExpect(
                         content()
                                 .string(
                                         containsString(
-                                                "Q00001\tUniRef50_P03901\tCluster: MoeK5 01\tHomo sapiens\t2\t2019-08-27\n"
+                                                "Q00001\tUniRef50_P03901\tCluster: MoeK5 01\tHomo sapiens\t1\t2019-08-27\n"
                                                         + "Q00002\tUniRef50_P03902\tCluster: MoeK5 02\tHomo sapiens\t2\t2019-08-27\n"
-                                                        + "Q00003\tUniRef50_P03903\tCluster: MoeK5 03\tHomo sapiens\t2\t2019-08-27\n"
-                                                        + "Q00004\tUniRef50_P03904\tCluster: MoeK5 04\tHomo sapiens\t2\t2019-08-27\n"
-                                                        + "Q00005\tUniRef50_P03905\tCluster: MoeK5 05\tHomo sapiens\t2\t2019-08-27")));
+                                                        + "Q00003\tUniRef50_P03903\tCluster: MoeK5 03\tHomo sapiens\t3\t2019-08-27\n"
+                                                        + "Q00004\tUniRef50_P03904\tCluster: MoeK5 04\tHomo sapiens\t4\t2019-08-27\n"
+                                                        + "Q00005\tUniRef50_P03905\tCluster: MoeK5 05\tHomo sapiens\t5\t2019-08-27")));
     }
 
     @Override

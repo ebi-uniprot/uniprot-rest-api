@@ -414,6 +414,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                                 "$.results.*.to.entryType",
                                 contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
                 .andExpect(
+                        jsonPath("$.results[1].to.extraAttributes.uniParcId", is("UPI0001661588")))
+                .andExpect(
                         jsonPath(
                                 "$.results[1].to.inactiveReason.inactiveReasonType", is("DELETED")))
                 .andExpect(

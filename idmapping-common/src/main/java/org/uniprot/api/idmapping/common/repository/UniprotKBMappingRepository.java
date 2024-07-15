@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.common.repository;
 
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
+
 import java.io.IOException;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -44,17 +46,24 @@ public class UniprotKBMappingRepository {
                     if (Utils.notNullNotEmpty(document.inactiveReason)) {
                         String[] inactiveReason = document.inactiveReason.split(":");
                         if (inactiveReason.length == 2) {
-                            inactiveReasonBuilder.deletedReason(
-                                    DeletedReason.valueOf(inactiveReason[1].strip()));
+                            if (inactiveReason[0].equals(InactiveReasonType.DELETED.toString())) {
+                                inactiveReasonBuilder.deletedReason(
+                                        DeletedReason.valueOf(inactiveReason[1].strip()));
+                            } else {
+                                return getDeletedEntry(inactiveReason[1].strip());
+                            }
                         }
                     }
                     String id = "";
                     if (Utils.notNullNotEmpty(document.id)) {
                         id = document.id.get(0);
                     }
-                    result =
-                            new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build())
-                                    .build();
+                    UniProtKBEntryBuilder builder =
+                            new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build());
+                    if (Utils.notNull(document.deletedEntryUniParc)) {
+                        builder.extraAttributesAdd(UNIPARC_ID_ATTRIB, document.deletedEntryUniParc);
+                    }
+                    result = builder.build();
                 }
             }
         } catch (SolrServerException | IOException e) {

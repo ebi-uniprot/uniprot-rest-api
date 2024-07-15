@@ -50,7 +50,7 @@ import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 

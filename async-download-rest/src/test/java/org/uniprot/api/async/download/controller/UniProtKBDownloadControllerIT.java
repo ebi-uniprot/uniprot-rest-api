@@ -40,12 +40,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
-import org.uniprot.api.async.download.messaging.listener.uniprotkb.UniProtKBMessageListener;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniProtKBDownloadJobRepository;
-import org.uniprot.api.async.download.model.common.DownloadJob;
-import org.uniprot.api.async.download.model.common.ValidDownloadRequest;
-import org.uniprot.api.async.download.model.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
+import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -160,9 +159,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
-                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
-                        this.maxEntryCount,
-                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
+                        "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
+                        this.maxEntryCount, UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         String query = "key:value";
         DownloadJob job =
                 builder.id(jobId)
@@ -202,9 +200,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         String errMsg =
                 String.format(
-                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
-                        this.maxEntryCount,
-                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
+                        "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s",
+                        this.maxEntryCount, UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         DownloadJob job =
                 builder.id(jobId)
                         .status(JobStatus.ABORTED)
@@ -300,7 +297,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String query = "*:*";
         String fields = "accession,rhea";
         ResultActions resultActions =
-                callPostJobStatus(query, fields, null, format.toString(), false);
+                callPostJobStatus(query, fields, null, format.toString(), false, false);
         resultActions
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
@@ -354,7 +351,12 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform)
+            String query,
+            String fields,
+            String sort,
+            String format,
+            boolean includeIsoform,
+            boolean force)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.post(getDownloadAPIsBasePath() + "/run")
@@ -363,7 +365,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                         .param("fields", fields)
                         .param("sort", sort)
                         .param("format", Objects.isNull(format) ? null : format)
-                        .param("includeIsoform", String.valueOf(includeIsoform));
+                        .param("includeIsoform", String.valueOf(includeIsoform))
+                        .param("force", String.valueOf(force));
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }
@@ -527,7 +530,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
             String sort,
             String fields,
             JobStatus jobStatus,
-            String format) {
+            String format,
+            int retried) {
         UniProtKBDownloadJob.UniProtKBDownloadJobBuilder builder = UniProtKBDownloadJob.builder();
         UniProtKBDownloadJob job =
                 builder.id(jobId)
@@ -537,6 +541,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                         .query(query)
                         .sort(sort)
                         .fields(fields)
+                        .retried(retried)
                         .build();
         return job;
     }
