@@ -14,7 +14,7 @@ public class UniParcCrossReferenceStoreConfig {
 
     @Bean
     @Profile("live")
-    public UniParcCrossReferenceStoreClient uniParcLightStoreClient(
+    public UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient(
             UniParcCrossReferenceStoreConfigProperties configProperties) {
         VoldemortClient<UniParcCrossReference> client =
                 new VoldemortRemoteUniParcCrossReferenceStore(
@@ -23,5 +23,12 @@ public class UniParcCrossReferenceStoreConfig {
                         configProperties.getStoreName(),
                         configProperties.getHost());
         return new UniParcCrossReferenceStoreClient(client, configProperties.getBatchSize());
+    }
+
+    @Bean
+    public UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader(
+            UniParcCrossReferenceStoreConfigProperties configProperties,
+            UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient) {
+        return new UniParcCrossReferenceLazyLoader(uniParcCrossReferenceStoreClient, configProperties.getBatchSize());
     }
 }

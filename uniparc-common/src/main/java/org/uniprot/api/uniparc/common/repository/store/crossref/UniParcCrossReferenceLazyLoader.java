@@ -1,0 +1,96 @@
+package org.uniprot.api.uniparc.common.repository.store.crossref;
+
+import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
+import org.uniprot.core.util.PairImpl;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.datastore.UniProtStoreClient;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.uniprot.core.util.Utils.notNull;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+public class UniParcCrossReferenceLazyLoader {
+
+    private static final ReturnFieldConfig FIELD_CONFIG =
+            ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
+    static final List<String> LAZY_FIELD_LIST =
+            List.of("organism_id", "organism", "protein", "gene", "proteome");
+    private final UniProtStoreClient<UniParcCrossReference> crossRefStoreClient;
+    private final int batchSize;
+
+    public UniParcCrossReferenceLazyLoader(UniProtStoreClient<UniParcCrossReference> crossRefStoreClient,
+                                           int batchSize){
+        this.crossRefStoreClient = crossRefStoreClient;
+        this.batchSize = batchSize;
+    }
+
+    public List<UniParcEntryLight> loadLazyLoadFields(List<UniParcEntryLight> entries, List<String> lazyFields) {
+        List<UniParcEntryLight> result = new ArrayList<>();
+        for (UniParcEntryLight entry : entries) {
+            result.add(loadLazyLoadFields(entry, lazyFields));
+        }
+        return result;
+    }
+
+    public UniParcEntryLight loadLazyLoadFields(UniParcEntryLight entry, List<String> lazyFields) {
+        UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
+        List<String> batchIds = new ArrayList<>(batchSize);
+        int index = 0;
+        for (String xrefId : entry.getUniParcCrossReferences()) {
+            batchIds.add(xrefId);
+            if (++index % batchSize == 0) {
+                addLazyFields(builder, lazyFields, batchIds);
+                batchIds = new ArrayList<>();
+            }
+        }
+        if (!batchIds.isEmpty()) {
+            addLazyFields(builder, lazyFields, batchIds);
+        }
+        return builder.build();
+    }
+
+    public List<String> getLazyFields(String fields) {
+        List<String> result = new ArrayList<>();
+        if (notNullNotEmpty(fields)) {
+            for (String field : fields.split(",")) {
+                String fieldItem = FIELD_CONFIG.getReturnFieldByName(field.strip()).getName();
+                if (LAZY_FIELD_LIST.contains(fieldItem)) {
+                    result.add(fieldItem);
+                }
+            }
+        }
+        return result;
+    }
+
+    private void addLazyFields(UniParcEntryLightBuilder builder, List<String> lazyFields, List<String> batchIds) {
+        List<UniParcCrossReference> xrefs = crossRefStoreClient.getEntries(batchIds);
+        for (UniParcCrossReference xref : xrefs) {
+            if ((lazyFields.contains(LAZY_FIELD_LIST.get(0))
+                    || lazyFields.contains(LAZY_FIELD_LIST.get(1)))
+                    && notNull(xref.getDatabase())) {
+                builder.organismsAdd(
+                        new PairImpl<>(
+                                (int) xref.getOrganism().getTaxonId(),
+                                xref.getOrganism().getScientificName()));
+            }
+            if (lazyFields.contains(LAZY_FIELD_LIST.get(2))
+                    && notNullNotEmpty(xref.getProteinName())) {
+                builder.proteinNamesAdd(xref.getProteinName());
+            }
+            if (lazyFields.contains(LAZY_FIELD_LIST.get(3))
+                    && notNullNotEmpty(xref.getGeneName())) {
+                builder.geneNamesAdd(xref.getGeneName());
+            }
+            if (lazyFields.contains(LAZY_FIELD_LIST.get(4))
+                    && notNullNotEmpty(xref.getProteomeId())) {
+                builder.proteomeIdsAdd(xref.getProteomeId());
+            }
+        }
+    }
+}

@@ -7,16 +7,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -41,18 +42,21 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
-import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
 /**
  * @author jluo
@@ -79,7 +83,9 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
 
-    private UniParcStoreClient storeClient;
+    private UniParcLightStoreClient storeClient;
+
+    private UniParcCrossReferenceStoreClient xRefStoreClient;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -141,15 +147,19 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     @BeforeAll
     void initDataStore() {
         storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
+
+        xRefStoreClient =
+                new UniParcCrossReferenceStoreClient(
+                        VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference"),10);
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
 
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIPARC,
-                        new UniParcDocumentConverter(
-                                TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
+                        DataStoreManager.StoreType.UNIPARC, new UniParcDocumentConverter());
+
     }
 
     @Test
@@ -359,16 +369,33 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     }
 
     private void saveEntry(UniParcEntry entry) {
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
+        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, entry);
 
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
+        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
+        for(UniParcCrossReference xref: entry.getUniParcCrossReferences()) {
+            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
+            xRefStoreClient.saveEntry(key, xref);
+        }
     }
 
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
+    }
+
+    @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
     }
 
     static class UniParcSearchParameterResolver extends AbstractSearchParameterResolver {

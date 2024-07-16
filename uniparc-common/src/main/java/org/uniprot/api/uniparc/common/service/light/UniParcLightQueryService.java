@@ -3,25 +3,32 @@ package org.uniprot.api.uniparc.common.service.light;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Import(UniParcSolrQueryConfig.class)
@@ -29,13 +36,9 @@ public class UniParcLightQueryService
         extends StoreStreamerSearchService<UniParcDocument, UniParcEntryLight> {
 
     public static final String UNIPARC_ID_FIELD = "upi";
-
     private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final UniParcQueryRepository repository;
-    private final UniParcLightQueryResultConverter entryConverter;
-    private final SolrQueryConfig solrQueryConfig;
-    private final RdfStreamer rdfStreamer;
+    private final UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader;
 
     @Autowired
     public UniParcLightQueryService(
@@ -47,9 +50,9 @@ public class UniParcLightQueryService
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
-            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
+            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
+            UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
 
         super(
                 repository,
@@ -62,10 +65,7 @@ public class UniParcLightQueryService
                 uniParcTupleStreamDocumentIdStream);
         this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
         this.searchFieldConfig = uniParcSearchFieldConfig;
-        this.repository = repository;
-        this.entryConverter = uniParcLightQueryResultConverter;
-        this.solrQueryConfig = uniParcSolrQueryConf;
-        this.rdfStreamer = uniParcRdfStreamer;
+        this.uniParcCrossReferenceLazyLoader = uniParcCrossReferenceLazyLoader;
     }
 
     @Override
@@ -100,5 +100,15 @@ public class UniParcLightQueryService
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC)
                 .getSearchFieldItemByName(UNIPARC_ID_FIELD)
                 .getFieldName();
+    }
+
+    @Override
+    protected Stream<UniParcEntryLight> convertDocumentsToEntries(SearchRequest request, QueryResult<UniParcDocument> results) {
+        Stream<UniParcEntryLight> result = super.convertDocumentsToEntries(request, results);
+        List<String> lazyFields = uniParcCrossReferenceLazyLoader.getLazyFields(request.getFields());
+        if(Utils.notNullNotEmpty(lazyFields)){
+            result = result.map(entry -> uniParcCrossReferenceLazyLoader.loadLazyLoadFields(entry, lazyFields));
+        }
+        return result;
     }
 }
