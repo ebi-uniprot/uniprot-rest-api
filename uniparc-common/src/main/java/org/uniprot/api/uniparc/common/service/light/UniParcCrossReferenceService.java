@@ -3,7 +3,6 @@ package org.uniprot.api.uniparc.common.service.light;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -19,11 +18,14 @@ import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossRefe
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.util.Utils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
+@Slf4j
 @Service
 public class UniParcCrossReferenceService {
 
@@ -59,28 +61,76 @@ public class UniParcCrossReferenceService {
         UniParcEntryLight entry = optUniParcLight.get();
         List<String> xrefIds = entry.getUniParcCrossReferences();
 
-        // Fetch, filter, and paginate
-        List<UniParcCrossReference> filteredResults = new ArrayList<>();
-        for (int i = 0; i < xrefIds.size(); i += this.crossReferenceStoreClient.getBatchSize()) {
-            int end = Math.min(i + this.crossReferenceStoreClient.getBatchSize(), xrefIds.size());
-            List<String> batch = xrefIds.subList(i, end);
-            Stream<UniParcCrossReference> batchStream = getCrossReferences(batch);
-            batchStream
-                    .filter(xref -> filterCrossReference(xref, request))
-                    .forEach(filteredResults::add);
-        }
-
-        // Apply pagination
         int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
-        CursorPage page = CursorPage.of(request.getCursor(), pageSize, filteredResults.size());
-        int offset = page.getOffset().intValue();
-        int nextOffset = CursorPage.getNextOffset(page);
-        List<UniParcCrossReference> paginatedResults = filteredResults.subList(offset, nextOffset);
-
+        List<UniParcCrossReference> paginatedResults;
+        CursorPage page;
+        // need to get crossref entries from datastore to filter by taxonId, taxonId+dbtypes or
+        // active status
+        if (Utils.notNullNotEmpty(request.getTaxonIds()) || Objects.nonNull(request.getActive())) {
+            // Fetch, filter, and paginate
+            List<UniParcCrossReference> filteredResults = new ArrayList<>();
+            for (int i = 0;
+                    i < xrefIds.size();
+                    i += this.crossReferenceStoreClient.getBatchSize()) {
+                int end =
+                        Math.min(i + this.crossReferenceStoreClient.getBatchSize(), xrefIds.size());
+                List<String> batch = xrefIds.subList(i, end);
+                Stream<UniParcCrossReference> batchStream = getCrossReferences(batch);
+                batchStream
+                        .filter(xref -> filterCrossReference(xref, request))
+                        .forEach(filteredResults::add);
+            }
+            // Apply pagination
+            page = CursorPage.of(request.getCursor(), pageSize, filteredResults.size());
+            paginatedResults = paginateCrossReferences(page, filteredResults);
+        } else {
+            if (Utils.notNullNotEmpty(request.getDbTypes())) { // filter by db type only
+                // each xref id <uniparcId>-<dbType>-<dbId>-<n>
+                List<String> dbTypes = csvToList(request.getDbTypes());
+                List<String> filteredXrefIds =
+                        xrefIds.stream().filter(id -> filterXrefIdByDbTypes(id, dbTypes)).toList();
+                page = CursorPage.of(request.getCursor(), pageSize, filteredXrefIds.size());
+                paginatedResults = paginateAndFetchResults(page, filteredXrefIds);
+            } else { // no filter at all
+                page = CursorPage.of(request.getCursor(), pageSize, xrefIds.size());
+                paginatedResults = paginateAndFetchResults(page, xrefIds);
+            }
+        }
         return QueryResult.<UniParcCrossReference>builder()
                 .content(paginatedResults.stream())
                 .page(page)
                 .build();
+    }
+
+    private List<UniParcCrossReference> paginateAndFetchResults(
+            CursorPage page, List<String> xrefIds) {
+        int offset = page.getOffset().intValue();
+        int nextOffset = CursorPage.getNextOffset(page);
+        List<String> pageXrefIds = xrefIds.subList(offset, nextOffset);
+        return getCrossReferences(pageXrefIds).toList();
+    }
+
+    private List<UniParcCrossReference> paginateCrossReferences(
+            CursorPage page, List<UniParcCrossReference> xrefs) {
+        int offset = page.getOffset().intValue();
+        int nextOffset = CursorPage.getNextOffset(page);
+        return xrefs.subList(offset, nextOffset);
+    }
+
+    // example xrefId key in VD - UPI0000000001-REFSEQ-12345-3
+    private static boolean filterXrefIdByDbTypes(String xrefId, List<String> dbTypes) {
+        String[] parts = xrefId.split("-");
+        if (parts.length > 1) {
+            try {
+                String displayName =
+                        UniParcDatabase.valueOf(parts[1]).getDisplayName().toLowerCase();
+                return dbTypes.contains(displayName);
+            } catch (IllegalArgumentException ile) {
+                log.warn("Unable to find UniParc database of type {}", parts[1]);
+                return false;
+            }
+        }
+        return false;
     }
 
     private Stream<UniParcCrossReference> getCrossReferences(List<String> xrefIds) {
@@ -96,9 +146,9 @@ public class UniParcCrossReferenceService {
     private boolean filterCrossReference(
             UniParcCrossReference xref, UniParcDatabasesRequest request) {
         List<String> databases = csvToList(request.getDbTypes());
-        List<String> toxonomyIds = csvToList(request.getTaxonIds());
+        List<String> taxonomyIds = csvToList(request.getTaxonIds());
         return filterByDatabases(xref, databases)
-                && filterByTaxonomyIds(xref, toxonomyIds)
+                && filterByTaxonomyIds(xref, taxonomyIds)
                 && filterByStatus(xref, request.getActive());
     }
 
@@ -134,7 +184,7 @@ public class UniParcCrossReferenceService {
                     Arrays.stream(csv.split(","))
                             .map(String::trim)
                             .map(String::toLowerCase)
-                            .collect(Collectors.toList());
+                            .toList();
         }
         return list;
     }

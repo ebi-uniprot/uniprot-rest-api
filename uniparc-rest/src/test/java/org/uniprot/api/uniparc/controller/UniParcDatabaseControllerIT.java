@@ -230,6 +230,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     @Test
     void testGetByAccessionWithDBFilterSuccess() throws Exception {
         // when
+        saveEntry();
         String dbTypes = "UniProtKB/TrEMBL,embl";
         ResultActions response =
                 getMockMvc()
