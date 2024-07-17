@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -32,13 +31,11 @@ import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.request.*;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -120,68 +117,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
         UniParcEntry entry = queryService.getByUniParcId(getByUniParcIdRequest);
         return super.getEntityResponse(entry, getByUniParcIdRequest.getFields(), request);
-    }
-
-    @GetMapping(
-            value = "/stream",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FASTA_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE,
-                TURTLE_MEDIA_TYPE_VALUE,
-                N_TRIPLES_MEDIA_TYPE_VALUE
-            })
-    @Operation(
-            summary = STREAM_UNIPARC_OPERATION,
-            responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
-                            @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation = Entry.class,
-                                                                    name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
-                        })
-            })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
-            @Valid @ModelAttribute UniParcStreamRequest streamRequest,
-            @Parameter(hidden = true)
-                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
-                    MediaType contentType,
-            HttpServletRequest request) {
-        setBasicRequestFormat(streamRequest, request);
-        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
-        if (acceptedRdfContentType.isPresent()) {
-            return super.streamRdf(
-                    () ->
-                            queryService.streamRdf(
-                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
-                    streamRequest,
-                    contentType,
-                    request);
-        } else {
-            return super.stream(
-                    () -> queryService.stream(streamRequest), streamRequest, contentType, request);
-        }
     }
 
     @GetMapping(

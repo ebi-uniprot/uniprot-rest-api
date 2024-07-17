@@ -49,13 +49,18 @@ import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.core.util.Utils;
+import org.uniprot.cv.taxonomy.TaxonomicNode;
+import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.util.TaxonomyRepoUtil;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
 /**
@@ -82,6 +87,8 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
+
+    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
     private UniParcLightStoreClient storeClient;
 
@@ -153,13 +160,11 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
         xRefStoreClient =
                 new UniParcCrossReferenceStoreClient(
-                        VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference"),10);
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
-
+                        VoldemortInMemoryUniParcCrossReferenceStore.getInstance(
+                                "uniparc-cross-reference"),
+                        10);
         getStoreManager()
-                .addDocConverter(
-                        DataStoreManager.StoreType.UNIPARC, new UniParcDocumentConverter());
-
+                .addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
     }
 
     @Test
@@ -369,11 +374,26 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     }
 
     private void saveEntry(UniParcEntry entry) {
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, entry);
+        UniParcDocumentConverter converter = new UniParcDocumentConverter();
+        UniParcDocument doc = converter.convert(entry);
+        UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
+        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
+            if(Utils.notNull(xref.getOrganism())) {
+                List<TaxonomicNode> nodes = TaxonomyRepoUtil.getTaxonomyLineage(taxonomyRepo, (int) xref.getOrganism().getTaxonId());
+                builder.organismId((int) xref.getOrganism().getTaxonId());
+                nodes.forEach(
+                        node -> {
+                            builder.taxLineageId(node.id());
+                            List<String> names = TaxonomyRepoUtil.extractTaxonFromNode(node);
+                            names.forEach(builder::organismTaxon);
+                        });
+            }
+        }
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
-        for(UniParcCrossReference xref: entry.getUniParcCrossReferences()) {
+        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
             String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
             xRefStoreClient.saveEntry(key, xref);
         }
@@ -493,15 +513,9 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].geneName")
-                                    .hasJsonPath())
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].taxonomy")
-                                    .doesNotExist())
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].proteinName")
-                                    .doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].geneNames").hasJsonPath())
+                    .resultMatcher(jsonPath("$.results[*].uniProtKBAccessions").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].proteinNames").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
                     .resultMatcher(
