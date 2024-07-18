@@ -2,17 +2,16 @@ package org.uniprot.api.uniparc.common.service;
 
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -29,14 +28,17 @@ import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
@@ -65,6 +67,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final RdfStreamer rdfStreamer;
 
     private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
+    private final UniParcLightStoreClient uniParcLightStoreClient;
+    private final UniParcCrossReferenceService uniParcCrossReferenceService;
 
     @Autowired
     public UniParcQueryService(
@@ -78,7 +82,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SearchFieldConfig uniParcSearchFieldConfig,
             RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
-            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
+            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
+            UniParcLightStoreClient uniParcLightStoreClient,
+            UniParcCrossReferenceService uniParcCrossReferenceService) {
 
         super(
                 repository,
@@ -95,21 +101,21 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
         this.rdfStreamer = uniParcRdfStreamer;
+        this.uniParcLightStoreClient = uniParcLightStoreClient;
+        this.uniParcCrossReferenceService = uniParcCrossReferenceService;
     }
 
-    public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
+    public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest uniParcIdRequest) {
+        UniParcEntry uniParcEntry = createUniParcEntry(uniParcIdRequest.getUpi());
 
-        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, getByUniParcIdRequest.getUpi());
-
-        return filterUniParcStream(Stream.of(uniParcEntry), getByUniParcIdRequest)
+        return filterUniParcStream(Stream.of(uniParcEntry), uniParcIdRequest)
                 .findFirst()
                 .orElse(null);
     }
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
-
-        UniParcEntry uniParcEntry =
-                getEntity(ACCESSION_FIELD, getByAccessionRequest.getAccession());
+        String uniParcId = searchUniParcId(ACCESSION_FIELD, getByAccessionRequest.getAccession());
+        UniParcEntry uniParcEntry = createUniParcEntry(uniParcId);
 
         return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
                 .findFirst()
@@ -119,7 +125,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public UniParcEntry getBySequence(UniParcSequenceRequest sequenceRequest) {
 
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
-        UniParcEntry uniParcEntry = getEntity(CHECKSUM_STR, md5Value);
+        String uniParcId = searchUniParcId(CHECKSUM_STR, md5Value);
+        UniParcEntry uniParcEntry = createUniParcEntry(uniParcId);
 
         return filterUniParcStream(Stream.of(uniParcEntry), sequenceRequest)
                 .findFirst()
@@ -239,6 +246,24 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
+    private UniParcEntry createUniParcEntry(String uniParcId) {
+        Optional<UniParcEntryLight> optLightEntry =
+                this.uniParcLightStoreClient.getEntry(uniParcId);
+        if (optLightEntry.isEmpty()) {
+            throw new ResourceNotFoundException("Unable to find UniParc by id " + uniParcId);
+        }
+        UniParcEntryBuilder builder = new UniParcEntryBuilder();
+        builder.uniParcId(uniParcId).sequence(optLightEntry.get().getSequence());
+        builder.sequenceFeaturesSet(optLightEntry.get().getSequenceFeatures());
+        // populate cross-references from its own store
+        List<UniParcCrossReference> crossReferences =
+                this.uniParcCrossReferenceService
+                        .getCrossReferences(optLightEntry.get().getUniParcCrossReferences())
+                        .toList();
+        builder.uniParcCrossReferencesSet(crossReferences);
+        return builder.build();
+    }
+
     private Stream<UniParcEntry> filterUniParcStream(
             Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
         // convert comma separated values to list
@@ -266,5 +291,24 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                             .collect(Collectors.toList());
         }
         return list;
+    }
+
+    private String searchUniParcId(String idField, String value) {
+        try {
+            String query = idField + ":" + value;
+            SolrRequest solrRequest =
+                    SolrRequest.builder().query(query).rows(NumberUtils.INTEGER_ONE).build();
+            UniParcDocument document =
+                    repository
+                            .getEntry(solrRequest)
+                            .orElseThrow(() -> new ResourceNotFoundException("{search.not.found}"));
+
+            return document.getUpi();
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            String message = "Could not get entity for id: [" + value + "]";
+            throw new ServiceException(message, e);
+        }
     }
 }

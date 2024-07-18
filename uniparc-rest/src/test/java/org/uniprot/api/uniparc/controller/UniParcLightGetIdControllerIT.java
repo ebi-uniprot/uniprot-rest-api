@@ -1,5 +1,17 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,29 +55,16 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
-
 @ContextConfiguration(classes = {UniParcRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                UniParcLightGetIdControllerIT.UniParcLightGetIdParameterResolver.class,
-                UniParcLightGetIdControllerIT.UniParcLightGetIdContentTypeParamResolver.class
+            SpringExtension.class,
+            UniParcLightGetIdControllerIT.UniParcLightGetIdParameterResolver.class,
+            UniParcLightGetIdControllerIT.UniParcLightGetIdContentTypeParamResolver.class
         })
-class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
+class UniParcLightGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
     private static final String UPI_PREF = "UPI0000083D";
@@ -74,21 +73,19 @@ class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
     @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
-    @Autowired
-    private UniParcLightStoreClient storeClient;
+    @Autowired private UniParcLightStoreClient storeClient;
 
-    @Autowired
-    private UniParcCrossReferenceStoreClient xRefStoreClient;
+    @Autowired private UniParcCrossReferenceStoreClient xRefStoreClient;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     @Autowired private UniParcQueryRepository repository;
 
     @BeforeAll
-    void initDataStore(){
+    void initDataStore() {
         getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
+        getStoreManager()
+                .addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
     }
 
     @BeforeEach
@@ -126,8 +123,10 @@ class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
         UniParcDocument doc = converter.convert(entry);
         UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            if(Utils.notNull(xref.getOrganism())) {
-                List<TaxonomicNode> nodes = TaxonomyRepoUtil.getTaxonomyLineage(taxonomyRepo, (int) xref.getOrganism().getTaxonId());
+            if (Utils.notNull(xref.getOrganism())) {
+                List<TaxonomicNode> nodes =
+                        TaxonomyRepoUtil.getTaxonomyLineage(
+                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
                 builder.organismId((int) xref.getOrganism().getTaxonId());
                 nodes.forEach(
                         node -> {

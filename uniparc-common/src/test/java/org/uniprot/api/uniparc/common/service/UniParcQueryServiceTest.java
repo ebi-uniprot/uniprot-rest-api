@@ -24,7 +24,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
@@ -50,6 +52,8 @@ class UniParcQueryServiceTest {
     @Mock private RdfStreamer uniparcRdfStreamer;
     @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Mock private TupleStreamDocumentIdStream solrIdStreamer;
+    @Mock private UniParcLightStoreClient uniParcLightStoreClient;
+    @Mock private UniParcCrossReferenceService uniParcCrossReferenceService;
     private UniParcQueryService service;
 
     @BeforeEach
@@ -66,7 +70,9 @@ class UniParcQueryServiceTest {
                         uniParcSearchFieldConfig,
                         uniparcRdfStreamer,
                         facetTupleStreamTemplate,
-                        solrIdStreamer);
+                        solrIdStreamer,
+                        uniParcLightStoreClient,
+                        uniParcCrossReferenceService);
     }
 
     @Test

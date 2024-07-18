@@ -133,7 +133,7 @@ public class UniParcCrossReferenceService {
         return false;
     }
 
-    private Stream<UniParcCrossReference> getCrossReferences(List<String> xrefIds) {
+    public Stream<UniParcCrossReference> getCrossReferences(List<String> xrefIds) {
         BatchStoreIterable<UniParcCrossReference> batchIterable =
                 new BatchStoreIterable<>(
                         xrefIds,

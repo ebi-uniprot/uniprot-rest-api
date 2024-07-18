@@ -114,18 +114,18 @@ class BestGuessAnalyser {
      *
      * @param filteredEntries list of UniParcEntry with possible filtered best guess cross
      *     references.
-     * @param databaseType database types that were filtered cross references
+     * @param databaseTypes database types that were filtered cross references
      * @return UniParcEntry best guess
      * @throws BestGuessAnalyserException if find more than one UniParcEntry with list the longest
      *     sequence.
      */
     private UniParcEntry getBestGuessUniParcEntry(
-            List<UniParcEntry> filteredEntries, UniParcDatabase... databaseType) {
+            List<UniParcEntry> filteredEntries, UniParcDatabase... databaseTypes) {
         UniParcEntry bestGuess = null;
 
         if (!filteredEntries.isEmpty()) {
             List<String> databases =
-                    Arrays.stream(databaseType)
+                    Arrays.stream(databaseTypes)
                             .map(UniParcDatabase::getDisplayName)
                             .map(String::toLowerCase)
                             .collect(Collectors.toList());
@@ -146,7 +146,7 @@ class BestGuessAnalyser {
                             .collect(Collectors.toList());
 
             // Now we need to iterate over databaseType (parameter order define database priority).
-            for (UniParcDatabase dbType : databaseType) {
+            for (UniParcDatabase dbType : databaseTypes) {
                 List<UniParcEntry> maxLengthBestGuessList =
                         getBestGuessByDatabase(maxLengthEntries, dbType);
                 if (!maxLengthBestGuessList.isEmpty()) {

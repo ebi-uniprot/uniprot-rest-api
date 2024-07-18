@@ -5,9 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +39,11 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
+import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -90,7 +96,25 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
         String uniparcId = simpleEntry.getUniParcId().getValue();
         Entry simpleXmlEntry = converter.toXml(simpleEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, simpleXmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, simpleEntry);
+        // put uniparc light and cross references in voldemort
+        UniParcEntryLightBuilder builder = new UniParcEntryLightBuilder();
+        builder.uniParcId(uniparcId);
+        builder.sequence(simpleEntry.getSequence());
+        builder.sequenceFeaturesSet(simpleEntry.getSequenceFeatures());
+        List<PairImpl<String, UniParcCrossReference>> xrefIdToObject =
+                simpleEntry.getUniParcCrossReferences().stream()
+                        .map(
+                                xref ->
+                                        new PairImpl<>(
+                                                UniParcEntryMocker.getUniParcXRefId(
+                                                        uniparcId, xref),
+                                                xref))
+                        .collect(Collectors.toList());
+        builder.uniParcCrossReferencesSet(xrefIdToObject.stream().map(PairImpl::getKey).toList());
+        UniParcEntryLight uniParcEntryLight = builder.build();
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
+        xrefIdToObject.forEach(
+                pair -> getStoreManager().saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
 
         // when
         ResultActions response =

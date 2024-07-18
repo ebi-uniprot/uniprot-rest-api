@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,11 +27,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
@@ -69,27 +76,42 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
 
     @Override
     protected void saveEntry() {
+        // full uniparc entry object for solr
         UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF);
         // append two more cross ref
         UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, 1);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(updatedEntry);
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
+        DataStoreManager manager = getStoreManager();
+        manager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
+        //  uniparc light and cross reference in voldemort
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
+        manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
+        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
+        crossReferences.forEach(
+                pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
     }
 
     @BeforeAll
     void initDataStore() {
-        storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
-
         getStoreManager()
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIPARC,
                         new UniParcDocumentConverter(
                                 TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
+
+        UniParcLightStoreClient uniParcLightStoreClient =
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
+        UniParcCrossReferenceStoreClient crossRefStoreClient =
+                new UniParcCrossReferenceStoreClient(xrefVDClient, 5);
+        getStoreManager()
+                .addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
+        getStoreManager().addStore(DataStoreManager.StoreType.CROSSREF, crossRefStoreClient);
     }
 
     @AfterAll
