@@ -60,9 +60,32 @@ class UniProtKBStatisticsEntryRepositoryTest {
     }
 
     @Test
+    void findAllByReleaseName() {
+        List<UniProtKBStatisticsEntry> results =
+                entryRepository.findAllByReleaseName(RELEASES[0]);
+
+        assertThat(
+                results,
+                containsInAnyOrder(
+                        STATISTICS_ENTRIES[0],
+                        STATISTICS_ENTRIES[1],
+                        STATISTICS_ENTRIES[3],
+                        STATISTICS_ENTRIES[4],
+                        STATISTICS_ENTRIES[5]));
+    }
+
+    @Test
     void findAllByReleaseNameAndEntryType_whenNoMatch() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryType(RELEASES[0], TREMBL);
+                entryRepository.findAllByReleaseNameAndEntryType(RELEASES[2], TREMBL);
+
+        assertThat(results, empty());
+    }
+
+    @Test
+    void findAllByReleaseName_whenNoMatch() {
+        List<UniProtKBStatisticsEntry> results =
+                entryRepository.findAllByReleaseName(RELEASES[2]);
 
         assertThat(results, empty());
     }
@@ -82,6 +105,19 @@ class UniProtKBStatisticsEntryRepositoryTest {
     }
 
     @Test
+    void findAllByReleaseNameAndStatisticsCategoryIdIn() {
+        List<UniProtKBStatisticsEntry> results =
+                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                        RELEASES[0],
+                        List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
+
+        assertThat(
+                results,
+                containsInAnyOrder(
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1], STATISTICS_ENTRIES[3]));
+    }
+
+    @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
@@ -91,10 +127,28 @@ class UniProtKBStatisticsEntryRepositoryTest {
     }
 
     @Test
+    void findAllByReleaseNameAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
+        List<UniProtKBStatisticsEntry> results =
+                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                        RELEASES[0], List.of(STATISTICS_CATEGORIES[0]));
+
+        assertThat(results, containsInAnyOrder(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
+    }
+
+    @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                         RELEASES[0], SWISSPROT, Collections.emptyList());
+
+        assertThat(results, empty());
+    }
+
+    @Test
+    void findAllByReleaseNameAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
+        List<UniProtKBStatisticsEntry> results =
+                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                        RELEASES[2], Collections.emptyList());
 
         assertThat(results, empty());
     }
@@ -131,7 +185,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
     }
 
     @Test
@@ -142,7 +196,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
     }
 
     @Test

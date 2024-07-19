@@ -1,9 +1,6 @@
 package org.uniprot.api.support.data.statistics.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -86,6 +83,28 @@ public class StatisticsServiceImpl implements StatisticsService {
         return results.stream()
                 .map(statisticsMapper::mapHistory)
                 .sorted(Comparator.comparing(StatisticsModuleStatisticsHistory::getReleaseName))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<StatisticsModuleStatisticsCategory> findAllByVersionAndCategoryIn(String version, Set<String> categories) {
+        List<UniProtKBStatisticsEntry> entries;
+        if (categories.isEmpty()) {
+            entries =
+                    statisticsEntryRepository.findAllByReleaseName(
+                            getRelease(version));
+        } else {
+            entries =
+                    statisticsEntryRepository
+                            .findAllByReleaseNameAndStatisticsCategoryIn(
+                                    getRelease(version),
+                                    getCategories(categories));
+        }
+        return entries.stream()
+                .collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getStatisticsCategory))
+                .entrySet()
+                .stream()
+                .map(this::buildStatisticsModuleStatisticsCategory)
                 .collect(Collectors.toList());
     }
 
