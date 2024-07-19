@@ -1,30 +1,40 @@
 package org.uniprot.api.uniparc.controller;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
-import org.uniprot.api.rest.controller.param.ContentTypeParam;
-import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
-import org.uniprot.api.rest.controller.param.GetIdParameter;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RdfPrologs;
-import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
@@ -43,52 +53,43 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
-
 @ContextConfiguration(classes = {UniParcRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcEntryLightController.class)
-@ExtendWith(
-        value = {
-                SpringExtension.class,
-                UniParcLightGetIdControllerIT.UniParcLightGetIdParameterResolver.class,
-                UniParcLightGetIdControllerIT.UniParcLightGetIdContentTypeParamResolver.class
-        })
-class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(SpringExtension.class)
+class UniParcLightGetIdControllerIT {
 
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
     private static final String UPI_PREF = "UPI0000083D";
     public static final String UNIPARC_ID = "UPI0000083D01";
+    public static final String UPI_PARAM = "upi";
 
     @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
 
-    @Autowired
-    private UniParcLightStoreClient storeClient;
+    @RegisterExtension private static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired
-    private UniParcCrossReferenceStoreClient xRefStoreClient;
+    @Autowired private UniParcLightStoreClient storeClient;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private UniParcCrossReferenceStoreClient xRefStoreClient;
+
+    @Autowired private MockMvc mockMvc;
 
     @Autowired private UniParcQueryRepository repository;
 
     @BeforeAll
-    void initDataStore(){
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
+    void initDataStore() {
+        storeManager.addSolrClient(
+                DataStoreManager.StoreType.UNIPARC_LIGHT, SolrCollection.uniparc);
+        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
+        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
+
+        ReflectionTestUtils.setField(
+                repository,
+                "solrClient",
+                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC_LIGHT));
+        saveEntry();
     }
 
     @BeforeEach
@@ -97,28 +98,12 @@ class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
-    @AfterEach
+    @AfterAll
     void cleanStoreClient() {
         storeClient.truncate();
         xRefStoreClient.truncate();
     }
 
-    @Override
-    protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIPARC;
-    }
-
-    @Override
-    protected SolrCollection getSolrCollection() {
-        return SolrCollection.uniparc;
-    }
-
-    @Override
-    protected SolrQueryRepository getRepository() {
-        return repository;
-    }
-
-    @Override
     protected void saveEntry() {
         UniParcEntry entry = createEntry(1, UPI_PREF);
 
@@ -126,8 +111,10 @@ class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
         UniParcDocument doc = converter.convert(entry);
         UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            if(Utils.notNull(xref.getOrganism())) {
-                List<TaxonomicNode> nodes = TaxonomyRepoUtil.getTaxonomyLineage(taxonomyRepo, (int) xref.getOrganism().getTaxonId());
+            if (Utils.notNull(xref.getOrganism())) {
+                List<TaxonomicNode> nodes =
+                        TaxonomyRepoUtil.getTaxonomyLineage(
+                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
                 builder.organismId((int) xref.getOrganism().getTaxonId());
                 nodes.forEach(
                         node -> {
@@ -137,224 +124,230 @@ class UniParcLightGetIdControllerIT  extends AbstractGetByIdControllerIT {
                         });
             }
         }
-        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPARC_LIGHT, doc);
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
+        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
             String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
             xRefStoreClient.saveEntry(key, xref);
         }
     }
 
-    @Override
     protected String getIdRequestPath() {
         return "/uniparc/{upi}/light";
     }
 
-    static class UniParcLightGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    @Test
+    void validIdReturnSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        @Override
-        public GetIdParameter validIdParameter() {
-            return GetIdParameter.builder()
-                    .id(UNIPARC_ID)
-                    .resultMatcher(jsonPath("$.uniParcId", is("UPI0000083D01")))
-                    .build();
-        }
+        ResultActions response = mockMvc.perform(requestBuilder);
 
-        @Override
-        public GetIdParameter invalidIdParameter() {
-            return GetIdParameter.builder()
-                    .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.messages.*",
-                                    contains(
-                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                    .build();
-        }
-
-        @Override
-        public GetIdParameter nonExistentIdParameter() {
-            return GetIdParameter.builder()
-                    .id("UPI0000083A09")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
-                    .build();
-        }
-
-        @Override
-        public GetIdParameter withFilterFieldsParameter() {
-            return GetIdParameter.builder()
-                    .id(UNIPARC_ID)
-                    .fields("upi,gene")
-                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                    .resultMatcher(jsonPath("$.geneNames", contains("geneName01")))
-                    .build();
-        }
-
-        @Override
-        public GetIdParameter withInvalidFilterParameter() {
-            return GetIdParameter.builder()
-                    .id(UNIPARC_ID)
-                    .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.messages.*",
-                                    contains("Invalid fields parameter value 'invalid'")))
-                    .build();
-        }
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                .andExpect(
+                        jsonPath(
+                                "$.uniParcCrossReferences",
+                                contains(
+                                        "UPI0000083D01-SWISSPROT-P10001",
+                                        "UPI0000083D01-TREMBL-P12301",
+                                        "UPI0000083D01-REFSEQ-WP_168893201")))
+                .andExpect(
+                        jsonPath(
+                                "$.commonTaxons[*].key",
+                                contains("cellular organisms", "other entries")))
+                .andExpect(jsonPath("$.commonTaxons[*].value", contains("Bacteria", "plasmids")))
+                .andExpect(jsonPath("$.uniProtKBAccessions", contains("P10001", "P12301")))
+                .andExpect(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
+                .andExpect(jsonPath("$.sequenceFeatures.size()", is(12)));
     }
 
-    static class UniParcLightGetIdContentTypeParamResolver
-            extends AbstractGetIdContentTypeParamResolver {
+    @Test
+    void invalidIdReturnBadRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), "INVALID").header(ACCEPT, MediaType.APPLICATION_JSON);
 
-        @Override
-        public GetIdContentTypeParam idSuccessContentTypesParam() {
-            return GetIdContentTypeParam.builder()
-                    .id(UNIPARC_ID)
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    TurtlePrologs.UNIPARC_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    NTriplesPrologs
-                                                                            .N_TRIPLES_COMMON_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                                    .build())
-                    .build();
-        }
+        ResultActions response = mockMvc.perform(requestBuilder);
 
-        @Override
-        public GetIdContentTypeParam idBadRequestContentTypesParam() {
-            return GetIdContentTypeParam.builder()
-                    .id("INVALID")
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
-                                    .resultMatcher(
-                                            jsonPath(
-                                                    "$.messages.*",
-                                                    contains(
-                                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
-                                    .build())
-                    .build();
-        }
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "The 'upi' value has invalid format. It should be a valid UniParc UPI")));
+    }
+
+    @Test
+    void nonExistentIdReturnFoundRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UPI_PREF + "10").header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
+    }
+
+    @Test
+    void withFilterFieldsReturnSuccess() throws Exception {
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("fields", "upi,gene");
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                .andExpect(
+                        jsonPath(
+                                "$.uniParcCrossReferences",
+                                contains(
+                                        "UPI0000083D01-SWISSPROT-P10001",
+                                        "UPI0000083D01-TREMBL-P12301",
+                                        "UPI0000083D01-REFSEQ-WP_168893201")))
+                .andExpect(jsonPath("$.geneNames", contains("geneName01")))
+                .andExpect(jsonPath("$.commonTaxons").doesNotExist())
+                .andExpect(jsonPath("$.uniProtKBAccessions").doesNotExist())
+                .andExpect(jsonPath("$.sequenceFeatures").doesNotExist());
+    }
+
+    @Test
+    void withInvalidFilterFieldsReturnBadRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("fields", "InvalidField,upi");
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains("Invalid fields parameter value 'InvalidField'")));
+    }
+
+    @Test
+    void contentTypeFastaSuccessRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString(">UPI0000083D01 status=active")))
+                .andExpect(content().string(containsString("MLMPKRTKYRA")));
+    }
+
+    @Test
+    void contentTypeTsvSuccessRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE_VALUE);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Entry\tOrganisms\tUniProtKB\tFirst seen\tLast seen\tLength")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")));
+    }
+
+    @Test
+    void contentTypeXlsSuccessRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, UniProtMediaType.XLS_MEDIA_TYPE_VALUE);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
+    }
+
+    @Test
+    void contentTypeRdfSuccessRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), UNIPARC_ID)
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE_VALUE);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                                                        "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:embl-cds=\"http://purl.uniprot.org/embl-cds/\" xmlns:ensembl=\"http://rdf.ebi.ac.uk/resource/ensembl/\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:ssmRegion=\"http://purl.uniprot.org/signatureSequenceMatch/\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\">\n" +
+                                                        "<owl:Ontology rdf:about=\"\">\n" +
+                                                        "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n" +
+                                                        "</owl:Ontology>\n" +
+                                                        "    <sample>text</sample>\n" +
+                                                        "    <anotherSample>text2</anotherSample>\n" +
+                                                        "    <someMore>text3</someMore>\n" +
+                                                        "</rdf:RDF>")));
     }
 }

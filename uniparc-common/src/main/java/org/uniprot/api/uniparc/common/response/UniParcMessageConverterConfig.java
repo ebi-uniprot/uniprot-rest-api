@@ -21,6 +21,7 @@ import org.uniprot.core.json.parser.uniparc.UniParcCrossRefJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcEntryLightJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryCrossRefValueMapper;
+import org.uniprot.core.parser.tsv.uniparc.UniParcEntryLightValueMapper;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -105,6 +106,19 @@ public class UniParcMessageConverterConfig {
                                 downloadGatekeeper));
                 // ####################### UniParcLight ###################
                 converters.add(new UniParcLightFastaMessageConverter(downloadGatekeeper));
+
+                converters.add(
+                        new TsvMessageConverter<>(
+                                UniParcEntryLight.class,
+                                returnFieldConfig,
+                                new UniParcEntryLightValueMapper(),
+                                downloadGatekeeper));
+                converters.add(
+                        new XlsMessageConverter<>(
+                                UniParcEntryLight.class,
+                                returnFieldConfig,
+                                new UniParcEntryLightValueMapper(),
+                                downloadGatekeeper));
 
                 JsonMessageConverter<UniParcEntryLight> uniparcLightJsonConverter =
                         new JsonMessageConverter<>(

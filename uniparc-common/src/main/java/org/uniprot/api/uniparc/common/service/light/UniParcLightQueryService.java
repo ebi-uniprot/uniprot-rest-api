@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.common.service.light;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -19,6 +22,7 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
+import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
@@ -39,6 +43,9 @@ public class UniParcLightQueryService
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader;
 
+    private final SolrQueryConfig solrQueryConfig;
+    private final RdfStreamer rdfStreamer;
+
     @Autowired
     public UniParcLightQueryService(
             UniParcQueryRepository repository,
@@ -49,6 +56,7 @@ public class UniParcLightQueryService
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
+            RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
             UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
@@ -65,6 +73,8 @@ public class UniParcLightQueryService
         this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.uniParcCrossReferenceLazyLoader = uniParcCrossReferenceLazyLoader;
+        this.solrQueryConfig = uniParcSolrQueryConf;
+        this.rdfStreamer = uniParcRdfStreamer;
     }
 
     @Override
@@ -120,5 +130,18 @@ public class UniParcLightQueryService
                                             entry, lazyFields));
         }
         return result;
+    }
+
+    @Override
+    protected RdfStreamer getRdfStreamer() {
+        return this.rdfStreamer;
+    }
+
+    public Stream<String> streamRdf(
+            UniParcStreamRequest streamRequest, String dataType, String format) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 }

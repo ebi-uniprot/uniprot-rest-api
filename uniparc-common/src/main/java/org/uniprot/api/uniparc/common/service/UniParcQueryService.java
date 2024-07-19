@@ -61,8 +61,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
-    private final SolrQueryConfig solrQueryConfig;
-    private final RdfStreamer rdfStreamer;
 
     private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
 
@@ -93,8 +91,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
-        this.solrQueryConfig = uniParcSolrQueryConf;
-        this.rdfStreamer = uniParcRdfStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
@@ -143,14 +139,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 .page(results.getPage())
                 .facets(results.getFacets())
                 .build();
-    }
-
-    public Stream<String> streamRdf(
-            UniParcStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override
@@ -209,11 +197,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 .content(entries.stream())
                 .page(cursorPage)
                 .build();
-    }
-
-    @Override
-    protected RdfStreamer getRdfStreamer() {
-        return this.rdfStreamer;
     }
 
     @Override

@@ -34,6 +34,8 @@ import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,8 +44,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Tag(name = TAG_UNIPARC, description = TAG_UNIPARC_DESC)
 @RestController
@@ -74,51 +74,47 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
     @GetMapping(
             value = "/{upi}/light",
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    RDF_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = ID_UNIPARC_LIGHT_OPERATION,
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UniParcEntryLight.class)),
-                                    @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniParcEntryLight.class)),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryLight>> getEntryLightByUpId(
             @PathVariable("upi")
-            @Pattern(
-                    regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
-                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    message = "{search.invalid.upi.value}")
-            @NotNull(message = "{search.required}")
-            @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
-            String upi,
+                    @Pattern(
+                            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.upi.value}")
+                    @NotNull(message = "{search.required}")
+                    @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
+                    String upi,
             @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
-            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
-            @RequestParam(value = "fields", required = false)
-            String fields,
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+                    @RequestParam(value = "fields", required = false)
+                    String fields,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
-            String result =
-                    queryService.getRdf(
-                            upi,
-                            DATA_TYPE,
-                            acceptedRdfContentType.get());
+            String result = queryService.getRdf(upi, DATA_TYPE, acceptedRdfContentType.get());
             return super.getEntityResponseRdf(result, contentType, request);
         }
 

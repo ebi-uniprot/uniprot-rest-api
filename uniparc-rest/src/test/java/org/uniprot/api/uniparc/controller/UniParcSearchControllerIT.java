@@ -378,8 +378,10 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         UniParcDocument doc = converter.convert(entry);
         UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            if(Utils.notNull(xref.getOrganism())) {
-                List<TaxonomicNode> nodes = TaxonomyRepoUtil.getTaxonomyLineage(taxonomyRepo, (int) xref.getOrganism().getTaxonId());
+            if (Utils.notNull(xref.getOrganism())) {
+                List<TaxonomicNode> nodes =
+                        TaxonomyRepoUtil.getTaxonomyLineage(
+                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
                 builder.organismId((int) xref.getOrganism().getTaxonId());
                 nodes.forEach(
                         node -> {

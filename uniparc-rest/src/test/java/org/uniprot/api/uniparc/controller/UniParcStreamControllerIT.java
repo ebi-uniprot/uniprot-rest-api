@@ -76,13 +76,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniParcController.class)
-// @ContextConfiguration(
-//        classes = {
-//            UniParcDataStoreTestConfig.class,
-//            UniParcRestApplication.class,
-//            ErrorHandlerConfig.class
-//        })
+@WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
