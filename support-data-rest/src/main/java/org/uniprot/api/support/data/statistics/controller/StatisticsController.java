@@ -79,7 +79,44 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = "Get release statistics by UniProt release name and statistics type.",
+            summary = "Get release statistics by UniProt release name.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            StatisticsModuleStatisticsResult.class))
+                        })
+            })
+    @GetMapping(
+            value = "/releases/{release}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
+            getAllByVersionAndCategoryIn(
+                    @Parameter(
+                                    description = RELEASE_NAME_STATS_DESCRIPTION,
+                                    example = RELEASE_NAME_STATS_EXAMPLE,
+                                    required = true)
+                            @PathVariable
+                            String release,
+                    @Parameter(
+                                    description = CATEGORY_STATS_DESCRIPTION,
+                                    example = CATEGORY_STATS_EXAMPLE)
+                            @RequestParam(required = false, defaultValue = "")
+                            Set<String> categories) {
+        return ResponseEntity.ok()
+                .body(
+                        new StatisticsModuleStatisticsResult<>(
+                                statisticsService.findAllByVersionAndCategoryIn(
+                                        release, categories)));
+    }
+
+    @Operation(
+            hidden = true,
+            summary = "Get history by attribute and statistics type.",
             responses = {
                 @ApiResponse(
                         content = {
