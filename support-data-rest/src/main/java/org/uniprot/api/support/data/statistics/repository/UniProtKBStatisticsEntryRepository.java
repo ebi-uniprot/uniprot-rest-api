@@ -2,6 +2,7 @@ package org.uniprot.api.support.data.statistics.repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,8 @@ public interface UniProtKBStatisticsEntryRepository
             String attributeName, EntryType entryType);
 
     List<UniProtKBStatisticsEntry> findAllByAttributeNameIgnoreCase(String attributeName);
+
+    List<UniProtKBStatisticsEntry> findAllByReleaseName(UniProtRelease releaseName);
+
+    List<UniProtKBStatisticsEntry> findAllByReleaseNameAndStatisticsCategoryIn(UniProtRelease releaseName, Collection<StatisticsCategory> statisticsCategory);
 }

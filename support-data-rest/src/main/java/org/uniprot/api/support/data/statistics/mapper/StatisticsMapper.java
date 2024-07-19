@@ -44,6 +44,7 @@ public class StatisticsMapper {
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
                 .entryCount(entry.getEntryCount())
+                .statisticsType(map(entry.getEntryType()))
                 .description(entry.getDescription())
                 .label(getLabel(entry))
                 .build();
