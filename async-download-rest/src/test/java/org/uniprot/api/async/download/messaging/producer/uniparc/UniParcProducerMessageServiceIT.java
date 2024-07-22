@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.producer.uniparc;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,7 +18,6 @@ import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
 import org.uniprot.api.async.download.messaging.consumer.uniparc.UniParcMessageConsumer;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceIT;
-import org.uniprot.api.async.download.messaging.producer.uniparc.UniParcProducerMessageService;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.messaging.repository.UniParcDownloadJobRepository;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
@@ -24,8 +25,6 @@ import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandle
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
-
-import java.time.LocalDateTime;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
