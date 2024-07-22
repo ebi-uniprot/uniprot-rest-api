@@ -1,28 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -52,7 +30,24 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
 
 /**
  * @author lgonzales
@@ -98,7 +93,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     void bestGuessCanReturnSuccessSwissProt() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(BEST_GUESS_PATH).header(ACCEPT, MediaType.APPLICATION_JSON).param("query", "*");
+                get(BEST_GUESS_PATH).header(ACCEPT, MediaType.APPLICATION_JSON).param("upis", "UPI0000183A10");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
@@ -117,7 +112,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "upi:UPI0000183A11 OR upi:UPI0000183A12");
+                        .param("upis", "UPI0000183A11,UPI0000183A12");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
@@ -135,8 +130,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param(
-                                "query",
-                                "upi:UPI0000183A11 OR upi:UPI0000183A12 OR upi:UPI0000183A13");
+                                "upis",
+                                "UPI0000183A11,UPI0000183A12,UPI0000183A13");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
@@ -156,7 +151,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "taxonomy_id:9609");
+                        .param("taxonIds", "9609");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
@@ -176,13 +171,14 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "database:embl-cds")
+                        .param("dbids", "trembl2")
+                        .param("taxonIds", "9607")
                         .param("fields", "upi,sequence");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.uniParcId", is("UPI0000183A10")))
+                .andExpect(jsonPath("$.uniParcId", is("UPI0000183A12")))
                 .andExpect(jsonPath("$.sequence").exists())
                 .andExpect(jsonPath("$.uniParcCrossReferences").doesNotExist());
     }
@@ -193,7 +189,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "invalid_query:9607")
+                        .param("invalid_query", "9607")
                         .param("fields", "invalid");
 
         mockMvc.perform(requestBuilder)
@@ -206,7 +202,47 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid fields parameter value 'invalid'",
-                                        "'invalid_query' is not a valid search field")));
+                                        "Provide at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds'. 'dbids' alone is not allowed.")));
+    }
+
+    @Test
+    void bestGuessReturnBadRequestWhenOnlyDbIdsPassed() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(BEST_GUESS_PATH)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("dbids", "sample1,sample2");
+
+        mockMvc.perform(requestBuilder)
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Provide at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds'. 'dbids' alone is not allowed.")));
+    }
+
+    @Test
+    void bestGuessReturnBadRequestWhenInvalidTaxonIdPassed() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(BEST_GUESS_PATH)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("taxonIds", "1234,invalidTaxonId");
+
+        mockMvc.perform(requestBuilder)
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "taxonIds value has invalid format. It should be a list of comma separated taxonIds (without spaces).")));
     }
 
     @Test
@@ -215,7 +251,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(BEST_GUESS_PATH)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "taxonomy_id:9607");
+                        .param("taxonIds", "9607");
 
         mockMvc.perform(requestBuilder)
                 .andDo(log())
@@ -229,7 +265,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                                         "Invalid request received. More than one Best Guess found {UPI0000183A10:trembl0;UPI0000183A12:trembl2;UPI0000183A13:trembl3}. Review your query and/or contact us.")));
     }
 
-    private void saveEntries() throws IOException, SolrServerException {
+    private void  saveEntries() throws IOException, SolrServerException {
         UniParcEntryConverter converter = new UniParcEntryConverter();
 
         // SWISSPROT

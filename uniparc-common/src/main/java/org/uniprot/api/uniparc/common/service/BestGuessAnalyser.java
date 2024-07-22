@@ -18,21 +18,7 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.search.SolrQueryUtil;
 
-/**
- * This class is responsible to analyse a list of UniParcEntry and return the BestGuess among then.
- *
- * <p>DEFINITION: Best Guess return the UniParcEntry with an active UniProt/Swiss-Prot or
- * UniProtKB/Swiss-Prot protein isoforms cross reference that has the longest sequence from a list
- * of UniParcEntry and taking account the requested parameters in the query.
- *
- * <p>If it does not find any, it also try to search the longest sequence from an active
- * UniProt/TrEMBL cross reference.
- *
- * <p>If it find more than one cross reference it throws BestGuessAnalyserException
- *
- * @author lgonzales
- * @since 12/08/2020
- */
+
 class BestGuessAnalyser {
 
     private static final String MORE_THAN_ONE_BEST_GUESS_FOUND =
@@ -48,16 +34,7 @@ class BestGuessAnalyser {
         this.statusFilter = new UniParcDatabaseStatusFilter();
         this.searchFieldConfig = searchFieldConfig;
     }
-    /**
-     * This method return UniParcEntry BestGuess from a list of UniParcEntry and based on request
-     * parameters
-     *
-     * @param queryResult solr query result
-     * @param request user request Filter
-     * @return UniParcEntry best guess
-     * @throws BestGuessAnalyserException if find more than one UniParcEntry with list the longest
-     *     sequence.
-     */
+
     UniParcEntry analyseBestGuess(
             Stream<UniParcEntry> queryResult, UniParcBestGuessRequest request) {
         // First Search for DatabaseType.SWISSPROT or DatabaseType.SWISSPROT_VARSPLIC (isoforms)
@@ -73,20 +50,6 @@ class BestGuessAnalyser {
         return bestGuess;
     }
 
-    /**
-     * As we need iterate over results more than one time, that is why we convert it to a list
-     *
-     * <p>It also Filter params for BestGuess cross reference filter. This Filter will always create
-     * a filter for actives cross references only and also for a database type (in this case
-     * SWISSPROT, SWISSPROT_VARSPLIC or TREMBL)
-     *
-     * <p>If the user query for other cross references attribute like (TAXID) it also add it to best
-     * guess filter
-     *
-     * @param entries solr query result
-     * @param request user request Filter
-     * @return a list of UniParcEntry
-     */
     private List<UniParcEntry> getFilteredUniParcEntries(
             Stream<UniParcEntry> entries, UniParcBestGuessRequest request) {
         List<String> databases = new ArrayList<>();
@@ -109,16 +72,7 @@ class BestGuessAnalyser {
         return SolrQueryUtil.getTermValues(request.getQuery(), taxFieldName);
     }
 
-    /**
-     * Get longest sequence among filtered entries.
-     *
-     * @param filteredEntries list of UniParcEntry with possible filtered best guess cross
-     *     references.
-     * @param databaseTypes database types that were filtered cross references
-     * @return UniParcEntry best guess
-     * @throws BestGuessAnalyserException if find more than one UniParcEntry with list the longest
-     *     sequence.
-     */
+
     private UniParcEntry getBestGuessUniParcEntry(
             List<UniParcEntry> filteredEntries, UniParcDatabase... databaseTypes) {
         UniParcEntry bestGuess = null;
@@ -168,12 +122,7 @@ class BestGuessAnalyser {
         return bestGuess;
     }
 
-    /**
-     * Build more than one best guess entry error message
-     *
-     * @param maxLengthBestGuessList list of UniParcEntry with with longest length
-     * @return error message
-     */
+
     private String getMoreThanOneBestGuessErrorMessage(List<UniParcEntry> maxLengthBestGuessList) {
         StringBuilder crossReferenceList = new StringBuilder("{");
         for (UniParcEntry entry : maxLengthBestGuessList) {
@@ -188,13 +137,6 @@ class BestGuessAnalyser {
                 "{list}", crossReferenceList.substring(0, crossReferenceList.length() - 1) + "}");
     }
 
-    /**
-     * Return filtered list of UniParcEntry for a specific database type
-     *
-     * @param maxLengthEntries list of UniParcEntry entries
-     * @param databaseType database type cross references
-     * @return filtered list of UniParcEntry with a specific cross reference database type.
-     */
     private List<UniParcEntry> getBestGuessByDatabase(
             List<UniParcEntry> maxLengthEntries, UniParcDatabase databaseType) {
         return maxLengthEntries.stream()
