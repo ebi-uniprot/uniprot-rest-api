@@ -152,7 +152,7 @@ public class UniParcCrossReferenceService {
                 && filterByStatus(xref, request.getActive());
     }
 
-    private boolean filterByDatabases(UniParcCrossReference xref, List<String> databases) {
+    public boolean filterByDatabases(UniParcCrossReference xref, List<String> databases) {
         if (Utils.nullOrEmpty(databases)) {
             return true;
         }
@@ -161,7 +161,7 @@ public class UniParcCrossReferenceService {
                 && databases.contains(xref.getDatabase().getDisplayName().toLowerCase());
     }
 
-    private boolean filterByTaxonomyIds(UniParcCrossReference xref, List<String> taxonomyIds) {
+    public boolean filterByTaxonomyIds(UniParcCrossReference xref, List<String> taxonomyIds) {
         if (Utils.nullOrEmpty(taxonomyIds)) {
             return true;
         }
@@ -170,14 +170,14 @@ public class UniParcCrossReferenceService {
                 && taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId()));
     }
 
-    private boolean filterByStatus(UniParcCrossReference xref, Boolean isActive) {
+    public boolean filterByStatus(UniParcCrossReference xref, Boolean isActive) {
         if (isActive == null) {
             return true;
         }
         return Objects.nonNull(xref.getDatabase()) && Objects.equals(isActive, xref.isActive());
     }
 
-    private List<String> csvToList(String csv) {
+    public List<String> csvToList(String csv) {
         List<String> list = new ArrayList<>();
         if (Utils.notNullNotEmpty(csv)) {
             list =

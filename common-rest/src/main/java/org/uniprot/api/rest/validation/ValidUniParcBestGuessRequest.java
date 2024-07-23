@@ -1,33 +1,40 @@
 package org.uniprot.api.rest.validation;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.uniprot.core.util.Utils;
-
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.uniprot.core.util.Utils;
+
 @Constraint(validatedBy = ValidUniParcBestGuessRequest.UniParcBestGuessRequestValidator.class)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUniParcBestGuessRequest {
-    String message() default "Invalid request: at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds' must be provided. If 'dbids' is provided, one of the other parameters must also be provided.";
+    String message() default
+            "Invalid request: at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds' must be provided. If 'dbids' is provided, one of the other parameters must also be provided.";
 
     String upis() default "upis";
+
     String accessions() default "accessions";
+
     String dbids() default "dbids";
+
     String genes() default "genes";
+
     String taxonIds() default "taxonIds";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    class UniParcBestGuessRequestValidator implements javax.validation.ConstraintValidator<ValidUniParcBestGuessRequest, Object> {
+    class UniParcBestGuessRequestValidator
+            implements javax.validation.ConstraintValidator<ValidUniParcBestGuessRequest, Object> {
         private String upis;
         private String accessions;
         private String dbids;
@@ -59,25 +66,35 @@ public @interface ValidUniParcBestGuessRequest {
                 boolean genesNotEmpty = !Utils.nullOrEmpty(genesValue);
                 boolean taxonIdsNotEmpty = !Utils.nullOrEmpty(taxonIdsValue);
 
-                if (upisNotEmpty || accessionsNotEmpty || dbidsNotEmpty || genesNotEmpty || taxonIdsNotEmpty) {
+                if (upisNotEmpty
+                        || accessionsNotEmpty
+                        || dbidsNotEmpty
+                        || genesNotEmpty
+                        || taxonIdsNotEmpty) {
                     if (dbidsNotEmpty) {
-                        isValid = upisNotEmpty || accessionsNotEmpty || genesNotEmpty || taxonIdsNotEmpty;
+                        isValid =
+                                upisNotEmpty
+                                        || accessionsNotEmpty
+                                        || genesNotEmpty
+                                        || taxonIdsNotEmpty;
                     }
                 } else {
                     isValid = false;
                 }
             } catch (Exception e) {
-                isValid=false;
+                isValid = false;
             }
-            if(!isValid){
-                buildErrorMessage(context, "Provide at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds'. 'dbids' alone is not allowed.");
+            if (!isValid) {
+                buildErrorMessage(
+                        context,
+                        "Provide at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds'. 'dbids' alone is not allowed.");
             }
             return isValid;
         }
+
         void buildErrorMessage(ConstraintValidatorContext context, String message) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(message)
-                    .addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
         }
     }
 }

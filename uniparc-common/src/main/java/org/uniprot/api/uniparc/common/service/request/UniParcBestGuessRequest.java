@@ -1,7 +1,12 @@
 package org.uniprot.api.uniparc.common.service.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
+import java.util.Arrays;
+import java.util.List;
+
+import javax.validation.constraints.Pattern;
+
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -10,11 +15,8 @@ import org.uniprot.api.rest.validation.ValidUniqueIdList;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.validation.constraints.Pattern;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
 
 /**
  * @author lgonzales
@@ -54,7 +56,7 @@ public class UniParcBestGuessRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
 
-    public String getQuery(){
+    public String getQuery() {
         StringBuilder qb = new StringBuilder();
         appendQuery(qb, "upi", this.upis);
         appendQuery(qb, "uniprotkb", this.accessions);
@@ -74,7 +76,7 @@ public class UniParcBestGuessRequest {
     }
 
     private List<String> csvToList(String csv) {
-        if(Utils.nullOrEmpty(csv)){
+        if (Utils.nullOrEmpty(csv)) {
             return List.of();
         }
         return Arrays.stream(csv.split(",")).map(String::trim).toList();

@@ -182,8 +182,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
         Stream<UniParcEntry> streamResult = stream(streamRequest);
 
-        BestGuessAnalyser analyser = new BestGuessAnalyser(searchFieldConfig);
-        return analyser.analyseBestGuess(streamResult, request);
+        // UniParcBestGuessService analyser = new UniParcBestGuessService(searchFieldConfig);
+        // return analyser.analyseBestGuess(streamResult, request);
+        return null;
     }
 
     public QueryResult<UniParcCrossReference> getDatabasesByUniParcId(

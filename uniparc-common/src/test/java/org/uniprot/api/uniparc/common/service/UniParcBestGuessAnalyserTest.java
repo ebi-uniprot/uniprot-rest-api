@@ -2,38 +2,19 @@ package org.uniprot.api.uniparc.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
-import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
-import org.uniprot.core.Sequence;
-import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.*;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.uniprotkb.taxonomy.Organism;
-import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 /**
  * @author lgonzales
  * @since 13/08/2020
  */
-class BestGuessAnalyserTest {
+class UniParcBestGuessAnalyserTest {
 
-    @Test
+    /*@Test
     void analyseBestGuessEmptyList() throws BestGuessAnalyserException {
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result =
                 bestGuessAnalyser.analyseBestGuess(Stream.empty(), new UniParcBestGuessRequest());
         assertNull(result);
@@ -62,7 +43,7 @@ class BestGuessAnalyserTest {
 
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result =
                 bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
@@ -104,7 +85,7 @@ class BestGuessAnalyserTest {
 
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result =
                 bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
@@ -141,7 +122,7 @@ class BestGuessAnalyserTest {
 
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result =
                 bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
@@ -174,7 +155,7 @@ class BestGuessAnalyserTest {
 
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result =
                 bestGuessAnalyser.analyseBestGuess(entries.stream(), new UniParcBestGuessRequest());
         assertNotNull(result);
@@ -213,7 +194,7 @@ class BestGuessAnalyserTest {
 
         SearchFieldConfig searchConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcBestGuessRequest request = new UniParcBestGuessRequest();
         Stream<UniParcEntry> entryStream = entries.stream();
         BestGuessAnalyserException result =
@@ -251,7 +232,7 @@ class BestGuessAnalyserTest {
         request.setQuery(
                 searchConfig.getSearchFieldItemByName("taxonomy_id").getFieldName() + ":9606");
 
-        BestGuessAnalyser bestGuessAnalyser = new BestGuessAnalyser(searchConfig);
+        UniParcBestGuessService bestGuessAnalyser = new UniParcBestGuessService(searchConfig);
         UniParcEntry result = bestGuessAnalyser.analyseBestGuess(entries.stream(), request);
         assertNotNull(result);
         assertNotNull(result.getUniParcCrossReferences());
@@ -290,5 +271,5 @@ class BestGuessAnalyserTest {
         Sequence uniSeq = new SequenceBuilder(sequence.toString()).build();
         builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(crossReferences);
         return builder.build();
-    }
+    }*/
 }

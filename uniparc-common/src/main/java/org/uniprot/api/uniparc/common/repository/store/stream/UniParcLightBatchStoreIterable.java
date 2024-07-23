@@ -1,7 +1,5 @@
 package org.uniprot.api.uniparc.common.repository.store.stream;
 
-import static org.uniprot.core.util.Utils.*;
-
 import java.util.Iterator;
 import java.util.List;
 

@@ -26,12 +26,16 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.uniparc.common.service.UniParcBestGuessService;
 import org.uniprot.api.uniparc.common.service.UniParcQueryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
@@ -54,11 +58,13 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     private static final String DATA_TYPE = "uniparc";
 
     private final UniParcQueryService queryService;
+    private final UniParcBestGuessService bestGuessService;
 
     @Autowired
     public UniParcController(
             ApplicationEventPublisher eventPublisher,
             UniParcQueryService queryService,
+            UniParcBestGuessService bestGuessService,
             MessageConverterContextFactory<UniParcEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
@@ -69,6 +75,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 UNIPARC,
                 downloadGatekeeper);
         this.queryService = queryService;
+        this.bestGuessService = bestGuessService;
     }
 
     @GetMapping(
@@ -280,7 +287,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @Valid @ModelAttribute UniParcBestGuessRequest bestGuessRequest,
             HttpServletRequest request) {
 
-        UniParcEntry bestGuess = queryService.getUniParcBestGuess(bestGuessRequest);
+        UniParcEntry bestGuess = bestGuessService.getUniParcBestGuess(bestGuessRequest);
 
         return super.getEntityResponse(bestGuess, bestGuessRequest.getFields(), request);
     }

@@ -340,14 +340,14 @@ class UniParcLightGetIdControllerIT {
                         content()
                                 .string(
                                         containsString(
-                                                "<?xml version='1.0' encoding='UTF-8'?>\n" +
-                                                        "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:embl-cds=\"http://purl.uniprot.org/embl-cds/\" xmlns:ensembl=\"http://rdf.ebi.ac.uk/resource/ensembl/\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:ssmRegion=\"http://purl.uniprot.org/signatureSequenceMatch/\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\">\n" +
-                                                        "<owl:Ontology rdf:about=\"\">\n" +
-                                                        "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n" +
-                                                        "</owl:Ontology>\n" +
-                                                        "    <sample>text</sample>\n" +
-                                                        "    <anotherSample>text2</anotherSample>\n" +
-                                                        "    <someMore>text3</someMore>\n" +
-                                                        "</rdf:RDF>")));
+                                                "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                        + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:embl-cds=\"http://purl.uniprot.org/embl-cds/\" xmlns:ensembl=\"http://rdf.ebi.ac.uk/resource/ensembl/\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:ssmRegion=\"http://purl.uniprot.org/signatureSequenceMatch/\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\">\n"
+                                                        + "<owl:Ontology rdf:about=\"\">\n"
+                                                        + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                                        + "</owl:Ontology>\n"
+                                                        + "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n"
+                                                        + "</rdf:RDF>")));
     }
 }

@@ -140,7 +140,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         return this.storeStreamer.streamEntries(idsInPage, storeRequest);
     }
 
-    protected StoreRequest getStoreRequest(BasicRequest request) {
+    public StoreRequest getStoreRequest(BasicRequest request) {
         return StoreRequest.builder().fields(request.getFields()).build();
     }
 
