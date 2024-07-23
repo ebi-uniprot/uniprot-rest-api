@@ -1,13 +1,13 @@
 package org.uniprot.api.support.data.configure.service;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.response.UniProtReturnField;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 
 class GeneCentricConfigureServiceTest {
 
