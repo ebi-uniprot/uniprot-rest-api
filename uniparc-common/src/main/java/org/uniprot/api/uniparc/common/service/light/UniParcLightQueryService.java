@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.common.service.light;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
+
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -35,8 +37,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
 
 @Service
 @Import(UniParcSolrQueryConfig.class)

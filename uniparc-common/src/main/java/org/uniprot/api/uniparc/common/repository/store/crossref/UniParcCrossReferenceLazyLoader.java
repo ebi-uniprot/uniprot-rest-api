@@ -6,8 +6,10 @@ import static org.uniprot.core.util.Utils.notNullNotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.ProteomeBuilder;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -87,7 +89,12 @@ public class UniParcCrossReferenceLazyLoader {
             }
             if (lazyFields.contains(LAZY_FIELD_LIST.get(4))
                     && notNullNotEmpty(xref.getProteomeId())) {
-                builder.proteomesAdd(xref.getProteomeId() + ":" + xref.getComponent());
+                Proteome proteome =
+                        new ProteomeBuilder()
+                                .id(xref.getProteomeId())
+                                .component(xref.getComponent())
+                                .build();
+                builder.proteomesAdd(proteome);
             }
         }
     }
