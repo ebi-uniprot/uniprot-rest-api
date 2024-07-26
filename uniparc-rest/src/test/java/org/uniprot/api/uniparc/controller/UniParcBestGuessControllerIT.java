@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
@@ -120,7 +121,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         .param("upis", "UPI0000183A11,UPI0000183A12");
 
         mockMvc.perform(requestBuilder)
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.uniParcId", is("UPI0000183A12")))
                 .andExpect(jsonPath("$.uniParcCrossReferences.size()", is(1)))

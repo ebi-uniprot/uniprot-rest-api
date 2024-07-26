@@ -2,9 +2,6 @@ package org.uniprot.api.uniparc.common.service.request;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.validation.constraints.Pattern;
 
 import org.springdoc.api.annotations.ParameterObject;
@@ -12,6 +9,7 @@ import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidUniParcBestGuessRequest;
 import org.uniprot.api.rest.validation.ValidUniqueIdList;
+import org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -71,14 +69,10 @@ public class UniParcBestGuessRequest {
             if (!qb.isEmpty()) {
                 qb.append(" AND ");
             }
-            qb.append(field).append(":(").append(String.join(" OR ", csvToList(csv))).append(")");
+            qb.append(field)
+                    .append(":(")
+                    .append(String.join(" OR ", UniParcServiceUtils.csvToList(csv)))
+                    .append(")");
         }
-    }
-
-    private List<String> csvToList(String csv) {
-        if (Utils.nullOrEmpty(csv)) {
-            return List.of();
-        }
-        return Arrays.stream(csv.split(",")).map(String::trim).toList();
     }
 }

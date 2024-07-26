@@ -1,18 +1,17 @@
 package org.uniprot.api.uniparc.common.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.*;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
-import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
@@ -28,10 +27,6 @@ public class UniParcBestGuessService {
             "More than one Best Guess found {list}. Review your query and/or contact us.";
     private final UniParcLightQueryService uniParcLightQueryService;
     private final UniParcCrossReferenceService uniParcCrossReferenceService;
-    private UniParcDatabaseFilter databaseFilter; // TODO remove
-
-    @Value("${voldemort.cross.reference.batchSize}")
-    private Integer crossRefStoreBatch;
 
     @Autowired
     public UniParcBestGuessService(
@@ -39,144 +34,221 @@ public class UniParcBestGuessService {
             UniParcCrossReferenceService uniParcCrossReferenceService) {
         this.uniParcLightQueryService = uniParcLightQueryService;
         this.uniParcCrossReferenceService = uniParcCrossReferenceService;
-        this.databaseFilter = new UniParcDatabaseFilter();
     }
 
     public UniParcEntry getUniParcBestGuess(UniParcBestGuessRequest request) {
         UniParcStreamRequest streamRequest = new UniParcStreamRequest();
         streamRequest.setQuery(request.getQuery());
         streamRequest.setFields(request.getFields());
-        Stream<UniParcEntryLight> streamResult =
+        Stream<UniParcEntryLight> uniParcLightEntriesStream =
                 this.uniParcLightQueryService.stream(streamRequest);
-        return analyseBestGuess(streamResult, request);
+        return analyseBestGuess(uniParcLightEntriesStream, request);
     }
 
-    private UniParcEntry analyseBestGuess(
-            Stream<UniParcEntryLight> queryResult, UniParcBestGuessRequest request) {
+    UniParcEntry analyseBestGuess(
+            Stream<UniParcEntryLight> uniParcLightEntriesStream, UniParcBestGuessRequest request) {
         // First Search for DatabaseType.SWISSPROT or DatabaseType.SWISSPROT_VARSPLIC (isoforms)
-        List<UniParcEntry> resultList = getFilteredUniParcEntries(queryResult, request);
+        // UniParcId and corresponding cross-references after applying DB filters
+        List<UniParcEntryLight> uniParcLightEntries = uniParcLightEntriesStream.toList();
+        // Map<String, List<UniParcCrossReference>>
+        var uniParcIdCrossReferencesMap =
+                getUniParcIdCrossReferencesMap(uniParcLightEntries, request);
         UniParcEntry bestGuess =
                 getBestGuessUniParcEntry(
-                        resultList, UniParcDatabase.SWISSPROT, UniParcDatabase.SWISSPROT_VARSPLIC);
-        if (bestGuess == null) {
-            // if does not find, then search for DatabaseType.TREMBL
-            bestGuess = getBestGuessUniParcEntry(resultList, UniParcDatabase.TREMBL);
+                        uniParcLightEntries,
+                        uniParcIdCrossReferencesMap,
+                        UniParcDatabase.SWISSPROT,
+                        UniParcDatabase.SWISSPROT_VARSPLIC);
+        if (Objects.isNull(bestGuess)) {
+            bestGuess =
+                    getBestGuessUniParcEntry(
+                            uniParcLightEntries,
+                            uniParcIdCrossReferencesMap,
+                            UniParcDatabase.TREMBL);
         }
         return bestGuess;
     }
 
-    private List<UniParcEntry> getFilteredUniParcEntries(
-            Stream<UniParcEntryLight> lightEntriesStream, UniParcBestGuessRequest request) {
+    Map<String, List<UniParcCrossReference>> getUniParcIdCrossReferencesMap(
+            List<UniParcEntryLight> uniParcLightEntries, UniParcBestGuessRequest request) {
         List<String> databases = new ArrayList<>();
         databases.add(UniParcDatabase.SWISSPROT.getDisplayName().toLowerCase());
         databases.add(UniParcDatabase.SWISSPROT_VARSPLIC.getDisplayName().toLowerCase());
         databases.add(UniParcDatabase.TREMBL.getDisplayName().toLowerCase());
-        List<String> taxonomyIds = uniParcCrossReferenceService.csvToList(request.getTaxonIds());
-        return lightEntriesStream
-                .map(lightEntry -> convertToUniParcEntry(lightEntry, databases, taxonomyIds))
-                .toList();
+        List<String> taxonomyIds = csvToList(request.getTaxonIds());
+        return uniParcLightEntries.stream()
+                .collect(
+                        Collectors.toMap(
+                                UniParcEntryLight::getUniParcId,
+                                lightEntry ->
+                                        filterCrossReference(lightEntry, databases, taxonomyIds),
+                                (existing, replacement) -> replacement));
     }
 
-    private UniParcEntry convertToUniParcEntry(
+    private List<UniParcCrossReference> filterCrossReference(
             UniParcEntryLight uniParcEntryLight, List<String> databases, List<String> taxonomyIds) {
+        // we have just ids
         List<String> xrefIds = uniParcEntryLight.getUniParcCrossReferences();
+
         List<UniParcCrossReference> filteredCrossReferences = new ArrayList<>();
         Stream<UniParcCrossReference> batchStream =
-                uniParcCrossReferenceService.getCrossReferences(xrefIds);
+                this.uniParcCrossReferenceService.getCrossReferences(xrefIds);
         batchStream
                 .filter(xref -> filterCrossReference(xref, databases, taxonomyIds))
                 .forEach(filteredCrossReferences::add);
-        // convert into full uniparc entry
-        UniParcEntryBuilder builder = new UniParcEntryBuilder();
-        builder.uniParcId(uniParcEntryLight.getUniParcId())
-                .sequence(uniParcEntryLight.getSequence());
-        builder.sequenceFeaturesSet(uniParcEntryLight.getSequenceFeatures());
-        builder.uniParcCrossReferencesSet(filteredCrossReferences);
-        return builder.build();
+        return filteredCrossReferences;
     }
 
     private boolean filterCrossReference(
             UniParcCrossReference xref, List<String> databases, List<String> taxonomyIds) {
-        return uniParcCrossReferenceService.filterByDatabases(xref, databases)
-                && uniParcCrossReferenceService.filterByTaxonomyIds(xref, taxonomyIds)
-                && uniParcCrossReferenceService.filterByStatus(xref, true);
+        return UniParcServiceUtils.filterByDatabases(xref, databases)
+                && filterByTaxonomyIds(xref, taxonomyIds)
+                && filterByStatus(xref, true);
     }
 
     private UniParcEntry getBestGuessUniParcEntry(
-            List<UniParcEntry> filteredEntries, UniParcDatabase... databaseTypes) {
+            List<UniParcEntryLight> uniParcLightEntries,
+            Map<String, List<UniParcCrossReference>> uniParcIdCrossReferencesMap,
+            UniParcDatabase... databaseTypes)
+            throws BestGuessAnalyserException {
         UniParcEntry bestGuess = null;
-
-        if (!filteredEntries.isEmpty()) {
-            List<String> databases =
-                    Arrays.stream(databaseTypes)
-                            .map(UniParcDatabase::getDisplayName)
-                            .map(String::toLowerCase)
-                            .collect(Collectors.toList());
-
+        if (!uniParcLightEntries.isEmpty()) {
+            List<String> databases = getDatabaseNames(databaseTypes);
             // Get longest sequence among filtered entries.
-            int maxLength =
-                    filteredEntries.stream()
-                            .mapToInt(entry -> entry.getSequence().getLength())
-                            .max()
-                            .orElse(0);
+            int maxLength = getMaxSequenceLength(uniParcLightEntries);
+            // Get UniParcEntry with the longest sequence and its cross references, we might have
+            // more than one entry.
+            Map<UniParcEntryLight, List<UniParcCrossReference>> maxLengthEntriesMap =
+                    createMaxLengthUniParcCrossReferenceMap(
+                            uniParcLightEntries, uniParcIdCrossReferencesMap, maxLength, databases);
 
-            // Get list of UniParcEntry with the longest sequence, we might have more than one
-            // entry.
-            List<UniParcEntry> maxLengthEntries =
-                    filteredEntries.stream()
-                            .filter(entry -> entry.getSequence().getLength() == maxLength)
-                            .map(uniParcEntry -> this.databaseFilter.apply(uniParcEntry, databases))
-                            .collect(Collectors.toList());
+            // Now we need to iterate over databaseType (parameter order defines database priority).
+            bestGuess = getBestGuessUniParcEntry(databaseTypes, maxLengthEntriesMap, bestGuess);
+        }
+        return bestGuess;
+    }
 
-            // Now we need to iterate over databaseType (parameter order define database priority).
-            for (UniParcDatabase dbType : databaseTypes) {
-                List<UniParcEntry> maxLengthBestGuessList =
-                        getBestGuessByDatabase(maxLengthEntries, dbType);
-                if (!maxLengthBestGuessList.isEmpty()) {
-                    if (maxLengthBestGuessList.size() == 1) {
-                        // Now we make sure that we found just one best guess for the specific
-                        // database
-                        bestGuess = maxLengthBestGuessList.get(0);
-                        break;
-                    } else {
-                        // if there is more than one best guess entry for the same database we throw
-                        // an exception
-                        String errorMessage =
-                                getMoreThanOneBestGuessErrorMessage(maxLengthBestGuessList);
-                        throw new BestGuessAnalyserException(errorMessage);
-                    }
+    private UniParcEntry getBestGuessUniParcEntry(
+            UniParcDatabase[] databaseTypes,
+            Map<UniParcEntryLight, List<UniParcCrossReference>> maxLengthEntriesMap,
+            UniParcEntry bestGuess) {
+        for (UniParcDatabase dbType : databaseTypes) {
+            Map<UniParcEntryLight, List<UniParcCrossReference>> maxLengthBestGuessMap =
+                    getBestGuessByDatabase(maxLengthEntriesMap, dbType);
+            if (!maxLengthBestGuessMap.isEmpty()) {
+                if (maxLengthBestGuessMap.size() == 1) {
+                    // Now we make sure that we found just one best guess for the specific
+                    // database
+                    var entry = maxLengthBestGuessMap.entrySet().iterator().next();
+                    bestGuess = convertToUniParcEntry(entry.getKey(), entry.getValue());
+                    break;
+                } else {
+                    // if there is more than one best guess entry for the same database we throw
+                    // an exception
+                    String errorMessage =
+                            getMoreThanOneBestGuessErrorMessage(maxLengthBestGuessMap);
+                    throw new BestGuessAnalyserException(errorMessage);
                 }
             }
         }
         return bestGuess;
     }
 
-    private String getMoreThanOneBestGuessErrorMessage(List<UniParcEntry> maxLengthBestGuessList) {
+    private LinkedHashMap<UniParcEntryLight, List<UniParcCrossReference>>
+            createMaxLengthUniParcCrossReferenceMap(
+                    List<UniParcEntryLight> uniParcLightEntries,
+                    Map<String, List<UniParcCrossReference>> uniParcIdCrossReferencesMap,
+                    int maxLength,
+                    List<String> databases) {
+        return uniParcLightEntries.stream()
+                .filter(entry -> entry.getSequence().getLength() == maxLength)
+                .collect(
+                        Collectors.toMap(
+                                entry -> entry,
+                                entry ->
+                                        filterByDatabases(
+                                                uniParcIdCrossReferencesMap, entry, databases),
+                                (oldEntry, newEntry) -> newEntry,
+                                LinkedHashMap::new));
+    }
+
+    private List<UniParcCrossReference> filterByDatabases(
+            Map<String, List<UniParcCrossReference>> uniParcIdCrossReferencesMap,
+            UniParcEntryLight entry,
+            List<String> databases) {
+        return uniParcIdCrossReferencesMap.get(entry.getUniParcId()).stream()
+                .filter(xref -> Objects.nonNull(xref.getDatabase()))
+                .filter(
+                        xref ->
+                                databases.contains(
+                                        xref.getDatabase().getDisplayName().toLowerCase()))
+                .toList();
+    }
+
+    private int getMaxSequenceLength(List<UniParcEntryLight> uniParcLightEntries) {
+        return uniParcLightEntries.stream()
+                .mapToInt(entry -> entry.getSequence().getLength())
+                .max()
+                .orElse(0);
+    }
+
+    private List<String> getDatabaseNames(UniParcDatabase[] databaseTypes) {
+        return Arrays.stream(databaseTypes)
+                .map(UniParcDatabase::getDisplayName)
+                .map(String::toLowerCase)
+                .toList();
+    }
+
+    private Map<UniParcEntryLight, List<UniParcCrossReference>> getBestGuessByDatabase(
+            Map<UniParcEntryLight, List<UniParcCrossReference>> maxLengthEntriesMap,
+            UniParcDatabase databaseType) {
+
+        Map<UniParcEntryLight, List<UniParcCrossReference>> filteredMaxEntriesMap = new HashMap<>();
+
+        for (Map.Entry<UniParcEntryLight, List<UniParcCrossReference>> entry :
+                maxLengthEntriesMap.entrySet()) {
+            List<UniParcCrossReference> filteredCrossReferences = new ArrayList<>();
+            for (UniParcCrossReference crossReference : entry.getValue()) {
+                if (!filteredCrossReferences.isEmpty()) {
+                    filteredCrossReferences.add(crossReference);
+                }
+
+                if (crossReference.getDatabase().equals(databaseType)) {
+                    filteredCrossReferences.add(crossReference);
+                }
+            }
+            if (!filteredCrossReferences.isEmpty()) {
+                filteredMaxEntriesMap.put(entry.getKey(), filteredCrossReferences);
+            }
+        }
+
+        return filteredMaxEntriesMap;
+    }
+
+    private UniParcEntry convertToUniParcEntry(
+            UniParcEntryLight uniParcEntryLight, List<UniParcCrossReference> crossReferences) {
+        // convert into full uniparc entry
+        UniParcEntryBuilder builder = new UniParcEntryBuilder();
+        builder.uniParcId(uniParcEntryLight.getUniParcId())
+                .sequence(uniParcEntryLight.getSequence());
+        builder.sequenceFeaturesSet(uniParcEntryLight.getSequenceFeatures());
+        builder.uniParcCrossReferencesSet(crossReferences);
+        return builder.build();
+    }
+
+    private String getMoreThanOneBestGuessErrorMessage(
+            Map<UniParcEntryLight, List<UniParcCrossReference>> maxLengthBestGuessMap) {
         StringBuilder crossReferenceList = new StringBuilder("{");
-        for (UniParcEntry entry : maxLengthBestGuessList) {
-            crossReferenceList.append(entry.getUniParcId().getValue()).append(":");
+        for (Map.Entry<UniParcEntryLight, List<UniParcCrossReference>> entry :
+                maxLengthBestGuessMap.entrySet()) {
+            crossReferenceList.append(entry.getKey().getUniParcId()).append(":");
             crossReferenceList.append(
-                    entry.getUniParcCrossReferences().stream()
+                    entry.getValue().stream()
                             .map(UniParcCrossReference::getId)
                             .collect(Collectors.joining(",")));
             crossReferenceList.append(";");
         }
         return MORE_THAN_ONE_BEST_GUESS_FOUND.replace(
                 "{list}", crossReferenceList.substring(0, crossReferenceList.length() - 1) + "}");
-    }
-
-    private List<UniParcEntry> getBestGuessByDatabase(
-            List<UniParcEntry> maxLengthEntries, UniParcDatabase databaseType) {
-        return maxLengthEntries.stream()
-                .filter(
-                        uniParcEntry ->
-                                uniParcEntry.getUniParcCrossReferences().stream()
-                                        .anyMatch(
-                                                crossReference ->
-                                                        crossReference != null
-                                                                && crossReference
-                                                                        .getDatabase()
-                                                                        .equals(databaseType)))
-                .toList();
     }
 }

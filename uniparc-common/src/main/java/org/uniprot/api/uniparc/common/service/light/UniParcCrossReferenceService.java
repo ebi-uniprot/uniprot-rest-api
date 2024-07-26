@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.common.service.light;
 
+import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.*;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
@@ -86,7 +88,8 @@ public class UniParcCrossReferenceService {
         } else {
             if (Utils.notNullNotEmpty(request.getDbTypes())) { // filter by db type only
                 // each xref id <uniparcId>-<dbType>-<dbId>-<n>
-                List<String> dbTypes = csvToList(request.getDbTypes());
+                List<String> dbTypes =
+                        csvToList(request.getDbTypes()).stream().map(String::toLowerCase).toList();
                 List<String> filteredXrefIds =
                         xrefIds.stream().filter(id -> filterXrefIdByDbTypes(id, dbTypes)).toList();
                 page = CursorPage.of(request.getCursor(), pageSize, filteredXrefIds.size());
@@ -145,48 +148,13 @@ public class UniParcCrossReferenceService {
 
     private boolean filterCrossReference(
             UniParcCrossReference xref, UniParcDatabasesRequest request) {
-        List<String> databases = csvToList(request.getDbTypes());
+        List<String> databases =
+                csvToList(request.getDbTypes()).stream().map(String::toLowerCase).toList();
+        ;
         List<String> taxonomyIds = csvToList(request.getTaxonIds());
         return filterByDatabases(xref, databases)
                 && filterByTaxonomyIds(xref, taxonomyIds)
                 && filterByStatus(xref, request.getActive());
-    }
-
-    public boolean filterByDatabases(UniParcCrossReference xref, List<String> databases) {
-        if (Utils.nullOrEmpty(databases)) {
-            return true;
-        }
-
-        return Objects.nonNull(xref.getDatabase())
-                && databases.contains(xref.getDatabase().getDisplayName().toLowerCase());
-    }
-
-    public boolean filterByTaxonomyIds(UniParcCrossReference xref, List<String> taxonomyIds) {
-        if (Utils.nullOrEmpty(taxonomyIds)) {
-            return true;
-        }
-
-        return Objects.nonNull(xref.getOrganism())
-                && taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId()));
-    }
-
-    public boolean filterByStatus(UniParcCrossReference xref, Boolean isActive) {
-        if (isActive == null) {
-            return true;
-        }
-        return Objects.nonNull(xref.getDatabase()) && Objects.equals(isActive, xref.isActive());
-    }
-
-    public List<String> csvToList(String csv) {
-        List<String> list = new ArrayList<>();
-        if (Utils.notNullNotEmpty(csv)) {
-            list =
-                    Arrays.stream(csv.split(","))
-                            .map(String::trim)
-                            .map(String::toLowerCase)
-                            .toList();
-        }
-        return list;
     }
 
     private int getDefaultPageSize() {
