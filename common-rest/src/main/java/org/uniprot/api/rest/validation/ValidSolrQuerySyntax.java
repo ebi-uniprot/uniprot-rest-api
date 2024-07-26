@@ -74,7 +74,7 @@ public @interface ValidSolrQuerySyntax {
             } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
-                    if (isValidWildcardQuery(clause.getQuery())) {
+                    if (!isValidWildcardQuery(clause.getQuery())) {
                         isValid = false;
                     }
                 }

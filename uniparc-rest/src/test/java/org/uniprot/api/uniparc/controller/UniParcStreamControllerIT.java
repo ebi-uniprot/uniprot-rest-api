@@ -18,6 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getUniParcXRefId;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,21 +56,29 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RdfPrologs;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.cv.taxonomy.TaxonomicNode;
+import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.util.TaxonomyRepoUtil;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 import lombok.extern.slf4j.Slf4j;
+import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
 /**
  * @author lgonzales
@@ -86,10 +96,10 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
-    private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
+    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
-    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> storeClient;
+    @Autowired private UniParcCrossReferenceStoreClient xRefStoreClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
 
@@ -374,11 +384,31 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
     private void saveEntry(int i) throws Exception {
         UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-        UniParcDocument doc = documentConverter.convert(xmlEntry);
+        UniParcDocumentConverter documentConverter = new UniParcDocumentConverter();
+        UniParcDocument doc = documentConverter.convert(entry);
+        UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
+        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
+            if (Utils.notNull(xref.getOrganism())) {
+                List<TaxonomicNode> nodes =
+                        TaxonomyRepoUtil.getTaxonomyLineage(
+                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
+                builder.organismId((int) xref.getOrganism().getTaxonId());
+                nodes.forEach(
+                        node -> {
+                            builder.taxLineageId(node.id());
+                            List<String> names = TaxonomyRepoUtil.extractTaxonFromNode(node);
+                            names.forEach(builder::organismTaxon);
+                        });
+            }
+        }
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(entry);
+
+        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
+        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
+            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
+            xRefStoreClient.saveEntry(key, xref);
+        }
+        storeClient.saveEntry(entryLight);
     }
 
     private Stream<Arguments> getAllSortFields() {

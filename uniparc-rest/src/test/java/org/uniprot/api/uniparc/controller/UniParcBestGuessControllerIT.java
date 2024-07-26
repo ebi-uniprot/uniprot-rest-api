@@ -355,6 +355,11 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 
+    private UniParcEntryLight createEntryLight(
+            String upi0000183A13, int i, List<UniParcCrossReference> crossReferences) {
+        return null;
+    }
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniparc);

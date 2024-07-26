@@ -475,7 +475,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
             return SearchParameter.builder()
                     .queryParam(
                             "query",
-                            Collections.singletonList(
+                            List.of(
                                     "upi:INVALID OR taxonomy_id:INVALID "
                                             + "OR length:INVALID OR upid:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
@@ -570,26 +570,6 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    XML_DECLARATION
-                                                                            + UNIPARC_XML_SCHEMA)))
-                                    .resultMatcher(
-                                            content().string(containsString("UPI0000083A11")))
-                                    .resultMatcher(
-                                            content().string(containsString("UPI0000083A20")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            endsWith(
-                                                                    COPYRIGHT_TAG
-                                                                            + UNIPARC_XML_CLOSE_TAG)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().string(containsString("UPI0000083A11")))
@@ -644,15 +624,6 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

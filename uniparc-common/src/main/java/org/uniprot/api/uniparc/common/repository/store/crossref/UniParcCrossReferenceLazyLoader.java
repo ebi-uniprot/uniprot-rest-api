@@ -9,7 +9,6 @@ import java.util.List;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
-import org.uniprot.core.util.PairImpl;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -76,10 +75,7 @@ public class UniParcCrossReferenceLazyLoader {
             if ((lazyFields.contains(LAZY_FIELD_LIST.get(0))
                             || lazyFields.contains(LAZY_FIELD_LIST.get(1)))
                     && notNull(xref.getOrganism())) {
-                builder.organismsAdd(
-                        new PairImpl<>(
-                                (int) xref.getOrganism().getTaxonId(),
-                                xref.getOrganism().getScientificName()));
+                builder.organismsAdd(xref.getOrganism());
             }
             if (lazyFields.contains(LAZY_FIELD_LIST.get(2))
                     && notNullNotEmpty(xref.getProteinName())) {
@@ -91,7 +87,7 @@ public class UniParcCrossReferenceLazyLoader {
             }
             if (lazyFields.contains(LAZY_FIELD_LIST.get(4))
                     && notNullNotEmpty(xref.getProteomeId())) {
-                builder.proteomeIdsAdd(xref.getProteomeId());
+                builder.proteomesAdd(xref.getProteomeId() + ":" + xref.getComponent());
             }
         }
     }

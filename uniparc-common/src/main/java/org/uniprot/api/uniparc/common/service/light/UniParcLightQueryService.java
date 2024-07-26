@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.common.service.light;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,17 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
+import org.uniprot.api.uniparc.common.service.request.UniParcBasicRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -32,12 +36,16 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
+
 @Service
 @Import(UniParcSolrQueryConfig.class)
 public class UniParcLightQueryService
         extends StoreStreamerSearchService<UniParcDocument, UniParcEntryLight> {
 
     public static final String UNIPARC_ID_FIELD = "upi";
+
+    private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
     private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader;
@@ -129,6 +137,22 @@ public class UniParcLightQueryService
                                             entry, lazyFields));
         }
         return result;
+    }
+
+    @Override
+    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
+            BasicRequest request,
+            AbstractSolrSortClause solrSortClause,
+            SolrQueryConfig queryBoosts) {
+        if (request instanceof UniParcBasicRequest uniParcBasicRequest) {
+            String cleanQuery =
+                    CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+            if (UNIPARC_UPI_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
+                uniParcBasicRequest.setQuery(cleanQuery.toUpperCase());
+            }
+            return super.createSolrRequestBuilder(uniParcBasicRequest, solrSortClause, queryBoosts);
+        }
+        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
     @Override
