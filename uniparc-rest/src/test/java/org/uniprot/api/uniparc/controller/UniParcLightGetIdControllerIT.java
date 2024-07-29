@@ -7,11 +7,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
 import java.util.List;
@@ -63,7 +62,6 @@ class UniParcLightGetIdControllerIT {
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
     private static final String UPI_PREF = "UPI0000083D";
     public static final String UNIPARC_ID = "UPI0000083D01";
-    public static final String UPI_PARAM = "upi";
 
     @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
@@ -147,7 +145,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
@@ -160,9 +158,9 @@ class UniParcLightGetIdControllerIT {
                                         "UPI0000083D01-REFSEQ-WP_168893201")))
                 .andExpect(
                         jsonPath(
-                                "$.commonTaxons[*].key",
+                                "$.commonTaxons[*].topLevel",
                                 contains("cellular organisms", "other entries")))
-                .andExpect(jsonPath("$.commonTaxons[*].value", contains("Bacteria", "plasmids")))
+                .andExpect(jsonPath("$.commonTaxons[*].commonTaxon", contains("Bacteria", "plasmids")))
                 .andExpect(jsonPath("$.uniProtKBAccessions", contains("P10001", "P12301")))
                 .andExpect(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
                 .andExpect(jsonPath("$.sequenceFeatures.size()", is(12)));
@@ -177,7 +175,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.size()", is(1)))
@@ -197,7 +195,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -215,7 +213,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
@@ -243,7 +241,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -264,7 +262,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -284,7 +282,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -312,7 +310,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
@@ -330,7 +328,7 @@ class UniParcLightGetIdControllerIT {
         ResultActions response = mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
