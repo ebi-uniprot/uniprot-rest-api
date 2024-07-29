@@ -67,6 +67,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
     private final UniParcLightStoreClient uniParcLightStoreClient;
     private final UniParcCrossReferenceService uniParcCrossReferenceService;
+    private final RdfStreamer rdfStreamer;
 
     @Autowired
     public UniParcQueryService(
@@ -99,6 +100,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.entryConverter = uniParcQueryResultConverter;
         this.uniParcLightStoreClient = uniParcLightStoreClient;
         this.uniParcCrossReferenceService = uniParcCrossReferenceService;
+        this.rdfStreamer = uniParcRdfStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest uniParcIdRequest) {
@@ -146,6 +148,11 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 .page(results.getPage())
                 .facets(results.getFacets())
                 .build();
+    }
+
+    @Override
+    protected RdfStreamer getRdfStreamer() {
+        return this.rdfStreamer;
     }
 
     @Override

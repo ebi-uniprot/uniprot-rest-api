@@ -160,7 +160,8 @@ class UniParcLightGetIdControllerIT {
                         jsonPath(
                                 "$.commonTaxons[*].topLevel",
                                 contains("cellular organisms", "other entries")))
-                .andExpect(jsonPath("$.commonTaxons[*].commonTaxon", contains("Bacteria", "plasmids")))
+                .andExpect(
+                        jsonPath("$.commonTaxons[*].commonTaxon", contains("Bacteria", "plasmids")))
                 .andExpect(jsonPath("$.uniProtKBAccessions", contains("P10001", "P12301")))
                 .andExpect(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
                 .andExpect(jsonPath("$.sequenceFeatures.size()", is(12)));
