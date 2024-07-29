@@ -18,8 +18,10 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreStreamer;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.search.SolrCollection;
@@ -79,8 +81,10 @@ public class UniParcStreamConfig {
 
     @Bean
     public StoreStreamer<UniParcEntryLight> uniParcEntryLightStoreStreamer(
-            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig) {
-        return new StoreStreamer<>(storeLightStreamerConfig);
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,
+            UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
+        return new UniParcLightStoreStreamer(
+                storeLightStreamerConfig, uniParcCrossReferenceLazyLoader);
     }
 
     @Bean
@@ -114,7 +118,7 @@ public class UniParcStreamConfig {
 
     @Bean
     public FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())

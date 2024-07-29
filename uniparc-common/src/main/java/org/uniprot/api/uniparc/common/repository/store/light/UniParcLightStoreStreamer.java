@@ -6,21 +6,16 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.repository.store.stream.UniParcLightBatchStoreIterable;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 public class UniParcLightStoreStreamer extends StoreStreamer<UniParcEntryLight> {
-
-    private final StoreStreamerConfig<UniParcCrossReference> crossRefenceConfig;
 
     private final UniParcCrossReferenceLazyLoader lazyLoader;
 
     public UniParcLightStoreStreamer(
             StoreStreamerConfig<UniParcEntryLight> config,
-            StoreStreamerConfig<UniParcCrossReference> crossReferenceConfig,
             UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
         super(config);
-        this.crossRefenceConfig = crossReferenceConfig;
         this.lazyLoader = uniParcCrossReferenceLazyLoader;
     }
 

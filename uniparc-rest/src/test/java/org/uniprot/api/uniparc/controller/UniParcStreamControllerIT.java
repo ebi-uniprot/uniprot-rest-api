@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -320,7 +321,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -329,11 +330,11 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.geneName",
+                                "$.results.*.geneNames.*",
                                 containsInAnyOrder("geneName05", "geneName06")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.organism.taxonId",
+                                "$.results.*.organisms.*.taxonId",
                                 containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
