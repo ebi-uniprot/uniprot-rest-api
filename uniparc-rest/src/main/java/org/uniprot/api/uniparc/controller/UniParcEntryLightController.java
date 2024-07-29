@@ -4,8 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
 
@@ -28,10 +27,15 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.store.config.UniProtDataType;
@@ -234,6 +238,205 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         }
     }
 
+    @GetMapping(
+            value = "/dbreference/{dbId}",
+            produces = {
+                APPLICATION_JSON_VALUE,
+                APPLICATION_XML_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = DBID_UNIPARC_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntryLight
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntryLight>> searchByDBRefId(
+            @Valid @ModelAttribute UniParcGetByDBRefIdRequest getByDbIdRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntryLight> results = queryService.searchByFieldId(getByDbIdRequest);
+
+        return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/proteome/{upId}",
+            produces = {
+                APPLICATION_JSON_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = PROTEOME_UPID_UNIPARC_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntryLight
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntryLight>> searchByProteomeId(
+            @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntryLight> results = queryService.searchByFieldId(getByUpIdRequest);
+
+        return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
+    }
+
+    @SuppressWarnings("squid:S3752")
+    @RequestMapping(
+            value = "/upis",
+            method = {RequestMethod.GET},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = IDS_UNIPARC_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntryLight
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            org.uniprot.core.xml
+                                                                                    .jaxb.uniparc
+                                                                                    .Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpisGet(
+            @Valid @ModelAttribute UniParcIdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return getByUpis(idsSearchRequest, request, response);
+    }
+
+    @SuppressWarnings("squid:S3752")
+    @RequestMapping(
+            value = "/upis",
+            method = {RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = IDS_UNIPARC_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntryLight
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            org.uniprot.core.xml
+                                                                                    .jaxb.uniparc
+                                                                                    .Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpisPost(
+            @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
+                    UniParcIdsPostRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return getByUpis(idsSearchRequest, request, response);
+    }
+
     @Override
     protected String getEntityId(UniParcEntryLight entity) {
         return entity.getUniParcId();
@@ -249,5 +452,19 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
+    }
+
+    private ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpis(
+            IdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
     }
 }

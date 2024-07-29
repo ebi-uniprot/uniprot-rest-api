@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
+import java.util.List;
+
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
@@ -9,8 +11,6 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.util.TaxonomyRepoUtil;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
-
-import java.util.List;
 
 public class UniParcITUtils {
 
@@ -37,6 +37,4 @@ public class UniParcITUtils {
         }
         return builder;
     }
-
-
 }

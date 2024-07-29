@@ -27,6 +27,7 @@ import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.request.UniParcBasicRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -52,6 +53,8 @@ public class UniParcLightQueryService
 
     private final SolrQueryConfig solrQueryConfig;
     private final RdfStreamer rdfStreamer;
+    private final UniParcQueryRepository repository;
+    private final UniParcLightQueryResultConverter uniParcLightQueryResultConverter;
 
     @Autowired
     public UniParcLightQueryService(
@@ -82,6 +85,8 @@ public class UniParcLightQueryService
         this.uniParcCrossReferenceLazyLoader = uniParcCrossReferenceLazyLoader;
         this.solrQueryConfig = uniParcSolrQueryConf;
         this.rdfStreamer = uniParcRdfStreamer;
+        this.repository = repository;
+        this.uniParcLightQueryResultConverter = uniParcLightQueryResultConverter;
     }
 
     @Override
@@ -166,5 +171,10 @@ public class UniParcLightQueryService
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
+    }
+
+    public QueryResult<UniParcEntryLight> searchByFieldId(
+            UniParcGetByIdPageSearchRequest searchRequest) {
+        return super.search(searchRequest);
     }
 }

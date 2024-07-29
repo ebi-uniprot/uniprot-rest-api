@@ -3,7 +3,6 @@ package org.uniprot.api.uniparc.common.repository;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -63,7 +63,9 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         // when
         String upid = "UP123456701";
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid));
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                                .param("fields", "proteome,fullSequence,fullsequencefeatures"));
 
         // then
         response.andDo(log())
@@ -91,9 +93,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath("$.results[0].uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(
                         jsonPath("$.results[0].uniParcCrossReferences[*].taxonomy", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].proteomeId", hasItem(upid)))
+                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.value", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.length", notNullValue()))
@@ -134,10 +134,11 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         ResultActions response =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                                .param("fields", "proteome")
                                 .param("size", String.valueOf(size)));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -151,22 +152,20 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C01", "UPI0000083C02")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].proteomeId",
-                                hasItem(upid)));
+                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
 
         String cursor1 = extractCursor(response);
         // when get second page
         ResultActions responsePage2 =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                                .param("fields", "proteome")
                                 .param("size", String.valueOf(size))
                                 .param("cursor", cursor1));
 
         // then verify second page
         responsePage2
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -180,10 +179,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C03", "UPI0000083C04")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].proteomeId",
-                                hasItem(upid)));
+                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
 
         String cursor2 = extractCursor(responsePage2);
 
@@ -191,6 +187,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         ResultActions responsePage3 =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                                .param("fields", "proteome")
                                 .param("size", String.valueOf(size))
                                 .param("cursor", cursor2));
 
@@ -205,10 +202,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].uniParcCrossReferences[*].proteomeId",
-                                hasItem(upid)));
+                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
     }
 
     @Test

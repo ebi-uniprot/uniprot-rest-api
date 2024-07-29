@@ -102,7 +102,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest uniParcIdRequest) {
-        UniParcEntry uniParcEntry = createUniParcEntry(uniParcIdRequest.getUpi());
+        UniParcEntry uniParcEntry = getUniParcEntry(uniParcIdRequest.getUpi());
 
         return filterUniParcStream(Stream.of(uniParcEntry), uniParcIdRequest)
                 .findFirst()
@@ -111,7 +111,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
         String uniParcId = searchUniParcId(ACCESSION_FIELD, getByAccessionRequest.getAccession());
-        UniParcEntry uniParcEntry = createUniParcEntry(uniParcId);
+        UniParcEntry uniParcEntry = getUniParcEntry(uniParcId);
 
         return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
                 .findFirst()
@@ -122,7 +122,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
         String uniParcId = searchUniParcId(CHECKSUM_STR, md5Value);
-        UniParcEntry uniParcEntry = createUniParcEntry(uniParcId);
+        UniParcEntry uniParcEntry = getUniParcEntry(uniParcId);
 
         return filterUniParcStream(Stream.of(uniParcEntry), sequenceRequest)
                 .findFirst()
@@ -230,7 +230,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
-    private UniParcEntry createUniParcEntry(String uniParcId) {
+    private UniParcEntry getUniParcEntry(String uniParcId) {
         Optional<UniParcEntryLight> optLightEntry =
                 this.uniParcLightStoreClient.getEntry(uniParcId);
         if (optLightEntry.isEmpty()) {
