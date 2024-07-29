@@ -6,7 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniparc.controller.UniParcITUtils.*;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
 import java.util.*;
@@ -49,19 +49,13 @@ import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.util.Utils;
-import org.uniprot.cv.taxonomy.TaxonomicNode;
-import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.util.TaxonomyRepoUtil;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
 /**
  * @author jluo
@@ -87,8 +81,6 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
-
-    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
     private UniParcLightStoreClient storeClient;
 
@@ -374,24 +366,8 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     }
 
     private void saveEntry(UniParcEntry entry) {
-        UniParcDocumentConverter converter = new UniParcDocumentConverter();
-        UniParcDocument doc = converter.convert(entry);
-        UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
-        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            if (Utils.notNull(xref.getOrganism())) {
-                List<TaxonomicNode> nodes =
-                        TaxonomyRepoUtil.getTaxonomyLineage(
-                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
-                builder.organismId((int) xref.getOrganism().getTaxonId());
-                nodes.forEach(
-                        node -> {
-                            builder.taxLineageId(node.id());
-                            List<String> names = TaxonomyRepoUtil.extractTaxonFromNode(node);
-                            names.forEach(builder::organismTaxon);
-                        });
-            }
-        }
-        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, doc);
+        UniParcDocument.UniParcDocumentBuilder builder = getUniParcDocument(entry);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, builder.build());
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
