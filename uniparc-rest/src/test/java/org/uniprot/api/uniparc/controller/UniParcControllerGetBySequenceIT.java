@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,12 +34,19 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.util.EnumDisplay;
+import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
@@ -81,7 +89,16 @@ class UniParcControllerGetBySequenceIT {
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(updatedEntry);
         storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
+
+        // uniparc light and its cross references in voldemort
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
+        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
+        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
+        crossReferences.forEach(
+                pair -> storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, pair));
+
     }
 
     @BeforeAll
@@ -92,9 +109,11 @@ class UniParcControllerGetBySequenceIT {
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC));
 
-        UniParcStoreClient storeClient =
-                new UniParcStoreClient(VoldemortInMemoryUniParcEntryStore.getInstance("uniparc"));
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
+        var storeClient =
+                new UniParcLightStoreClient(VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
+        var crossRefStoreClient = new UniParcCrossReferenceStoreClient(VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"), 5);
+        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
 
         storeManager.addDocConverter(
                 DataStoreManager.StoreType.UNIPARC,
@@ -372,7 +391,7 @@ class UniParcControllerGetBySequenceIT {
                                 .param("active", active));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
