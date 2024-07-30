@@ -27,6 +27,7 @@ import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStat
 @ExtendWith(MockitoExtension.class)
 class StatisticsMapperTest {
     private static final Map<String, FacetProperty> FACET_MAP = new HashMap<>();
+    public static final String QUERY = "query";
     @Mock
     private StatisticsAttributeConfig statisticsAttributeConfig;
     @InjectMocks
@@ -70,7 +71,7 @@ class StatisticsMapperTest {
         UniProtKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
-                statisticsMapper.map(statisticsEntry);
+                statisticsMapper.map(statisticsEntry, QUERY);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
                 statisticsEntry, statisticsModuleStatisticsAttribute, LABEL_0);
     }
@@ -80,7 +81,7 @@ class StatisticsMapperTest {
         UniProtKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
-                statisticsMapper.map(statisticsEntry);
+                statisticsMapper.map(statisticsEntry, QUERY);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
                 statisticsEntry, statisticsModuleStatisticsAttribute, null);
     }
@@ -107,6 +108,7 @@ class StatisticsMapperTest {
         assertEquals(expect.getEntryCount().longValue(), actual.getEntryCount());
         assertSame(expect.getDescription(), actual.getDescription());
         assertSame(REVIEWED, actual.getStatisticsType());
+        assertSame(QUERY, actual.getQuery());
         assertSame(label, actual.getLabel());
     }
 }

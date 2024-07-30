@@ -185,7 +185,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
     }
 
     @Test
@@ -196,13 +196,13 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
     }
 
     @Test
     void findAllByAttributeName_emptyResult() {
         List<UniProtKBStatisticsEntry> result =
-                entryRepository.findAllByAttributeNameIgnoreCase("name2");
+                entryRepository.findAllByAttributeNameIgnoreCase("name3");
 
         assertThat(result, empty());
     }
