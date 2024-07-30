@@ -12,4 +12,6 @@ public interface StatisticsModuleStatisticsAttribute {
     String getDescription();
 
     StatisticsModuleStatisticsType getStatisticsType();
+
+    String getQuery();
 }

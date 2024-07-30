@@ -7,10 +7,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 
-import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
-import org.uniprot.api.support.data.statistics.entity.UniProtKBStatisticsEntry;
-import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
+import org.uniprot.api.support.data.statistics.entity.*;
 
 public class TestEntityGeneratorUtil {
 
@@ -25,7 +22,7 @@ public class TestEntityGeneratorUtil {
     public static final String DB_TYPE = "dbType";
     public static final Long[] ENTRY_IDS = new Long[] {34L, 411L, 999L, 1L, 29L, 392L};
     public static final String[] ENTRY_NAMES =
-            new String[] {"name0", "name1", "name0", "name0", "name1", "name0"};
+            new String[] {"name0", "name1", "name0", "name0", "name1", "name2"};
     public static final int[] STAT_CATEGORY_IDS = new int[] {0, 0, 1, 1, 2, 2};
     public static final Long[] VALUE_COUNTS = new Long[] {3L, 27L, 9999L, 500L, 87L, 55L};
     public static final Long[] ENTRY_COUNTS = new Long[] {31L, 25L, 188999L, 1098L, 510L, 67L};
@@ -33,6 +30,13 @@ public class TestEntityGeneratorUtil {
     public static final String LABEL_1 = "label1";
     public static final String LABEL_2 = "label2";
     public static final String[] LABELS = new String[] {LABEL_0, LABEL_1, LABEL_2};
+    public static final Long[] ATTRIBUTE_QUERY_IDS = new Long[]{123L, 3333L};
+    public static final String[] QUERY_TEMPLATES = new String[] {"(query:query)", "(previous_release_date:previous_release_date)"};
+    public static final String[] QUERIES =
+            new String[] {"(reviewed:true) AND (query:query)", "(reviewed:true) AND (previous_release_date:2022-05-25)", "(reviewed:false) AND (query:query)", "(reviewed:true) AND (query:query)", "(reviewed:true) AND (previous_release_date:2022-05-25)"};
+    public static final String[] QUERIES_COMMON =
+            new String[] {"(query:query)", "(previous_release_date:2022-05-25)", "(query:query)", "(query:query)", "(previous_release_date:2022-05-25)"};
+    public static final AttributeQuery[] ATTRIBUTE_QUERIES = new AttributeQuery[] {createAttributeQuery(0), createAttributeQuery(1)};
     public static final String[] SEARCH_FIELDS = new String[] {"sf0", "sf1", "sf2"};
     public static final String[] DESCRIPTIONS =
             new String[] {"des0", "des1", "des2", "des3", "des4", "des5"};
@@ -49,12 +53,19 @@ public class TestEntityGeneratorUtil {
                 createRelease(REL_1, DATES[1]),
                 createRelease(REL_2, DATES[2])
             };
-
     private static UniProtRelease createRelease(String name, Date date) {
         UniProtRelease release = new UniProtRelease();
         release.setId(name);
         release.setDate(date);
         return release;
+    }
+
+    private static AttributeQuery createAttributeQuery(int i) {
+        AttributeQuery attributeQuery = new AttributeQuery();
+        attributeQuery.setId(ATTRIBUTE_QUERY_IDS[i]);
+        attributeQuery.setAttributeName(ENTRY_NAMES[i]);
+        attributeQuery.setQuery(QUERY_TEMPLATES[i]);
+        return attributeQuery;
     }
 
     public static final EntryType[] ENTRY_TYPES =

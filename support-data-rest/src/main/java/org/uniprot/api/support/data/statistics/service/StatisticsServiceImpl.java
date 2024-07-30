@@ -1,36 +1,44 @@
 package org.uniprot.api.support.data.statistics.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
-import org.uniprot.api.support.data.statistics.entity.UniProtKBStatisticsEntry;
-import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
+import org.uniprot.api.support.data.statistics.entity.*;
 import org.uniprot.api.support.data.statistics.mapper.StatisticsMapper;
 import org.uniprot.api.support.data.statistics.model.*;
+import org.uniprot.api.support.data.statistics.repository.AttributeQueryRepository;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtKBStatisticsEntryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtReleaseRepository;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.uniprot.api.support.data.statistics.entity.EntryType.SWISSPROT;
+import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
+
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
+    public static final String PREVIOUS_RELEASE_DATE = ":previous_release_date";
+    public static final String START_QUERY = "(";
+    public static final String END_QUERY = ")";
+    public static final String REVIEWED = "reviewed:";
     private final UniProtKBStatisticsEntryRepository statisticsEntryRepository;
     private final StatisticsCategoryRepository statisticsCategoryRepository;
     private final UniProtReleaseRepository releaseRepository;
+    private final AttributeQueryRepository attributeQueryRepository;
     private final StatisticsMapper statisticsMapper;
 
     public StatisticsServiceImpl(
             UniProtKBStatisticsEntryRepository uniprotkbStatisticsEntryRepository,
             StatisticsCategoryRepository statisticsCategoryRepository,
-            UniProtReleaseRepository uniProtReleaseRepository,
+            UniProtReleaseRepository uniProtReleaseRepository, AttributeQueryRepository attributeQueryRepository,
             StatisticsMapper statisticsMapper) {
         this.statisticsEntryRepository = uniprotkbStatisticsEntryRepository;
         this.statisticsCategoryRepository = statisticsCategoryRepository;
         this.releaseRepository = uniProtReleaseRepository;
+        this.attributeQueryRepository = attributeQueryRepository;
         this.statisticsMapper = statisticsMapper;
     }
 
@@ -104,8 +112,27 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getStatisticsCategory))
                 .entrySet()
                 .stream()
+                .map(this::groupEntries)
                 .map(this::buildStatisticsModuleStatisticsCategory)
                 .collect(Collectors.toList());
+    }
+
+    private Map.Entry<StatisticsCategory, List<UniProtKBStatisticsEntry>> groupEntries(Map.Entry<StatisticsCategory, List<UniProtKBStatisticsEntry>> entry) {
+        List<UniProtKBStatisticsEntry> groupedEntries = entry.getValue().stream().collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getAttributeName))
+                .values().stream().map(this::mapToSingleEntry).sorted(Comparator.comparing(UniProtKBStatisticsEntry::getAttributeName)).toList();
+        return new AbstractMap.SimpleEntry<>(entry.getKey(), groupedEntries);
+    }
+
+    private UniProtKBStatisticsEntry mapToSingleEntry(List<UniProtKBStatisticsEntry> uniProtKBStatisticsEntries) {
+        UniProtKBStatisticsEntry uniProtKBStatisticsEntry = new UniProtKBStatisticsEntry();
+        UniProtKBStatisticsEntry firstEntry = uniProtKBStatisticsEntries.get(0);
+        uniProtKBStatisticsEntry.setAttributeName(firstEntry.getAttributeName());
+        uniProtKBStatisticsEntry.setStatisticsCategory(firstEntry.getStatisticsCategory());
+        uniProtKBStatisticsEntry.setValueCount(uniProtKBStatisticsEntries.stream().mapToLong(UniProtKBStatisticsEntry::getValueCount).sum());
+        uniProtKBStatisticsEntry.setEntryCount(uniProtKBStatisticsEntries.stream().mapToLong(UniProtKBStatisticsEntry::getEntryCount).sum());
+        uniProtKBStatisticsEntry.setDescription(firstEntry.getDescription());
+        uniProtKBStatisticsEntry.setReleaseName(firstEntry.getReleaseName());
+        return uniProtKBStatisticsEntry;
     }
 
     private StatisticsModuleStatisticsCategoryImpl buildStatisticsModuleStatisticsCategory(
@@ -121,7 +148,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private List<StatisticsModuleStatisticsAttribute> getItems(
             Map.Entry<StatisticsCategory, List<UniProtKBStatisticsEntry>> entry) {
-        return entry.getValue().stream().map(statisticsMapper::map).collect(Collectors.toList());
+        return entry.getValue().stream().map(e -> statisticsMapper.map(e, getAttributeQuery(e))).collect(Collectors.toList());
     }
 
     private static long getTotalCount(
@@ -142,6 +169,24 @@ public class StatisticsServiceImpl implements StatisticsService {
                                                                         "Invalid Statistic Category: %s",
                                                                         cat))))
                 .collect(Collectors.toSet());
+    }
+
+    private String getAttributeQuery(UniProtKBStatisticsEntry entry) {
+        Optional<AttributeQuery> attributeQuery = attributeQueryRepository.findByAttributeNameIgnoreCase(entry.getAttributeName());
+        return attributeQuery.map(query -> enrichQueryForReleaseDate(query, entry)).orElse("");
+    }
+
+    private String enrichQueryForReleaseDate(AttributeQuery query, UniProtKBStatisticsEntry entry) {
+        String result = query.getQuery();
+        if (result.contains(PREVIOUS_RELEASE_DATE)) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String currentRelease = entry.getReleaseName().getId();
+            Date previousReleaseDate = releaseRepository.findPreviousReleaseDate(currentRelease).orElseThrow(() -> new IllegalArgumentException("Invalid Release Name: %s".formatted(currentRelease)));
+            result = result.replace(PREVIOUS_RELEASE_DATE, ":" + simpleDateFormat.format(previousReleaseDate));
+        }
+        EntryType entryType = entry.getEntryType();
+        String prepend = Objects.equals(entryType, SWISSPROT) ? START_QUERY + REVIEWED + "true" + END_QUERY + " AND " : Objects.equals(entryType, TREMBL) ? START_QUERY + REVIEWED + "false" + END_QUERY + " AND " : "";
+        return prepend +  result;
     }
 
     private static StatisticsModuleStatisticsType getStatisticType(String statisticType) {

@@ -16,4 +16,5 @@ public class StatisticsModuleStatisticsAttributeImpl
     long entryCount;
     String description;
     StatisticsModuleStatisticsType statisticsType;
+    String query;
 }
