@@ -98,8 +98,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     private static final String MISSING_ID2 = "UPI0000000051";
 
     @Autowired UniProtStoreClient<UniParcEntryLight> storeClient;
-    @Autowired
-    private UniParcCrossReferenceStoreClient crossRefStoreClient;
+    @Autowired private UniParcCrossReferenceStoreClient crossRefStoreClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
@@ -271,8 +270,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 = jsonPath("$.results.*.sequence").doesNotExist();
         ResultMatcher rm3 = jsonPath("$.results.*.geneNames").exists();
-        ResultMatcher rm4 =
-                jsonPath("$.results.*.organisms").exists();
+        ResultMatcher rm4 = jsonPath("$.results.*.organisms").exists();
         ResultMatcher rm5 = jsonPath("$.results.*.sequenceFeatures.*.database").exists();
         ResultMatcher rm6 = jsonPath("$.results[0].sequenceFeatures[0].database", is("CDD"));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);

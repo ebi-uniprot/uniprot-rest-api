@@ -35,7 +35,6 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
-import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
@@ -47,7 +46,6 @@ import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
@@ -97,8 +95,9 @@ class UniParcControllerGetBySequenceIT {
         List<PairImpl<String, UniParcCrossReference>> crossReferences =
                 UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
         crossReferences.forEach(
-                pair -> storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, pair));
-
+                pair ->
+                        storeManager.saveToStore(
+                                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, pair));
     }
 
     @BeforeAll
@@ -110,10 +109,15 @@ class UniParcControllerGetBySequenceIT {
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC));
 
         var storeClient =
-                new UniParcLightStoreClient(VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
         storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
-        var crossRefStoreClient = new UniParcCrossReferenceStoreClient(VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"), 5);
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
+        var crossRefStoreClient =
+                new UniParcCrossReferenceStoreClient(
+                        VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"),
+                        5);
+        storeManager.addStore(
+                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
 
         storeManager.addDocConverter(
                 DataStoreManager.StoreType.UNIPARC,

@@ -160,7 +160,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
         @Override
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
-                    .id("UPI0000083A09")
+                    .id("UPI0000083A99")
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();

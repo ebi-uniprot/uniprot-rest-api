@@ -46,6 +46,7 @@ import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
@@ -284,7 +285,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         UniParcDocument doc = documentConverter.convert(converter.toXml(entry));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         // save uniparc light in store
-        UniParcEntryLight lightEntry = createEntryLight("UPI0000183A10", 20, crossReferences);
+        UniParcEntryLight lightEntry =
+                UniParcEntryMocker.createEntryLight("UPI0000183A10", 20, crossReferences);
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         crossReferences.forEach(
@@ -354,11 +356,6 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                 });
 
         cloudSolrClient.commit(SolrCollection.uniparc.name());
-    }
-
-    private UniParcEntryLight createEntryLight(
-            String upi0000183A13, int i, List<UniParcCrossReference> crossReferences) {
-        return null;
     }
 
     @Override

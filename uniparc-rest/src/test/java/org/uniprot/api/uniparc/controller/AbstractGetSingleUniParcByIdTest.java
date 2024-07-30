@@ -78,6 +78,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     protected void saveEntry() {
         // full uniparc entry object for solr
         UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF);
+        System.out.println(entry.getUniParcId().getValue());
         // append two more cross ref
         UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, 1);
         UniParcEntryConverter converter = new UniParcEntryConverter();

@@ -393,7 +393,6 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
