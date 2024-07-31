@@ -188,10 +188,10 @@ public class StatisticsServiceImpl implements StatisticsService {
     private String getAttributeQuery(UniProtKBStatisticsEntry entry) {
         Optional<AttributeQuery> attributeQuery =
                 attributeQueryRepository.findByAttributeNameIgnoreCase(entry.getAttributeName());
-        return attributeQuery.map(query -> enrichQueryForReleaseDate(query, entry)).orElse("");
+        return attributeQuery.map(query -> prepareQuery(query, entry)).orElse("");
     }
 
-    private String enrichQueryForReleaseDate(AttributeQuery query, UniProtKBStatisticsEntry entry) {
+    private String prepareQuery(AttributeQuery query, UniProtKBStatisticsEntry entry) {
         String result = query.getQuery();
         if (result.contains(PREVIOUS_RELEASE_DATE)) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
