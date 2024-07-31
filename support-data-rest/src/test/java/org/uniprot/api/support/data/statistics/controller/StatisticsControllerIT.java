@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.statistics.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -156,7 +155,7 @@ class StatisticsControllerIT {
     void getAllByAttributeAndStatisticsType_emptyResultsWithoutStatisticTypeSpecified()
             throws Exception {
         this.mockMvc
-                .perform(get("/statistics/history/random?statisticType=unreviewed"))
+                .perform(get("/statistics/history/random"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(0)));
@@ -168,6 +167,7 @@ class StatisticsControllerIT {
                 .perform(get("/statistics/history/fungi?statisticType=random"))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.messages[0]", containsString("Invalid Statistic Type")))
                 .andExpect(jsonPath("$.results").doesNotExist());
     }
 
