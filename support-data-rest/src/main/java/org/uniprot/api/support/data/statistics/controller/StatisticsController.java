@@ -32,7 +32,8 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION,
+            summary =
+                    GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -116,7 +117,7 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = "Get history by attribute and statistics type.",
+            summary = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION,
             responses = {
                 @ApiResponse(
                         content = {

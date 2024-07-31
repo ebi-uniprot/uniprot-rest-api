@@ -1,5 +1,12 @@
 package org.uniprot.api.support.data.statistics.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,31 +20,26 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Import({
-        HttpCommonHeaderConfig.class,
-        RequestMappingHandlerMapping.class,
-        RequestMappingHandlerAdapter.class
+    HttpCommonHeaderConfig.class,
+    RequestMappingHandlerMapping.class,
+    RequestMappingHandlerAdapter.class
 })
 class UniProtReleaseRepositoryTest {
-    @Autowired
-    private TestEntityManager entityManager;
+    @Autowired private TestEntityManager entityManager;
 
-    @Autowired
-    private UniProtReleaseRepository uniProtReleaseRepository;
-    private static final String[] IDS = new String[]{"2023_05", "2023_06", "2024_01", "2024_02"};
-    private static final Date[] DATES = new Date[]{Date.from(Instant.ofEpochMilli(100L)), Date.from(Instant.ofEpochMilli(200L)),
-            Date.from(Instant.ofEpochMilli(300L)), Date.from(Instant.ofEpochMilli(400L))};
+    @Autowired private UniProtReleaseRepository uniProtReleaseRepository;
+    private static final String[] IDS = new String[] {"2023_05", "2023_06", "2024_01", "2024_02"};
+    private static final Date[] DATES =
+            new Date[] {
+                Date.from(Instant.ofEpochMilli(100L)),
+                Date.from(Instant.ofEpochMilli(200L)),
+                Date.from(Instant.ofEpochMilli(300L)),
+                Date.from(Instant.ofEpochMilli(400L))
+            };
     private static final UniProtRelease[] UNIPROT_RELEASES = new UniProtRelease[4];
-
 
     @BeforeEach
     void setUp() {
@@ -52,14 +54,16 @@ class UniProtReleaseRepositoryTest {
 
     @Test
     void findPreviousReleaseDate_forSameYear() {
-        Optional<Date> previousReleaseDate = uniProtReleaseRepository.findPreviousReleaseDate("2024_02");
+        Optional<Date> previousReleaseDate =
+                uniProtReleaseRepository.findPreviousReleaseDate("2024_02");
 
         assertEquals(DATES[2], previousReleaseDate.get());
     }
 
     @Test
     void findPreviousReleaseDate_forDifferentYear() {
-        Optional<Date> previousReleaseDate = uniProtReleaseRepository.findPreviousReleaseDate("2024_01");
+        Optional<Date> previousReleaseDate =
+                uniProtReleaseRepository.findPreviousReleaseDate("2024_01");
 
         assertEquals(DATES[1], previousReleaseDate.get());
     }

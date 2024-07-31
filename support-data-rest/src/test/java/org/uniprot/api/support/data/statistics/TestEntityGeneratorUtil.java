@@ -30,13 +30,27 @@ public class TestEntityGeneratorUtil {
     public static final String LABEL_1 = "label1";
     public static final String LABEL_2 = "label2";
     public static final String[] LABELS = new String[] {LABEL_0, LABEL_1, LABEL_2};
-    public static final Long[] ATTRIBUTE_QUERY_IDS = new Long[]{123L, 3333L};
-    public static final String[] QUERY_TEMPLATES = new String[] {"(query:query)", "(previous_release_date:previous_release_date)"};
+    public static final Long[] ATTRIBUTE_QUERY_IDS = new Long[] {123L, 3333L};
+    public static final String[] QUERY_TEMPLATES =
+            new String[] {"(query:query)", "(previous_release_date:previous_release_date)"};
     public static final String[] QUERIES =
-            new String[] {"(reviewed:true) AND (query:query)", "(reviewed:true) AND (previous_release_date:2022-05-25)", "(reviewed:false) AND (query:query)", "(reviewed:true) AND (query:query)", "(reviewed:true) AND (previous_release_date:2022-05-25)"};
+            new String[] {
+                "(reviewed:true) AND (query:query)",
+                "(reviewed:true) AND (previous_release_date:2022-05-25)",
+                "(reviewed:false) AND (query:query)",
+                "(reviewed:true) AND (query:query)",
+                "(reviewed:true) AND (previous_release_date:2022-05-25)"
+            };
     public static final String[] QUERIES_COMMON =
-            new String[] {"(query:query)", "(previous_release_date:2022-05-25)", "(query:query)", "(query:query)", "(previous_release_date:2022-05-25)"};
-    public static final AttributeQuery[] ATTRIBUTE_QUERIES = new AttributeQuery[] {createAttributeQuery(0), createAttributeQuery(1)};
+            new String[] {
+                "(query:query)",
+                "(previous_release_date:2022-05-25)",
+                "(query:query)",
+                "(query:query)",
+                "(previous_release_date:2022-05-25)"
+            };
+    public static final AttributeQuery[] ATTRIBUTE_QUERIES =
+            new AttributeQuery[] {createAttributeQuery(0), createAttributeQuery(1)};
     public static final String[] SEARCH_FIELDS = new String[] {"sf0", "sf1", "sf2"};
     public static final String[] DESCRIPTIONS =
             new String[] {"des0", "des1", "des2", "des3", "des4", "des5"};
@@ -53,6 +67,7 @@ public class TestEntityGeneratorUtil {
                 createRelease(REL_1, DATES[1]),
                 createRelease(REL_2, DATES[2])
             };
+
     private static UniProtRelease createRelease(String name, Date date) {
         UniProtRelease release = new UniProtRelease();
         release.setId(name);

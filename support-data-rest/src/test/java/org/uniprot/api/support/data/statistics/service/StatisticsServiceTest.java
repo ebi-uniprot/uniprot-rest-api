@@ -38,7 +38,8 @@ class StatisticsServiceTest {
     private static final String VERSION = "version";
     private static final UniProtRelease UNI_PROT_RELEASE = new UniProtRelease();
     public static final String NAME_0 = "name0";
-    private static final Date PREVIOUS_RELEASE_DATE = Date.from(Instant.ofEpochMilli(1653476723000L));
+    private static final Date PREVIOUS_RELEASE_DATE =
+            Date.from(Instant.ofEpochMilli(1653476723000L));
     private StatisticsModuleStatisticsCategory statisticsModuleStatisticsCategory0;
     private StatisticsModuleStatisticsCategory statisticsModuleStatisticsCategory1;
     private StatisticsModuleStatisticsCategory statisticsModuleStatisticsCategory2;
@@ -103,17 +104,41 @@ class StatisticsServiceTest {
         lenient()
                 .when(statisticsMapper.map(STATISTICS_ENTRIES[3], QUERIES[3]))
                 .thenReturn(statisticsModuleStatisticsAttribute3);
-        lenient().when(statisticsMapper.map(getCommonEntry(STATISTICS_ENTRIES[0]), QUERIES_COMMON[0])).thenReturn(statisticsModuleStatisticsAttribute0);
-        lenient().when(statisticsMapper.map(getCommonEntry(STATISTICS_ENTRIES[1]), QUERIES_COMMON[1])).thenReturn(statisticsModuleStatisticsAttribute1);
-        lenient().when(statisticsMapper.map(getCommonEntry(STATISTICS_ENTRIES[4]), QUERIES_COMMON[4])).thenReturn(statisticsModuleStatisticsAttribute4);
-        lenient().when(statisticsMapper.map(getCommonEntry(STATISTICS_ENTRIES[3]), QUERIES_COMMON[3])).thenReturn(statisticsModuleStatisticsAttribute3);
+        lenient()
+                .when(
+                        statisticsMapper.map(
+                                getCommonEntry(STATISTICS_ENTRIES[0]), QUERIES_COMMON[0]))
+                .thenReturn(statisticsModuleStatisticsAttribute0);
+        lenient()
+                .when(
+                        statisticsMapper.map(
+                                getCommonEntry(STATISTICS_ENTRIES[1]), QUERIES_COMMON[1]))
+                .thenReturn(statisticsModuleStatisticsAttribute1);
+        lenient()
+                .when(
+                        statisticsMapper.map(
+                                getCommonEntry(STATISTICS_ENTRIES[4]), QUERIES_COMMON[4]))
+                .thenReturn(statisticsModuleStatisticsAttribute4);
+        lenient()
+                .when(
+                        statisticsMapper.map(
+                                getCommonEntry(STATISTICS_ENTRIES[3]), QUERIES_COMMON[3]))
+                .thenReturn(statisticsModuleStatisticsAttribute3);
         lenient()
                 .when(releaseRepository.findById(VERSION))
                 .thenReturn(Optional.of(UNI_PROT_RELEASE));
-        lenient().when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[0])).thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
-        lenient().when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[1])).thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
-        lenient().when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[5])).thenReturn(Optional.empty());
-        lenient().when(releaseRepository.findPreviousReleaseDate(REL_0)).thenReturn(Optional.of(PREVIOUS_RELEASE_DATE));
+        lenient()
+                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[0]))
+                .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
+        lenient()
+                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[1]))
+                .thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
+        lenient()
+                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[5]))
+                .thenReturn(Optional.empty());
+        lenient()
+                .when(releaseRepository.findPreviousReleaseDate(REL_0))
+                .thenReturn(Optional.of(PREVIOUS_RELEASE_DATE));
     }
 
     private UniProtKBStatisticsEntry getCommonEntry(UniProtKBStatisticsEntry statisticsEntry) {
@@ -152,8 +177,7 @@ class StatisticsServiceTest {
 
     @Test
     void findAllByVersionAndCategoryIn_whenEmptyListOfCategoriesPassed() {
-        when(statisticsEntryRepository.findAllByReleaseName(
-                        UNI_PROT_RELEASE))
+        when(statisticsEntryRepository.findAllByReleaseName(UNI_PROT_RELEASE))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -205,8 +229,7 @@ class StatisticsServiceTest {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
         when(statisticsEntryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE,
-                        Set.of(statisticsCategory0, statisticsCategory1)))
+                        UNI_PROT_RELEASE, Set.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -247,8 +270,7 @@ class StatisticsServiceTest {
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
 
         Collection<StatisticsModuleStatisticsCategory> results =
-                statisticsService.findAllByVersionAndCategoryIn(
-                        VERSION, Set.of(CATEGORY_0));
+                statisticsService.findAllByVersionAndCategoryIn(VERSION, Set.of(CATEGORY_0));
 
         assertThat(results, containsInAnyOrder(statisticsModuleStatisticsCategory0));
     }
@@ -272,9 +294,7 @@ class StatisticsServiceTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () ->
-                        statisticsService.findAllByVersionAndCategoryIn(
-                                VERSION, Set.of(CATEGORY_0)));
+                () -> statisticsService.findAllByVersionAndCategoryIn(VERSION, Set.of(CATEGORY_0)));
     }
 
     @Test

@@ -38,7 +38,8 @@ public class StatisticsMapper {
         };
     }
 
-    public StatisticsModuleStatisticsAttribute map(UniProtKBStatisticsEntry entry, String attributeQuery) {
+    public StatisticsModuleStatisticsAttribute map(
+            UniProtKBStatisticsEntry entry, String attributeQuery) {
         return StatisticsModuleStatisticsAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
