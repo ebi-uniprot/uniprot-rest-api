@@ -14,5 +14,6 @@ public interface StatisticsService {
     List<StatisticsModuleStatisticsHistory> findAllByAttributeAndStatisticType(
             String attribute, String statisticType);
 
-    Collection<StatisticsModuleStatisticsCategory> findAllByVersionAndCategoryIn(String release, Set<String> categories);
+    Collection<StatisticsModuleStatisticsCategory> findAllByVersionAndCategoryIn(
+            String release, Set<String> categories);
 }

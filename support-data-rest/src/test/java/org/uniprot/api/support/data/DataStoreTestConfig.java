@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.uniprot.api.support.data.statistics.repository.AttributeQueryRepository;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtKBStatisticsEntryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtReleaseRepository;
@@ -28,5 +29,11 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public UniProtReleaseRepository uniProtReleaseRepository() {
         return mock(UniProtReleaseRepository.class);
+    }
+
+    @Bean("testAttributeQueryRepository")
+    @Profile("offline")
+    public AttributeQueryRepository attributeQueryRepository() {
+        return mock(AttributeQueryRepository.class);
     }
 }

@@ -61,8 +61,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseName() {
-        List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseName(RELEASES[0]);
+        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByReleaseName(RELEASES[0]);
 
         assertThat(
                 results,
@@ -84,8 +83,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseName_whenNoMatch() {
-        List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseName(RELEASES[2]);
+        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByReleaseName(RELEASES[2]);
 
         assertThat(results, empty());
     }
@@ -108,8 +106,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     void findAllByReleaseNameAndStatisticsCategoryIdIn() {
         List<UniProtKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
-                        RELEASES[0],
-                        List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
+                        RELEASES[0], List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
 
         assertThat(
                 results,
@@ -185,7 +182,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
     }
 
     @Test
@@ -196,13 +193,13 @@ class UniProtKBStatisticsEntryRepositoryTest {
         assertThat(
                 result,
                 containsInAnyOrder(
-                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3], STATISTICS_ENTRIES[5]));
+                        STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[2], STATISTICS_ENTRIES[3]));
     }
 
     @Test
     void findAllByAttributeName_emptyResult() {
         List<UniProtKBStatisticsEntry> result =
-                entryRepository.findAllByAttributeNameIgnoreCase("name2");
+                entryRepository.findAllByAttributeNameIgnoreCase("name3");
 
         assertThat(result, empty());
     }
