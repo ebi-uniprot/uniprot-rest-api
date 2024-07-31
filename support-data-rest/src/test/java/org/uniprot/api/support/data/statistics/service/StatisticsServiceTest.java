@@ -127,6 +127,28 @@ class StatisticsServiceTest {
     }
 
     @Test
+    void findAllByVersionAndCategoryIn_whenEmptyListOfCategoriesPassed() {
+        when(statisticsEntryRepository.findAllByReleaseName(
+                        UNI_PROT_RELEASE))
+                .thenReturn(
+                        List.of(
+                                STATISTICS_ENTRIES[0],
+                                STATISTICS_ENTRIES[1],
+                                STATISTICS_ENTRIES[3],
+                                STATISTICS_ENTRIES[4]));
+
+        Collection<StatisticsModuleStatisticsCategory> results =
+                statisticsService.findAllByVersionAndCategoryIn(VERSION, Collections.emptySet());
+
+        assertThat(
+                results,
+                containsInAnyOrder(
+                        statisticsModuleStatisticsCategory0,
+                        statisticsModuleStatisticsCategory1,
+                        statisticsModuleStatisticsCategory2));
+    }
+
+    @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn() {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
@@ -153,6 +175,31 @@ class StatisticsServiceTest {
     }
 
     @Test
+    void findAllByVersionAndCategoryIn() {
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
+                .thenReturn(Optional.of(statisticsCategory0));
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
+                .thenReturn(Optional.of(statisticsCategory1));
+        when(statisticsEntryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                        UNI_PROT_RELEASE,
+                        Set.of(statisticsCategory0, statisticsCategory1)))
+                .thenReturn(
+                        List.of(
+                                STATISTICS_ENTRIES[0],
+                                STATISTICS_ENTRIES[1],
+                                STATISTICS_ENTRIES[3]));
+
+        Collection<StatisticsModuleStatisticsCategory> results =
+                statisticsService.findAllByVersionAndCategoryIn(
+                        VERSION, Set.of(CATEGORY_0, CATEGORY_1));
+
+        assertThat(
+                results,
+                containsInAnyOrder(
+                        statisticsModuleStatisticsCategory0, statisticsModuleStatisticsCategory1));
+    }
+
+    @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenSingleCategoryIsPassed() {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
@@ -168,6 +215,21 @@ class StatisticsServiceTest {
     }
 
     @Test
+    void findAllByVersionAndCategoryIn_whenSingleCategoryIsPassed() {
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
+                .thenReturn(Optional.of(statisticsCategory0));
+        when(statisticsEntryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                        UNI_PROT_RELEASE, Set.of(statisticsCategory0)))
+                .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
+
+        Collection<StatisticsModuleStatisticsCategory> results =
+                statisticsService.findAllByVersionAndCategoryIn(
+                        VERSION, Set.of(CATEGORY_0));
+
+        assertThat(results, containsInAnyOrder(statisticsModuleStatisticsCategory0));
+    }
+
+    @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenWrongCategoryIsPassed() {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.empty());
@@ -177,6 +239,18 @@ class StatisticsServiceTest {
                 () ->
                         statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
                                 VERSION, STATISTIC_TYPE, Set.of(CATEGORY_0)));
+    }
+
+    @Test
+    void findAllByVersionAndCategoryIn_whenWrongCategoryIsPassed() {
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        statisticsService.findAllByVersionAndCategoryIn(
+                                VERSION, Set.of(CATEGORY_0)));
     }
 
     @Test

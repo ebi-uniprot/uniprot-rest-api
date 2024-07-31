@@ -23,19 +23,19 @@ public class TestEntityGeneratorUtil {
     public static final String[] STAT_CATEGORIES_NAMES =
             new String[] {CATEGORY_0, CATEGORY_1, CATEGORY_2};
     public static final String DB_TYPE = "dbType";
-    public static final Long[] ENTRY_IDS = new Long[] {34L, 411L, 999L, 1L, 29L};
+    public static final Long[] ENTRY_IDS = new Long[] {34L, 411L, 999L, 1L, 29L, 392L};
     public static final String[] ENTRY_NAMES =
-            new String[] {"name0", "name1", "name0", "name0", "name1"};
-    public static final int[] STAT_CATEGORY_IDS = new int[] {0, 0, 1, 1, 2};
-    public static final Long[] VALUE_COUNTS = new Long[] {3L, 27L, 9999L, 500L, 87L};
-    public static final Long[] ENTRY_COUNTS = new Long[] {31L, 25L, 188999L, 1098L, 510L};
+            new String[] {"name0", "name1", "name0", "name0", "name1", "name0"};
+    public static final int[] STAT_CATEGORY_IDS = new int[] {0, 0, 1, 1, 2, 2};
+    public static final Long[] VALUE_COUNTS = new Long[] {3L, 27L, 9999L, 500L, 87L, 55L};
+    public static final Long[] ENTRY_COUNTS = new Long[] {31L, 25L, 188999L, 1098L, 510L, 67L};
     public static final String LABEL_0 = "label0";
     public static final String LABEL_1 = "label1";
     public static final String LABEL_2 = "label2";
     public static final String[] LABELS = new String[] {LABEL_0, LABEL_1, LABEL_2};
     public static final String[] SEARCH_FIELDS = new String[] {"sf0", "sf1", "sf2"};
     public static final String[] DESCRIPTIONS =
-            new String[] {"des0", "des1", "des2", "des3", "des4"};
+            new String[] {"des0", "des1", "des2", "des3", "des4", "des5"};
     public static final String REL_0 = "rel0";
     public static final String REL_1 = "rel1";
     public static final String REL_2 = "rel2";
@@ -58,7 +58,7 @@ public class TestEntityGeneratorUtil {
     }
 
     public static final EntryType[] ENTRY_TYPES =
-            new EntryType[] {SWISSPROT, SWISSPROT, TREMBL, SWISSPROT, SWISSPROT};
+            new EntryType[] {SWISSPROT, SWISSPROT, TREMBL, SWISSPROT, SWISSPROT, TREMBL};
     public static final StatisticsCategory[] STATISTICS_CATEGORIES =
             new StatisticsCategory[] {
                 createStatisticsCategory(0),
@@ -71,7 +71,8 @@ public class TestEntityGeneratorUtil {
                 createStatisticsEntry(1),
                 createStatisticsEntry(2),
                 createStatisticsEntry(3),
-                createStatisticsEntry(4)
+                createStatisticsEntry(4),
+                createStatisticsEntry(5)
             };
 
     private static UniProtKBStatisticsEntry createStatisticsEntry(int index) {
@@ -84,7 +85,7 @@ public class TestEntityGeneratorUtil {
         uniprotkbStatisticsEntry.setEntryCount(ENTRY_COUNTS[index]);
         uniprotkbStatisticsEntry.setDescription(DESCRIPTIONS[index]);
         uniprotkbStatisticsEntry.setReleaseName(
-                Set.of(0, 1, 3, 4).contains(index) ? RELEASES[0] : RELEASES[1]);
+                Set.of(0, 1, 3, 4, 5).contains(index) ? RELEASES[0] : RELEASES[1]);
         uniprotkbStatisticsEntry.setEntryType(ENTRY_TYPES[index]);
         return uniprotkbStatisticsEntry;
     }
