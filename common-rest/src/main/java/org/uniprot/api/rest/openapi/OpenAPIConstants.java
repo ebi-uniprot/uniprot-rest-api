@@ -342,13 +342,9 @@ public class OpenAPIConstants {
     public static final String RELEASE_NAME_STATS_EXAMPLE = "2023_05";
     public static final String TYPE_STATS_EXAMPLE = "reviewed";
     public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
-    public static final String
-            GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION =
-                    "Get release statistics by UniProt release name and statistics type.";
-    public static final String GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_DESCRIPTION =
-            "Get release statistics by UniProt release name.";
-    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION =
-            "Get history by attribute and statistics type.";
+    public static final String GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION = "Get release statistics by UniProt release name and statistics type.";
+    public static final String GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_DESCRIPTION = "Get release statistics by UniProt release name.";
+    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION = "Get history by attribute and statistics type.";
 
     // SUBCEL
     public static final String TAG_SUBCEL = "Subcellular locations";
