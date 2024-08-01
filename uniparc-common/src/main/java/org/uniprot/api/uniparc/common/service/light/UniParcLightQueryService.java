@@ -111,7 +111,7 @@ public class UniParcLightQueryService
         UniParcEntryLight entryLight = findByUniqueId(uniqueId);
         List<String> lazyFields = uniParcCrossReferenceLazyLoader.getLazyFields(filters);
         if (Utils.notNullNotEmpty(lazyFields)) {
-            entryLight = uniParcCrossReferenceLazyLoader.loadLazyLoadFields(entryLight, lazyFields);
+            entryLight = uniParcCrossReferenceLazyLoader.populateLazyFields(entryLight, lazyFields);
         }
         return entryLight;
     }
@@ -138,7 +138,7 @@ public class UniParcLightQueryService
             result =
                     result.map(
                             entry ->
-                                    uniParcCrossReferenceLazyLoader.loadLazyLoadFields(
+                                    uniParcCrossReferenceLazyLoader.populateLazyFields(
                                             entry, lazyFields));
         }
         return result;

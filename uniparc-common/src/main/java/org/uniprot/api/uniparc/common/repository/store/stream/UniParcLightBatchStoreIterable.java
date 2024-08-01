@@ -46,7 +46,7 @@ public class UniParcLightBatchStoreIterable extends BatchStoreIterable<UniParcEn
         List<UniParcEntryLight> entries = super.convertBatch(batch);
         List<String> lazyFields = lazyLoader.getLazyFields(fields);
         if (Utils.notNullNotEmpty(lazyFields)) {
-            entries = lazyLoader.loadLazyLoadFields(entries, lazyFields);
+            entries = lazyLoader.populateLazyFields(entries, lazyFields);
         }
         return entries;
     }

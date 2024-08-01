@@ -31,27 +31,23 @@ public class UniParcCrossReferenceLazyLoader {
         this.batchSize = batchSize;
     }
 
-    public List<UniParcEntryLight> loadLazyLoadFields(
+    public List<UniParcEntryLight> populateLazyFields(
             List<UniParcEntryLight> entries, List<String> lazyFields) {
         List<UniParcEntryLight> result = new ArrayList<>();
         for (UniParcEntryLight entry : entries) {
-            result.add(loadLazyLoadFields(entry, lazyFields));
+            UniParcEntryLight lightEntry = populateLazyFields(entry, lazyFields);
+            result.add(lightEntry);
         }
         return result;
     }
 
-    public UniParcEntryLight loadLazyLoadFields(UniParcEntryLight entry, List<String> lazyFields) {
+    public UniParcEntryLight populateLazyFields(UniParcEntryLight entry, List<String> lazyFields) {
         UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
-        List<String> batchIds = new ArrayList<>(batchSize);
-        int index = 0;
-        for (String xrefId : entry.getUniParcCrossReferences()) {
-            batchIds.add(xrefId);
-            if (++index % batchSize == 0) {
-                addLazyFields(builder, lazyFields, batchIds);
-                batchIds = new ArrayList<>();
-            }
-        }
-        if (!batchIds.isEmpty()) {
+        int crossRefSize = entry.getUniParcCrossReferences().size();
+        for (int i = 0; i < crossRefSize; i = i + batchSize) {
+            List<String> batchIds =
+                    entry.getUniParcCrossReferences()
+                            .subList(i, Math.min(i + batchSize, crossRefSize));
             addLazyFields(builder, lazyFields, batchIds);
         }
         return builder.build();
