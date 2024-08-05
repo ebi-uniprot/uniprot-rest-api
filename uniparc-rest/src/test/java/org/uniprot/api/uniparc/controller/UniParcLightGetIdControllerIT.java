@@ -149,13 +149,11 @@ class UniParcLightGetIdControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                .andExpect(jsonPath("$.uniParcCrossReferences").doesNotExist())
                 .andExpect(
                         jsonPath(
-                                "$.uniParcCrossReferences",
-                                contains(
-                                        "UPI0000083D01-SWISSPROT-P10001",
-                                        "UPI0000083D01-TREMBL-P12301",
-                                        "UPI0000083D01-REFSEQ-WP_168893201")))
+                                "$.uniParcCrossReferencesLink",
+                                is("/uniparc/" + UNIPARC_ID + "/databases?size=25")))
                 .andExpect(
                         jsonPath(
                                 "$.commonTaxons[*].topLevel",
