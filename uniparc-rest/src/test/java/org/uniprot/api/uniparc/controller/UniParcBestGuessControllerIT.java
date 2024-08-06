@@ -43,6 +43,7 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
@@ -292,7 +293,11 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         crossReferences.forEach(
                 xref -> {
                     String xrefId = getUniParcXRefId("UPI0000183A10", xref);
-                    uniParcCrossReferenceStoreClient.saveEntry(xrefId, xref);
+                    uniParcCrossReferenceStoreClient.saveEntry(
+                            xrefId,
+                            new UniParcCrossReferencePair(
+                                    "UPI0000183A10",
+                                    List.of(xref))); // TODO create the page logic here
                 });
 
         // SWISSPROT - SMALLER SEQUENCE
@@ -313,7 +318,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         crossReferences.forEach(
                 xref -> {
                     String xrefId = getUniParcXRefId("UPI0000183A11", xref);
-                    uniParcCrossReferenceStoreClient.saveEntry(xrefId, xref);
+                    uniParcCrossReferenceStoreClient.saveEntry(
+                            xrefId, new UniParcCrossReferencePair("UPI0000183A11", List.of(xref)));
                 });
 
         // TREMBL
@@ -332,7 +338,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         crossReferences.forEach(
                 xref -> {
                     String xrefId = getUniParcXRefId("UPI0000183A12", xref);
-                    uniParcCrossReferenceStoreClient.saveEntry(xrefId, xref);
+                    uniParcCrossReferenceStoreClient.saveEntry(
+                            xrefId, new UniParcCrossReferencePair("UPI0000183A12", List.of(xref)));
                 });
 
         // ISOFORM
@@ -352,7 +359,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         crossReferences.forEach(
                 xref -> {
                     String xrefId = getUniParcXRefId("UPI0000183A13", xref);
-                    uniParcCrossReferenceStoreClient.saveEntry(xrefId, xref);
+                    uniParcCrossReferenceStoreClient.saveEntry(
+                            xrefId, new UniParcCrossReferencePair("UPI0000183A13", List.of(xref)));
                 });
 
         cloudSolrClient.commit(SolrCollection.uniparc.name());

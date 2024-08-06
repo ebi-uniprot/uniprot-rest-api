@@ -6,10 +6,12 @@ import static org.uniprot.core.util.Utils.notNullNotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.ProteomeBuilder;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -22,11 +24,11 @@ public class UniParcCrossReferenceLazyLoader {
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
     static final List<String> LAZY_FIELD_LIST =
             List.of("organism_id", "organism", "protein", "gene", "proteome");
-    private final UniProtStoreClient<UniParcCrossReference> crossRefStoreClient;
+    private final UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient;
     private final int batchSize;
 
     public UniParcCrossReferenceLazyLoader(
-            UniProtStoreClient<UniParcCrossReference> crossRefStoreClient, int batchSize) {
+            UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient, int batchSize) {
         this.crossRefStoreClient = crossRefStoreClient;
         this.batchSize = batchSize;
     }
@@ -43,12 +45,11 @@ public class UniParcCrossReferenceLazyLoader {
 
     public UniParcEntryLight populateLazyFields(UniParcEntryLight entry, List<String> lazyFields) {
         UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
-        int crossRefSize = entry.getUniParcCrossReferences().size();
-        for (int i = 0; i < crossRefSize; i = i + batchSize) {
-            List<String> batchIds =
-                    entry.getUniParcCrossReferences()
-                            .subList(i, Math.min(i + batchSize, crossRefSize));
-            addLazyFields(builder, lazyFields, batchIds);
+        if (entry.getNumberOfUniParcCrossReferences() > 0) {
+            int pageNumbers = (entry.getNumberOfUniParcCrossReferences() / batchSize);
+            for (int i = 0; i <= pageNumbers; i = i + batchSize) {
+                addLazyFields(builder, lazyFields, entry.getUniParcId() + "_" + i);
+            }
         }
         return builder.build();
     }
@@ -67,9 +68,15 @@ public class UniParcCrossReferenceLazyLoader {
     }
 
     private void addLazyFields(
-            UniParcEntryLightBuilder builder, List<String> lazyFields, List<String> batchIds) {
-        List<UniParcCrossReference> xrefs = crossRefStoreClient.getEntries(batchIds);
-        for (UniParcCrossReference xref : xrefs) {
+            UniParcEntryLightBuilder builder, List<String> lazyFields, String key) {
+        UniParcCrossReferencePair pair =
+                crossRefStoreClient
+                        .getEntry(key)
+                        .orElseThrow(
+                                () ->
+                                        new ServiceException(
+                                                "unable to find cross reference page " + key));
+        for (UniParcCrossReference xref : pair.getValue()) {
             if ((lazyFields.contains(LAZY_FIELD_LIST.get(0))
                             || lazyFields.contains(LAZY_FIELD_LIST.get(1)))
                     && notNull(xref.getOrganism())) {

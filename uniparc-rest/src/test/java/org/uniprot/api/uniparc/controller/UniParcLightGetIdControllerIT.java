@@ -42,6 +42,7 @@ import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreCl
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.util.Utils;
 import org.uniprot.cv.taxonomy.TaxonomicNode;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
@@ -128,7 +129,11 @@ class UniParcLightGetIdControllerIT {
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
             String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
-            xRefStoreClient.saveEntry(key, xref);
+            xRefStoreClient.saveEntry(
+                    key,
+                    new UniParcCrossReferencePair(
+                            entryLight.getUniParcId(),
+                            List.of(xref))); // TODO create the page logic here
         }
     }
 

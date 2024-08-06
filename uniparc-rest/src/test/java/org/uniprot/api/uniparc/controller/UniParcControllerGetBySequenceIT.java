@@ -40,6 +40,7 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.util.EnumDisplay;
 import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -92,7 +93,7 @@ class UniParcControllerGetBySequenceIT {
         UniParcEntryLight uniParcEntryLight =
                 UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
-        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+        List<UniParcCrossReferencePair> crossReferences =
                 UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
         crossReferences.forEach(
                 pair ->

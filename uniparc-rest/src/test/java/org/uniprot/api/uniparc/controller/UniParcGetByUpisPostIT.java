@@ -32,6 +32,7 @@ import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -233,9 +234,10 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         UniParcEntryLight uniParcEntryLight =
                 UniParcEntryMocker.createUniParcEntryLight(i, UPI_PREF);
         storeClient.saveEntry(uniParcEntryLight);
-        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+        List<UniParcCrossReferencePair> crossReferences =
                 UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), i);
-        crossReferences.forEach(
-                pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair.getValue()));
+        // TODO: IMPORTANT
+        // crossReferences.forEach(
+        //        pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair.getValue()));
     }
 }

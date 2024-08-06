@@ -33,6 +33,7 @@ import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreCl
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -89,7 +90,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         UniParcEntryLight uniParcEntryLight =
                 UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
-        List<PairImpl<String, UniParcCrossReference>> crossReferences =
+        List<UniParcCrossReferencePair> crossReferences =
                 UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
         crossReferences.forEach(
                 pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));

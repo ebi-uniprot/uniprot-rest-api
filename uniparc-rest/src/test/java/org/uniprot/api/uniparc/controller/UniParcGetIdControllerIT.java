@@ -110,7 +110,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                         uniparcId, xref),
                                                 xref))
                         .collect(Collectors.toList());
-        builder.uniParcCrossReferencesSet(xrefIdToObject.stream().map(PairImpl::getKey).toList());
+        builder.numberOfUniParcCrossReferences(xrefIdToObject.size());
         UniParcEntryLight uniParcEntryLight = builder.build();
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         xrefIdToObject.forEach(

@@ -48,6 +48,7 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -373,7 +374,11 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
             String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
-            xRefStoreClient.saveEntry(key, xref);
+            xRefStoreClient.saveEntry(
+                    key,
+                    new UniParcCrossReferencePair(
+                            entryLight.getUniParcId(),
+                            List.of(xref))); // TODO create the page logic here
         }
     }
 

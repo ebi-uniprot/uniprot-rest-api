@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortRemoteUniParcCrossReferenceStore;
 
@@ -16,7 +16,7 @@ public class UniParcCrossReferenceStoreConfig {
     @Profile("live")
     public UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient(
             UniParcCrossReferenceStoreConfigProperties configProperties) {
-        VoldemortClient<UniParcCrossReference> client =
+        VoldemortClient<UniParcCrossReferencePair> client =
                 new VoldemortRemoteUniParcCrossReferenceStore(
                         configProperties.getNumberOfConnections(),
                         configProperties.isBrotliEnabled(),

@@ -61,6 +61,7 @@ import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossRefe
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -384,7 +385,11 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
             String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
-            xRefStoreClient.saveEntry(key, xref);
+            xRefStoreClient.saveEntry(
+                    key,
+                    new UniParcCrossReferencePair(
+                            entryLight.getUniParcId(),
+                            List.of(xref))); // TODO create the page logic here
         }
         storeClient.saveEntry(entryLight);
     }

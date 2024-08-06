@@ -82,11 +82,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                uniParcEntryLight1.getUniParcCrossReferences()))
+                                uniParcEntryLight1.getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                uniParcEntryLight2.getUniParcCrossReferences()))
+                                uniParcEntryLight2.getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
         // then
         UniParcEntry result = bestGuessService.analyseBestGuess(entries.stream(), request);
@@ -130,11 +130,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(0).getUniParcCrossReferences()))
+                                entries.get(0).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(1).getUniParcCrossReferences()))
+                                entries.get(1).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
 
         UniParcEntry result =
@@ -174,11 +174,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(0).getUniParcCrossReferences()))
+                                entries.get(0).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(1).getUniParcCrossReferences()))
+                                entries.get(1).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
 
         UniParcEntry result =
@@ -214,11 +214,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(0).getUniParcCrossReferences()))
+                                entries.get(0).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(1).getUniParcCrossReferences()))
+                                entries.get(1).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
 
         UniParcEntry result =
@@ -259,11 +259,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(0).getUniParcCrossReferences()))
+                                entries.get(0).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(1).getUniParcCrossReferences()))
+                                entries.get(1).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
 
         UniParcBestGuessRequest request = new UniParcBestGuessRequest();
@@ -302,11 +302,11 @@ class UniParcBestGuessServiceTest {
         // when
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(0).getUniParcCrossReferences()))
+                                entries.get(0).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(
                         uniParcCrossReferenceService.getCrossReferences(
-                                entries.get(1).getUniParcCrossReferences()))
+                                entries.get(1).getNumberOfUniParcCrossReferences()))
                 .thenReturn(crossReferences2.stream());
 
         UniParcEntry result = bestGuessService.analyseBestGuess(entries.stream(), request);
@@ -347,7 +347,7 @@ class UniParcBestGuessServiceTest {
         Sequence uniSeq = new SequenceBuilder(sequence.toString()).build();
         List<String> xrefIds =
                 crossReferences.stream().map(xref -> getUniParcXRefId(id, xref)).toList();
-        builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(xrefIds);
+        // builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(xrefIds); TODO check it
         return builder.build();
     }
 }
