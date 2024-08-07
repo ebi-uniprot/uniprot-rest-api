@@ -63,59 +63,81 @@ public class UniParcCrossReferenceService {
         if (optUniParcLight.isEmpty()) {
             throw new ResourceNotFoundException("Unable to find UniParc id " + uniParcId);
         }
-        UniParcEntryLight entry = optUniParcLight.get();
-        int xrefCount = entry.getNumberOfUniParcCrossReferences();
-        int groupSize = this.storeConfigProperties.getGroupSize();
-        int storePageCount = xrefCount / groupSize;
+        UniParcEntryLight uniParcEntryLight = optUniParcLight.get();
         int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
         List<UniParcCrossReference> paginatedResults;
         CursorPage page;
         if (hasRequestFilters(request)) {
-            List<UniParcCrossReference> entryXrefs = new ArrayList<>();
-            for (int i = 0; i <= storePageCount; i++) {
-                String xrefPageId = entry.getUniParcId() + "_" + i;
-                Stream<UniParcCrossReference> xrefs =
-                        this.crossReferenceStoreClient
-                                .getEntry(xrefPageId)
-                                .map(UniParcCrossReferencePair::getValue)
-                                .stream()
-                                .flatMap(Collection::stream);
-                xrefs = xrefs.filter(xref -> filterCrossReference(xref, request));
-                entryXrefs.addAll(xrefs.toList());
-            }
-            page = CursorPage.of(request.getCursor(), pageSize, entryXrefs.size());
-            paginatedResults = paginateCrossReferences(page, entryXrefs);
+            List<UniParcCrossReference> filteredCrossReferences =
+                    getFilteredCrossReferences(uniParcEntryLight, request);
+            page = CursorPage.of(request.getCursor(), pageSize, filteredCrossReferences.size());
+            paginatedResults = paginateCrossReferences(page, filteredCrossReferences);
         } else {
+            int xrefCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
             page = CursorPage.of(request.getCursor(), pageSize, xrefCount);
+            List<UniParcCrossReference> requiredCrossReferenceBatches =
+                    getRequiredCrossReferenceBatches(uniParcEntryLight, page);
+            // start offset in the current candidates
             int offset = page.getOffset().intValue();
             int nextOffset = CursorPage.getNextOffset(page);
-            // start batch where first or first few xrefs are
-            int startBatchIndex = offset / groupSize;
-            // end batch where last or last few xrefs are or even end index of sublist lies
-            int endBatchIndex = (nextOffset - 1) / groupSize;
-            int estimatedCapacity = (endBatchIndex - startBatchIndex + 1) * groupSize;
-            List<UniParcCrossReference> candidateBatches = new ArrayList<>(estimatedCapacity);
-            // get all the xrefs from start to end batches
-            for (int i = startBatchIndex; i <= endBatchIndex; i++) {
-                String xrefBatchId = entry.getUniParcId() + "_" + i;
-                List<UniParcCrossReference> xrefs =
-                        this.crossReferenceStoreClient
-                                .getEntry(xrefBatchId)
-                                .map(UniParcCrossReferencePair::getValue)
-                                .orElse(List.of());
-                candidateBatches.addAll(xrefs);
-            }
-            // start offset in the current candidates
-            int scaledOffset = offset % groupSize;
+            int scaledOffset = offset % this.storeConfigProperties.getGroupSize();
             // end index for sublist
             int scaledNextOffset = scaledOffset + nextOffset - offset;
-            scaledNextOffset = Math.min(scaledNextOffset, candidateBatches.size());
-            paginatedResults = candidateBatches.subList(scaledOffset, scaledNextOffset);
+            scaledNextOffset = Math.min(scaledNextOffset, requiredCrossReferenceBatches.size());
+            paginatedResults =
+                    requiredCrossReferenceBatches.subList(scaledOffset, scaledNextOffset);
         }
         return QueryResult.<UniParcCrossReference>builder()
                 .content(paginatedResults.stream())
                 .page(page)
                 .build();
+    }
+
+    private List<UniParcCrossReference> getFilteredCrossReferences(
+            UniParcEntryLight uniParcEntryLight, UniParcDatabasesRequest request) {
+        List<UniParcCrossReference> filteredCrossReferences = new ArrayList<>();
+        int groupSize = this.storeConfigProperties.getGroupSize();
+        int crossReferencesCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
+        // Calculate the number of batches required
+        int storePageCount =
+                crossReferencesCount / groupSize + (crossReferencesCount % groupSize == 0 ? 0 : 1);
+        for (int i = 0; i < storePageCount; i++) {
+            String xrefPageId = uniParcEntryLight.getUniParcId() + "_" + i;
+            Stream<UniParcCrossReference> filteredCrossReferencesBatch =
+                    this.crossReferenceStoreClient
+                            .getEntry(xrefPageId)
+                            .map(UniParcCrossReferencePair::getValue)
+                            .stream()
+                            .flatMap(Collection::stream)
+                            .filter(xref -> filterCrossReference(xref, request));
+            filteredCrossReferences.addAll(filteredCrossReferencesBatch.toList());
+        }
+        return filteredCrossReferences;
+    }
+
+    private List<UniParcCrossReference> getRequiredCrossReferenceBatches(
+            UniParcEntryLight entry, CursorPage page) {
+        int groupSize = this.storeConfigProperties.getGroupSize();
+        int offset = page.getOffset().intValue();
+        int nextOffset = CursorPage.getNextOffset(page);
+        // start batch where first or first few xrefs are
+        int startBatchIndex = offset / groupSize;
+        // end batch where last or last few xrefs are or even end index of sublist lies
+        int endBatchIndex = (nextOffset - 1) / groupSize;
+        int estimatedCapacity = (endBatchIndex - startBatchIndex + 1) * groupSize;
+        List<UniParcCrossReference> requiredCrossReferenceBatches =
+                new ArrayList<>(estimatedCapacity);
+        // get all the xrefs from start to end batches
+        for (int i = startBatchIndex; i <= endBatchIndex; i++) {
+            String xrefBatchId = entry.getUniParcId() + "_" + i;
+            List<UniParcCrossReference> crossReferencesBatch =
+                    this.crossReferenceStoreClient
+                            .getEntry(xrefBatchId)
+                            .map(UniParcCrossReferencePair::getValue)
+                            .orElse(List.of());
+            requiredCrossReferenceBatches.addAll(crossReferencesBatch);
+        }
+        return requiredCrossReferenceBatches;
     }
 
     private boolean hasRequestFilters(UniParcDatabasesRequest request) {
