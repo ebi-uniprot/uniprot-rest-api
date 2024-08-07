@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -104,6 +105,9 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniParcFacetConfig facetConfig;
+
+    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -378,18 +382,18 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     }
 
     private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
+        int xrefCount = 25;
+        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         UniParcEntryLight uniParcEntryLight =
-                UniParcEntryMocker.createUniParcEntryLight(i, UPI_PREF);
+                UniParcEntryMocker.createUniParcEntryLight(i, UPI_PREF, xrefCount);
         storeClient.saveEntry(uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
-                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), i);
-        // TODO: IMPORTANT
-        // crossReferences.forEach(
-        //        pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair.getValue()));
+                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+         crossReferences.forEach(
+                pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair));
     }
 }

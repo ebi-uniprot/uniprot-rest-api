@@ -19,6 +19,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,7 +60,8 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     private UniParcStoreClient storeClient;
 
     protected abstract String getIdPathValue();
-
+    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.UNIPARC;
@@ -77,21 +79,19 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
 
     @Override
     protected void saveEntry() {
+        int xrefCount = 25;
         // full uniparc entry object for solr
-        UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF);
-        System.out.println(entry.getUniParcId().getValue());
-        // append two more cross ref
-        UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, 1);
+        UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(updatedEntry);
+        Entry xmlEntry = converter.toXml(entry);
         DataStoreManager manager = getStoreManager();
         manager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         //  uniparc light and cross reference in voldemort
         UniParcEntryLight uniParcEntryLight =
-                UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF);
+                UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF, xrefCount);
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
-                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), 1);
+                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
         crossReferences.forEach(
                 pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
     }
@@ -110,7 +110,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
                 VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
         UniParcCrossReferenceStoreClient crossRefStoreClient =
-                new UniParcCrossReferenceStoreClient(xrefVDClient, 5);
+                new UniParcCrossReferenceStoreClient(xrefVDClient);
         getStoreManager()
                 .addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
         getStoreManager().addStore(DataStoreManager.StoreType.CROSSREF, crossRefStoreClient);

@@ -154,8 +154,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         xRefStoreClient =
                 new UniParcCrossReferenceStoreClient(
                         VoldemortInMemoryUniParcCrossReferenceStore.getInstance(
-                                "uniparc-cross-reference"),
-                        10);
+                                "uniparc-cross-reference"));
         getStoreManager()
                 .addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
     }

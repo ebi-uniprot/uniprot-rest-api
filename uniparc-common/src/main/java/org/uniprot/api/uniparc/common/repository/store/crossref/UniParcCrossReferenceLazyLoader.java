@@ -1,11 +1,5 @@
 package org.uniprot.api.uniparc.common.repository.store.crossref;
 
-import static org.uniprot.core.util.Utils.notNull;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
@@ -18,6 +12,12 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.uniprot.core.util.Utils.notNull;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
 public class UniParcCrossReferenceLazyLoader {
 
     private static final ReturnFieldConfig FIELD_CONFIG =
@@ -25,12 +25,10 @@ public class UniParcCrossReferenceLazyLoader {
     static final List<String> LAZY_FIELD_LIST =
             List.of("organism_id", "organism", "protein", "gene", "proteome");
     private final UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient;
-    private final int batchSize;
 
     public UniParcCrossReferenceLazyLoader(
-            UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient, int batchSize) {
+            UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient) {
         this.crossRefStoreClient = crossRefStoreClient;
-        this.batchSize = batchSize;
     }
 
     public List<UniParcEntryLight> populateLazyFields(
@@ -44,6 +42,7 @@ public class UniParcCrossReferenceLazyLoader {
     }
 
     public UniParcEntryLight populateLazyFields(UniParcEntryLight entry, List<String> lazyFields) {
+        int batchSize = 10;// hardcoded value get groupSize TODO
         UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
         if (entry.getNumberOfUniParcCrossReferences() > 0) {
             int pageNumbers = (entry.getNumberOfUniParcCrossReferences() / batchSize);

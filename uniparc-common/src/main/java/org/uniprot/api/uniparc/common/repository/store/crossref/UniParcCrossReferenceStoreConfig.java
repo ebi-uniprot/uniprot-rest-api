@@ -22,14 +22,13 @@ public class UniParcCrossReferenceStoreConfig {
                         configProperties.isBrotliEnabled(),
                         configProperties.getStoreName(),
                         configProperties.getHost());
-        return new UniParcCrossReferenceStoreClient(client, configProperties.getBatchSize());
+        return new UniParcCrossReferenceStoreClient(client);
     }
 
     @Bean
     public UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader(
             UniParcCrossReferenceStoreConfigProperties configProperties,
             UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient) {
-        return new UniParcCrossReferenceLazyLoader(
-                uniParcCrossReferenceStoreClient, configProperties.getBatchSize());
+        return new UniParcCrossReferenceLazyLoader(uniParcCrossReferenceStoreClient);
     }
 }

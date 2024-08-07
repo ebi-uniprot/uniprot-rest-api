@@ -7,15 +7,8 @@ import org.uniprot.store.datastore.voldemort.VoldemortClient;
 public class UniParcCrossReferenceStoreClient
         extends UniProtStoreClient<UniParcCrossReferencePair> {
 
-    private final int batchSize;
-
     public UniParcCrossReferenceStoreClient(
-            VoldemortClient<UniParcCrossReferencePair> client, int batchSize) {
+            VoldemortClient<UniParcCrossReferencePair> client) {
         super(client);
-        this.batchSize = batchSize;
-    }
-
-    public int getBatchSize() {
-        return this.batchSize;
     }
 }

@@ -14,5 +14,5 @@ public class UniParcCrossReferenceStoreConfigProperties {
     private boolean brotliEnabled;
     private int fetchMaxRetries;
     private int fetchRetryDelayMillis;
-    private int batchSize;
+    private int groupSize;
 }

@@ -108,8 +108,8 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     void testGetDatabasesWithSizeAndPagination() throws Exception {
         // when
         saveEntry();
-        Integer size = 3;
-        Integer total = 6;
+        Integer size = 8;
+        Integer total = 25;
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -120,7 +120,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "6"))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
 
@@ -141,9 +141,48 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "6"))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
+        // 3rd page
+        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
+        response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("size", String.valueOf(size))
+                                        .param("cursor", cursor));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
+
+        // 4th and last page
+        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
+        response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("size", String.valueOf(size))
+                                        .param("cursor", cursor));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(total - size)));
+                .andExpect(jsonPath("$.results.size()", Matchers.is(1)));
     }
 
     @Test
