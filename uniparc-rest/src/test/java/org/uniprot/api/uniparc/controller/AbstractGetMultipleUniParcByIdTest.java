@@ -37,11 +37,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
-import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -51,6 +49,7 @@ import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniP
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -210,7 +209,7 @@ abstract class AbstractGetMultipleUniParcByIdTest {
 
     private void saveEntry(int qualifier) {
         int xrefCount = 25;
-        UniParcEntry entry = UniParcEntryMocker.createEntry(qualifier, UPI_PREF, xrefCount);
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(qualifier, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
@@ -219,7 +218,8 @@ abstract class AbstractGetMultipleUniParcByIdTest {
                 UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
-                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+                UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
+                        uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
         storeManager.saveToStore(DataStoreManager.StoreType.CROSSREF, crossReferences);
     }
 

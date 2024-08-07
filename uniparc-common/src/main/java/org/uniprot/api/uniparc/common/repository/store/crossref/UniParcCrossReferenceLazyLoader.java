@@ -1,5 +1,11 @@
 package org.uniprot.api.uniparc.common.repository.store.crossref;
 
+import static org.uniprot.core.util.Utils.notNull;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
@@ -11,12 +17,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.uniprot.core.util.Utils.notNull;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 public class UniParcCrossReferenceLazyLoader {
 
@@ -42,7 +42,7 @@ public class UniParcCrossReferenceLazyLoader {
     }
 
     public UniParcEntryLight populateLazyFields(UniParcEntryLight entry, List<String> lazyFields) {
-        int batchSize = 10;// hardcoded value get groupSize TODO
+        int batchSize = 10; // hardcoded value get groupSize TODO
         UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
         if (entry.getNumberOfUniParcCrossReferences() > 0) {
             int pageNumbers = (entry.getNumberOfUniParcCrossReferences() / batchSize);

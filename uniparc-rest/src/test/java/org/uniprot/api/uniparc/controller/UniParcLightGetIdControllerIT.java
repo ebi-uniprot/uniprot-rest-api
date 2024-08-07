@@ -104,7 +104,7 @@ class UniParcLightGetIdControllerIT {
     }
 
     protected void saveEntry() {
-        UniParcEntry entry = createEntry(1, UPI_PREF);
+        UniParcEntry entry = createUniParcEntry(1, UPI_PREF);
 
         UniParcDocumentConverter converter = new UniParcDocumentConverter();
         UniParcDocument doc = converter.convert(entry);
@@ -128,7 +128,7 @@ class UniParcLightGetIdControllerIT {
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
+            String key = ""; // FIXME
             xRefStoreClient.saveEntry(
                     key,
                     new UniParcCrossReferencePair(

@@ -144,7 +144,8 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
-        // 3rd page
+
+        // when 3rd page
         linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
         cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
@@ -164,7 +165,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
 
-        // 4th and last page
+        // when 4th and last page will have only 1 cross ref left
         linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
         cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];

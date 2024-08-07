@@ -31,17 +31,16 @@ import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
-import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -60,8 +59,10 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     private UniParcStoreClient storeClient;
 
     protected abstract String getIdPathValue();
+
     @Value("${voldemort.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.UNIPARC;
@@ -81,7 +82,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     protected void saveEntry() {
         int xrefCount = 25;
         // full uniparc entry object for solr
-        UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF, xrefCount);
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(1, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         DataStoreManager manager = getStoreManager();
@@ -91,7 +92,8 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF, xrefCount);
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
-                UniParcEntryMocker.getXrefPairs(uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+                UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
+                        uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
         crossReferences.forEach(
                 pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
     }

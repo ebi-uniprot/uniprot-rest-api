@@ -1,10 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -15,13 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniparc.controller.UniParcITUtils.getUniParcDocument;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getUniParcXRefId;
 
 import java.util.Collections;
 import java.util.List;
@@ -58,10 +50,8 @@ import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -378,19 +368,20 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, UPI_PREF);
         UniParcDocument.UniParcDocumentBuilder builder = getUniParcDocument(entry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), builder.build());
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
-        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
-            xRefStoreClient.saveEntry(
-                    key,
-                    new UniParcCrossReferencePair(
-                            entryLight.getUniParcId(),
-                            List.of(xref))); // TODO create the page logic here
-        }
+        // TODO
+        //        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
+        //            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
+        //            xRefStoreClient.saveEntry(
+        //                    key,
+        //                    new UniParcCrossReferencePair(
+        //                            entryLight.getUniParcId(),
+        //                            List.of(xref))); // TODO create the page logic here
+        //        }
         storeClient.saveEntry(entryLight);
     }
 

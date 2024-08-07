@@ -1,7 +1,6 @@
 package org.uniprot.api.uniparc.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getUniParcXRefId;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 
+// TODO fix this
 /**
  * @author lgonzales
  * @since 13/08/2020
@@ -345,8 +345,6 @@ class UniParcBestGuessServiceTest {
         StringBuilder sequence = new StringBuilder();
         IntStream.range(0, sequenceLength).forEach(i -> sequence.append("A"));
         Sequence uniSeq = new SequenceBuilder(sequence.toString()).build();
-        List<String> xrefIds =
-                crossReferences.stream().map(xref -> getUniParcXRefId(id, xref)).toList();
         // builder.uniParcId(id).sequence(uniSeq).uniParcCrossReferencesSet(xrefIds); TODO check it
         return builder.build();
     }

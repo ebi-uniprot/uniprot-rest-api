@@ -10,6 +10,7 @@ import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -62,10 +63,11 @@ public class IdMappingUniParcITUtils {
             int i, CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
             throws Exception {
         UniParcEntryBuilder builder =
-                UniParcEntryBuilder.from(UniParcEntryMocker.createEntry(i, UPI_PREF));
+                UniParcEntryBuilder.from(UniParcEntryMocker.createUniParcEntry(i, UPI_PREF));
         if (i % 3 == 0) {
             builder.uniParcCrossReferencesAdd(
-                    UniParcEntryMocker.getXref(UniParcDatabase.EG_METAZOA));
+                    UniParcCrossReferenceMocker.createUniParcCrossReference(
+                            UniParcDatabase.EG_METAZOA));
         }
         UniParcEntry entry = builder.build();
         UniParcEntryConverter converter = new UniParcEntryConverter();

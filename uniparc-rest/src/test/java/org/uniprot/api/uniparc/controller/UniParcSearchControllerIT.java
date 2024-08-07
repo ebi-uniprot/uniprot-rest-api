@@ -55,6 +55,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -347,10 +348,14 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         saveEntry(11);
         saveEntry(20);
         if (SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
-            UniParcEntry entry = createEntry(30, UPI_PREF);
+            UniParcEntry entry = createUniParcEntry(30, UPI_PREF);
             UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
             Arrays.stream(UniParcDatabase.values())
-                    .forEach(db -> builder.uniParcCrossReferencesAdd(getXref(db)));
+                    .forEach(
+                            db ->
+                                    builder.uniParcCrossReferencesAdd(
+                                            UniParcCrossReferenceMocker.createUniParcCrossReference(
+                                                    db)));
             saveEntry(builder.build());
         }
     }
@@ -361,7 +366,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     }
 
     private void saveEntry(int i) {
-        UniParcEntry entry = createEntry(i, UPI_PREF);
+        UniParcEntry entry = createUniParcEntry(i, UPI_PREF);
         saveEntry(entry);
     }
 
@@ -372,7 +377,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
+            String key = ""; // FIXME
             xRefStoreClient.saveEntry(
                     key,
                     new UniParcCrossReferencePair(

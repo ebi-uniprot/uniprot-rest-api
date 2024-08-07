@@ -303,7 +303,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     private void saveUniParc(int i) {
-        UniParcEntry uniParcEntry = UniParcEntryMocker.createEntry(i, "UPI0000283A");
+        UniParcEntry uniParcEntry = UniParcEntryMocker.createUniParcEntry(i, "UPI0000283A");
         uniParcStoreClient.saveEntry(uniParcEntry);
     }
 

@@ -11,7 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntryLightWithSequenceLength;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createUniParcEntry;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -276,23 +278,31 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
 
         // SWISSPROT
         List<UniParcCrossReference> crossReferences = new ArrayList<>();
-        crossReferences.add(getXref(UniParcDatabase.SWISSPROT, "swissProt0", 9606, true));
-        crossReferences.add(getXref(UniParcDatabase.TREMBL, "trembl0", 9607, true));
         crossReferences.add(
-                getXref(UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive0", 9608, false));
-        crossReferences.add(getXref(UniParcDatabase.EMBL, "EMBL0", 9609, true));
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT, "swissProt0", 9606, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.TREMBL, "trembl0", 9607, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive0", 9608, false));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.EMBL, "EMBL0", 9609, true));
 
-        UniParcEntry entry = createEntry("UPI0000183A10", 20, crossReferences);
+        UniParcEntry entry = createUniParcEntry("UPI0000183A10", 20, crossReferences);
         UniParcDocument doc = documentConverter.convert(converter.toXml(entry));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         // save uniparc light in store
         UniParcEntryLight lightEntry =
-                UniParcEntryMocker.createEntryLight("UPI0000183A10", 20, crossReferences);
+                UniParcEntryMocker.createEntryLightWithSequenceLength(
+                        "UPI0000183A10", 20, crossReferences.size());
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         crossReferences.forEach(
                 xref -> {
-                    String xrefId = getUniParcXRefId("UPI0000183A10", xref);
+                    String xrefId = ""; // FIXME
                     uniParcCrossReferenceStoreClient.saveEntry(
                             xrefId,
                             new UniParcCrossReferencePair(
@@ -302,63 +312,87 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
 
         // SWISSPROT - SMALLER SEQUENCE
         crossReferences = new ArrayList<>();
-        crossReferences.add(getXref(UniParcDatabase.SWISSPROT, "swissProt1", 9606, true));
-        crossReferences.add(getXref(UniParcDatabase.TREMBL, "trembl1", 9607, true));
         crossReferences.add(
-                getXref(UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive1", 9608, false));
-        crossReferences.add(getXref(UniParcDatabase.EMBL, "EMBL1", 9609, true));
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT, "swissProt1", 9606, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.TREMBL, "trembl1", 9607, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT_VARSPLIC, "isoformInactive1", 9608, false));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.EMBL, "EMBL1", 9609, true));
 
-        entry = createEntry("UPI0000183A11", 19, crossReferences);
+        entry = createUniParcEntry("UPI0000183A11", 19, crossReferences);
         doc = documentConverter.convert(converter.toXml(entry));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         // save uniparc light in store
-        lightEntry = createEntryLight("UPI0000183A11", 19, crossReferences);
+        lightEntry =
+                createEntryLightWithSequenceLength("UPI0000183A11", 19, crossReferences.size());
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         crossReferences.forEach(
                 xref -> {
-                    String xrefId = getUniParcXRefId("UPI0000183A11", xref);
+                    String xrefId = "getUniParcXRefId(UPI0000183A11, xref)"; // FIXME
                     uniParcCrossReferenceStoreClient.saveEntry(
                             xrefId, new UniParcCrossReferencePair("UPI0000183A11", List.of(xref)));
                 });
 
         // TREMBL
         crossReferences = new ArrayList<>();
-        crossReferences.add(getXref(UniParcDatabase.TREMBL, "trembl2", 9607, true));
-        crossReferences.add(getXref(UniParcDatabase.TREMBL, "inactive2", 9608, false));
-        crossReferences.add(getXref(UniParcDatabase.EMBL, "EMBL2", 9609, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.TREMBL, "trembl2", 9607, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.TREMBL, "inactive2", 9608, false));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.EMBL, "EMBL2", 9609, true));
 
-        entry = createEntry("UPI0000183A12", 20, crossReferences);
+        entry = createUniParcEntry("UPI0000183A12", 20, crossReferences);
         doc = documentConverter.convert(converter.toXml(entry));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         // save uniparc light in store
-        lightEntry = createEntryLight("UPI0000183A12", 20, crossReferences);
+        lightEntry =
+                createEntryLightWithSequenceLength("UPI0000183A12", 20, crossReferences.size());
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         crossReferences.forEach(
                 xref -> {
-                    String xrefId = getUniParcXRefId("UPI0000183A12", xref);
+                    String xrefId = ""; // FIXME
                     uniParcCrossReferenceStoreClient.saveEntry(
                             xrefId, new UniParcCrossReferencePair("UPI0000183A12", List.of(xref)));
                 });
 
         // ISOFORM
         crossReferences = new ArrayList<>();
-        crossReferences.add(getXref(UniParcDatabase.SWISSPROT_VARSPLIC, "isoform3", 9609, true));
-        crossReferences.add(getXref(UniParcDatabase.TREMBL, "trembl3", 9607, true));
-        crossReferences.add(getXref(UniParcDatabase.SWISSPROT, "swissProtInactive3", 9608, false));
-        crossReferences.add(getXref(UniParcDatabase.EMBL, "EMBL3", 9610, true));
-        entry = createEntry("UPI0000183A13", 20, crossReferences);
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT_VARSPLIC, "isoform3", 9609, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.TREMBL, "trembl3", 9607, true));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.SWISSPROT, "swissProtInactive3", 9608, false));
+        crossReferences.add(
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.EMBL, "EMBL3", 9610, true));
+        entry = createUniParcEntry("UPI0000183A13", 20, crossReferences);
         doc = documentConverter.convert(converter.toXml(entry));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
 
         // save uniparc light in store
-        lightEntry = createEntryLight("UPI0000183A13", 20, crossReferences);
+        lightEntry =
+                createEntryLightWithSequenceLength("UPI0000183A13", 20, crossReferences.size());
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         crossReferences.forEach(
                 xref -> {
-                    String xrefId = getUniParcXRefId("UPI0000183A13", xref);
+                    String xrefId = ""; // FIXME
                     uniParcCrossReferenceStoreClient.saveEntry(
                             xrefId, new UniParcCrossReferencePair("UPI0000183A13", List.of(xref)));
                 });

@@ -7,8 +7,7 @@ import org.uniprot.store.datastore.voldemort.VoldemortClient;
 public class UniParcCrossReferenceStoreClient
         extends UniProtStoreClient<UniParcCrossReferencePair> {
 
-    public UniParcCrossReferenceStoreClient(
-            VoldemortClient<UniParcCrossReferencePair> client) {
+    public UniParcCrossReferenceStoreClient(VoldemortClient<UniParcCrossReferencePair> client) {
         super(client);
     }
 }

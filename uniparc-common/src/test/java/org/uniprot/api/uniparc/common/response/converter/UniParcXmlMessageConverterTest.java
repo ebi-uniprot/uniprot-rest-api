@@ -30,6 +30,6 @@ class UniParcXmlMessageConverterTest extends AbstractXmlValidationTest<UniParcEn
 
     @Override
     protected UniParcEntry getEntry() {
-        return UniParcEntryMocker.createEntry(2, "UPI");
+        return UniParcEntryMocker.createUniParcEntry(2, "UPI");
     }
 }

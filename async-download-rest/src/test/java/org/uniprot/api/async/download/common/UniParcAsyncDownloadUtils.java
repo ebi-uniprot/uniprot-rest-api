@@ -68,7 +68,7 @@ public class UniParcAsyncDownloadUtils {
             String upi,
             UniProtStoreClient<UniParcEntry> storeClient)
             throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, upi);
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, upi);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcEntryConverter uniParcEntryConverter = new UniParcEntryConverter();
