@@ -86,7 +86,6 @@ public class UniParcCrossReferenceService {
             page = CursorPage.of(request.getCursor(), pageSize, entryXrefs.size());
             paginatedResults = paginateCrossReferences(page, entryXrefs);
         } else {
-            List<UniParcCrossReference> candidateBatches = new ArrayList<>();
             page = CursorPage.of(request.getCursor(), pageSize, xrefCount);
             int offset = page.getOffset().intValue();
             int nextOffset = CursorPage.getNextOffset(page);
@@ -94,6 +93,8 @@ public class UniParcCrossReferenceService {
             int startBatchIndex = offset/groupSize;
             // end batch where last or last few xrefs are or even end index of sublist lies
             int endBatchIndex = nextOffset/groupSize;
+            int estimatedCapacity = (endBatchIndex-startBatchIndex+1)*groupSize;
+            List<UniParcCrossReference> candidateBatches = new ArrayList<>(estimatedCapacity);
             // get all the xrefs from start to end batches
             for(int i = startBatchIndex; i <= endBatchIndex; i++){
                 String xrefBatchId = entry.getUniParcId() + "_" + i;
@@ -105,7 +106,8 @@ public class UniParcCrossReferenceService {
             int scaledOffset = offset%groupSize;
             // end index for sublist
             int scaledNextOffset = scaledOffset + nextOffset - offset;
-            paginatedResults = candidateBatches.subList(scaledOffset, Math.min(scaledNextOffset, candidateBatches.size()));
+            scaledNextOffset = Math.min(scaledNextOffset, candidateBatches.size());
+            paginatedResults = candidateBatches.subList(scaledOffset, scaledNextOffset);
         }
         return QueryResult.<UniParcCrossReference>builder()
                 .content(paginatedResults.stream())
