@@ -3,7 +3,6 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
@@ -64,7 +63,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083C01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.value", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.length", notNullValue()))
@@ -112,7 +111,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)));
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)));
     }
 
     @Test
@@ -141,14 +140,14 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo("UPI0000083C01")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)));
     }
@@ -195,7 +194,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)));
     }
@@ -218,7 +217,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)));
     }
@@ -241,7 +240,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)))
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)));
     }
@@ -270,7 +269,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C01", "UPI0000083C02")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)));
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)));
 
         String cursor1 = extractCursor(response);
         // when get second page
@@ -295,7 +294,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C03", "UPI0000083C04")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)));
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)));
 
         String cursor2 = extractCursor(responsePage2);
 
@@ -316,7 +315,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)));
+                .andExpect(jsonPath("$.results[0].crossReferenceCount", is(25)));
     }
 
     @Override

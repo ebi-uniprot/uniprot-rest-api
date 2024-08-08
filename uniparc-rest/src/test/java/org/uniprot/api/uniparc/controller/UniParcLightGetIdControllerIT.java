@@ -156,11 +156,8 @@ class UniParcLightGetIdControllerIT {
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
                 .andExpect(
                         jsonPath(
-                                "$.uniParcCrossReferences",
-                                contains(
-                                        "UPI0000083D01-SWISSPROT-P10001",
-                                        "UPI0000083D01-TREMBL-P12301",
-                                        "UPI0000083D01-REFSEQ-WP_168893201")))
+                                "$.crossReferenceCount",
+                                is(3)))
                 .andExpect(
                         jsonPath(
                                 "$.commonTaxons[*].topLevel",
@@ -223,13 +220,6 @@ class UniParcLightGetIdControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                .andExpect(
-                        jsonPath(
-                                "$.uniParcCrossReferences",
-                                contains(
-                                        "UPI0000083D01-SWISSPROT-P10001",
-                                        "UPI0000083D01-TREMBL-P12301",
-                                        "UPI0000083D01-REFSEQ-WP_168893201")))
                 .andExpect(jsonPath("$.geneNames", contains("geneName01")))
                 .andExpect(jsonPath("$.commonTaxons").doesNotExist())
                 .andExpect(jsonPath("$.uniProtKBAccessions").doesNotExist())

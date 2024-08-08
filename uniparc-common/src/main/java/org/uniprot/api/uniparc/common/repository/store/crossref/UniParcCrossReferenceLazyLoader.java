@@ -44,8 +44,8 @@ public class UniParcCrossReferenceLazyLoader {
     public UniParcEntryLight populateLazyFields(UniParcEntryLight entry, List<String> lazyFields) {
         int batchSize = 10; // hardcoded value get groupSize TODO
         UniParcEntryLightBuilder builder = UniParcEntryLightBuilder.from(entry);
-        if (entry.getNumberOfUniParcCrossReferences() > 0) {
-            int pageNumbers = (entry.getNumberOfUniParcCrossReferences() / batchSize);
+        if (entry.getCrossReferenceCount() > 0) {
+            int pageNumbers = (entry.getCrossReferenceCount() / batchSize);
             for (int i = 0; i <= pageNumbers; i = i + batchSize) {
                 addLazyFields(builder, lazyFields, entry.getUniParcId() + "_" + i);
             }

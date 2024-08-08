@@ -1,16 +1,8 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +52,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
 
     protected abstract String getIdPathValue();
 
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @Override
@@ -82,9 +74,9 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     protected void saveEntry() {
         int xrefCount = 25;
         // full uniparc entry object for solr
-        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(1, UPI_PREF, xrefCount);
+        UniParcEntry uniParcEntry = UniParcEntryMocker.createUniParcEntry(1, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
+        Entry xmlEntry = converter.toXml(uniParcEntry);
         DataStoreManager manager = getStoreManager();
         manager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         //  uniparc light and cross reference in voldemort
@@ -94,9 +86,9 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
-                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
-        crossReferences.forEach(
-                pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
+                        uniParcEntryLight.getUniParcId(), 1, xrefCount, xrefGroupSize);
+        manager.saveToStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossReferences);
+
     }
 
     @BeforeAll
@@ -111,12 +103,13 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 new UniParcLightStoreClient(
                         VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
         VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
-                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference");
         UniParcCrossReferenceStoreClient crossRefStoreClient =
                 new UniParcCrossReferenceStoreClient(xrefVDClient);
         getStoreManager()
                 .addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
-        getStoreManager().addStore(DataStoreManager.StoreType.CROSSREF, crossRefStoreClient);
+        getStoreManager()
+                .addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
     }
 
     @AfterAll
@@ -141,13 +134,21 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(2)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(8)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].database",
-                                containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")))
+                                containsInAnyOrder(
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
@@ -192,7 +193,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
@@ -217,15 +218,12 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(21)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.uniParcCrossReferences[*].active",
-                                contains(true, true, true, true, true)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", everyItem(is(true))))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
@@ -246,11 +244,11 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(1)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", contains(false)))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", everyItem(is(false))))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
