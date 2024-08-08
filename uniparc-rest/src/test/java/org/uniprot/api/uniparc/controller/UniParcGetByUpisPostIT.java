@@ -1,10 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -79,7 +75,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniParcFacetConfig facetConfig;
 
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @BeforeAll
@@ -155,7 +151,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6));
+        ResultMatcher rm2 = jsonPath("$.results[0].crossReferenceCount", is(25));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
         ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12));

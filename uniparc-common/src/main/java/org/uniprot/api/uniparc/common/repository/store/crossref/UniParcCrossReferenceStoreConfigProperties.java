@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import lombok.Data;
 
 @Data
-@ConfigurationProperties(prefix = "voldemort.cross.reference")
+@ConfigurationProperties(prefix = "voldemort.uniparc.cross.reference")
 public class UniParcCrossReferenceStoreConfigProperties {
     private String host;
     private int numberOfConnections;

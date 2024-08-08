@@ -6,6 +6,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.controller.ControllerITUtils.CACHE_VALUE;
@@ -231,7 +232,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.OK.value()))
                             .andExpect(
                                     header().string(

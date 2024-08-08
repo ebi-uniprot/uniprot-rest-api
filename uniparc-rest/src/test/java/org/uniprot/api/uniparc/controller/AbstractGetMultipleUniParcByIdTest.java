@@ -6,7 +6,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
@@ -76,7 +75,7 @@ abstract class AbstractGetMultipleUniParcByIdTest {
 
     protected abstract String getSearchValue();
 
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @BeforeAll
@@ -95,11 +94,12 @@ abstract class AbstractGetMultipleUniParcByIdTest {
                 new UniParcLightStoreClient(
                         VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
         VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
-                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference");
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference");
         UniParcCrossReferenceStoreClient crossRefStoreClient =
                 new UniParcCrossReferenceStoreClient(xrefVDClient);
         storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
-        storeManager.addStore(DataStoreManager.StoreType.CROSSREF, crossRefStoreClient);
+        storeManager.addStore(
+                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
 
         // create 5 entries
         IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
@@ -152,7 +152,7 @@ abstract class AbstractGetMultipleUniParcByIdTest {
             contentType = MediaType.APPLICATION_JSON_VALUE;
         }
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, contentType));
     }
@@ -217,10 +217,11 @@ abstract class AbstractGetMultipleUniParcByIdTest {
         UniParcEntryLight uniParcEntryLight =
                 UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
-        List<UniParcCrossReferencePair> crossReferences =
+        List<UniParcCrossReferencePair> crossReferencePairs =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
                         uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
-        storeManager.saveToStore(DataStoreManager.StoreType.CROSSREF, crossReferences);
+        storeManager.saveToStore(
+                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossReferencePairs);
     }
 
     protected static Stream<Arguments> getAllReturnedFields() {

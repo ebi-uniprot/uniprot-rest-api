@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,9 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
             UniParcDatabaseControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
+
+    @Value("${search.default.page.size:#{null}}")
+    private Integer searchBatchSize;
 
     @Override
     protected String getIdPathValue() {
@@ -189,6 +193,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     @Test
     void testGetByAccessionWithInActiveCrossRefFilterSuccess() throws Exception {
         // when
+        saveEntry();
         String active = "false";
         ResultActions response =
                 getMockMvc()
@@ -201,11 +206,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(4)))
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].active", contains(false)));
+                .andExpect(jsonPath("$.results[*].active", contains(false, false, false, false)));
     }
 
     @Test
@@ -223,7 +228,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
+                .andExpect(jsonPath("$.results", iterableWithSize(4)))
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
@@ -246,13 +251,18 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(2)))
+                .andExpect(jsonPath("$.results", iterableWithSize(5)))
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(
                         jsonPath(
                                 "$.results[*].database",
-                                containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")));
+                                containsInAnyOrder(
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL")));
     }
 
     @Test
@@ -284,7 +294,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(UNIPARC_ID)
-                    .resultMatcher(jsonPath("$.results.size()", is(6)))
+                    .resultMatcher(jsonPath("$.results.size()", is(5)))
                     .build();
         }
 
@@ -345,7 +355,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.results.size()", is(6)))
+                                    .resultMatcher(jsonPath("$.results.size()", is(5)))
                                     .resultMatcher(jsonPath("$.results.*.database").exists())
                                     .resultMatcher(jsonPath("$.results.*.id").exists())
                                     .build())
@@ -365,8 +375,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                                             + "UniProtKB/TrEMBL\tP12301\t7\tName 9606\t2017-02-12\t2017-04-23\tYes\n"
                                                                             + "RefSeq\tWP_168893201\t7\t\t2017-02-12\t2017-04-23\tYes\n"
                                                                             + "EMBL\tembl1\t7\t\t2017-02-12\t2017-04-23\tYes\n"
-                                                                            + "UNIMES\tunimes1\t7\t\t2017-02-12\t2017-04-23\tNo\n"
-                                                                            + "VectorBase\tcommon-vector\t7\t\t2017-02-12\t2017-04-23\tYes")))
+                                                                            + "UNIMES\tunimes1\t7\t\t2017-02-12\t2017-04-23\tNo")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

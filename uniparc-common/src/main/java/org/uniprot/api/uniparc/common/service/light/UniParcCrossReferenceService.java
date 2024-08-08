@@ -73,7 +73,7 @@ public class UniParcCrossReferenceService {
             page = CursorPage.of(request.getCursor(), pageSize, filteredCrossReferences.size());
             paginatedResults = paginateCrossReferences(page, filteredCrossReferences);
         } else {
-            int xrefCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
+            int xrefCount = uniParcEntryLight.getCrossReferenceCount();
             page = CursorPage.of(request.getCursor(), pageSize, xrefCount);
             List<UniParcCrossReference> requiredCrossReferenceBatches =
                     getRequiredCrossReferenceBatches(uniParcEntryLight, page);
@@ -97,7 +97,7 @@ public class UniParcCrossReferenceService {
             UniParcEntryLight uniParcEntryLight, UniParcDatabasesRequest request) {
         List<UniParcCrossReference> filteredCrossReferences = new ArrayList<>();
         int groupSize = this.storeConfigProperties.getGroupSize();
-        int crossReferencesCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
+        int crossReferencesCount = uniParcEntryLight.getCrossReferenceCount();
         // Calculate the number of batches required
         int storePageCount =
                 crossReferencesCount / groupSize + (crossReferencesCount % groupSize == 0 ? 0 : 1);
@@ -206,7 +206,7 @@ public class UniParcCrossReferenceService {
 
     private List<String> generateUniParcCrossReferenceKeys(UniParcEntryLight uniParcEntryLight) {
         int groupSize = this.storeConfigProperties.getGroupSize();
-        int xrefCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
+        int xrefCount = uniParcEntryLight.getCrossReferenceCount();
         List<String> xrefKeys = new ArrayList<>();
         String uniParcId = uniParcEntryLight.getUniParcId();
         for (int i = 0, batchId = 0; i < xrefCount; i += groupSize, batchId++) {

@@ -1,17 +1,11 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -105,7 +99,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniParcFacetConfig facetConfig;
 
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @BeforeAll
@@ -235,7 +229,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6));
+        ResultMatcher rm2 = jsonPath("$.results[0].crossReferenceCount", is(25));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
         ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12));
@@ -248,7 +242,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Database", "Organisms"));
         ResultMatcher rm3 =
                 jsonPath("$.facets.*.name", contains("database_facet", "organism_name"));
-        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(2));
+        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(5));
         ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("UniProtKB"));
         ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("100"));
         ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(10));
@@ -380,19 +374,20 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 
-    private void saveEntry(int i) throws Exception {
+    private void saveEntry(int qualifier) throws Exception {
         int xrefCount = 25;
-        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, UPI_PREF, xrefCount);
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(qualifier, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         UniParcEntryLight uniParcEntryLight =
-                UniParcEntryMocker.createUniParcEntryLight(i, UPI_PREF, xrefCount);
+                UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
         storeClient.saveEntry(uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
-                        uniParcEntryLight.getUniParcId(), i, xrefCount, xrefGroupSize);
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
+
         crossReferences.forEach(pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair));
     }
 }
