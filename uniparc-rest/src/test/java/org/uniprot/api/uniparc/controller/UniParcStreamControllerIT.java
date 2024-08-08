@@ -85,7 +85,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     private static final String streamRequestPath = "/uniparc/stream";
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @Autowired private UniProtStoreClient<UniParcEntryLight> storeClient;
@@ -382,7 +382,9 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         List<UniParcCrossReferencePair> xrefPairs =
                 UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
-                        entryLight.getUniParcId(), xrefGroupSize, entry.getUniParcCrossReferences());
+                        entryLight.getUniParcId(),
+                        xrefGroupSize,
+                        entry.getUniParcCrossReferences());
         for (UniParcCrossReferencePair xrefPair : xrefPairs) {
             xRefStoreClient.saveEntry(xrefPair);
         }

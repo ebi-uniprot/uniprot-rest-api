@@ -83,7 +83,8 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
-    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
     @Value("${search.default.page.size:#{null}}")
@@ -383,7 +384,9 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         List<UniParcCrossReferencePair> xrefPairs =
                 UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
-                        entryLight.getUniParcId(), xrefGroupSize, entry.getUniParcCrossReferences());
+                        entryLight.getUniParcId(),
+                        xrefGroupSize,
+                        entry.getUniParcCrossReferences());
         for (UniParcCrossReferencePair xrefPair : xrefPairs) {
             xRefStoreClient.saveEntry(xrefPair);
         }

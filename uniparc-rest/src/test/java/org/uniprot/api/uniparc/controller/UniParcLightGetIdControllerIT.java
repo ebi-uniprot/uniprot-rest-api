@@ -154,10 +154,7 @@ class UniParcLightGetIdControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                .andExpect(
-                        jsonPath(
-                                "$.crossReferenceCount",
-                                is(3)))
+                .andExpect(jsonPath("$.crossReferenceCount", is(3)))
                 .andExpect(
                         jsonPath(
                                 "$.commonTaxons[*].topLevel",

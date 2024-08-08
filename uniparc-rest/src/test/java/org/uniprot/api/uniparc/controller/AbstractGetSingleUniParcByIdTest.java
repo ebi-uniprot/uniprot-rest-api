@@ -88,7 +88,6 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
                         uniParcEntryLight.getUniParcId(), 1, xrefCount, xrefGroupSize);
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossReferences);
-
     }
 
     @BeforeAll

@@ -300,7 +300,15 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].database",
-                                containsInAnyOrder("UniProtKB/TrEMBL", "EMBL","UniProtKB/TrEMBL", "EMBL","UniProtKB/TrEMBL", "EMBL","UniProtKB/TrEMBL", "EMBL")))
+                                containsInAnyOrder(
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL",
+                                        "UniProtKB/TrEMBL",
+                                        "EMBL")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
@@ -378,10 +386,7 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.uniParcCrossReferences[*].active",
-                                everyItem(is(true))))
+                .andExpect(jsonPath("$.uniParcCrossReferences[*].active", everyItem(is(true))))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
