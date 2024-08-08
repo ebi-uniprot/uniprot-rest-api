@@ -88,12 +88,13 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         DataStoreManager manager = getStoreManager();
         manager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
         //  uniparc light and cross reference in voldemort
+        int qualifier = 1;
         UniParcEntryLight uniParcEntryLight =
-                UniParcEntryMocker.createUniParcEntryLight(1, UPI_PREF, xrefCount);
+                UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
         manager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
-                        uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
         crossReferences.forEach(
                 pair -> manager.saveToStore(DataStoreManager.StoreType.CROSSREF, pair));
     }

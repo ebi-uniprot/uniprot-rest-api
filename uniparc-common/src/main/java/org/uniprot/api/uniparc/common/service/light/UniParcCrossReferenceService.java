@@ -204,8 +204,7 @@ public class UniParcCrossReferenceService {
         return this.defaultPageSize;
     }
 
-
-    private List<String> generateUniParcCrossReferenceKeys(UniParcEntryLight uniParcEntryLight){
+    private List<String> generateUniParcCrossReferenceKeys(UniParcEntryLight uniParcEntryLight) {
         int groupSize = this.storeConfigProperties.getGroupSize();
         int xrefCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
         List<String> xrefKeys = new ArrayList<>();

@@ -1,6 +1,25 @@
 package org.uniprot.api.uniparc.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntryLightWithSequenceLength;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createUniParcEntry;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -35,25 +54,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntryLightWithSequenceLength;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createUniParcEntry;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author lgonzales
@@ -301,7 +302,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         uniParcLightStoreClient.saveEntry(lightEntry);
         // save cross references in store
         String xrefBatchKey = uniParcId + "_0";
-        uniParcCrossReferenceStoreClient.saveEntry(new UniParcCrossReferencePair(xrefBatchKey, crossReferences));
+        uniParcCrossReferenceStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey, crossReferences));
 
         // SWISSPROT - SMALLER SEQUENCE
         String uniParcId1 = "UPI0000183A11";
@@ -323,11 +325,13 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         UniParcDocument doc1 = documentConverter.convert(converter.toXml(entry1));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc1);
         // save uniparc light in store
-        UniParcEntryLight lightEntry1 = createEntryLightWithSequenceLength(uniParcId1, 19, crossReferences1.size());
+        UniParcEntryLight lightEntry1 =
+                createEntryLightWithSequenceLength(uniParcId1, 19, crossReferences1.size());
         uniParcLightStoreClient.saveEntry(lightEntry1);
         // save cross references in store
         String xrefBatchKey1 = uniParcId1 + "_0";
-        uniParcCrossReferenceStoreClient.saveEntry(new UniParcCrossReferencePair(xrefBatchKey1, crossReferences1));
+        uniParcCrossReferenceStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey1, crossReferences1));
 
         // TREMBL
         String uniParcId2 = "UPI0000183A12";
@@ -346,11 +350,13 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         UniParcDocument doc2 = documentConverter.convert(converter.toXml(entry2));
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc2);
         // save uniparc light in store
-        UniParcEntryLight lightEntry2 = createEntryLightWithSequenceLength(uniParcId2, 20, crossReferences2.size());
+        UniParcEntryLight lightEntry2 =
+                createEntryLightWithSequenceLength(uniParcId2, 20, crossReferences2.size());
         uniParcLightStoreClient.saveEntry(lightEntry2);
         // save cross references in store
         String xrefBatchKey2 = uniParcId2 + "_0";
-        uniParcCrossReferenceStoreClient.saveEntry(new UniParcCrossReferencePair(xrefBatchKey2, crossReferences2));
+        uniParcCrossReferenceStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey2, crossReferences2));
 
         // ISOFORM
         String uniParcId3 = "UPI0000183A13";
@@ -372,11 +378,13 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc3);
 
         // save uniparc light in store
-        UniParcEntryLight lightEntry3 = createEntryLightWithSequenceLength(uniParcId3, 20, crossReferences3.size());
+        UniParcEntryLight lightEntry3 =
+                createEntryLightWithSequenceLength(uniParcId3, 20, crossReferences3.size());
         uniParcLightStoreClient.saveEntry(lightEntry3);
         // save cross references in store
         String xrefBatchKey3 = uniParcId3 + "_0";
-        uniParcCrossReferenceStoreClient.saveEntry(new UniParcCrossReferencePair(xrefBatchKey3, crossReferences3));
+        uniParcCrossReferenceStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey3, crossReferences3));
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 

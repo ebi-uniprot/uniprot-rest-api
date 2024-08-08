@@ -240,7 +240,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         storeClient.saveEntry(uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
-                        uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
         crossReferences.forEach(pair -> crossRefStoreClient.saveEntry(pair.getKey(), pair));
     }
 }

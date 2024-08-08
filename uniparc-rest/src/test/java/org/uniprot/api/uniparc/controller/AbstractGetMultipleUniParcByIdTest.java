@@ -219,7 +219,7 @@ abstract class AbstractGetMultipleUniParcByIdTest {
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
         List<UniParcCrossReferencePair> crossReferences =
                 UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
-                        uniParcEntryLight.getUniParcId(), xrefCount, xrefGroupSize);
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
         storeManager.saveToStore(DataStoreManager.StoreType.CROSSREF, crossReferences);
     }
 

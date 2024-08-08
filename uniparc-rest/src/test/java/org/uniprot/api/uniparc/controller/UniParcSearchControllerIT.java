@@ -44,7 +44,6 @@ import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -110,7 +109,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return 5;
     }
 
     @Override
@@ -376,13 +375,11 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
-        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            String key = ""; // FIXME
-            xRefStoreClient.saveEntry(
-                    key,
-                    new UniParcCrossReferencePair(
-                            entryLight.getUniParcId(),
-                            List.of(xref))); // TODO create the page logic here
+        List<UniParcCrossReferencePair> xrefPairs =
+                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
+                        entryLight.getUniParcId(), 3, entry.getUniParcCrossReferences());
+        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
+            xRefStoreClient.saveEntry(xrefPair);
         }
     }
 
