@@ -29,6 +29,7 @@ public class UniParcCrossReferenceStoreConfig {
     public UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader(
             UniParcCrossReferenceStoreConfigProperties configProperties,
             UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient) {
-        return new UniParcCrossReferenceLazyLoader(uniParcCrossReferenceStoreClient);
+        return new UniParcCrossReferenceLazyLoader(
+                uniParcCrossReferenceStoreClient, configProperties);
     }
 }

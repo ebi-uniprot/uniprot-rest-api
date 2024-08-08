@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -82,6 +83,11 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
+    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
+
+    @Value("${search.default.page.size:#{null}}")
+    private Integer defaultPageSize;
 
     private UniParcLightStoreClient storeClient;
 
@@ -109,7 +115,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Override
     protected int getDefaultPageSize() {
-        return 5;
+        return defaultPageSize;
     }
 
     @Override
@@ -377,7 +383,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
         List<UniParcCrossReferencePair> xrefPairs =
                 UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
-                        entryLight.getUniParcId(), 3, entry.getUniParcCrossReferences());
+                        entryLight.getUniParcId(), xrefGroupSize, entry.getUniParcCrossReferences());
         for (UniParcCrossReferencePair xrefPair : xrefPairs) {
             xRefStoreClient.saveEntry(xrefPair);
         }

@@ -31,6 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
@@ -52,12 +53,14 @@ import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -82,6 +85,9 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
+
+    @Value("${voldemort.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
 
     @Autowired private UniProtStoreClient<UniParcEntryLight> storeClient;
     @Autowired private UniParcCrossReferenceStoreClient xRefStoreClient;
@@ -373,16 +379,14 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), builder.build());
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
-        // TODO
-        //        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-        //            String key = getUniParcXRefId(entry.getUniParcId().getValue(), xref);
-        //            xRefStoreClient.saveEntry(
-        //                    key,
-        //                    new UniParcCrossReferencePair(
-        //                            entryLight.getUniParcId(),
-        //                            List.of(xref))); // TODO create the page logic here
-        //        }
         storeClient.saveEntry(entryLight);
+
+        List<UniParcCrossReferencePair> xrefPairs =
+                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
+                        entryLight.getUniParcId(), xrefGroupSize, entry.getUniParcCrossReferences());
+        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
+            xRefStoreClient.saveEntry(xrefPair);
+        }
     }
 
     private Stream<Arguments> getAllSortFields() {
