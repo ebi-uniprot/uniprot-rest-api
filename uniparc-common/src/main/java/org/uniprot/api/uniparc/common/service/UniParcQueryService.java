@@ -249,7 +249,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         // populate cross-references from its own store
         List<UniParcCrossReference> crossReferences =
                 this.uniParcCrossReferenceService
-                        .getCrossReferences(optLightEntry.get().getNumberOfUniParcCrossReferences())
+                        .getCrossReferences(optLightEntry.get())
                         .toList();
         builder.uniParcCrossReferencesSet(crossReferences);
         return builder.build();

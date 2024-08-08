@@ -177,10 +177,10 @@ public class UniParcCrossReferenceService {
         return false;
     }
 
-    public Stream<UniParcCrossReference> getCrossReferences(int numberOfXrefs) {
+    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight) {
         BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
                 new BatchStoreIterable<>(
-                        List.of(), // TODO: we need to implement BatchStoreIterable
+                        generateUniParcCrossReferenceKeys(uniParcEntryLight),
                         this.crossReferenceStoreClient,
                         this.crossReferenceStoreRetryPolicy,
                         1);
@@ -202,5 +202,17 @@ public class UniParcCrossReferenceService {
 
     private int getDefaultPageSize() {
         return this.defaultPageSize;
+    }
+
+
+    private List<String> generateUniParcCrossReferenceKeys(UniParcEntryLight uniParcEntryLight){
+        int groupSize = this.storeConfigProperties.getGroupSize();
+        int xrefCount = uniParcEntryLight.getNumberOfUniParcCrossReferences();
+        List<String> xrefKeys = new ArrayList<>();
+        String uniParcId = uniParcEntryLight.getUniParcId();
+        for (int i = 0, batchId = 0; i < xrefCount; i += groupSize, batchId++) {
+            xrefKeys.add(uniParcId + "_" + batchId);
+        }
+        return xrefKeys;
     }
 }
