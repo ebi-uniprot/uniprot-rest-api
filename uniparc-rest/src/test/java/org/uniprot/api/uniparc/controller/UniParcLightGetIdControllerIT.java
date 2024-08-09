@@ -19,6 +19,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
@@ -39,19 +40,13 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
-import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
-import org.uniprot.core.util.Utils;
-import org.uniprot.cv.taxonomy.TaxonomicNode;
-import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.util.TaxonomyRepoUtil;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 
 @ContextConfiguration(classes = {UniParcRestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
@@ -60,7 +55,6 @@ import org.uniprot.store.search.document.uniparc.UniParcDocumentConverter;
 @ExtendWith(SpringExtension.class)
 class UniParcLightGetIdControllerIT {
 
-    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
     private static final String UPI_PREF = "UPI0000083D";
     public static final String UNIPARC_ID = "UPI0000083D01";
 
@@ -76,6 +70,9 @@ class UniParcLightGetIdControllerIT {
     @Autowired private MockMvc mockMvc;
 
     @Autowired private UniParcQueryRepository repository;
+
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
 
     @BeforeAll
     void initDataStore() {
@@ -106,34 +103,19 @@ class UniParcLightGetIdControllerIT {
     protected void saveEntry() {
         UniParcEntry entry = createUniParcEntry(1, UPI_PREF);
 
-        UniParcDocumentConverter converter = new UniParcDocumentConverter();
-        UniParcDocument doc = converter.convert(entry);
-        UniParcDocument.UniParcDocumentBuilder builder = doc.toBuilder();
-        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            if (Utils.notNull(xref.getOrganism())) {
-                List<TaxonomicNode> nodes =
-                        TaxonomyRepoUtil.getTaxonomyLineage(
-                                taxonomyRepo, (int) xref.getOrganism().getTaxonId());
-                builder.organismId((int) xref.getOrganism().getTaxonId());
-                nodes.forEach(
-                        node -> {
-                            builder.taxLineageId(node.id());
-                            List<String> names = TaxonomyRepoUtil.extractTaxonFromNode(node);
-                            names.forEach(builder::organismTaxon);
-                        });
-            }
-        }
-        storeManager.saveDocs(DataStoreManager.StoreType.UNIPARC_LIGHT, doc);
+        UniParcDocument.UniParcDocumentBuilder docBuilder =
+                UniParcITUtils.getUniParcDocument(entry);
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPARC_LIGHT, docBuilder.build());
 
         UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
         storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
-        for (UniParcCrossReference xref : entry.getUniParcCrossReferences()) {
-            String key = ""; // FIXME
-            xRefStoreClient.saveEntry(
-                    key,
-                    new UniParcCrossReferencePair(
-                            entryLight.getUniParcId(),
-                            List.of(xref))); // TODO create the page logic here
+        List<UniParcCrossReferencePair> xrefPairs =
+                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
+                        entryLight.getUniParcId(),
+                        xrefGroupSize,
+                        entry.getUniParcCrossReferences());
+        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
+            xRefStoreClient.saveEntry(xrefPair);
         }
     }
 
