@@ -1,5 +1,15 @@
 package org.uniprot.api.support.data.statistics.mapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.*;
+import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType.REVIEWED;
+import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType.UNREVIEWED;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,23 +24,12 @@ import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsA
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsHistory;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.*;
-import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType.REVIEWED;
-import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType.UNREVIEWED;
-
 @ExtendWith(MockitoExtension.class)
 class StatisticsMapperTest {
     private static final Map<String, FacetProperty> FACET_MAP = new HashMap<>();
-    @Mock
-    private StatisticsAttributeConfig statisticsAttributeConfig;
-    @InjectMocks
-    private StatisticsMapper statisticsMapper;
+    public static final String QUERY = "query";
+    @Mock private StatisticsAttributeConfig statisticsAttributeConfig;
+    @InjectMocks private StatisticsMapper statisticsMapper;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +69,7 @@ class StatisticsMapperTest {
         UniProtKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
-                statisticsMapper.map(statisticsEntry);
+                statisticsMapper.map(statisticsEntry, QUERY);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
                 statisticsEntry, statisticsModuleStatisticsAttribute, LABEL_0);
     }
@@ -80,7 +79,7 @@ class StatisticsMapperTest {
         UniProtKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
-                statisticsMapper.map(statisticsEntry);
+                statisticsMapper.map(statisticsEntry, QUERY);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
                 statisticsEntry, statisticsModuleStatisticsAttribute, null);
     }
@@ -107,6 +106,7 @@ class StatisticsMapperTest {
         assertEquals(expect.getEntryCount().longValue(), actual.getEntryCount());
         assertSame(expect.getDescription(), actual.getDescription());
         assertSame(REVIEWED, actual.getStatisticsType());
+        assertSame(QUERY, actual.getQuery());
         assertSame(label, actual.getLabel());
     }
 }

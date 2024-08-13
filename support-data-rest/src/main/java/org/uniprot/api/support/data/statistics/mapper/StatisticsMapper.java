@@ -29,20 +29,21 @@ public class StatisticsMapper {
     }
 
     public StatisticsModuleStatisticsType map(EntryType entryType) {
-        switch (entryType) {
-            case TREMBL:
-                return StatisticsModuleStatisticsType.UNREVIEWED;
-            case SWISSPROT:
-                return StatisticsModuleStatisticsType.REVIEWED;
+        if (entryType == null) {
+            return null;
         }
-        throw new IllegalArgumentException(
-                String.format("Entry type %s is not recognized", entryType));
+        return switch (entryType) {
+            case TREMBL -> StatisticsModuleStatisticsType.UNREVIEWED;
+            case SWISSPROT -> StatisticsModuleStatisticsType.REVIEWED;
+        };
     }
 
-    public StatisticsModuleStatisticsAttribute map(UniProtKBStatisticsEntry entry) {
+    public StatisticsModuleStatisticsAttribute map(
+            UniProtKBStatisticsEntry entry, String attributeQuery) {
         return StatisticsModuleStatisticsAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
+                .query(attributeQuery)
                 .entryCount(entry.getEntryCount())
                 .statisticsType(map(entry.getEntryType()))
                 .description(entry.getDescription())
