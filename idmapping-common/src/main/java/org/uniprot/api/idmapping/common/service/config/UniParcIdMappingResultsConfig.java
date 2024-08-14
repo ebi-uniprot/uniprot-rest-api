@@ -3,10 +3,10 @@ package org.uniprot.api.idmapping.common.service.config;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -19,12 +19,17 @@ import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortRemoteUniParcEntryStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortRemoteUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortRemoteUniParcCrossReferenceStore;
 import org.uniprot.store.search.SolrCollection;
 
 import net.jodah.failsafe.RetryPolicy;
@@ -35,6 +40,7 @@ import net.jodah.failsafe.RetryPolicy;
  */
 @Configuration
 @Import(RepositoryConfig.class)
+@EnableConfigurationProperties({UniParcCrossReferenceStoreConfigProperties.class})
 public class UniParcIdMappingResultsConfig {
 
     @Bean("uniParcStreamerConfigProperties")
@@ -44,7 +50,7 @@ public class UniParcIdMappingResultsConfig {
     }
 
     @Bean("uniParcStoreConfigProperties")
-    @ConfigurationProperties(prefix = "voldemort.uniparc")
+    @ConfigurationProperties(prefix = "voldemort.uniparc.light")
     public StoreConfigProperties uniParcStoreConfigProperties() {
         return new StoreConfigProperties();
     }
@@ -52,7 +58,6 @@ public class UniParcIdMappingResultsConfig {
     @Bean("uniParcTupleStreamTemplate")
     public TupleStreamTemplate uniParcTupleStreamTemplate(
             StreamerConfigProperties uniParcStreamerConfigProperties,
-            HttpClient httpClient,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -74,7 +79,7 @@ public class UniParcIdMappingResultsConfig {
 
     @Bean("uniParcFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())
@@ -82,20 +87,20 @@ public class UniParcIdMappingResultsConfig {
     }
 
     @Bean("uniParcEntryStoreStreamer")
-    public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
+    public StoreStreamer<UniParcEntryLight> uniParcEntryStoreStreamer(
             @Qualifier("uniParcStoreStreamerConfig")
-                    StoreStreamerConfig<UniParcEntry> uniParcStoreStreamerConfig) {
+                    StoreStreamerConfig<UniParcEntryLight> uniParcStoreStreamerConfig) {
         return new StoreStreamer<>(uniParcStoreStreamerConfig);
     }
 
     @Bean("uniParcStoreStreamerConfig")
-    public StoreStreamerConfig<UniParcEntry> uniParcStoreStreamerConfig(
-            @Qualifier("uniParcStoreClient") UniProtStoreClient<UniParcEntry> storeClient,
+    public StoreStreamerConfig<UniParcEntryLight> uniParcStoreStreamerConfig(
+            @Qualifier("uniParcStoreClient") UniProtStoreClient<UniParcEntryLight> storeClient,
             @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniParcDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
             @Qualifier("uniParcStoreRetryPolicy") RetryPolicy<Object> uniParcStoreRetryPolicy) {
-        return StoreStreamerConfig.<UniParcEntry>builder()
+        return StoreStreamerConfig.<UniParcEntryLight>builder()
                 .streamConfig(streamConfig)
                 .storeClient(storeClient)
                 .tupleStreamTemplate(tupleStreamTemplate)
@@ -115,14 +120,43 @@ public class UniParcIdMappingResultsConfig {
 
     @Bean("uniParcStoreClient")
     @Profile("live")
-    public UniProtStoreClient<UniParcEntry> uniParcStoreClient(
+    public UniProtStoreClient<UniParcEntryLight> uniParcStoreClient(
             StoreConfigProperties uniParcStoreConfigProperties) {
-        VoldemortClient<UniParcEntry> client =
-                new VoldemortRemoteUniParcEntryStore(
+        VoldemortClient<UniParcEntryLight> client =
+                new VoldemortRemoteUniParcEntryLightStore(
                         uniParcStoreConfigProperties.getNumberOfConnections(),
                         uniParcStoreConfigProperties.isBrotliEnabled(),
                         uniParcStoreConfigProperties.getStoreName(),
                         uniParcStoreConfigProperties.getHost());
+        return new UniProtStoreClient<>(client);
+    }
+
+    @Bean
+    public StoreStreamer<UniParcEntryLight> uniParcEntryLightStoreStreamer(
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,
+            UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
+        return new UniParcLightStoreStreamer(
+                storeLightStreamerConfig, uniParcCrossReferenceLazyLoader);
+    }
+
+    @Bean
+    public UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader(
+            UniParcCrossReferenceStoreConfigProperties configProperties,
+            UniProtStoreClient<UniParcCrossReferencePair> uniParcCrossReferenceStoreClient) {
+        return new UniParcCrossReferenceLazyLoader(
+                uniParcCrossReferenceStoreClient, configProperties);
+    }
+
+    @Bean
+    @Profile("live")
+    public UniProtStoreClient<UniParcCrossReferencePair> uniParcCrossReferenceStoreClient(
+            UniParcCrossReferenceStoreConfigProperties configProperties) {
+        VoldemortClient<UniParcCrossReferencePair> client =
+                new VoldemortRemoteUniParcCrossReferenceStore(
+                        configProperties.getNumberOfConnections(),
+                        configProperties.isBrotliEnabled(),
+                        configProperties.getStoreName(),
+                        configProperties.getHost());
         return new UniProtStoreClient<>(client);
     }
 }

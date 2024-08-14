@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.repository.store.crossref;
+package org.uniprot.api.common.repository.stream.store.uniparc;
 
 import static org.uniprot.core.util.Utils.notNull;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;

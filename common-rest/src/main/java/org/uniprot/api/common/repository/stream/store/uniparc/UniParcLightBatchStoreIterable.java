@@ -1,10 +1,9 @@
-package org.uniprot.api.uniparc.common.repository.store.stream;
+package org.uniprot.api.common.repository.stream.store.uniparc;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceLazyLoader;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.UniProtStoreClient;

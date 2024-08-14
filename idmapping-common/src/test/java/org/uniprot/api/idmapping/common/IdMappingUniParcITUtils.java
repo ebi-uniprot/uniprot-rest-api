@@ -5,6 +5,8 @@ import java.util.HashMap;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -51,16 +53,21 @@ public class IdMappingUniParcITUtils {
     }
 
     public static void saveEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniParcEntryLight> storeClient,
+            UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
         for (int i = 1; i <= AbstractJobOperation.DEFAULT_IDS_COUNT; i++) {
-            saveEntry(i, cloudSolrClient, storeClient);
+            saveEntry(i, cloudSolrClient, storeClient, xrefStoreClient);
         }
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 
     private static void saveEntry(
-            int i, CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
+            int i,
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniParcEntryLight> storeClient,
+            UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
         UniParcEntryBuilder builder =
                 UniParcEntryBuilder.from(UniParcEntryMocker.createUniParcEntry(i, UPI_PREF));
@@ -74,6 +81,11 @@ public class IdMappingUniParcITUtils {
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(entry);
+        UniParcEntryLight lightEntry = UniParcEntryMocker.convertToUniParcEntryLight(entry);
+        storeClient.saveEntry(lightEntry);
+        // save cross references in store
+        String xrefBatchKey = lightEntry.getUniParcId() + "_0";
+        xrefStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey, entry.getUniParcCrossReferences()));
     }
 }

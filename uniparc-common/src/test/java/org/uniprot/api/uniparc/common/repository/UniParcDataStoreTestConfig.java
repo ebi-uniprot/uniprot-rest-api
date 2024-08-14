@@ -34,6 +34,6 @@ public class UniParcDataStoreTestConfig {
     @Profile("offline")
     public UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient() {
         return new UniParcCrossReferenceStoreClient(
-                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("cross-reference"));
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference"));
     }
 }

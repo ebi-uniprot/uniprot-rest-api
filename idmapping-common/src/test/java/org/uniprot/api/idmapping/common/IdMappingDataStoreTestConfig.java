@@ -20,12 +20,14 @@ import org.uniprot.api.idmapping.common.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
 /**
@@ -62,8 +64,16 @@ public class IdMappingDataStoreTestConfig {
 
     @Bean("uniParcStoreClient")
     @Profile("offline")
-    public UniProtStoreClient<UniParcEntry> uniParcStoreClient() {
-        return new UniProtStoreClient<>(VoldemortInMemoryUniParcEntryStore.getInstance("uniparc"));
+    public UniProtStoreClient<UniParcEntryLight> uniParcStoreClient() {
+        return new UniProtStoreClient<>(
+                VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+    }
+
+    @Bean
+    @Profile("offline")
+    public UniProtStoreClient<UniParcCrossReferencePair> uniParcCrossReferenceStoreClient() {
+        return new UniProtStoreClient<>(
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference"));
     }
 
     @Bean
