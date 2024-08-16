@@ -19,13 +19,13 @@ public class UniParcDataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public UniParcStoreClient uniparcStoreClient() {
+    public UniParcStoreClient uniParcStoreClient() {
         return new UniParcStoreClient(VoldemortInMemoryUniParcEntryStore.getInstance("uniparc"));
     }
 
     @Bean
     @Profile("offline")
-    public UniParcLightStoreClient uniParcLightStoreClient() {
+    public UniParcLightStoreClient lightStoreClient() {
         return new UniParcLightStoreClient(
                 VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
     }

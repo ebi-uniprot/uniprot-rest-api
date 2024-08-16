@@ -43,10 +43,10 @@ public class UniParcCrossReferenceService {
     @Autowired
     public UniParcCrossReferenceService(
             UniParcLightStoreClient uniParcLightStoreClient,
-            UniParcCrossReferenceStoreClient crossReferenceStoreClient,
+            UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient,
             UniParcCrossReferenceStoreConfigProperties storeConfigProperties) {
         this.uniParcLightStoreClient = uniParcLightStoreClient;
-        this.crossReferenceStoreClient = crossReferenceStoreClient;
+        this.crossReferenceStoreClient = uniParcCrossReferenceStoreClient;
         this.crossReferenceStoreRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)

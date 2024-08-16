@@ -11,12 +11,12 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.facade.uniparc
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
 public class UniParcSolrIdResultRequestProcessorTest
         extends SolrIdResultRequestProcessorTest<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
     @Mock private UniParcDownloadConfigProperties uniParcDownloadConfigProperties;
     @Mock private UniParcHeartbeatProducer uniParcHeartbeatProducer;
     @Mock private UniParcSolrIdResultStreamerFacade uniParcResultStreamerFacade;

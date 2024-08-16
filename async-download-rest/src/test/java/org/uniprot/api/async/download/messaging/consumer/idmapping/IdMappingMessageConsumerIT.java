@@ -8,7 +8,6 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.async.download.messaging.consumer.MessageConsumer.CURRENT_RETRIED_COUNT_HEADER;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
-import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.*;
@@ -74,6 +73,8 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -116,13 +117,15 @@ public class IdMappingMessageConsumerIT {
 
     @Autowired private IdMappingDownloadConfigProperties downloadConfigProperties;
 
-    @Autowired private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @Autowired private IdMappingFileHandler asyncDownloadFileHandler;
 
     @Autowired private IdMappingMessageConsumer idMappingMessageConsumer;
+
+    @Autowired private UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient;
 
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
@@ -295,7 +298,14 @@ public class IdMappingMessageConsumerIT {
 
     private void saveUniParc(int i) {
         UniParcEntry uniParcEntry = UniParcEntryMocker.createUniParcEntry(i, "UPI0000283A");
-        uniParcStoreClient.saveEntry(uniParcEntry);
+        UniParcEntryLight uniParcLightEntry =
+                UniParcEntryMocker.convertToUniParcEntryLight(uniParcEntry);
+        uniParcLightStoreClient.saveEntry(uniParcLightEntry);
+        // save cross references in store
+        String xrefBatchKey = uniParcLightEntry.getUniParcId() + "_0";
+        xrefStoreClient.saveEntry(
+                new UniParcCrossReferencePair(
+                        xrefBatchKey, uniParcEntry.getUniParcCrossReferences()));
     }
 
     private void saveUniRef(UniRefEntry uniRefEntry) {

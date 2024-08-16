@@ -62,16 +62,16 @@ public class IdMappingDataStoreTestConfig {
                 VoldemortInMemoryUniRefEntryLightStore.getInstance("avro-uniprot"));
     }
 
-    @Bean("uniParcStoreClient")
+    @Bean
     @Profile("offline")
-    public UniProtStoreClient<UniParcEntryLight> uniParcStoreClient() {
+    public UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient() {
         return new UniProtStoreClient<>(
                 VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
     }
 
     @Bean
     @Profile("offline")
-    public UniProtStoreClient<UniParcCrossReferencePair> uniParcCrossReferenceStoreClient() {
+    public UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient() {
         return new UniProtStoreClient<>(
                 VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference"));
     }

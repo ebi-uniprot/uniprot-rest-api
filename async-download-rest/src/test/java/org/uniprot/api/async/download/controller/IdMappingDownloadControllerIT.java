@@ -84,7 +84,10 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -122,9 +125,11 @@ public class IdMappingDownloadControllerIT {
 
     @Autowired protected IdMappingJobCacheService cacheService;
 
-    @Autowired private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
+
+    @Autowired private UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient;
 
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
@@ -304,7 +309,14 @@ public class IdMappingDownloadControllerIT {
 
     private void saveUniParc(int i) {
         UniParcEntry uniParcEntry = UniParcEntryMocker.createUniParcEntry(i, "UPI0000283A");
-        uniParcStoreClient.saveEntry(uniParcEntry);
+        UniParcEntryLight uniParcLightEntry =
+                UniParcEntryMocker.convertToUniParcEntryLight(uniParcEntry);
+        uniParcLightStoreClient.saveEntry(uniParcLightEntry);
+        // save cross references in store
+        String xrefBatchKey = uniParcLightEntry.getUniParcId() + "_0";
+        uniParcCrossReferenceStoreClient.saveEntry(
+                new UniParcCrossReferencePair(
+                        xrefBatchKey, uniParcEntry.getUniParcCrossReferences()));
     }
 
     private void saveUniRef(UniRefEntry uniRefEntry) {
@@ -765,7 +777,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=list]")));
+                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=list]")));
     }
 
     @Test

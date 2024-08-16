@@ -17,6 +17,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -41,10 +43,11 @@ public class UniParcAsyncDownloadUtils {
             UniParcQueryRepository uniparcQueryRepository,
             CloudSolrClient cloudSolrClient,
             SolrClient solrClient,
-            UniProtStoreClient<UniParcEntry> storeClient)
+            UniProtStoreClient<UniParcEntryLight> storeClient,
+            UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
         ReflectionTestUtils.setField(uniparcQueryRepository, "solrClient", cloudSolrClient);
-        saveEntries(cloudSolrClient, storeClient);
+        saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
         long queryHits = 100L;
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
@@ -54,10 +57,12 @@ public class UniParcAsyncDownloadUtils {
     }
 
     protected static void saveEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniParcEntryLight> storeClient,
+            UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
         for (int i = 1; i <= 12; i++) {
-            saveEntry(cloudSolrClient, i, "upi" + i, storeClient);
+            saveEntry(cloudSolrClient, i, "upi" + i, storeClient, xrefStoreClient);
         }
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
@@ -66,7 +71,8 @@ public class UniParcAsyncDownloadUtils {
             CloudSolrClient cloudSolrClient,
             int i,
             String upi,
-            UniProtStoreClient<UniParcEntry> storeClient)
+            UniProtStoreClient<UniParcEntryLight> storeClient,
+            UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
         UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, upi);
         UniParcEntryConverter converter = new UniParcEntryConverter();
@@ -75,6 +81,11 @@ public class UniParcAsyncDownloadUtils {
         UniParcEntry uniParcEntry = uniParcEntryConverter.fromXml(xmlEntry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(uniParcEntry);
+        UniParcEntryLight lightEntry = UniParcEntryMocker.convertToUniParcEntryLight(entry);
+        storeClient.saveEntry(lightEntry);
+        // save cross references in store
+        String xrefBatchKey = lightEntry.getUniParcId() + "_0";
+        xrefStoreClient.saveEntry(
+                new UniParcCrossReferencePair(xrefBatchKey, entry.getUniParcCrossReferences()));
     }
 }

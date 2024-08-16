@@ -17,25 +17,26 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappin
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.UniParcIdBuilder;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcIdMappingBatchResultStreamerTest
-        extends IdMappingBatchResultStreamerTest<UniParcEntry, UniParcEntryPair> {
+        extends IdMappingBatchResultStreamerTest<UniParcEntryLight, UniParcEntryLightPair> {
     public static final int BATCH_SIZE = 2;
-    @Mock private StoreStreamerConfig<UniParcEntry> storeStreamerConfig;
-    @Mock private UniParcEntry uniParc1;
-    @Mock private UniParcEntry uniParc2;
-    @Mock private UniParcEntry uniParc3;
+    @Mock private StoreStreamerConfig<UniParcEntryLight> storeStreamerConfig;
+    @Mock private UniParcEntryLight uniParc1;
+    @Mock private UniParcEntryLight uniParc2;
+    @Mock private UniParcEntryLight uniParc3;
     @Mock private StreamerConfigProperties streamerConfigProperties;
-    @Mock private UniProtStoreClient<UniParcEntry> storeClient;
+    @Mock private UniProtStoreClient<UniParcEntryLight> storeClient;
     @Mock protected IdMappingJobService idMappingJobService;
     @Mock protected IdMappingHeartbeatProducer idMappingHeartbeatProducer;
+    @Mock protected UniParcCrossReferenceLazyLoader lazyLoader;
 
     @BeforeEach
     void setUp() {
@@ -43,22 +44,25 @@ class UniParcIdMappingBatchResultStreamerTest
         jobService = idMappingJobService;
         idMappingBatchResultStreamer =
                 new UniParcIdMappingBatchResultStreamer(
-                        idMappingHeartbeatProducer, idMappingJobService, storeStreamerConfig);
+                        idMappingHeartbeatProducer,
+                        idMappingJobService,
+                        storeStreamerConfig,
+                        lazyLoader);
     }
 
     @Override
-    protected Iterable<UniParcEntryPair> getEntryList() {
+    protected Iterable<UniParcEntryLightPair> getEntryList() {
         return List.of(
-                UniParcEntryPair.builder().from("from1").to(uniParc1).build(),
-                UniParcEntryPair.builder().from("from2").to(uniParc2).build(),
-                UniParcEntryPair.builder().from("from3").to(uniParc3).build());
+                UniParcEntryLightPair.builder().from("from1").to(uniParc1).build(),
+                UniParcEntryLightPair.builder().from("from2").to(uniParc2).build(),
+                UniParcEntryLightPair.builder().from("from3").to(uniParc3).build());
     }
 
     @Override
     protected void mockBatch() {
-        when(uniParc1.getUniParcId()).thenReturn(new UniParcIdBuilder("to1").build());
-        when(uniParc2.getUniParcId()).thenReturn(new UniParcIdBuilder("to2").build());
-        when(uniParc3.getUniParcId()).thenReturn(new UniParcIdBuilder("to3").build());
+        when(uniParc1.getUniParcId()).thenReturn("to1");
+        when(uniParc2.getUniParcId()).thenReturn("to2");
+        when(uniParc3.getUniParcId()).thenReturn("to3");
         when(storeStreamerConfig.getStreamConfig()).thenReturn(streamerConfigProperties);
         when(streamerConfigProperties.getStoreBatchSize()).thenReturn(BATCH_SIZE);
         when(storeStreamerConfig.getStoreFetchRetryPolicy()).thenReturn(new RetryPolicy<>());
@@ -67,7 +71,7 @@ class UniParcIdMappingBatchResultStreamerTest
     }
 
     @NotNull
-    private List<UniParcEntry> getUniParcEntries(InvocationOnMock inv) {
+    private List<UniParcEntryLight> getUniParcEntries(InvocationOnMock inv) {
         Iterable<String> strings = inv.getArgument(0);
         List<String> args = StreamSupport.stream(strings.spliterator(), false).toList();
         if (List.of("to1", "to2").containsAll(args) && args.size() == 2) {

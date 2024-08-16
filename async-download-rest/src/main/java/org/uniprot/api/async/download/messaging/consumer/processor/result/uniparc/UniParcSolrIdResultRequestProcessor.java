@@ -12,14 +12,15 @@ import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
 public class UniParcSolrIdResultRequestProcessor
         extends SolrIdResultRequestProcessor<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
     private static final Type type =
-            (new ParameterizedTypeReference<MessageConverterContext<UniParcEntry>>() {}).getType();
+            (new ParameterizedTypeReference<MessageConverterContext<UniParcEntryLight>>() {})
+                    .getType();
 
     public UniParcSolrIdResultRequestProcessor(
             UniParcDownloadConfigProperties downloadConfigProperties,
