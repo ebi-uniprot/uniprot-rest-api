@@ -62,7 +62,7 @@ public class IdMappingDataStoreTestConfig {
                 VoldemortInMemoryUniRefEntryLightStore.getInstance("avro-uniprot"));
     }
 
-    @Bean
+    @Bean("uniParcLightStoreClient")
     @Profile("offline")
     public UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient() {
         return new UniProtStoreClient<>(

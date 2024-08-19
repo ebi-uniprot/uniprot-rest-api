@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,7 +27,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
@@ -73,6 +76,10 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     @Override
     protected String getIdRequestPath() {
         return "/uniparc/{upi}/databases";
+    }
+
+    protected String getStreamRequestPath() {
+        return "/uniparc/{upi}/databases/stream";
     }
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
@@ -210,7 +217,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].active", contains(false, false, false, false)));
+                .andExpect(jsonPath("$.results[*].active", everyItem(is(false))));
     }
 
     @Test
@@ -285,7 +292,55 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].active", contains(true, true, true, true, true)));
+                .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
+    }
+
+    @Test
+    void streamCanReturnSuccess() throws Exception {
+        // when
+        saveEntry();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamRequestPath(), getIdPathValue())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
+
+        // then
+        getMockMvc()
+                .perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(25)));
+    }
+
+    @Test
+    void canStreamWithFilters() throws Exception {
+        // when
+        saveEntry();
+        String active = "true";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamRequestPath(), getIdPathValue())
+                        .param("active", active)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
+
+        // then
+        getMockMvc()
+                .perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(21)))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", iterableWithSize(21)))
+                .andExpect(jsonPath("$.results[*].id", notNullValue()))
+                .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
+                .andExpect(jsonPath("$.results[*].database", notNullValue()))
+                .andExpect(jsonPath("$.results[*].organism", notNullValue()))
+                .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
