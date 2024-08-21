@@ -6,9 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
@@ -103,7 +100,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("fields", "CDD"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
