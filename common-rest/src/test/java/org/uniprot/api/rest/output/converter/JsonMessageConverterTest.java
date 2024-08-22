@@ -120,7 +120,8 @@ class JsonMessageConverterTest {
 
         DocumentContext resultJson = JsonPath.parse(result);
         assertNotNull(resultJson.read(JsonPath.compile("$.matchedFields")));
-        assertEquals(resultJson.read(JsonPath.compile("$.matchedFields.size()")), Integer.valueOf(1));
+        assertEquals(
+                resultJson.read(JsonPath.compile("$.matchedFields.size()")), Integer.valueOf(1));
         assertEquals("fieldName", resultJson.read(JsonPath.compile("$.matchedFields[0].name")));
 
         assertNotNull(resultJson.read(JsonPath.compile("$.results")));
@@ -160,8 +161,8 @@ class JsonMessageConverterTest {
         log.debug("------- BEGIN: writeCanWriteEntity");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBefore(messageContext, outputStream);
-        UniProtKBEntry simpleEntry = new UniProtKBEntryBuilder("P12345", "ID", UniProtKBEntryType.TREMBL)
-                .build();
+        UniProtKBEntry simpleEntry =
+                new UniProtKBEntryBuilder("P12345", "ID", UniProtKBEntryType.TREMBL).build();
         jsonMessageConverter.writeEntity(simpleEntry, outputStream);
         writeAfter(messageContext, outputStream);
 
@@ -315,8 +316,9 @@ class JsonMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"},\n"
-                        + "{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}]}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}},
+                        {"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}]}""",
                 result);
     }
 
@@ -344,7 +346,8 @@ class JsonMessageConverterTest {
         String result = outputStream.toString(StandardCharsets.UTF_8);
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}],\"obsoleteCount\":10}",
+                """
+                        {"results":[{"entryType":"UniProtKB reviewed (Swiss-Prot)","primaryAccession":"P00001","extraAttributes":{"uniParcId":"UP1234567890"}}],"failedIds":["id1"],"suggestedIds":[{"from":"fromid2","to":"toid2"}],"obsoleteCount":10}""",
                 result);
     }
 

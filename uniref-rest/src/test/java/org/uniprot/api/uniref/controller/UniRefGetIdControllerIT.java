@@ -48,8 +48,8 @@ import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.converters.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 
 @ContextConfiguration(
@@ -295,7 +295,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                                                                    "Cluster ID\tCluster Name\tCommon taxon\tSize\tDate of last modification")))
                                     .resultMatcher(
                                             content()
                                                     .string(

@@ -4,6 +4,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -12,6 +13,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@EqualsAndHashCode
 public class UniProtKBEntryPair implements EntryPair<UniProtKBEntry> {
     private final String from;
     private final UniProtKBEntry to;

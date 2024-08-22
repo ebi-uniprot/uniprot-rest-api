@@ -7,10 +7,12 @@ import java.util.*;
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
+import org.uniprot.core.util.Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,8 +25,10 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
+@EnableConfigurationProperties({OpenAPIConfiguration.class})
 public class APIDocConfig {
 
     private static final List<String> STRING_SERIALISER_LIST =
@@ -67,8 +71,14 @@ public class APIDocConfig {
     }
 
     @Bean
-    public OpenApiCustomiser defaultOpenApiCustomiser() {
+    public OpenApiCustomiser defaultOpenApiCustomiser(OpenAPIConfiguration openAPIConfiguration) {
         return openAPI -> {
+            if (Utils.notNullNotEmpty(openAPIConfiguration.getServer())) {
+                Server server = new Server();
+                server.setDescription("UniProt REST API Server");
+                server.setUrl(openAPIConfiguration.getServer());
+                openAPI.setServers(List.of(server));
+            }
             customiseSchema(openAPI);
             sortRequestParametersForGetAndPostMethods(openAPI.getPaths().values());
         };

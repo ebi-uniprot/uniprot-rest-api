@@ -154,9 +154,7 @@ DR   MINT; P97929; -.
 DR   STRING; 10090.ENSMUSP00000038576; -.
 DR   iPTMnet; P97929; -.
 DR   PhosphoSitePlus; P97929; -.
-DR   EPD; P97929; -.
 DR   jPOST; P97929; -.
-DR   MaxQB; P97929; -.
 DR   PaxDb; P97929; -.
 DR   PeptideAtlas; P97929; -.
 DR   PRIDE; P97929; -.

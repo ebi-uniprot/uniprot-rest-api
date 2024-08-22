@@ -1792,22 +1792,6 @@
         "dataType": "",
         "items": [
           {
-            "id": "id_xref_compluyeast-2dpage",
-            "label": "COMPLUYEAST-2DPAGE",
-            "itemType": "database",
-            "term": "xref",
-            "dataType": "string",
-            "valuePrefix": "compluyeast-2dpage"
-          },
-          {
-            "id": "id_xref_dosac-cobs-2dpage",
-            "label": "DOSAC-COBS-2DPAGE",
-            "itemType": "database",
-            "term": "xref",
-            "dataType": "string",
-            "valuePrefix": "dosac-cobs-2dpage"
-          },
-          {
             "id": "id_xref_ogp",
             "label": "OGP",
             "itemType": "database",
@@ -1862,22 +1846,6 @@
             "term": "xref",
             "dataType": "string",
             "valuePrefix": "cptac"
-          },
-          {
-            "id": "id_xref_epd",
-            "label": "EPD",
-            "itemType": "database",
-            "term": "xref",
-            "dataType": "string",
-            "valuePrefix": "epd"
-          },
-          {
-            "id": "id_xref_maxqb",
-            "label": "MaxQB",
-            "itemType": "database",
-            "term": "xref",
-            "dataType": "string",
-            "valuePrefix": "maxqb"
           },
           {
             "id": "id_xref_paxdb",

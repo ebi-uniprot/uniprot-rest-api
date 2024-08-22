@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
-		<version>1.0.32-SNAPSHOT</version>
+		<version>1.0.33-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>idmapping-common</artifactId>
@@ -34,6 +34,11 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>xml-parser</artifactId>
 			<version>${uniprot-core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>uniref-common</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

@@ -136,7 +136,7 @@ public abstract class BasicIdService<T, U> {
         int pageSize = getPageSize(searchRequest);
         CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, mappedIds.size());
         long start = System.currentTimeMillis();
-        Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest.getFields());
+        Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest);
         long end = System.currentTimeMillis();
         log.debug(
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
@@ -157,7 +157,7 @@ public abstract class BasicIdService<T, U> {
             StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
         List<IdMappingStringPair> mappedIds =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
-        return streamEntries(mappedIds, streamRequest.getFields());
+        return streamEntries(mappedIds, streamRequest);
     }
 
     public Stream<String> streamRdf(
@@ -189,7 +189,8 @@ public abstract class BasicIdService<T, U> {
 
     protected abstract UniProtDataType getUniProtDataType();
 
-    protected abstract Stream<U> streamEntries(List<IdMappingStringPair> mappedIds, String fields);
+    protected abstract Stream<U> streamEntries(
+            List<IdMappingStringPair> mappedIds, StreamRequest streamRequest);
 
     protected Stream<T> getEntries(List<String> toIds, String fields) {
         return this.storeStreamer.streamEntries(toIds);
@@ -269,8 +270,10 @@ public abstract class BasicIdService<T, U> {
         return pageSize;
     }
 
-    private Stream<U> getPagedEntries(
-            List<IdMappingStringPair> mappedIdPairs, CursorPage cursorPage, String fields) {
+    protected Stream<U> getPagedEntries(
+            List<IdMappingStringPair> mappedIdPairs,
+            CursorPage cursorPage,
+            SearchRequest searchRequest) {
         List<IdMappingStringPair> mappedIdsInPage =
                 mappedIdPairs.subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
@@ -280,7 +283,7 @@ public abstract class BasicIdService<T, U> {
                 mappedIdsInPage.stream()
                         .map(IdMappingStringPair::getTo)
                         .collect(Collectors.toSet());
-        Stream<T> entries = getEntries(new ArrayList<>(toIds), fields);
+        Stream<T> entries = getEntries(new ArrayList<>(toIds), searchRequest.getFields());
         // accession -> entry map
         Map<String, T> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry

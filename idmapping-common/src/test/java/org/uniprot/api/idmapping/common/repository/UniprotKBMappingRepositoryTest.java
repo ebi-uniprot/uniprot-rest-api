@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.common.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
 
 import java.io.IOException;
 
@@ -25,6 +26,7 @@ class UniprotKBMappingRepositoryTest {
         solrDocument.put("id", "INACTIVE_DROME");
         solrDocument.put("active", false);
         solrDocument.put("inactive_reason", "DELETED:SWISSPROT_DELETION");
+        solrDocument.put("deleted_entry_uniparc", "UPI000031CDF9");
         Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(solrDocument);
 
@@ -37,6 +39,7 @@ class UniprotKBMappingRepositoryTest {
                 InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
         assertEquals(
                 DeletedReason.SWISSPROT_DELETION, result.getInactiveReason().getDeletedReason());
+        assertEquals("UPI000031CDF9", result.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 
     @Test
@@ -79,6 +82,7 @@ class UniprotKBMappingRepositoryTest {
         deletedDocument.put("id", "INACTIVE_A0A0D5V897");
         deletedDocument.put("active", false);
         deletedDocument.put("inactive_reason", "DELETED:PROTEOME_REDUNDANCY");
+        deletedDocument.put("deleted_entry_uniparc", "UPI000031CDF9");
         Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("A0A0D5V897")))
                 .thenReturn(deletedDocument);
 
@@ -91,5 +95,6 @@ class UniprotKBMappingRepositoryTest {
                 InactiveReasonType.DELETED, result.getInactiveReason().getInactiveReasonType());
         assertEquals(
                 DeletedReason.PROTEOME_REDUNDANCY, result.getInactiveReason().getDeletedReason());
+        assertEquals("UPI000031CDF9", result.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
     }
 }

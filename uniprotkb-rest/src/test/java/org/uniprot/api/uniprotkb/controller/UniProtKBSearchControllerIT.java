@@ -680,6 +680,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         "I8FBX0",
                         "INACTIVE_DROME",
                         InactiveEntryMocker.DELETED,
+                        "UPI0001661588",
                         null,
                         "SOURCE_DELETION_EMBL");
         getStoreManager()
@@ -1022,6 +1023,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].uniProtkbId", is("Q14301_FGFR2")))
                 .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results[0].extraAttributes.uniParcId")
+                                .doesNotExist())
+                .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
                 .andExpect(
@@ -1080,6 +1084,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.entryType", contains("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results.*.extraAttributes.uniParcId")
+                                .doesNotExist())
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
@@ -1195,6 +1202,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.results.*.entryType", contains("Inactive")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
+                                "$.results.*.extraAttributes.uniParcId", contains("UPI00000DCD3D")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")))
                 .andExpect(
@@ -1220,6 +1230,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].primaryAccession", is("I8FBX1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.extraAttributes.uniParcId", contains("UPI00000DCD3D")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].inactiveReason.inactiveReasonType", is("DELETED")))
@@ -1263,6 +1276,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.results.*.entryType", contains("Inactive")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
+                                "$.results.*.extraAttributes.uniParcId", contains("UPI000012CEBB")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")))
                 .andExpect(
@@ -1286,6 +1302,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.extraAttributes.uniParcId", contains("UPI000012CEBB")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
@@ -2227,6 +2246,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             "I8FBX0",
                             "INACTIVE_DROME",
                             InactiveEntryMocker.DELETED,
+                            "UPI0001661588",
                             null,
                             "SOURCE_DELETION_EMBL");
             getStoreManager()
