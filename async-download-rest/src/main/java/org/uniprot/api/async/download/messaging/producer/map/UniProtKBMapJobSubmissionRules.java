@@ -6,7 +6,8 @@ import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequ
 import org.uniprot.api.async.download.service.map.MapJobService;
 
 @Component
-public class UniProtKBMapJobSubmissionRules extends MapJobSubmissionRules<UniProtKBMapDownloadRequest> {
+public class UniProtKBMapJobSubmissionRules
+        extends MapJobSubmissionRules<UniProtKBMapDownloadRequest> {
     protected UniProtKBMapJobSubmissionRules(
             @Value("${async.download.map.retryMaxCount}") int maxRetryCount,
             @Value("${async.download.map.waitingMaxTime}") int maxWaitingTime,

@@ -10,13 +10,14 @@ import org.uniprot.api.async.download.messaging.consumer.processor.map.to.UniRef
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBToUniRefMapCompositeRequestProcessorTest extends MapCompositeRequestProcessorTest<UniProtKBMapDownloadRequest> {
-    @Mock
-    UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
-    @Mock
-    private UniProtKBMapFromRequestProcessor uniProtKBMapFromRequestProcessor;
+public class UniProtKBToUniRefMapCompositeRequestProcessorTest
+        extends MapCompositeRequestProcessorTest<UniProtKBMapDownloadRequest> {
+    @Mock UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+    @Mock private UniProtKBMapFromRequestProcessor uniProtKBMapFromRequestProcessor;
     @Mock private UniRefMapToRequestProcessor uniRefMapToRequestProcessor;
-    @Mock private UniProtKBToUniRefMapResultRequestProcessor uniProtKBToUniRefMapResultRequestProcessor;
+
+    @Mock
+    private UniProtKBToUniRefMapResultRequestProcessor uniProtKBToUniRefMapResultRequestProcessor;
 
     @BeforeEach
     void setUp() {
@@ -26,6 +27,8 @@ public class UniProtKBToUniRefMapCompositeRequestProcessorTest extends MapCompos
         requestProcessor3 = uniProtKBToUniRefMapResultRequestProcessor;
         compositeRequestProcessor =
                 new UniProtKBToUniRefMapCompositeRequestProcessor(
-                        uniProtKBMapFromRequestProcessor, uniRefMapToRequestProcessor,uniProtKBToUniRefMapResultRequestProcessor);
+                        uniProtKBMapFromRequestProcessor,
+                        uniRefMapToRequestProcessor,
+                        uniProtKBToUniRefMapResultRequestProcessor);
     }
 }

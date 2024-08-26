@@ -1,18 +1,18 @@
 package org.uniprot.api.async.download.model.job.map;
 
-import lombok.Builder;
+import java.io.Serial;
+import java.time.LocalDateTime;
+
 import org.springframework.data.redis.core.RedisHash;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import java.io.Serial;
-import java.time.LocalDateTime;
+import lombok.Builder;
 
 @RedisHash("map")
 public class MapDownloadJob extends DownloadJob {
 
-    @Serial
-    private static final long serialVersionUID = 3430390961923980454L;
+    @Serial private static final long serialVersionUID = 3430390961923980454L;
 
     @Builder
     public MapDownloadJob(

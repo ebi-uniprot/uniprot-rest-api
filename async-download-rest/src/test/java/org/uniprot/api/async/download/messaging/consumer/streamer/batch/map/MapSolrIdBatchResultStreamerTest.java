@@ -11,8 +11,7 @@ import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 
 public abstract class MapSolrIdBatchResultStreamerTest<T extends DownloadRequest, S>
-        extends SolrIdBatchResultStreamerTest<
-                T, MapDownloadJob, S> {
+        extends SolrIdBatchResultStreamerTest<T, MapDownloadJob, S> {
     protected static final int BATCH_SIZE = 2;
     @Mock protected MapDownloadJob mapDownloadJob;
     @Mock protected MapHeartbeatProducer mapHeartbeatProducer;

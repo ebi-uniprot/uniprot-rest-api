@@ -14,23 +14,14 @@ import org.uniprot.api.async.download.mq.map.MapMessagingService;
 import org.uniprot.api.async.download.service.map.MapJobService;
 
 @ExtendWith(MockitoExtension.class)
-class MapMessageConsumerTest
-        extends MessageConsumerTest<MapDownloadRequest, MapDownloadJob> {
-    @Mock
-    private MapMessagingService mapMessagingService;
-    @Mock
-    private MapFileHandler mapFileHandler;
-    @Mock
-    private MapJobService mapJobService;
-    @Mock
-    private MessageConverter mapMessageConverter;
-    @Mock
-    private MapDownloadJob mapDownloadJob;
-    @Mock
-    private MapRequestProcessor mapRequestProcessor;
-    @Mock
-    private MapDownloadRequest mapDownloadRequest;
-
+class MapMessageConsumerTest extends MessageConsumerTest<MapDownloadRequest, MapDownloadJob> {
+    @Mock private MapMessagingService mapMessagingService;
+    @Mock private MapFileHandler mapFileHandler;
+    @Mock private MapJobService mapJobService;
+    @Mock private MessageConverter mapMessageConverter;
+    @Mock private MapDownloadJob mapDownloadJob;
+    @Mock private MapRequestProcessor mapRequestProcessor;
+    @Mock private MapDownloadRequest mapDownloadRequest;
 
     @BeforeEach
     void setUp() {

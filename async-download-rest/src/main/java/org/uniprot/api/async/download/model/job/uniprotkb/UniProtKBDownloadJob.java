@@ -12,8 +12,7 @@ import lombok.Builder;
 @RedisHash("uniprotkb")
 public class UniProtKBDownloadJob extends DownloadJob {
 
-    @Serial
-    private static final long serialVersionUID = 1092075039555402818L;
+    @Serial private static final long serialVersionUID = 1092075039555402818L;
 
     @Builder
     public UniProtKBDownloadJob(

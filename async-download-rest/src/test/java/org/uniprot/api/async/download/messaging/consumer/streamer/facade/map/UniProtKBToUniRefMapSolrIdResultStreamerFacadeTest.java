@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.facade.map;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -12,24 +14,23 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.util.stream.Stream;
-
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBToUniRefMapSolrIdResultStreamerFacadeTest extends MapSolrIdResultStreamerFacadeTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
+public class UniProtKBToUniRefMapSolrIdResultStreamerFacadeTest
+        extends MapSolrIdResultStreamerFacadeTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
+    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+    @Mock private UniProtKBToUniRefMapRDFResultStreamer uniProtKBToUniRefMapRDFResultStreamer;
+    @Mock private UniProtKBToUniRefMapListResultStreamer uniProtKBToUniRefMapListResultStreamer;
+
     @Mock
-    private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+    private UniProtKBToUniRefMapSolrIdBatchResultStreamer
+            uniProtKBToUniRefMapSolrIdBatchResultStreamer;
+
+    @Mock private Stream<UniRefEntryLight> refEntryLightStream;
+    @Mock private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;
+
     @Mock
-    private UniProtKBToUniRefMapRDFResultStreamer uniProtKBToUniRefMapRDFResultStreamer;
-    @Mock
-    private UniProtKBToUniRefMapListResultStreamer uniProtKBToUniRefMapListResultStreamer;
-    @Mock
-    private UniProtKBToUniRefMapSolrIdBatchResultStreamer uniProtKBToUniRefMapSolrIdBatchResultStreamer;
-    @Mock
-    private Stream<UniRefEntryLight> refEntryLightStream;
-    @Mock
-    private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;
-    @Mock
-    private MessageConverterContextFactory<UniRefEntryLight> uniRefEntryLightMessageConverterContextFactory;
+    private MessageConverterContextFactory<UniRefEntryLight>
+            uniRefEntryLightMessageConverterContextFactory;
 
     @BeforeEach
     void setUp() {

@@ -1,16 +1,17 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.map.to;
 
-import org.uniprot.api.async.download.messaging.consumer.processor.id.IdRequestProcessor;
-import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
-import org.uniprot.api.async.download.model.request.map.MapDownloadRequest;
-import org.uniprot.api.async.download.service.map.MapJobService;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class MapToRequestProcessor<T extends MapDownloadRequest> implements IdRequestProcessor<T> {
+import org.uniprot.api.async.download.messaging.consumer.processor.id.IdRequestProcessor;
+import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
+import org.uniprot.api.async.download.model.request.map.MapDownloadRequest;
+import org.uniprot.api.async.download.service.map.MapJobService;
+
+public abstract class MapToRequestProcessor<T extends MapDownloadRequest>
+        implements IdRequestProcessor<T> {
     protected static final String TOTAL_ENTRIES = "totalEntries";
     private final MapFileHandler fileHandler;
     private final MapJobService jobService;

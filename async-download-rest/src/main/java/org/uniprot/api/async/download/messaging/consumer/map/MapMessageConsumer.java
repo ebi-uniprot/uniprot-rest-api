@@ -11,8 +11,7 @@ import org.uniprot.api.async.download.mq.map.MapMessagingService;
 import org.uniprot.api.async.download.service.map.MapJobService;
 
 @Component
-public class MapMessageConsumer
-        extends MessageConsumer<MapDownloadRequest, MapDownloadJob> {
+public class MapMessageConsumer extends MessageConsumer<MapDownloadRequest, MapDownloadJob> {
     public MapMessageConsumer(
             MapMessagingService messagingService,
             MapRequestProcessor requestProcessor,

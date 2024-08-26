@@ -1,5 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.async.download.messaging.consumer.processor.map.MapRequestProcessor.RESULT_FILE;
+import static org.uniprot.api.async.download.messaging.consumer.processor.map.MapRequestProcessor.STATUS;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
+import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,29 +20,19 @@ import org.uniprot.api.async.download.messaging.consumer.processor.composite.map
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 import org.uniprot.api.async.download.service.map.MapJobService;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.map.MapRequestProcessor.RESULT_FILE;
-import static org.uniprot.api.async.download.messaging.consumer.processor.map.MapRequestProcessor.STATUS;
-import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
-import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
-
 @ExtendWith(MockitoExtension.class)
 class MapRequestProcessorTest {
     public static final String ID = "someId";
     public static final String UNI_PROT_KB = "UniProtKB";
     public static final String UNI_REF = "UniRef";
+    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+
     @Mock
-    private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
-    @Mock
-    private UniProtKBToUniRefMapCompositeRequestProcessor uniProtKBToUniRefMapCompositeRequestProcessor;
-    @Mock
-    private MapJobService mapJobService;
-    @InjectMocks
-    private MapRequestProcessor mapRequestProcessor;
+    private UniProtKBToUniRefMapCompositeRequestProcessor
+            uniProtKBToUniRefMapCompositeRequestProcessor;
+
+    @Mock private MapJobService mapJobService;
+    @InjectMocks private MapRequestProcessor mapRequestProcessor;
 
     @Test
     void process_mapFromUniProtKBToUniRef() {
@@ -43,9 +43,11 @@ class MapRequestProcessorTest {
         mapRequestProcessor.process(uniProtKBMapDownloadRequest);
 
         InOrderImpl inOrder =
-                new InOrderImpl(List.of(mapJobService, uniProtKBToUniRefMapCompositeRequestProcessor));
+                new InOrderImpl(
+                        List.of(mapJobService, uniProtKBToUniRefMapCompositeRequestProcessor));
         inOrder.verify(mapJobService).update(ID, Map.of(STATUS, RUNNING));
-        inOrder.verify(uniProtKBToUniRefMapCompositeRequestProcessor).process(uniProtKBMapDownloadRequest);
+        inOrder.verify(uniProtKBToUniRefMapCompositeRequestProcessor)
+                .process(uniProtKBMapDownloadRequest);
         inOrder.verify(mapJobService).update(ID, Map.of(STATUS, FINISHED, RESULT_FILE, ID));
     }
 
@@ -54,6 +56,8 @@ class MapRequestProcessorTest {
         when(uniProtKBMapDownloadRequest.getDownloadJobId()).thenReturn(ID);
         when(uniProtKBMapDownloadRequest.getFrom()).thenReturn("unknown");
 
-        assertThrows(IllegalArgumentException.class, () -> mapRequestProcessor.process(uniProtKBMapDownloadRequest));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> mapRequestProcessor.process(uniProtKBMapDownloadRequest));
     }
 }

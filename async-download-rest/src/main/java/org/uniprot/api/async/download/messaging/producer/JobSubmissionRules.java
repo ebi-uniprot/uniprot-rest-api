@@ -15,8 +15,7 @@ public abstract class JobSubmissionRules<T extends DownloadRequest, R extends Do
     private final int maxWaitingTime;
     private final JobService<R> jobService;
 
-    protected JobSubmissionRules(
-            int maxRetryCount, int maxWaitingTime, JobService<R> jobService) {
+    protected JobSubmissionRules(int maxRetryCount, int maxWaitingTime, JobService<R> jobService) {
         this.maxRetryCount = maxRetryCount;
         this.maxWaitingTime = maxWaitingTime;
         this.jobService = jobService;

@@ -40,7 +40,9 @@ public abstract class SolrProducerMessageServiceIT<
 
         // Validate cached data
         DownloadJob downloadJob =
-                getJobRepository().findById(jobId).orElseThrow(AssertionFailedError::new);
+                getMapDownloadJobRepository()
+                        .findById(jobId)
+                        .orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
     }
 
@@ -53,7 +55,7 @@ public abstract class SolrProducerMessageServiceIT<
         createJobFiles(jobId);
         LocalDateTime idleSince = LocalDateTime.now().minusMinutes(20);
         R idleJob = getDownloadJob(jobId, idleSince, request);
-        getJobRepository().save(idleJob);
+        getMapDownloadJobRepository().save(idleJob);
 
         String jobIdResult = getService().sendMessage(request);
         assertEquals(jobId, jobIdResult);
@@ -66,12 +68,14 @@ public abstract class SolrProducerMessageServiceIT<
 
         // Validate cached data is a new Job
         DownloadJob downloadJob =
-                getJobRepository().findById(jobId).orElseThrow(AssertionFailedError::new);
+                getMapDownloadJobRepository()
+                        .findById(jobId)
+                        .orElseThrow(AssertionFailedError::new);
         validateDownloadJob(jobId, downloadJob, request);
 
         // Validate idle job files were deleted
-        assertFalse(getFileHandler().isIdFilePresent(jobId));
-        assertFalse(getFileHandler().isResultFilePresent(jobId));
+        assertFalse(getMapFileHandler().isIdFilePresent(jobId));
+        assertFalse(getMapFileHandler().isResultFilePresent(jobId));
     }
 
     @Test
@@ -80,7 +84,7 @@ public abstract class SolrProducerMessageServiceIT<
 
         String jobId = "bca57aa8e6ae2c6ab771633215666a23d725c738";
         R runningJob = getDownloadJob(jobId, LocalDateTime.now(), request);
-        getJobRepository().save(runningJob);
+        getMapDownloadJobRepository().save(runningJob);
 
         IllegalDownloadJobSubmissionException submissionError =
                 assertThrows(
@@ -108,7 +112,7 @@ public abstract class SolrProducerMessageServiceIT<
 
     protected abstract R getDownloadJob(String jobId, LocalDateTime idleSince, T request);
 
-    protected abstract DownloadJobRepository<R> getJobRepository();
+    protected abstract DownloadJobRepository<R> getMapDownloadJobRepository();
 
     protected abstract MessageConsumer<T, R> getConsumer();
 

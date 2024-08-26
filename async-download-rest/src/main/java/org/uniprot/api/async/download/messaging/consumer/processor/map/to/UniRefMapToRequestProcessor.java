@@ -1,5 +1,8 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.map.to;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
@@ -10,14 +13,15 @@ import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Component
-public class UniRefMapToRequestProcessor extends MapToRequestProcessor<UniProtKBMapDownloadRequest> {
+public class UniRefMapToRequestProcessor
+        extends MapToRequestProcessor<UniProtKBMapDownloadRequest> {
     private final UniRefEntryLightService uniRefEntryLightService;
 
-    protected UniRefMapToRequestProcessor(MapFileHandler fileHandler, MapJobService jobService, UniRefEntryLightService uniRefEntryLightService) {
+    protected UniRefMapToRequestProcessor(
+            MapFileHandler fileHandler,
+            MapJobService jobService,
+            UniRefEntryLightService uniRefEntryLightService) {
         super(fileHandler, jobService);
         this.uniRefEntryLightService = uniRefEntryLightService;
     }

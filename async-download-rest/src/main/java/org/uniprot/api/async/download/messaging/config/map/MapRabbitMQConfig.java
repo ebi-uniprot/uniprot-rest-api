@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
 import org.uniprot.api.async.download.messaging.consumer.map.MapMessageConsumer;
 import org.uniprot.api.async.download.model.request.DownloadRequestToArrayConverter;
-import org.uniprot.api.async.download.model.request.map.MapDownloadRequest;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -31,8 +30,7 @@ public class MapRabbitMQConfig {
     }
 
     @Bean
-    public Queue mapDownloadQueue(
-            MapAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    public Queue mapDownloadQueue(MapAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getQueueName())
                 .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
                 .deadLetterRoutingKey(asyncDownloadQConfigProps.getRetryQueueName())
@@ -53,8 +51,7 @@ public class MapRabbitMQConfig {
 
     // queue where failed messages after maximum retries will end up
     @Bean
-    Queue mapUndeliveredQueue(
-            MapAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    Queue mapUndeliveredQueue(MapAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getRejectedQueueName())
                 .quorum()
                 .build();
@@ -78,8 +75,7 @@ public class MapRabbitMQConfig {
     }
 
     @Bean
-    Binding mapUndeliveredBinding(
-            Queue mapUndeliveredQueue, Exchange mapDownloadExchange) {
+    Binding mapUndeliveredBinding(Queue mapUndeliveredQueue, Exchange mapDownloadExchange) {
         return BindingBuilder.bind(mapUndeliveredQueue)
                 .to((DirectExchange) mapDownloadExchange)
                 .with(mapUndeliveredQueue.getName());

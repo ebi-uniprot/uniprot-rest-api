@@ -1,6 +1,12 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch.map;
 
-import net.jodah.failsafe.RetryPolicy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -8,23 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBToUniRefMapSolrIdBatchResultStreamerTest extends MapSolrIdBatchResultStreamerTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
-    @Mock
-    private UniProtKBMapDownloadRequest uniParcDownloadRequest;
-    @Mock
-    private UniRefEntryLight uniRef1;
-    @Mock
-    private UniRefEntryLight uniRef2;
-    @Mock
-    private UniRefEntryLight uniRef3;
+public class UniProtKBToUniRefMapSolrIdBatchResultStreamerTest
+        extends MapSolrIdBatchResultStreamerTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
+    @Mock private UniProtKBMapDownloadRequest uniParcDownloadRequest;
+    @Mock private UniRefEntryLight uniRef1;
+    @Mock private UniRefEntryLight uniRef2;
+    @Mock private UniRefEntryLight uniRef3;
 
     @BeforeEach
     void setUp() {
@@ -33,9 +31,7 @@ public class UniProtKBToUniRefMapSolrIdBatchResultStreamerTest extends MapSolrId
         job = mapDownloadJob;
         solrIdBatchResultStreamer =
                 new UniProtKBToUniRefMapSolrIdBatchResultStreamer(
-                        mapHeartbeatProducer,
-                        mapJobService,
-                        uniRefEntryStoreStreamerConfig);
+                        mapHeartbeatProducer, mapJobService, uniRefEntryStoreStreamerConfig);
     }
 
     @Override

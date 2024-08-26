@@ -116,13 +116,13 @@ public abstract class BasicProducerMessageServiceIT {
                                 + getDownloadConfigProperties().getResultFilesFolder());
         Files.createDirectories(Path.of(getDownloadConfigProperties().getIdFilesFolder()));
         Files.createDirectories(Path.of(getDownloadConfigProperties().getResultFilesFolder()));
-        assertTrue(getFileHandler().getIdFile(jobId).toFile().createNewFile());
-        assertTrue(getFileHandler().getResultFile(jobId).toFile().createNewFile());
-        assertTrue(getFileHandler().isIdFilePresent(jobId));
-        assertTrue(getFileHandler().isResultFilePresent(jobId));
+        assertTrue(getMapFileHandler().getIdFile(jobId).toFile().createNewFile());
+        assertTrue(getMapFileHandler().getResultFile(jobId).toFile().createNewFile());
+        assertTrue(getMapFileHandler().isIdFilePresent(jobId));
+        assertTrue(getMapFileHandler().isResultFilePresent(jobId));
     }
 
     protected abstract DownloadConfigProperties getDownloadConfigProperties();
 
-    protected abstract FileHandler getFileHandler();
+    protected abstract FileHandler getMapFileHandler();
 }

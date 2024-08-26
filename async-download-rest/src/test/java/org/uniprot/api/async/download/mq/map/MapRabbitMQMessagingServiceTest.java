@@ -10,8 +10,7 @@ import org.uniprot.api.async.download.mq.RabbitMQMessagingServiceTest;
 
 @ExtendWith(MockitoExtension.class)
 class MapRabbitMQMessagingServiceTest extends RabbitMQMessagingServiceTest {
-    @Mock
-    private MapAsyncDownloadQueueConfigProperties mapAsyncDownloadQueueConfigProperties;
+    @Mock private MapAsyncDownloadQueueConfigProperties mapAsyncDownloadQueueConfigProperties;
 
     @Mock private MapRabbitTemplate mapRabbitTemplate;
 
@@ -20,7 +19,6 @@ class MapRabbitMQMessagingServiceTest extends RabbitMQMessagingServiceTest {
         queueConfigProperties = mapAsyncDownloadQueueConfigProperties;
         rabbitTemplate = mapRabbitTemplate;
         messagingService =
-                new MapMessagingService(
-                        mapAsyncDownloadQueueConfigProperties, mapRabbitTemplate);
+                new MapMessagingService(mapAsyncDownloadQueueConfigProperties, mapRabbitTemplate);
     }
 }

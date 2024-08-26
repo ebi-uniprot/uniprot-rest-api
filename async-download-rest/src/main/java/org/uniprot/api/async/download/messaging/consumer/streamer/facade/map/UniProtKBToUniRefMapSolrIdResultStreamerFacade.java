@@ -5,7 +5,6 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.map.UniP
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.map.UniProtKBToUniRefMapListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.map.UniProtKBToUniRefMapRDFResultStreamer;
 import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
-import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;

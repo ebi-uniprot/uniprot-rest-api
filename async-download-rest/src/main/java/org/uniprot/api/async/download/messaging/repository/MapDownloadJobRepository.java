@@ -5,5 +5,4 @@ import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
 
 @Repository
 public interface MapDownloadJobRepository
-        extends DownloadJobRepository<MapDownloadJob>,
-                MapDownloadJobPartialUpdateRepository {}
+        extends DownloadJobRepository<MapDownloadJob>, MapDownloadJobPartialUpdateRepository {}

@@ -7,9 +7,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBToUniRefMapListResultStreamerTest extends MapListResultStreamerTest<UniProtKBMapDownloadRequest> {
-    @Mock
-    private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+public class UniProtKBToUniRefMapListResultStreamerTest
+        extends MapListResultStreamerTest<UniProtKBMapDownloadRequest> {
+    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
 
     @BeforeEach
     void setUp() {

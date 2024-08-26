@@ -1,6 +1,7 @@
 package org.uniprot.api.async.download.messaging.producer.map;
 
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
@@ -11,7 +12,7 @@ import org.uniprot.api.async.download.service.map.MapJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.HashGenerator;
 
-import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class MapProducerMessageService<T extends MapDownloadRequest>

@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch.map;
 
+import java.util.Iterator;
+
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.map.MapHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.SolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
@@ -8,8 +10,6 @@ import org.uniprot.api.async.download.service.map.MapJobService;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.core.uniref.UniRefEntryLight;
-
-import java.util.Iterator;
 
 public abstract class UniRefMapSolrIdBatchResultStreamer<T extends MapDownloadRequest>
         extends SolrIdBatchResultStreamer<T, MapDownloadJob, UniRefEntryLight> {
@@ -25,7 +25,7 @@ public abstract class UniRefMapSolrIdBatchResultStreamer<T extends MapDownloadRe
 
     @Override
     public BatchStoreIterable<UniRefEntryLight> getBatchStoreIterable(
-            Iterator<String> idsIterator, T  request) {
+            Iterator<String> idsIterator, T request) {
         return new BatchStoreIterable<>(
                 idsIterator,
                 storeStreamerConfig.getStoreClient(),

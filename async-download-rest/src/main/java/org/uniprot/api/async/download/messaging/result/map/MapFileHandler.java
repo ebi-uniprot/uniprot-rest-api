@@ -2,9 +2,7 @@ package org.uniprot.api.async.download.messaging.result.map;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.map.MapDownloadConfigProperties;
-import org.uniprot.api.async.download.messaging.config.uniparc.UniParcDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.map.MapHeartbeatProducer;
-import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniparc.UniParcHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 
 @Component

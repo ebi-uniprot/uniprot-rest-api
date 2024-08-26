@@ -9,8 +9,21 @@ import org.uniprot.api.async.download.service.map.MapJobService;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @Component
-public class UniProtKBMapProducerMessageService extends MapProducerMessageService<UniProtKBMapDownloadRequest> {
-    public UniProtKBMapProducerMessageService(MapJobService jobService, MessageConverter messageConverter, MapMessagingService messagingService, HashGenerator<UniProtKBMapDownloadRequest> hashGenerator, MapFileHandler asyncDownloadFileHandler, MapJobSubmissionRules<UniProtKBMapDownloadRequest> asyncDownloadSubmissionRules) {
-        super(jobService, messageConverter, messagingService, hashGenerator, asyncDownloadFileHandler, asyncDownloadSubmissionRules);
+public class UniProtKBMapProducerMessageService
+        extends MapProducerMessageService<UniProtKBMapDownloadRequest> {
+    public UniProtKBMapProducerMessageService(
+            MapJobService jobService,
+            MessageConverter messageConverter,
+            MapMessagingService messagingService,
+            HashGenerator<UniProtKBMapDownloadRequest> hashGenerator,
+            MapFileHandler asyncDownloadFileHandler,
+            MapJobSubmissionRules<UniProtKBMapDownloadRequest> asyncDownloadSubmissionRules) {
+        super(
+                jobService,
+                messageConverter,
+                messagingService,
+                hashGenerator,
+                asyncDownloadFileHandler,
+                asyncDownloadSubmissionRules);
     }
 }

@@ -261,7 +261,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     }
 
     @Override
-    protected FileHandler getFileHandler() {
+    protected FileHandler getMapFileHandler() {
         return fileHandler;
     }
 

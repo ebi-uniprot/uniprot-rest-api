@@ -7,16 +7,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBMapJobSubmissionRulesTest extends MapJobSubmissionRulesTest<UniProtKBMapDownloadRequest> {
-    @Mock
-    private UniProtKBMapDownloadRequest mapDownloadRequest;
+class UniProtKBMapJobSubmissionRulesTest
+        extends MapJobSubmissionRulesTest<UniProtKBMapDownloadRequest> {
+    @Mock private UniProtKBMapDownloadRequest mapDownloadRequest;
 
     @BeforeEach
     void setUp() {
         init();
         downloadRequest = mapDownloadRequest;
         jobSubmissionRules =
-                new UniProtKBMapJobSubmissionRules(MAX_RETRY_COUNT, MAX_WAITING_TIME, mapJobService);
+                new UniProtKBMapJobSubmissionRules(
+                        MAX_RETRY_COUNT, MAX_WAITING_TIME, mapJobService);
         mock();
     }
 }
