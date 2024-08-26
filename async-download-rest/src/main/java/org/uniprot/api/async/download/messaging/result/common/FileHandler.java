@@ -27,7 +27,10 @@ public abstract class FileHandler {
     }
 
     public void writeIds(String jobId, Stream<String> ids) {
-        Path idsFile = getIdFile(jobId);
+        writeIds(jobId, ids, getIdFile(jobId));
+    }
+
+    private void writeIds(String jobId, Stream<String> ids, Path idsFile) {
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
                         idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -38,7 +41,7 @@ public abstract class FileHandler {
                 heartbeatProducer.generateForIds(jobId);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             heartbeatProducer.stop(jobId);
         }
@@ -58,6 +61,10 @@ public abstract class FileHandler {
 
     public Path getIdFile(String jobId) {
         return getPath(downloadConfigProperties.getIdFilesFolder(), jobId);
+    }
+
+    public Path getFromIdFile(String jobId) {
+        return getPath(downloadConfigProperties.getFromIdFilesFolder(), jobId);
     }
 
     public Path getResultFile(String jobId) {
@@ -93,5 +100,9 @@ public abstract class FileHandler {
                     jobId);
             throw new FileHandelerException(e);
         }
+    }
+
+    public void writeFromIds(String jobId, Stream<String> ids) {
+        writeIds(jobId, ids, getFromIdFile(jobId));
     }
 }

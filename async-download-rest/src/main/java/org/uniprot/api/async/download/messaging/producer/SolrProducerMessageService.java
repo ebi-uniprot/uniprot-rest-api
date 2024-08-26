@@ -18,7 +18,7 @@ public abstract class SolrProducerMessageService<
             MessagingService messagingService,
             HashGenerator<T> hashGenerator,
             FileHandler fileHandler,
-            JobSubmissionRules jobSubmissionRules) {
+            JobSubmissionRules<T,R> jobSubmissionRules) {
         super(
                 jobService,
                 messageConverter,

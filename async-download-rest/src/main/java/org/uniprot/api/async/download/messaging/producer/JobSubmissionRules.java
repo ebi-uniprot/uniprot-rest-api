@@ -13,18 +13,18 @@ import org.uniprot.api.rest.download.model.JobStatus;
 public abstract class JobSubmissionRules<T extends DownloadRequest, R extends DownloadJob> {
     private final int maxRetryCount;
     private final int maxWaitingTime;
-    private final JobService<R> downloadJobRepository;
+    private final JobService<R> jobService;
 
     protected JobSubmissionRules(
-            int maxRetryCount, int maxWaitingTime, JobService<R> downloadJobRepository) {
+            int maxRetryCount, int maxWaitingTime, JobService<R> jobService) {
         this.maxRetryCount = maxRetryCount;
         this.maxWaitingTime = maxWaitingTime;
-        this.downloadJobRepository = downloadJobRepository;
+        this.jobService = jobService;
     }
 
     public JobSubmitFeedback submit(T request) {
         String jobId = request.getDownloadJobId();
-        Optional<? extends DownloadJob> downloadJobOpt = downloadJobRepository.find(jobId);
+        Optional<? extends DownloadJob> downloadJobOpt = jobService.find(jobId);
         if (downloadJobOpt.isPresent()) {
             DownloadJob downloadJob = downloadJobOpt.get();
             JobStatus downloadJobStatus = downloadJob.getStatus();

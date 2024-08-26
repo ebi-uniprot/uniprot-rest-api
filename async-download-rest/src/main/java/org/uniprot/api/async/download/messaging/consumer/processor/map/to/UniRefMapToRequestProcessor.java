@@ -1,0 +1,44 @@
+package org.uniprot.api.async.download.messaging.consumer.processor.map.to;
+
+import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
+import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
+import org.uniprot.api.async.download.service.map.MapJobService;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
+import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
+import org.uniprot.core.uniref.UniRefEntryLight;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Component
+public class UniRefMapToRequestProcessor extends MapToRequestProcessor<UniProtKBMapDownloadRequest> {
+    private final UniRefEntryLightService uniRefEntryLightService;
+
+    protected UniRefMapToRequestProcessor(MapFileHandler fileHandler, MapJobService jobService, UniRefEntryLightService uniRefEntryLightService) {
+        super(fileHandler, jobService);
+        this.uniRefEntryLightService = uniRefEntryLightService;
+    }
+
+    @Override
+    protected long getSolrHits(Stream<String> ids) {
+        UniRefSearchRequest searchRequest = new UniRefSearchRequest();
+        searchRequest.setQuery(getQuery(ids));
+        searchRequest.setSize(0);
+        QueryResult<UniRefEntryLight> searchResults = uniRefEntryLightService.search(searchRequest);
+        return searchResults.getPage().getTotalElements();
+    }
+
+    private static String getQuery(Stream<String> ids) {
+        return "uniprot_id: (" + ids.collect(Collectors.joining(" OR ")) + ")";
+    }
+
+    @Override
+    protected Stream<String> mapIds(Stream<String> ids) {
+        UniRefDownloadRequest uniRefDownloadRequest = new UniRefDownloadRequest();
+        uniRefDownloadRequest.setQuery(getQuery(ids));
+        return uniRefEntryLightService.streamIdsForDownload(uniRefDownloadRequest);
+    }
+}

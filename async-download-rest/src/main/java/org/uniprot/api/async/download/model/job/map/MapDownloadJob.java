@@ -1,22 +1,21 @@
-package org.uniprot.api.async.download.model.job.uniprotkb;
+package org.uniprot.api.async.download.model.job.map;
 
-import java.io.Serial;
-import java.time.LocalDateTime;
-
+import lombok.Builder;
 import org.springframework.data.redis.core.RedisHash;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import lombok.Builder;
+import java.io.Serial;
+import java.time.LocalDateTime;
 
-@RedisHash("uniprotkb")
-public class UniProtKBDownloadJob extends DownloadJob {
+@RedisHash("map")
+public class MapDownloadJob extends DownloadJob {
 
     @Serial
-    private static final long serialVersionUID = 1092075039555402818L;
+    private static final long serialVersionUID = 3430390961923980454L;
 
     @Builder
-    public UniProtKBDownloadJob(
+    public MapDownloadJob(
             String id,
             JobStatus status,
             LocalDateTime created,
