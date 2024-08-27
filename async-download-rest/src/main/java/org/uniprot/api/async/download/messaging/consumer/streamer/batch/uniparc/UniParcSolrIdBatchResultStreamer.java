@@ -10,29 +10,36 @@ import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadReque
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightBatchStoreIterable;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
 public class UniParcSolrIdBatchResultStreamer
         extends SolrIdBatchResultStreamer<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
-    private final StoreStreamerConfig<UniParcEntry> storeStreamerConfig;
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
+    private final StoreStreamerConfig<UniParcEntryLight> storeStreamerConfig;
+    private final UniParcCrossReferenceLazyLoader lazyLoader;
 
     public UniParcSolrIdBatchResultStreamer(
             UniParcHeartbeatProducer heartbeatProducer,
             UniParcJobService jobService,
-            StoreStreamerConfig<UniParcEntry> storeStreamerConfig) {
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,
+            UniParcCrossReferenceLazyLoader lazyLoader) {
         super(heartbeatProducer, jobService);
-        this.storeStreamerConfig = storeStreamerConfig;
+        this.storeStreamerConfig = storeLightStreamerConfig;
+        this.lazyLoader = lazyLoader;
     }
 
     @Override
-    public BatchStoreIterable<UniParcEntry> getBatchStoreIterable(
+    public BatchStoreIterable<UniParcEntryLight> getBatchStoreIterable(
             Iterator<String> idsIterator, UniParcDownloadRequest request) {
-        return new BatchStoreIterable<>(
+        return new UniParcLightBatchStoreIterable(
                 idsIterator,
                 storeStreamerConfig.getStoreClient(),
                 storeStreamerConfig.getStoreFetchRetryPolicy(),
-                storeStreamerConfig.getStreamConfig().getStoreBatchSize());
+                storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
+                this.lazyLoader,
+                request.getFields());
     }
 }

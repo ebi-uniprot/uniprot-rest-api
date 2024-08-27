@@ -5,9 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
+import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -86,17 +90,25 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
     void testGetByUniParcIdWithFieldsThatDoesNotHaveValuesInEntry() throws Exception {
         // given
         UniParcEntryConverter converter = new UniParcEntryConverter();
-        UniParcEntry simpleEntry = UniParcEntryMocker.createSimpleEntry(2, "UPI0000083D");
-        String uniparcId = simpleEntry.getUniParcId().getValue();
+        UniParcEntry simpleEntry = UniParcEntryMocker.createUniParcEntry(2, "UPI0000083D");
+        simpleEntry = UniParcEntryBuilder.from(simpleEntry).sequenceFeaturesSet(List.of()).build();
+        String uniParcId = simpleEntry.getUniParcId().getValue();
         Entry simpleXmlEntry = converter.toXml(simpleEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, simpleXmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, simpleEntry);
+        // put uniparc light and cross references in voldemort
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.convertToUniParcEntryLight(simpleEntry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        uniParcId + "_0", simpleEntry.getUniParcCrossReferences());
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, pair);
 
         // when
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath(), uniparcId)
+                                MockMvcRequestBuilders.get(getIdRequestPath(), uniParcId)
                                         .param("fields", "CDD"));
 
         // then
@@ -104,7 +116,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.uniParcId", equalTo(uniparcId)))
+                .andExpect(jsonPath("$.uniParcId", equalTo(uniParcId)))
                 .andExpect(jsonPath("$.sequenceFeatures").doesNotExist());
     }
 
@@ -136,7 +148,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
         @Override
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
-                    .id("UPI0000083A09")
+                    .id("UPI0000083A99")
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();

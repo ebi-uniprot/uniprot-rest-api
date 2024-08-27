@@ -15,19 +15,19 @@ import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcSolrIdResultStreamerFacadeTest
         extends SolrIdResultStreamerFacadeTest<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
-    @Mock private Stream<UniParcEntry> uniParcEntryStream;
-    @Mock private MessageConverterContext<UniParcEntry> uniParcEntryMessageConverterContext;
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
+    @Mock private Stream<UniParcEntryLight> uniParcEntryStream;
+    @Mock private MessageConverterContext<UniParcEntryLight> uniParcEntryMessageConverterContext;
     @Mock private UniParcDownloadRequest uniParcDownloadRequest;
     @Mock private UniParcRDFResultStreamer uniParcRDFResultStreamer;
     @Mock private UniParcListResultStreamer uniParcListResultStreamer;
     @Mock private UniParcSolrIdBatchResultStreamer uniParcBatchResultStreamer;
-    @Mock private MessageConverterContextFactory<UniParcEntry> uniParcConverterContextFactory;
+    @Mock private MessageConverterContextFactory<UniParcEntryLight> uniParcConverterContextFactory;
     @Mock private UniParcFileHandler uniParcAsyncDownloadFileHandler;
 
     @BeforeEach

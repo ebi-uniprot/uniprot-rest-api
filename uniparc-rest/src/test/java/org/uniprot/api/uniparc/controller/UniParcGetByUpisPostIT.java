@@ -1,10 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -17,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -27,12 +24,16 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsPostControllerIT;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -67,11 +68,15 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         "UPI0000000008"
     };
 
-    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired UniProtStoreClient<UniParcEntryLight> storeClient;
+    @Autowired private UniParcCrossReferenceStoreClient crossRefStoreClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniParcFacetConfig facetConfig;
+
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -146,7 +151,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3));
+        ResultMatcher rm2 = jsonPath("$.results[0].crossReferenceCount", is(25));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
         ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12));
@@ -164,9 +169,8 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     protected List<ResultMatcher> getFieldsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 = jsonPath("$.results.*.sequence").doesNotExist();
-        ResultMatcher rm3 = jsonPath("$.results.*.uniParcCrossReferences.*.geneName").exists();
-        ResultMatcher rm4 =
-                jsonPath("$.results.*.uniParcCrossReferences.*.organism.taxonId").exists();
+        ResultMatcher rm3 = jsonPath("$.results.*.geneNames").exists();
+        ResultMatcher rm4 = jsonPath("$.results.*.organisms").exists();
         ResultMatcher rm5 = jsonPath("$.results.*.sequenceFeatures.*.database").exists();
         ResultMatcher rm6 = jsonPath("$.results[0].sequenceFeatures[0].database", is("CDD"));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);
@@ -220,12 +224,19 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 
-    private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
+    private void saveEntry(int qualifier) throws Exception {
+        int xrefCount = 25;
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(qualifier, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(entry);
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
+        storeClient.saveEntry(uniParcEntryLight);
+        List<UniParcCrossReferencePair> crossReferences =
+                UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
+        crossReferences.forEach(pair -> crossRefStoreClient.saveEntry(pair));
     }
 }

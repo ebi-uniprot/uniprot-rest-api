@@ -16,6 +16,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -24,12 +25,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniparc.common.service.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesStreamRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -50,16 +53,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/uniparc")
 public class UniParcDatabaseController extends BasicSearchController<UniParcCrossReference> {
 
-    private final UniParcQueryService queryService;
+    private final UniParcCrossReferenceService crossReferenceService;
 
     @Autowired
     public UniParcDatabaseController(
             ApplicationEventPublisher eventPublisher,
-            UniParcQueryService queryService,
+            UniParcCrossReferenceService crossReferenceService,
             MessageConverterContextFactory<UniParcCrossReference> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
-        this.queryService = queryService;
+        this.crossReferenceService = crossReferenceService;
     }
 
     @GetMapping(
@@ -91,8 +94,45 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniParcCrossReference> results =
-                queryService.getDatabasesByUniParcId(upi, databasesRequest);
+                this.crossReferenceService.getCrossReferencesByUniParcId(upi, databasesRequest);
         return super.getSearchResponse(results, databasesRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/{upi}/databases/stream",
+            produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            hidden = true,
+            summary = DATABASES_UNIPARC_OPERATION,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniParcCrossReference.class))
+                        })
+            })
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcCrossReference>>>
+            streamDatabasesByUpi(
+                    @PathVariable
+                            @Pattern(
+                                    regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
+                                    flags = {Pattern.Flag.CASE_INSENSITIVE},
+                                    message = "{search.invalid.upi.value}")
+                            @NotNull(message = "{search.required}")
+                            @Parameter(
+                                    description = ID_UNIPARC_DESCRIPTION,
+                                    example = ID_UNIPARC_EXAMPLE)
+                            String upi,
+                    @Valid @ModelAttribute UniParcDatabasesStreamRequest streamRequest,
+                    HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
+        setBasicRequestFormat(streamRequest, request);
+        return super.stream(
+                () -> crossReferenceService.streamCrossReferences(upi, streamRequest),
+                streamRequest,
+                contentType,
+                request);
     }
 
     @Override

@@ -512,6 +512,9 @@ public class OpenAPIConstants {
     public static final String SEARCH_UNIPARC_OPERATION =
             "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
+
+    public static final String ID_UNIPARC_LIGHT_OPERATION =
+            "Get UniParc light entry by a single upi.";
     public static final String STREAM_UNIPARC_OPERATION =
             "Download UniParc entries retrieved by a search query.";
     public static final String STREAM_UNIPARC_OPERATION_DESC =

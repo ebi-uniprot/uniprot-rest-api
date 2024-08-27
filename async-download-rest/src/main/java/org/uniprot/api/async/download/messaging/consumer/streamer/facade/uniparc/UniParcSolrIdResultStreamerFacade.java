@@ -12,18 +12,18 @@ import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandle
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
 public class UniParcSolrIdResultStreamerFacade
         extends SolrIdResultStreamerFacade<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
 
     public UniParcSolrIdResultStreamerFacade(
             UniParcRDFResultStreamer rdfResultStreamer,
             UniParcListResultStreamer listResultStreamer,
             UniParcSolrIdBatchResultStreamer batchResultStreamer,
-            MessageConverterContextFactory<UniParcEntry> converterContextFactory,
+            MessageConverterContextFactory<UniParcEntryLight> converterContextFactory,
             UniParcFileHandler fileHandler) {
         super(
                 rdfResultStreamer,

@@ -6,18 +6,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
+import static org.uniprot.api.uniparc.controller.UniParcITUtils.*;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,18 +43,21 @@ import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 /**
  * @author jluo
@@ -79,7 +84,15 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     @Autowired private UniParcQueryRepository repository;
     @Autowired private UniParcFacetConfig facetConfig;
 
-    private UniParcStoreClient storeClient;
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
+
+    @Value("${search.default.page.size:#{null}}")
+    private Integer defaultPageSize;
+
+    private UniParcLightStoreClient storeClient;
+
+    private UniParcCrossReferenceStoreClient xRefStoreClient;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -103,7 +116,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
 
     @Override
     protected int getDefaultPageSize() {
-        return 25;
+        return defaultPageSize;
     }
 
     @Override
@@ -141,15 +154,16 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     @BeforeAll
     void initDataStore() {
         storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        getStoreManager().addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
 
+        xRefStoreClient =
+                new UniParcCrossReferenceStoreClient(
+                        VoldemortInMemoryUniParcCrossReferenceStore.getInstance(
+                                "uniparc-cross-reference"));
         getStoreManager()
-                .addDocConverter(
-                        DataStoreManager.StoreType.UNIPARC,
-                        new UniParcDocumentConverter(
-                                TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
+                .addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
     }
 
     @Test
@@ -340,10 +354,14 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
         saveEntry(11);
         saveEntry(20);
         if (SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
-            UniParcEntry entry = createEntry(30, UPI_PREF);
+            UniParcEntry entry = createUniParcEntry(30, UPI_PREF);
             UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
             Arrays.stream(UniParcDatabase.values())
-                    .forEach(db -> builder.uniParcCrossReferencesAdd(getXref(db)));
+                    .forEach(
+                            db ->
+                                    builder.uniParcCrossReferencesAdd(
+                                            UniParcCrossReferenceMocker.createUniParcCrossReference(
+                                                    db)));
             saveEntry(builder.build());
         }
     }
@@ -354,21 +372,43 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     }
 
     private void saveEntry(int i) {
-        UniParcEntry entry = createEntry(i, UPI_PREF);
+        UniParcEntry entry = createUniParcEntry(i, UPI_PREF);
         saveEntry(entry);
     }
 
     private void saveEntry(UniParcEntry entry) {
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
+        UniParcDocument.UniParcDocumentBuilder builder = getUniParcDocument(entry);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPARC, builder.build());
 
-        getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC, entry);
+        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
+        List<UniParcCrossReferencePair> xrefPairs =
+                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
+                        entryLight.getUniParcId(),
+                        xrefGroupSize,
+                        entry.getUniParcCrossReferences());
+        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
+            xRefStoreClient.saveEntry(xrefPair);
+        }
     }
 
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
+    }
+
+    @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
     }
 
     static class UniParcSearchParameterResolver extends AbstractSearchParameterResolver {
@@ -426,7 +466,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
             return SearchParameter.builder()
                     .queryParam(
                             "query",
-                            Collections.singletonList(
+                            List.of(
                                     "upi:INVALID OR taxonomy_id:INVALID "
                                             + "OR length:INVALID OR upid:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
@@ -466,15 +506,9 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].geneName")
-                                    .hasJsonPath())
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].taxonomy")
-                                    .doesNotExist())
-                    .resultMatcher(
-                            jsonPath("$.results[*].uniParcCrossReferences[*].proteinName")
-                                    .doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].geneNames").hasJsonPath())
+                    .resultMatcher(jsonPath("$.results[*].uniProtKBAccessions").doesNotExist())
+                    .resultMatcher(jsonPath("$.results[*].proteinNames").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
                     .resultMatcher(
@@ -524,26 +558,6 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                             jsonPath(
                                                     "$.results.*.uniParcId",
                                                     contains("UPI0000083A11", "UPI0000083A20")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    XML_DECLARATION
-                                                                            + UNIPARC_XML_SCHEMA)))
-                                    .resultMatcher(
-                                            content().string(containsString("UPI0000083A11")))
-                                    .resultMatcher(
-                                            content().string(containsString("UPI0000083A20")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            endsWith(
-                                                                    COPYRIGHT_TAG
-                                                                            + UNIPARC_XML_CLOSE_TAG)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -601,15 +615,6 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

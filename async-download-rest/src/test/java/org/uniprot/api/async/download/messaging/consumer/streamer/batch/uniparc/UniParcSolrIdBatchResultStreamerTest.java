@@ -18,26 +18,28 @@ import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadReque
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
 public class UniParcSolrIdBatchResultStreamerTest
         extends SolrIdBatchResultStreamerTest<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
     private static final int BATCH_SIZE = 2;
     @Mock private UniParcDownloadRequest uniParcDownloadRequest;
     @Mock private UniParcDownloadJob uniParcDownloadJob;
     @Mock private UniParcHeartbeatProducer uniParcHeartbeatProducer;
     @Mock private UniParcJobService uniParcJobService;
-    @Mock private StoreStreamerConfig<UniParcEntry> uniParcEntryStoreStreamerConfig;
-    @Mock private UniParcStoreClient uniParcStoreClient;
+    @Mock private StoreStreamerConfig<UniParcEntryLight> uniParcEntryStoreStreamerConfig;
+    @Mock private UniParcLightStoreClient uniParcStoreClient;
     @Mock private StreamerConfigProperties streamerConfig;
-    @Mock private UniParcEntry uniParc1;
-    @Mock private UniParcEntry uniParc2;
-    @Mock private UniParcEntry uniParc3;
+    @Mock private UniParcEntryLight uniParc1;
+    @Mock private UniParcEntryLight uniParc2;
+    @Mock private UniParcEntryLight uniParc3;
+    @Mock private UniParcCrossReferenceLazyLoader lazyLoader;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +51,8 @@ public class UniParcSolrIdBatchResultStreamerTest
                 new UniParcSolrIdBatchResultStreamer(
                         uniParcHeartbeatProducer,
                         uniParcJobService,
-                        uniParcEntryStoreStreamerConfig);
+                        uniParcEntryStoreStreamerConfig,
+                        lazyLoader);
     }
 
     @Override
@@ -80,7 +83,7 @@ public class UniParcSolrIdBatchResultStreamerTest
     }
 
     @Override
-    protected Iterable<UniParcEntry> getEntryList() {
+    protected Iterable<UniParcEntryLight> getEntryList() {
         return List.of(uniParc1, uniParc2, uniParc3);
     }
 }
