@@ -3,6 +3,7 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 import org.junit.jupiter.api.Test;
@@ -196,7 +197,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         ResultActions response =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
-                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
         response.andDo(log())
