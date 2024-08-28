@@ -7,29 +7,30 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.uniparc.UniParcDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniparc.UniParcHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.processor.result.SolrIdResultRequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.streamer.facade.uniparc.UniParcSolrIdResultStreamerFacade;
+import org.uniprot.api.async.download.messaging.consumer.streamer.facade.uniparc.UniParcLightSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
-public class UniParcSolrIdResultRequestProcessor
+public class UniParcLightSolrIdResultRequestProcessor
         extends SolrIdResultRequestProcessor<
-                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
+                UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
     private static final Type type =
-            (new ParameterizedTypeReference<MessageConverterContext<UniParcEntry>>() {}).getType();
+            (new ParameterizedTypeReference<MessageConverterContext<UniParcEntryLight>>() {})
+                    .getType();
 
-    public UniParcSolrIdResultRequestProcessor(
+    public UniParcLightSolrIdResultRequestProcessor(
             UniParcDownloadConfigProperties downloadConfigProperties,
             UniParcHeartbeatProducer heartbeatProducer,
-            UniParcSolrIdResultStreamerFacade uniParcSolrIdResultStreamerFacade,
+            UniParcLightSolrIdResultStreamerFacade uniParcLightSolrIdResultStreamerFacade,
             UUWMessageConverterFactory uuwMessageConverterFactory) {
         super(
                 downloadConfigProperties,
                 heartbeatProducer,
-                uniParcSolrIdResultStreamerFacade,
+                uniParcLightSolrIdResultStreamerFacade,
                 uuwMessageConverterFactory);
     }
 
