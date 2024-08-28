@@ -82,7 +82,7 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
     }
 
     protected void mockFileExistence() {
-        when(fileHandler.areAllFilesPresent(ID)).thenReturn(true);
+        when(fileHandler.areIdAndResultFilesPresent(ID)).thenReturn(true);
     }
 
     @Test

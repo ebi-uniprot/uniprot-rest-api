@@ -76,7 +76,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
     }
 
     @Test
@@ -93,7 +93,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(RUNNING, job.getStatus());
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
-        assertTrue(fileHandler.areAllFilesPresent(ID));
+        assertTrue(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     @Test
@@ -111,7 +111,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
         assertEquals(PROCESSED_ENTRIES, job.getProcessedEntries());
-        assertTrue(fileHandler.areAllFilesPresent(ID));
+        assertTrue(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     @Test
@@ -132,7 +132,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
@@ -153,12 +153,16 @@ public abstract class SolrIdMessageConsumerIT<
         R job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(12, job.getTotalEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
         assertJobSpecifics(job, format);
         verifyIdsFiles(ID);
         if (Objects.equals(format, "json")) {
             verifyResultFile(ID);
         }
+    }
+
+    protected void areFilesPresent() {
+        assertFalse(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     protected abstract void verifyIdsFiles(String id) throws Exception;
@@ -190,7 +194,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(1, job.getRetried());
         assertEquals(12, job.getTotalEntries());
         assertEquals(12, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
         assertJobSpecifics(job, "json");
     }
 

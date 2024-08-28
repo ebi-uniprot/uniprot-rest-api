@@ -46,7 +46,7 @@ public class UniProtKBMapDownloadRequest extends UniProtKBStreamRequest
 
     @Override
     public String getFrom() {
-        return "UniprotKB";
+        return "UniProtKB";
     }
 
     @Override

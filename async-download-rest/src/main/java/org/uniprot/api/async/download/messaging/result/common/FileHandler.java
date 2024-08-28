@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -55,8 +56,16 @@ public abstract class FileHandler {
         return Files.exists(getResultFile(jobId));
     }
 
-    public boolean areAllFilesPresent(String jobId) {
+    public boolean isFromIdFilePresent(String jobId) {
+        return Files.exists(getFromIdFile(jobId));
+    }
+
+    public boolean areIdAndResultFilesPresent(String jobId) {
         return isIdFilePresent(jobId) && isResultFilePresent(jobId);
+    }
+
+    public boolean areAllFilesPresent(String jobId) {
+        return isFromIdFilePresent(jobId) && isIdFilePresent(jobId) && isResultFilePresent(jobId);
     }
 
     public Path getIdFile(String jobId) {
@@ -77,17 +86,27 @@ public abstract class FileHandler {
     }
 
     public void deleteIdFile(String jobId) {
-        Path idsFile = getIdFile(jobId);
-        deleteFile(idsFile, jobId);
+        if (!Objects.isNull(downloadConfigProperties.getFromIdFilesFolder())) {
+            deleteFile(getIdFile(jobId), jobId);
+        }
     }
 
     public void deleteResultFile(String jobId) {
-        deleteFile(getResultFile(jobId), jobId);
+        if (!Objects.isNull(downloadConfigProperties.getResultFilesFolder())) {
+            deleteFile(getResultFile(jobId), jobId);
+        }
+    }
+
+    public void deleteFromIdFile(String jobId) {
+        if (!Objects.isNull(downloadConfigProperties.getFromIdFilesFolder())) {
+            deleteFile(getFromIdFile(jobId), jobId);
+        }
     }
 
     public void deleteAllFiles(String jobId) {
         deleteIdFile(jobId);
         deleteResultFile(jobId);
+        deleteFromIdFile(jobId);
     }
 
     private void deleteFile(Path file, String jobId) {

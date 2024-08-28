@@ -134,7 +134,7 @@ class UniProtKBMessageConsumerIT
         UniProtKBDownloadJob job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(0, job.getTotalEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        assertFalse(fileHandler.areIdAndResultFilesPresent(ID));
         assertEquals(0, job.getUpdateCount());
         assertEquals(ABORTED, job.getStatus());
         assertEquals(0, job.getProcessedEntries());
@@ -154,7 +154,7 @@ class UniProtKBMessageConsumerIT
         UniProtKBDownloadJob job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(12, job.getTotalEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        assertFalse(fileHandler.areIdAndResultFilesPresent(ID));
         assertEquals(8, job.getUpdateCount());
         assertEquals(FINISHED, job.getStatus());
         assertEquals(12, job.getProcessedEntries());
