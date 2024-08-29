@@ -135,7 +135,17 @@ public class UniParcMessageConverterConfig {
     public MessageConverterContextFactory<UniParcEntry> uniparcMessageConverterContextFactory() {
         MessageConverterContextFactory<UniParcEntry> contextFactory =
                 new MessageConverterContextFactory<>();
-        contextFactory.addMessageConverterContext(uniParcContext(MediaType.APPLICATION_XML));
+        List.of(
+                        uniParcContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniParcContext(MediaType.APPLICATION_XML),
+                        uniParcContext(MediaType.APPLICATION_JSON),
+                        uniParcContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.XLS_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.RDF_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
         return contextFactory;
     }
 
