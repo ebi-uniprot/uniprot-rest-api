@@ -41,7 +41,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 @Service
 @Import(UniParcSolrQueryConfig.class)
-public class UniParcLightQueryService
+public class UniParcLightEntryService
         extends StoreStreamerSearchService<UniParcDocument, UniParcEntryLight> {
 
     public static final String UNIPARC_ID_FIELD = "upi";
@@ -55,7 +55,7 @@ public class UniParcLightQueryService
     private final RdfStreamer rdfStreamer;
 
     @Autowired
-    public UniParcLightQueryService(
+    public UniParcLightEntryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
             UniParcSortClause solrSortClause,

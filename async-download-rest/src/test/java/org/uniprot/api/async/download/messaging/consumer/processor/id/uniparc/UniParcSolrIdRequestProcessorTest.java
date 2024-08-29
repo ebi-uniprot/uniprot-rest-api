@@ -14,7 +14,7 @@ import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadReque
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.Page;
-import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
@@ -23,7 +23,7 @@ class UniParcSolrIdRequestProcessorTest
         extends SolrIdRequestProcessorTest<UniParcDownloadRequest, UniParcDownloadJob> {
     private static final String QUERY = "uniParcQuery";
     @Mock private QueryResult<UniParcEntryLight> searchResults;
-    @Mock private UniParcLightQueryService uniParcLightQueryService;
+    @Mock private UniParcLightEntryService uniParcLightEntryService;
     @Mock private UniParcFileHandler uniParcAsyncDownloadFileHandler;
     @Mock private UniParcJobService uniParcJobService;
     @Mock private UniParcDownloadRequest uniParcDownloadRequest;
@@ -38,10 +38,10 @@ class UniParcSolrIdRequestProcessorTest
                 new UniParcSolrIdRequestProcessor(
                         uniParcAsyncDownloadFileHandler,
                         uniParcJobService,
-                        uniParcLightQueryService);
+                        uniParcLightEntryService);
         when(downloadRequest.getQuery()).thenReturn(QUERY);
-        when(uniParcLightQueryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
-        when(uniParcLightQueryService.search(
+        when(uniParcLightEntryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
+        when(uniParcLightEntryService.search(
                         argThat(
                                 sr ->
                                         QUERY.equals(((UniParcSearchRequest) sr).getQuery())

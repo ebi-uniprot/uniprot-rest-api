@@ -52,7 +52,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  */
 @Service
 @Import(UniParcSolrQueryConfig.class)
-public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
+public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     public static final String UNIPARC_ID_FIELD = "upi";
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String CHECKSUM_STR = "checksum";
@@ -65,7 +65,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final RdfStreamer rdfStreamer;
 
     @Autowired
-    public UniParcQueryService(
+    public UniParcEntryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
             UniParcSortClause solrSortClause,

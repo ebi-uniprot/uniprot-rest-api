@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
-import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
@@ -25,14 +25,14 @@ public class UniParcBestGuessService {
 
     private static final String MORE_THAN_ONE_BEST_GUESS_FOUND =
             "More than one Best Guess found {list}. Review your query and/or contact us.";
-    private final UniParcLightQueryService uniParcLightQueryService;
+    private final UniParcLightEntryService uniParcLightEntryService;
     private final UniParcCrossReferenceService uniParcCrossReferenceService;
 
     @Autowired
     public UniParcBestGuessService(
-            UniParcLightQueryService uniParcLightQueryService,
+            UniParcLightEntryService uniParcLightEntryService,
             UniParcCrossReferenceService uniParcCrossReferenceService) {
-        this.uniParcLightQueryService = uniParcLightQueryService;
+        this.uniParcLightEntryService = uniParcLightEntryService;
         this.uniParcCrossReferenceService = uniParcCrossReferenceService;
     }
 
@@ -41,7 +41,7 @@ public class UniParcBestGuessService {
         streamRequest.setQuery(request.getQuery());
         streamRequest.setFields(request.getFields());
         Stream<UniParcEntryLight> uniParcLightEntriesStream =
-                this.uniParcLightQueryService.stream(streamRequest);
+                this.uniParcLightEntryService.stream(streamRequest);
         return analyseBestGuess(uniParcLightEntriesStream, request);
     }
 
