@@ -598,6 +598,11 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                     .resultMatcher(
                                             content()
                                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    ">UPI0000083A11 status=active")))
                                     .build())
                     .build();
         }
