@@ -48,6 +48,23 @@ public abstract class FileHandler {
         }
     }
 
+    private void writeFromIds(String jobId, Stream<String> ids, Path idsFile) {
+        try (BufferedWriter writer =
+                Files.newBufferedWriter(
+                        idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            Iterable<String> iterator = ids::iterator;
+            for (String id : iterator) {
+                writer.append(id);
+                writer.newLine();
+                heartbeatProducer.generateForFromIds(jobId);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            heartbeatProducer.stop(jobId);
+        }
+    }
+
     public boolean isIdFilePresent(String jobId) {
         return Files.exists(getIdFile(jobId));
     }
@@ -86,7 +103,7 @@ public abstract class FileHandler {
     }
 
     public void deleteIdFile(String jobId) {
-        if (!Objects.isNull(downloadConfigProperties.getFromIdFilesFolder())) {
+        if (!Objects.isNull(downloadConfigProperties.getIdFilesFolder())) {
             deleteFile(getIdFile(jobId), jobId);
         }
     }
@@ -122,6 +139,6 @@ public abstract class FileHandler {
     }
 
     public void writeFromIds(String jobId, Stream<String> ids) {
-        writeIds(jobId, ids, getFromIdFile(jobId));
+        writeFromIds(jobId, ids, getFromIdFile(jobId));
     }
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.LongConsumer;
 
 import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
 import org.uniprot.api.async.download.service.JobService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,17 @@ public class HeartbeatProducer {
                         .find(jobId)
                         .orElseThrow(
                                 () -> new IllegalArgumentException("Invalid job id: " + jobId)));
+    }
+
+    public void generateForFromIds(String jobId) {
+        generateForFromIds(
+                (MapDownloadJob)
+                        jobService
+                                .find(jobId)
+                                .orElseThrow(
+                                        () ->
+                                                new IllegalArgumentException(
+                                                        "Invalid job id: " + jobId)));
     }
 
     public void generateForIds(DownloadJob downloadJob) {
@@ -90,6 +102,50 @@ public class HeartbeatProducer {
         }
     }
 
+    public void generateForFromIds(MapDownloadJob downloadJob) {
+        try {
+            generateIfEligible(
+                    downloadJob,
+                    downloadJob.getTotalFromIds(),
+                    1,
+                    heartbeatConfig.getIdsInterval(),
+                    pe -> {
+                        long newUpdateCount = downloadJob.getUpdateCount() + 1;
+                        downloadJob.setUpdateCount(newUpdateCount);
+                        Failsafe.with(retryPolicy)
+                                .onFailure(
+                                        throwable ->
+                                                log.warn(
+                                                        MessageFormat.format(
+                                                                "Job {0} failed to update the processed count to {1} in initial Solr phase due to {2}",
+                                                                downloadJob.getId(),
+                                                                newUpdateCount,
+                                                                throwable.getFailure())))
+                                .run(
+                                        () ->
+                                                jobService.update(
+                                                        downloadJob.getId(),
+                                                        Map.of(
+                                                                UPDATE_COUNT,
+                                                                newUpdateCount,
+                                                                UPDATED,
+                                                                LocalDateTime.now())));
+                        log.info(
+                                String.format(
+                                        "%s: Job ID: %s updated in initial Solr phase",
+                                        downloadJob.getUpdateCount(), downloadJob.getId()));
+                    });
+
+        } catch (Exception e) {
+            log.warn(
+                    String.format(
+                            "%s: Updating Job ID: %s in initial Solr phase failed, %s",
+                            downloadJob.getUpdateCount(),
+                            downloadJob.getId(),
+                            Arrays.toString(e.getStackTrace())));
+        }
+    }
+
     private void generateIfEligible(
             DownloadJob downloadJob, long size, long interval, LongConsumer consumer) {
         if (heartbeatConfig.isEnabled()) {
@@ -98,6 +154,27 @@ public class HeartbeatProducer {
             processedEntries.put(jobId, totalProcessedEntries);
             if (isEligibleToUpdate(
                     downloadJob.getTotalEntries(),
+                    totalProcessedEntries,
+                    lastSavedPoints.getOrDefault(jobId, 0L),
+                    interval)) {
+                consumer.accept(totalProcessedEntries);
+                lastSavedPoints.put(jobId, totalProcessedEntries);
+            }
+        }
+    }
+
+    private void generateIfEligible(
+            DownloadJob downloadJob,
+            long totalNumberOfEntries,
+            long size,
+            long interval,
+            LongConsumer consumer) {
+        if (heartbeatConfig.isEnabled()) {
+            String jobId = downloadJob.getId();
+            long totalProcessedEntries = processedEntries.getOrDefault(jobId, 0L) + size;
+            processedEntries.put(jobId, totalProcessedEntries);
+            if (isEligibleToUpdate(
+                    totalNumberOfEntries,
                     totalProcessedEntries,
                     lastSavedPoints.getOrDefault(jobId, 0L),
                     interval)) {

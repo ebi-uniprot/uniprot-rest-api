@@ -27,22 +27,23 @@ public class UniRefMapToRequestProcessor
     }
 
     @Override
-    protected long getSolrHits(Stream<String> ids) {
+    protected long getSolrHits(String query) {
         UniRefSearchRequest searchRequest = new UniRefSearchRequest();
-        searchRequest.setQuery(getQuery(ids));
+        searchRequest.setQuery(query);
         searchRequest.setSize(0);
         QueryResult<UniRefEntryLight> searchResults = uniRefEntryLightService.search(searchRequest);
         return searchResults.getPage().getTotalElements();
     }
 
-    private static String getQuery(Stream<String> ids) {
+    @Override
+    protected String getQuery(Stream<String> ids) {
         return "uniprot_id: (" + ids.collect(Collectors.joining(" OR ")) + ")";
     }
 
     @Override
-    protected Stream<String> mapIds(Stream<String> ids) {
+    protected Stream<String> mapIds(String query) {
         UniRefDownloadRequest uniRefDownloadRequest = new UniRefDownloadRequest();
-        uniRefDownloadRequest.setQuery(getQuery(ids));
+        uniRefDownloadRequest.setQuery(query);
         return uniRefEntryLightService.streamIdsForDownload(uniRefDownloadRequest);
     }
 }

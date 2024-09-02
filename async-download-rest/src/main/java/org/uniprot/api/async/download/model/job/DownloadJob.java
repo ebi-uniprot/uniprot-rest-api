@@ -46,4 +46,8 @@ public class DownloadJob implements Serializable {
     private long totalEntries;
     private long processedEntries;
     private long updateCount;
+
+    public void setUpdateCount(long updateCount) {
+        this.updateCount = updateCount;
+    }
 }

@@ -11,6 +11,9 @@ public class UniRefAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.uniref.result.idFilesFolder}")
     private String idsFolder;
 
+    @Value("${async.download.uniref.result.fromIdFilesFolder}")
+    private String fromIdsFolder;
+
     @Value("${async.download.uniref.result.resultFilesFolder}")
     private String resultFolder;
 
@@ -22,6 +25,11 @@ public class UniRefAsyncConfig implements TestAsyncConfig {
 
     @Value(("${async.download.uniref.rejectedQueueName}"))
     private String rejectedQueue;
+
+    @Override
+    public String getFromIdsFolder() {
+        return fromIdsFolder;
+    }
 
     @Override
     public String getIdsFolder() {

@@ -66,6 +66,7 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     }
 
     protected void prepareDownloadFolders() throws IOException {
+        Files.createDirectories(Path.of(getTestAsyncConfig().getFromIdsFolder()));
         Files.createDirectories(Path.of(getTestAsyncConfig().getIdsFolder()));
         Files.createDirectories(Path.of(getTestAsyncConfig().getResultFolder()));
     }

@@ -56,7 +56,7 @@ public abstract class MapMessageConsumerIT<T extends MapDownloadRequest>
     protected void assertJobSpecifics(MapDownloadJob job, String format) {
         assertEquals(12, job.getProcessedEntries());
         assertEquals(FINISHED, job.getStatus());
-        assertEquals(Objects.equals(format, LIST_MEDIA_TYPE_VALUE) ? 12 : 7, job.getUpdateCount());
+        assertEquals(Objects.equals(format, LIST_MEDIA_TYPE_VALUE) ? 18 : 13, job.getUpdateCount());
     }
 
     @Override
@@ -90,5 +90,10 @@ public abstract class MapMessageConsumerIT<T extends MapDownloadRequest>
                         TURTLE_MEDIA_TYPE_VALUE,
                         N_TRIPLES_MEDIA_TYPE_VALUE)
                 .map(Arguments::of);
+    }
+
+    @Override
+    protected boolean isMappedDownload() {
+        return true;
     }
 }

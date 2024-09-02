@@ -23,25 +23,28 @@ public abstract class MapToRequestProcessor<T extends MapDownloadRequest>
 
     @Override
     public void process(T request) {
-        writeFromIdentifiers(request, getIds(request));
+        writeToIdentifiers(request, getFromIds(request));
     }
 
-    private void writeFromIdentifiers(T request, Stream<String> ids) {
-        updateTotalEntries(request, getSolrHits(ids));
-        writeIdentifiers(request, mapIds(ids));
+    private void writeToIdentifiers(T request, Stream<String> ids) {
+        String query = getQuery(ids);
+        updateTotalEntries(request, getSolrHits(query));
+        writeIdentifiers(request, mapIds(query));
     }
 
-    protected abstract long getSolrHits(Stream<String> request);
+    protected abstract long getSolrHits(String query);
 
-    protected abstract Stream<String> mapIds(Stream<String> downloadRequest);
+    protected abstract String getQuery(Stream<String> ids);
+
+    protected abstract Stream<String> mapIds(String query);
 
     private void writeIdentifiers(T request, Stream<String> ids) {
         fileHandler.writeIds(request.getDownloadJobId(), ids);
     }
 
-    private Stream<String> getIds(T request) {
+    private Stream<String> getFromIds(T request) {
         try {
-            return Files.lines(fileHandler.getIdFile(request.getDownloadJobId()));
+            return Files.lines(fileHandler.getFromIdFile(request.getDownloadJobId()));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

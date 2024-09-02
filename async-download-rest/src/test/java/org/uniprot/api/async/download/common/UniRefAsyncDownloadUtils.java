@@ -54,6 +54,23 @@ public class UniRefAsyncDownloadUtils {
         when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
+    public static void saveEntriesInSolrAndStoreForMapping(
+            UniRefQueryRepository unirefQueryRepository,
+            CloudSolrClient cloudSolrClient,
+            SolrClient solrClient,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            String[] accessions)
+            throws Exception {
+        ReflectionTestUtils.setField(unirefQueryRepository, "solrClient", cloudSolrClient);
+        saveEntriesForMapping(cloudSolrClient, storeClient, accessions);
+        long queryHits = 100L;
+        QueryResponse response = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(queryHits);
+        when(response.getResults()).thenReturn(results);
+        when(solrClient.query(anyString(), any())).thenReturn(response);
+    }
+
     protected static void saveEntries(
             CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
@@ -65,6 +82,19 @@ public class UniRefAsyncDownloadUtils {
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
 
+    protected static void saveEntriesForMapping(
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            String[] accessions)
+            throws Exception {
+        for (int i = 1; i < accessions.length; i++) {
+            saveEntryForMapping(cloudSolrClient, i, UniRefType.UniRef50, storeClient, accessions);
+            saveEntryForMapping(cloudSolrClient, i, UniRefType.UniRef90, storeClient, accessions);
+            saveEntryForMapping(cloudSolrClient, i, UniRefType.UniRef100, storeClient, accessions);
+        }
+        cloudSolrClient.commit(SolrCollection.uniref.name());
+    }
+
     private static void saveEntry(
             CloudSolrClient cloudSolrClient,
             int i,
@@ -72,6 +102,23 @@ public class UniRefAsyncDownloadUtils {
             UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
         UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
+        UniRefEntryConverter converter = new UniRefEntryConverter();
+        Entry xmlEntry = converter.toXml(entry);
+        UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
+        UniRefEntryLight entryLight = unirefLightConverter.fromXml(xmlEntry);
+        UniRefDocument doc = documentConverter.convert(xmlEntry);
+        cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
+        storeClient.saveEntry(entryLight);
+    }
+
+    private static void saveEntryForMapping(
+            CloudSolrClient cloudSolrClient,
+            int i,
+            UniRefType type,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            String[] accessions)
+            throws Exception {
+        UniRefEntry entry = UniRefEntryMocker.createEntryForMapping(i, type, accessions);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();

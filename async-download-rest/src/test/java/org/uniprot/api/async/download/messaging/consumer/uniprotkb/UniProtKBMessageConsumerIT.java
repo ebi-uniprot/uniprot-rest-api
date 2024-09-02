@@ -234,13 +234,13 @@ class UniProtKBMessageConsumerIT
 
     @Override
     protected void assertJobSpecifics(UniProtKBDownloadJob job, String format) {
+        assertEquals(isH5Format(format) ? UNFINISHED : FINISHED, job.getStatus());
+        assertEquals(isH5Format(format) ? 0 : 12, job.getProcessedEntries());
         assertEquals(
                 Objects.equals(format, LIST_MEDIA_TYPE_VALUE)
                         ? 12
                         : isRdfType(format) ? 7 : isH5Format(format) ? 6 : 8,
                 job.getUpdateCount());
-        assertEquals(isH5Format(format) ? UNFINISHED : FINISHED, job.getStatus());
-        assertEquals(isH5Format(format) ? 0 : 12, job.getProcessedEntries());
     }
 
     private static boolean isH5Format(String format) {

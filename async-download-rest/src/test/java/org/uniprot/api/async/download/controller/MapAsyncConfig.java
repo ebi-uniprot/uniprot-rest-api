@@ -11,6 +11,9 @@ public class MapAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.map.result.idFilesFolder}")
     private String idsFolder;
 
+    @Value("${async.download.map.result.fromIdFilesFolder}")
+    private String fromIdsFolder;
+
     @Value("${async.download.map.result.resultFilesFolder}")
     private String resultFolder;
 
@@ -26,6 +29,11 @@ public class MapAsyncConfig implements TestAsyncConfig {
     @Override
     public String getIdsFolder() {
         return idsFolder;
+    }
+
+    @Override
+    public String getFromIdsFolder() {
+        return fromIdsFolder;
     }
 
     @Override

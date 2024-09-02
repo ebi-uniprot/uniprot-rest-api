@@ -8,10 +8,16 @@ import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @RedisHash("map")
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class MapDownloadJob extends DownloadJob {
-
+    private long totalFromIds;
     @Serial private static final long serialVersionUID = 3430390961923980454L;
 
     @Builder

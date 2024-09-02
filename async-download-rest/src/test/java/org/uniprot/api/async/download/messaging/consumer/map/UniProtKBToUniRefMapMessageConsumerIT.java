@@ -70,26 +70,39 @@ public class UniProtKBToUniRefMapMessageConsumerIT
 
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired
-    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    private FacetTupleStreamTemplate uniRefFacetTupleStreamTemplate;
+
+    @Qualifier("uniProtKBFacetTupleStreamTemplate")
+    @Autowired
+    private FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate;
+
+    @Autowired
+    @Qualifier("uniProtKBTupleStream")
+    private TupleStreamTemplate uniProtKBTupleStream;
 
     @Autowired
     @Qualifier("uniRefTupleStreamTemplate")
-    private TupleStreamTemplate tupleStreamTemplate;
+    private TupleStreamTemplate uniRefTupleStreamTemplate;
 
     @MockBean(name = "uniRefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @BeforeAll
     void beforeAll() throws Exception {
+        startClusterForMapping(uniRefTupleStreamTemplate, uniRefFacetTupleStreamTemplate);
         initBeforeAll();
-        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient);
         UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository,
                 cloudSolrClient,
                 solrClient,
                 uniProtKBSolrClient,
                 taxRepository);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStoreForMapping(
+                uniRefQueryRepository,
+                cloudSolrClient,
+                solrClient,
+                uniRefStoreClient,
+                new String[] {"", "P00001", "P00005", " P00007", "P00010"});
     }
 
     @Override
@@ -156,11 +169,11 @@ public class UniProtKBToUniRefMapMessageConsumerIT
 
     @Override
     protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
+        return uniProtKBTupleStream;
     }
 
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+        return uniProtKBFacetTupleStreamTemplate;
     }
 }
