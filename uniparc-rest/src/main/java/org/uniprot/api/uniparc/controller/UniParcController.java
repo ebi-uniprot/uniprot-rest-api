@@ -9,6 +9,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -28,6 +31,8 @@ import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdStreamRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
@@ -223,6 +228,51 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         UniParcEntry entry = queryService.getBySequence(sequenceRequest);
 
         return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
+    }
+
+    @GetMapping(
+            value = "/proteome/{upId}",
+            produces = {FASTA_MEDIA_TYPE_VALUE})
+    @Operation(
+            hidden = true,
+            summary = PROTEOME_UPID_FASTA_UNIPARC_OPERATION,
+            responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getFastaByProteomeId(
+            @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        QueryResult<UniParcEntry> results =
+                queryService.searchByProteomeId(getByUpIdRequest, getByUpIdRequest.getUpId());
+
+        return super.getSearchResponse(
+                results,
+                getByUpIdRequest.getFields(),
+                false,
+                false,
+                null,
+                getByUpIdRequest.getUpId(),
+                request,
+                response);
+    }
+
+    @GetMapping(
+            value = "/proteome/{upId}/stream",
+            produces = {FASTA_MEDIA_TYPE_VALUE})
+    @Operation(
+            hidden = true,
+            summary = PROTEOME_UPID_UNIPARC_STREAM_OPERATION,
+            responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> streamByProteomeId(
+            @Valid @ModelAttribute UniParcGetByProteomeIdStreamRequest streamRequest,
+            HttpServletRequest request) {
+        setBasicRequestFormat(streamRequest, request);
+        return super.stream(
+                () -> queryService.streamByProteomeId(streamRequest, streamRequest.getUpId()),
+                streamRequest,
+                getAcceptHeader(request),
+                request,
+                streamRequest.getUpId());
     }
 
     @Override

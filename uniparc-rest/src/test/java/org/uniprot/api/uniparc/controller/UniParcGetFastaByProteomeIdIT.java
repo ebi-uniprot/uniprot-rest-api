@@ -31,13 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ContextConfiguration(classes = {UniParcDataStoreTestConfig.class, UniParcRestApplication.class})
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniParcEntryLightController.class)
+@WebMvcTest(UniParcController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
+class UniParcGetFastaByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
 
-    private static final String getByUpIdPath = "/uniparc/proteome/{upid}/light";
+    private static final String getByUpIdPath = "/uniparc/proteome/{upid}";
 
     @Override
     protected String getGetByIdEndpoint() {
@@ -197,6 +197,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         ResultActions response =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                                .param("size", "2")
                                 .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
@@ -205,4 +206,5 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(content().string("LEO"));
     }
+
 }

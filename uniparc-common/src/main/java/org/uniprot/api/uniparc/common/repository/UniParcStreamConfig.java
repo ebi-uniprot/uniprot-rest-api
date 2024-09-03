@@ -16,13 +16,17 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.stream.UniParcFastaStoreStreamer;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
+import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +54,13 @@ public class UniParcStreamConfig {
     }
 
     @Bean
-    public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
-            StoreStreamerConfig<UniParcEntry> storeStreamerConfig) {
-        return new StoreStreamer<>(storeStreamerConfig);
+    public StoreStreamer<UniParcEntry> uniParcFastaStoreStreamer(
+            StoreStreamerConfig<UniParcEntry> config,
+            StoreStreamerConfig<UniParcEntryLight> lightConfig,
+            UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient,
+            UniParcCrossReferenceStoreConfigProperties storeConfigProperties) {
+        return new UniParcFastaStoreStreamer(
+                config, lightConfig, crossRefStoreClient, storeConfigProperties);
     }
 
     @Bean

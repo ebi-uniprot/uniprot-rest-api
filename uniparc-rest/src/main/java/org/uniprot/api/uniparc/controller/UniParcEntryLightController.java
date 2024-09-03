@@ -288,10 +288,9 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
     }
 
     @GetMapping(
-            value = "/proteome/{upId}",
+            value = "/proteome/{upId}/light",
             produces = {
                 APPLICATION_JSON_VALUE,
-                FASTA_MEDIA_TYPE_VALUE,
                 TSV_MEDIA_TYPE_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE
@@ -321,8 +320,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                                                                     name = "entries"))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryLight>> searchByProteomeId(
