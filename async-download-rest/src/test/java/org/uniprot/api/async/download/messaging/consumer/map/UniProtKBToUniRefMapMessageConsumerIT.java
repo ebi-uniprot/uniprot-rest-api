@@ -105,6 +105,17 @@ public class UniProtKBToUniRefMapMessageConsumerIT
                 new String[] {"", "P00001", "P00005", " P00007", "P00010"});
     }
 
+    @BeforeEach
+    void setUp() {
+        initBeforeEach();
+        downloadRequest = new UniProtKBMapDownloadRequest();
+        downloadRequest.setFormat("json");
+        downloadRequest.setQuery("Human");
+        downloadRequest.setFields("id,name,organism");
+        downloadRequest.setTo("UniRef");
+        UniRefAsyncDownloadUtils.setUp(restTemplate);
+    }
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniref, SolrCollection.taxonomy, SolrCollection.uniprot);
@@ -154,17 +165,6 @@ public class UniProtKBToUniRefMapMessageConsumerIT
         assertEquals(12, members.size());
         List<String> organisms = JsonPath.read(resultsJson, "$.results.*.organisms");
         assertEquals(12, organisms.size());
-    }
-
-    @BeforeEach
-    void setUp() {
-        initBeforeEach();
-        downloadRequest = new UniProtKBMapDownloadRequest();
-        downloadRequest.setFormat("json");
-        downloadRequest.setQuery("Human");
-        downloadRequest.setFields("id,name,organism");
-        downloadRequest.setTo("UniRef");
-        UniRefAsyncDownloadUtils.setUp(restTemplate);
     }
 
     @Override

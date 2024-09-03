@@ -1,8 +1,8 @@
 package org.uniprot.api.async.download.model.request.map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPARC_DESCRIPTION;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPARC_EXAMPLE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FIELDS_UNIPROTKB_EXAMPLE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import org.springdoc.api.annotations.ParameterObject;
@@ -10,11 +10,14 @@ import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidTSVAndXLSFormatOnlyFields;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.uniprot.store.config.UniProtDataType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -34,10 +37,15 @@ public class UniProtKBMapDownloadRequest extends UniProtKBStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIPARC_EXAMPLE)
+    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
     private String format;
 
     private boolean force;
+
+    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
+    @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
+    private String fields;
 
     @Parameter(hidden = true)
     private String downloadJobId;
