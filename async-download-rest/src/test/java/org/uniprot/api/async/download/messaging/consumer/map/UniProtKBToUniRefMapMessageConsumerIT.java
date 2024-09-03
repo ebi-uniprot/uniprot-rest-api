@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -55,7 +55,7 @@ import com.jayway.jsonpath.JsonPath;
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UniProtKBToUniRefMapMessageConsumerIT
-        extends MapMessageConsumerIT<UniProtKBMapDownloadRequest> {
+        extends MapMessageConsumerIT<UniProtKBToUniRefMapDownloadRequest> {
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private TaxonomyLineageRepository taxRepository;
@@ -108,7 +108,7 @@ public class UniProtKBToUniRefMapMessageConsumerIT
     @BeforeEach
     void setUp() {
         initBeforeEach();
-        downloadRequest = new UniProtKBMapDownloadRequest();
+        downloadRequest = new UniProtKBToUniRefMapDownloadRequest();
         downloadRequest.setFormat("json");
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("id,name,organism");

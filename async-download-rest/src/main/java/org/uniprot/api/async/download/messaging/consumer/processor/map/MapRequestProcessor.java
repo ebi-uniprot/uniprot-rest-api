@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.composite.map.UniProtKBToUniRefMapCompositeRequestProcessor;
 import org.uniprot.api.async.download.model.request.map.MapDownloadRequest;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.async.download.service.map.MapJobService;
 
 @Component
@@ -45,7 +45,7 @@ public class MapRequestProcessor implements RequestProcessor<MapDownloadRequest>
         if (Objects.equals(UNIPROT_KB, request.getFrom())
                 && Objects.equals(UNIREF, request.getTo())) {
             uniProtKBToUniRefMapCompositeRequestProcessor.process(
-                    (UniProtKBMapDownloadRequest) request);
+                    (UniProtKBToUniRefMapDownloadRequest) request);
         } else {
             throw new IllegalArgumentException(
                     "Invalid from: %s or/and to: %s".formatted(request.getFrom(), request.getTo()));

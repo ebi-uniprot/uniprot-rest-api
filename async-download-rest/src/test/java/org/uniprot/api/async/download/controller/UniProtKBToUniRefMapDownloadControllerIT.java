@@ -1,6 +1,17 @@
 package org.uniprot.api.async.download.controller;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,28 +46,18 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
-@WebMvcTest({UniProtKBMapDownloadController.class})
+@WebMvcTest({UniProtKBToUniRefMapDownloadController.class})
 @ContextConfiguration(
         classes = {
-                TestConfig.class,
-                UniRefDataStoreTestConfig.class,
-                UniProtKBDataStoreTestConfig.class,
-                AsyncDownloadRestApp.class,
-                ErrorHandlerConfig.class,
-                RedisConfiguration.class
+            TestConfig.class,
+            UniRefDataStoreTestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadRestApp.class,
+            ErrorHandlerConfig.class,
+            RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
@@ -83,16 +84,14 @@ class UniProtKBToUniRefMapDownloadControllerIT extends MapDownloadControllerIT {
     @Qualifier("uniRefTupleStreamTemplate")
     private TupleStreamTemplate uniRefTupleStreamTemplate;
 
-    @Autowired
-    private UniRefQueryRepository uniRefQueryRepository;
-    @Autowired
-    private UniprotQueryRepository uniprotQueryRepository;
-    @Autowired
-    private TaxonomyLineageRepository taxRepository;
+    @Autowired private UniRefQueryRepository uniRefQueryRepository;
+    @Autowired private UniprotQueryRepository uniprotQueryRepository;
+    @Autowired private TaxonomyLineageRepository taxRepository;
 
     @Qualifier("uniRefLightStoreClient")
     @Autowired
-    private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient; // in memory voldemort store client
+    private UniProtStoreClient<UniRefEntryLight>
+            uniRefStoreClient; // in memory voldemort store client
 
     @MockBean(name = "uniRefRdfRestTemplate")
     private RestTemplate restTemplate;
@@ -113,8 +112,11 @@ class UniProtKBToUniRefMapDownloadControllerIT extends MapDownloadControllerIT {
                 uniProtKBSolrClient,
                 taxRepository);
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStoreForMapping(
-                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient,
-                new String[]{"", "P00001", "P00005", " P00007", "P00010"});
+                uniRefQueryRepository,
+                cloudSolrClient,
+                solrClient,
+                uniRefStoreClient,
+                new String[] {"", "P00001", "P00005", " P00007", "P00010"});
     }
 
     @Override
@@ -123,7 +125,7 @@ class UniProtKBToUniRefMapDownloadControllerIT extends MapDownloadControllerIT {
     }
 
     protected String getDownloadAPIsBasePath() {
-        return UniProtKBMapDownloadController.DOWNLOAD_RESOURCE;
+        return UniProtKBToUniRefMapDownloadController.DOWNLOAD_RESOURCE;
     }
 
     @Override

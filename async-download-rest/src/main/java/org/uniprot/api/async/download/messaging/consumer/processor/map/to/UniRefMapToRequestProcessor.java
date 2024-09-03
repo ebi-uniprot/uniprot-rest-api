@@ -5,7 +5,7 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.result.map.MapFileHandler;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.map.MapJobService;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -15,7 +15,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 public class UniRefMapToRequestProcessor
-        extends MapToRequestProcessor<UniProtKBMapDownloadRequest> {
+        extends MapToRequestProcessor<UniProtKBToUniRefMapDownloadRequest> {
     private final UniRefEntryLightService uniRefEntryLightService;
 
     protected UniRefMapToRequestProcessor(

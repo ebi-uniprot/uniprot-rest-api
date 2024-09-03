@@ -9,15 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.streamer.batch.map.UniProtKBToUniRefMapSolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.map.UniProtKBToUniRefMapListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.map.UniProtKBToUniRefMapRDFResultStreamer;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefMapSolrIdResultStreamerFacadeTest
-        extends MapSolrIdResultStreamerFacadeTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
-    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+        extends MapSolrIdResultStreamerFacadeTest<
+                UniProtKBToUniRefMapDownloadRequest, UniRefEntryLight> {
+    @Mock private UniProtKBToUniRefMapDownloadRequest uniProtKBToUniRefMapDownloadRequest;
     @Mock private UniProtKBToUniRefMapRDFResultStreamer uniProtKBToUniRefMapRDFResultStreamer;
     @Mock private UniProtKBToUniRefMapListResultStreamer uniProtKBToUniRefMapListResultStreamer;
 
@@ -38,7 +39,7 @@ public class UniProtKBToUniRefMapSolrIdResultStreamerFacadeTest
         entryStream = refEntryLightStream;
         messageConverterContext = uniRefEntryLightMessageConverterContext;
         converterContextFactory = uniRefEntryLightMessageConverterContextFactory;
-        downloadRequest = uniProtKBMapDownloadRequest;
+        downloadRequest = uniProtKBToUniRefMapDownloadRequest;
         rdfResultStreamer = uniProtKBToUniRefMapRDFResultStreamer;
         listResultStreamer = uniProtKBToUniRefMapListResultStreamer;
         solrIdBatchResultStreamer = uniProtKBToUniRefMapSolrIdBatchResultStreamer;

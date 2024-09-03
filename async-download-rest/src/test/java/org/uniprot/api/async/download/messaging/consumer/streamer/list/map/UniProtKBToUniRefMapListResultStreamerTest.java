@@ -4,17 +4,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefMapListResultStreamerTest
-        extends MapListResultStreamerTest<UniProtKBMapDownloadRequest> {
-    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+        extends MapListResultStreamerTest<UniProtKBToUniRefMapDownloadRequest> {
+    @Mock private UniProtKBToUniRefMapDownloadRequest uniProtKBToUniRefMapDownloadRequest;
 
     @BeforeEach
     void setUp() {
         init();
-        request = uniProtKBMapDownloadRequest;
+        request = uniProtKBToUniRefMapDownloadRequest;
         listResultStreamer =
                 new UniProtKBToUniRefMapListResultStreamer(mapHeartbeatProducer, mapJobService);
     }

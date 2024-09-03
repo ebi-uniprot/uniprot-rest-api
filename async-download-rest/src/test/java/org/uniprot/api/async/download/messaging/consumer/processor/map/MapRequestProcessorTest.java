@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.processor.composite.map.UniProtKBToUniRefMapCompositeRequestProcessor;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.async.download.service.map.MapJobService;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +25,7 @@ class MapRequestProcessorTest {
     public static final String ID = "someId";
     public static final String UNI_PROT_KB = "UniProtKB";
     public static final String UNI_REF = "UniRef";
-    @Mock private UniProtKBMapDownloadRequest uniProtKBMapDownloadRequest;
+    @Mock private UniProtKBToUniRefMapDownloadRequest uniProtKBToUniRefMapDownloadRequest;
 
     @Mock
     private UniProtKBToUniRefMapCompositeRequestProcessor
@@ -36,28 +36,28 @@ class MapRequestProcessorTest {
 
     @Test
     void process_mapFromUniProtKBToUniRef() {
-        when(uniProtKBMapDownloadRequest.getDownloadJobId()).thenReturn(ID);
-        when(uniProtKBMapDownloadRequest.getFrom()).thenReturn(UNI_PROT_KB);
-        when(uniProtKBMapDownloadRequest.getTo()).thenReturn(UNI_REF);
+        when(uniProtKBToUniRefMapDownloadRequest.getDownloadJobId()).thenReturn(ID);
+        when(uniProtKBToUniRefMapDownloadRequest.getFrom()).thenReturn(UNI_PROT_KB);
+        when(uniProtKBToUniRefMapDownloadRequest.getTo()).thenReturn(UNI_REF);
 
-        mapRequestProcessor.process(uniProtKBMapDownloadRequest);
+        mapRequestProcessor.process(uniProtKBToUniRefMapDownloadRequest);
 
         InOrderImpl inOrder =
                 new InOrderImpl(
                         List.of(mapJobService, uniProtKBToUniRefMapCompositeRequestProcessor));
         inOrder.verify(mapJobService).update(ID, Map.of(STATUS, RUNNING));
         inOrder.verify(uniProtKBToUniRefMapCompositeRequestProcessor)
-                .process(uniProtKBMapDownloadRequest);
+                .process(uniProtKBToUniRefMapDownloadRequest);
         inOrder.verify(mapJobService).update(ID, Map.of(STATUS, FINISHED, RESULT_FILE, ID));
     }
 
     @Test
     void process_mapUnknown() {
-        when(uniProtKBMapDownloadRequest.getDownloadJobId()).thenReturn(ID);
-        when(uniProtKBMapDownloadRequest.getFrom()).thenReturn("unknown");
+        when(uniProtKBToUniRefMapDownloadRequest.getDownloadJobId()).thenReturn(ID);
+        when(uniProtKBToUniRefMapDownloadRequest.getFrom()).thenReturn("unknown");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> mapRequestProcessor.process(uniProtKBMapDownloadRequest));
+                () -> mapRequestProcessor.process(uniProtKBToUniRefMapDownloadRequest));
     }
 }

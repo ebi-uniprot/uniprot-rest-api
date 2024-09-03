@@ -2,7 +2,6 @@ package org.uniprot.api.async.download.model.request.map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.FIELDS_UNIPROTKB_EXAMPLE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import org.springdoc.api.annotations.ParameterObject;
@@ -13,17 +12,17 @@ import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidTSVAndXLSFormatOnlyFields;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
+import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.uniprot.store.config.UniProtDataType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ValidDownloadRequest(groups = CustomConstraintGroup.class)
 @ParameterObject
-public class UniProtKBMapDownloadRequest extends UniProtKBStreamRequest
+public class UniProtKBToUniRefMapDownloadRequest extends UniProtKBStreamRequest
         implements MapDownloadRequest {
 
     @ValidAsyncDownloadFormats(

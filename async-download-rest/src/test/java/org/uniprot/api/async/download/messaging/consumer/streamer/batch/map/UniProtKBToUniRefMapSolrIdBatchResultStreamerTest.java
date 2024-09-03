@@ -11,15 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefMapSolrIdBatchResultStreamerTest
-        extends MapSolrIdBatchResultStreamerTest<UniProtKBMapDownloadRequest, UniRefEntryLight> {
-    @Mock private UniProtKBMapDownloadRequest uniParcDownloadRequest;
+        extends MapSolrIdBatchResultStreamerTest<
+                UniProtKBToUniRefMapDownloadRequest, UniRefEntryLight> {
+    @Mock private UniProtKBToUniRefMapDownloadRequest uniParcDownloadRequest;
     @Mock private UniRefEntryLight uniRef1;
     @Mock private UniRefEntryLight uniRef2;
     @Mock private UniRefEntryLight uniRef3;

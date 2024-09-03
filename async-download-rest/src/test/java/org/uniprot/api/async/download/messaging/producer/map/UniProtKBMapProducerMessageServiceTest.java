@@ -13,23 +13,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBMapProducerMessageServiceTest
-        extends MapProducerMessageServiceTest<UniProtKBMapDownloadRequest> {
+        extends MapProducerMessageServiceTest<UniProtKBToUniRefMapDownloadRequest> {
     public static final String UNIPROTKB_MAP_FIELDS = "uniProtKBMapFields";
     public static final String UNIPROTKB_MAP_SORT = "uniProtKBMapSort";
     public static final String UNIPROTKB_MAP_FORMAT = "uniProtKBMapFormat";
     protected final String UNIPROTKB_MAP_QUERY = "uniProtKBMapQuery";
-    @Mock private UniProtKBMapDownloadRequest mapDownloadRequest;
+    @Mock private UniProtKBToUniRefMapDownloadRequest mapDownloadRequest;
 
     @Mock
-    private HashGenerator<UniProtKBMapDownloadRequest> uniProtKBMapDownloadRequestHashGenerator;
+    private HashGenerator<UniProtKBToUniRefMapDownloadRequest>
+            uniProtKBMapDownloadRequestHashGenerator;
 
     @Mock
-    private MapJobSubmissionRules<UniProtKBMapDownloadRequest>
+    private MapJobSubmissionRules<UniProtKBToUniRefMapDownloadRequest>
             uniProtKBMapDownloadRequestMapJobSubmissionRules;
 
     @BeforeEach
@@ -66,7 +67,7 @@ public class UniProtKBMapProducerMessageServiceTest
     }
 
     @Override
-    protected void verifyDownloadJob(UniProtKBMapDownloadRequest request) {
+    protected void verifyDownloadJob(UniProtKBToUniRefMapDownloadRequest request) {
         verify(jobService)
                 .save(
                         argThat(

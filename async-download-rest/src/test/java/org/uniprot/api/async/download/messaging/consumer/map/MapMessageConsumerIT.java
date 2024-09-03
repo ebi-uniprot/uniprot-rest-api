@@ -91,9 +91,4 @@ public abstract class MapMessageConsumerIT<T extends MapDownloadRequest>
                         N_TRIPLES_MEDIA_TYPE_VALUE)
                 .map(Arguments::of);
     }
-
-    @Override
-    protected boolean isMappedDownload() {
-        return true;
-    }
 }

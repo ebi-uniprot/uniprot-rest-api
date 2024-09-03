@@ -4,12 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBMapJobSubmissionRulesTest
-        extends MapJobSubmissionRulesTest<UniProtKBMapDownloadRequest> {
-    @Mock private UniProtKBMapDownloadRequest mapDownloadRequest;
+        extends MapJobSubmissionRulesTest<UniProtKBToUniRefMapDownloadRequest> {
+    @Mock private UniProtKBToUniRefMapDownloadRequest mapDownloadRequest;
 
     @BeforeEach
     void setUp() {

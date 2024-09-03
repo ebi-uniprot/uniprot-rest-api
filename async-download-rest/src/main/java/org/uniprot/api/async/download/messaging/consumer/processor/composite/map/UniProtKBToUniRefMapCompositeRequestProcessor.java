@@ -7,11 +7,11 @@ import org.uniprot.api.async.download.messaging.consumer.processor.composite.Com
 import org.uniprot.api.async.download.messaging.consumer.processor.map.from.UniProtKBMapFromRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.map.result.UniProtKBToUniRefMapResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.map.to.UniRefMapToRequestProcessor;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 
 @Component
 public class UniProtKBToUniRefMapCompositeRequestProcessor
-        extends CompositeRequestProcessor<UniProtKBMapDownloadRequest> {
+        extends CompositeRequestProcessor<UniProtKBToUniRefMapDownloadRequest> {
     public UniProtKBToUniRefMapCompositeRequestProcessor(
             UniProtKBMapFromRequestProcessor uniProtKBMapFromRequestProcessor,
             UniRefMapToRequestProcessor uniRefMapToRequestProcessor,

@@ -1,6 +1,10 @@
 package org.uniprot.api.async.download.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,25 +15,16 @@ import org.uniprot.api.async.download.messaging.repository.MapDownloadJobReposit
 import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.store.search.SolrCollection;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class MapDownloadControllerIT extends AbstractDownloadControllerIT {
 
-    @Autowired
-    protected MapAsyncConfig mapAsyncConfig;
-    @Autowired
-    protected SolrClient solrClient;
-    @Autowired
-    protected MapDownloadJobRepository mapDownloadJobRepository;
-    @Autowired
-    protected MockMvc mockMvc;
+    @Autowired protected MapAsyncConfig mapAsyncConfig;
+    @Autowired protected SolrClient solrClient;
+    @Autowired protected MapDownloadJobRepository mapDownloadJobRepository;
+    @Autowired protected MockMvc mockMvc;
 
     protected void initBeforeAll() throws Exception {
         prepareDownloadFolders();
@@ -75,7 +70,8 @@ public abstract class MapDownloadControllerIT extends AbstractDownloadController
             JobStatus jobStatus,
             String format,
             int retried) {
-        return MapDownloadJob.builder().id(jobId)
+        return MapDownloadJob.builder()
+                .id(jobId)
                 .status(jobStatus)
                 .error(errMsg)
                 .format(format)

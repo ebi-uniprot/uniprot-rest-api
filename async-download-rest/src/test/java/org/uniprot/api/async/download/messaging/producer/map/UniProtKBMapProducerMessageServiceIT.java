@@ -12,7 +12,7 @@ import org.uniprot.api.async.download.messaging.config.map.MapDownloadConfigProp
 import org.uniprot.api.async.download.messaging.config.map.MapRabbitMQConfig;
 import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageService;
 import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
-import org.uniprot.api.async.download.model.request.map.UniProtKBMapDownloadRequest;
+import org.uniprot.api.async.download.model.request.map.UniProtKBToUniRefMapDownloadRequest;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 @ExtendWith(SpringExtension.class)
@@ -24,12 +24,12 @@ import org.uniprot.api.rest.download.model.JobStatus;
         })
 @EnableConfigurationProperties({MapDownloadConfigProperties.class})
 public class UniProtKBMapProducerMessageServiceIT
-        extends MapProducerMessageServiceIT<UniProtKBMapDownloadRequest> {
+        extends MapProducerMessageServiceIT<UniProtKBToUniRefMapDownloadRequest> {
     @Autowired private UniProtKBMapProducerMessageService service;
 
     @Override
     protected MapDownloadJob getDownloadJob(
-            String jobId, LocalDateTime idleSince, UniProtKBMapDownloadRequest request) {
+            String jobId, LocalDateTime idleSince, UniProtKBToUniRefMapDownloadRequest request) {
         return new MapDownloadJob(
                 jobId,
                 JobStatus.RUNNING,
@@ -48,8 +48,8 @@ public class UniProtKBMapProducerMessageServiceIT
     }
 
     @Override
-    protected UniProtKBMapDownloadRequest getSuccessDownloadRequest() {
-        UniProtKBMapDownloadRequest request = new UniProtKBMapDownloadRequest();
+    protected UniProtKBToUniRefMapDownloadRequest getSuccessDownloadRequest() {
+        UniProtKBToUniRefMapDownloadRequest request = new UniProtKBToUniRefMapDownloadRequest();
         request.setQuery("query2 value");
         request.setSort("accession2 asc");
         request.setFormat("json");
@@ -58,8 +58,8 @@ public class UniProtKBMapProducerMessageServiceIT
     }
 
     @Override
-    protected UniProtKBMapDownloadRequest getSuccessDownloadRequestWithForce() {
-        UniProtKBMapDownloadRequest request = new UniProtKBMapDownloadRequest();
+    protected UniProtKBToUniRefMapDownloadRequest getSuccessDownloadRequestWithForce() {
+        UniProtKBToUniRefMapDownloadRequest request = new UniProtKBToUniRefMapDownloadRequest();
         request.setQuery("query value");
         request.setSort("accession asc");
         request.setFormat("json");
@@ -69,22 +69,23 @@ public class UniProtKBMapProducerMessageServiceIT
     }
 
     @Override
-    protected UniProtKBMapDownloadRequest getAlreadyRunningRequest() {
-        UniProtKBMapDownloadRequest request = new UniProtKBMapDownloadRequest();
+    protected UniProtKBToUniRefMapDownloadRequest getAlreadyRunningRequest() {
+        UniProtKBToUniRefMapDownloadRequest request = new UniProtKBToUniRefMapDownloadRequest();
         request.setQuery("AlreadyExist");
         request.setFormat("json");
         return request;
     }
 
     @Override
-    protected UniProtKBMapDownloadRequest getWithoutFormatRequest() {
-        UniProtKBMapDownloadRequest request = new UniProtKBMapDownloadRequest();
+    protected UniProtKBToUniRefMapDownloadRequest getWithoutFormatRequest() {
+        UniProtKBToUniRefMapDownloadRequest request = new UniProtKBToUniRefMapDownloadRequest();
         request.setQuery("Not using format");
         return request;
     }
 
     @Override
-    protected SolrProducerMessageService<UniProtKBMapDownloadRequest, MapDownloadJob> getService() {
+    protected SolrProducerMessageService<UniProtKBToUniRefMapDownloadRequest, MapDownloadJob>
+            getService() {
         return service;
     }
 }
