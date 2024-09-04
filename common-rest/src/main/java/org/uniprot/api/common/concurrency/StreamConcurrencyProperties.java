@@ -20,6 +20,7 @@ public class StreamConcurrencyProperties {
 
     static final int DEFAULT_CONCURRENT_DOWNLOADS = 20;
     static final int LARGE_DOWNLOAD_TIMEOUT = 20;
+    static final String DOWNLOAD_THREAD_PREFIX = "download-task-executor-";
 
     // used to configure a thread pool executor
     private int corePoolSize = DEFAULT_CORE_POOL_SIZE;
@@ -28,6 +29,7 @@ public class StreamConcurrencyProperties {
     private int keepAliveSeconds = KEEP_ALIVE_SECONDS;
     private boolean allowCoreThreadTimeout = ALLOW_CORE_THREAD_TIMEOUT;
     private boolean waitForTasksToCompleteOnShutdown = WAIT_FOR_TASKS_TO_COMPLETE_ON_SHUTDOWN;
+    private String threadNamePrefix = DOWNLOAD_THREAD_PREFIX;
 
     // used to configure a {@link Gatekeeper}
     private int concurrentLargeDownloadsCount = DEFAULT_CONCURRENT_DOWNLOADS;
