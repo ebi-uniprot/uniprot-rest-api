@@ -48,6 +48,8 @@ public class IdMappingConfig {
                 taskExecutorProperties.isAllowCoreThreadTimeout());
         configurableJobTaskExecutor.setWaitForTasksToCompleteOnShutdown(
                 taskExecutorProperties.isWaitForTasksToCompleteOnShutdown());
+        configurableJobTaskExecutor.setThreadNamePrefix(
+                taskExecutorProperties.getThreadNamePrefix());
         return configurableJobTaskExecutor;
     }
 
