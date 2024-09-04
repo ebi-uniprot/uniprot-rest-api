@@ -238,6 +238,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         }
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -287,6 +288,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {
