@@ -5,10 +5,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.support.data.statistics.StatisticsAttributeConfig;
 import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttributeImpl;
-import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
+import org.uniprot.api.support.data.statistics.entity.UniProtKBStatisticsEntry;
+import org.uniprot.api.support.data.statistics.model.*;
 
 @Component
 public class StatisticsMapper {
@@ -31,27 +29,39 @@ public class StatisticsMapper {
     }
 
     public StatisticsModuleStatisticsType map(EntryType entryType) {
-        switch (entryType) {
-            case TREMBL:
-                return StatisticsModuleStatisticsType.UNREVIEWED;
-            case SWISSPROT:
-                return StatisticsModuleStatisticsType.REVIEWED;
+        if (entryType == null) {
+            return null;
         }
-        throw new IllegalArgumentException(
-                String.format("Entry type %s is not recognized", entryType));
+        return switch (entryType) {
+            case TREMBL -> StatisticsModuleStatisticsType.UNREVIEWED;
+            case SWISSPROT -> StatisticsModuleStatisticsType.REVIEWED;
+        };
     }
 
-    public StatisticsModuleStatisticsAttribute map(UniprotKBStatisticsEntry entry) {
+    public StatisticsModuleStatisticsAttribute map(
+            UniProtKBStatisticsEntry entry, String attributeQuery) {
         return StatisticsModuleStatisticsAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
+                .query(attributeQuery)
                 .entryCount(entry.getEntryCount())
+                .statisticsType(map(entry.getEntryType()))
                 .description(entry.getDescription())
                 .label(getLabel(entry))
                 .build();
     }
 
-    private String getLabel(UniprotKBStatisticsEntry entry) {
+    public StatisticsModuleStatisticsHistory mapHistory(UniProtKBStatisticsEntry entry) {
+        return StatisticsModuleStatisticsHistoryImpl.builder()
+                .statisticsType(map(entry.getEntryType()))
+                .releaseName(entry.getReleaseName().getId())
+                .releaseDate(entry.getReleaseName().getDate())
+                .valueCount(entry.getValueCount())
+                .entryCount(entry.getEntryCount())
+                .build();
+    }
+
+    private String getLabel(UniProtKBStatisticsEntry entry) {
         return Optional.ofNullable(
                         statisticsAttributeConfig
                                 .getAttributes()

@@ -10,4 +10,8 @@ public interface StatisticsModuleStatisticsAttribute {
     long getEntryCount();
 
     String getDescription();
+
+    StatisticsModuleStatisticsType getStatisticsType();
+
+    String getQuery();
 }
