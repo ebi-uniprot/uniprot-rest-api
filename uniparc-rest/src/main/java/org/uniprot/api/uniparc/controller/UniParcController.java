@@ -88,6 +88,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = SEARCH_UNIPARC_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -140,6 +141,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = ID_UNIPARC_OPERATION,
+            description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -189,6 +191,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = STREAM_UNIPARC_OPERATION,
+            description = STREAM_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -334,6 +337,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = PROTEOME_UPID_UNIPARC_OPERATION,
+            description = PROTEOME_UPID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

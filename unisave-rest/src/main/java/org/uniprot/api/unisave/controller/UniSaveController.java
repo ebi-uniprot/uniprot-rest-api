@@ -57,6 +57,7 @@ public class UniSaveController {
 
     @Operation(
             summary = ID_UNISAVE_OPERATION,
+            description = ID_UNISAVE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

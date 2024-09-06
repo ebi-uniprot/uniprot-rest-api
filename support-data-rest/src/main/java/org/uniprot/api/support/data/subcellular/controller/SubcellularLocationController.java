@@ -72,6 +72,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
     @Operation(
             summary = ID_SUBCEL_OPERATION,
+            description = ID_SUBCEL_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -129,6 +130,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
     @Operation(
             summary = SEARCH_SUBCEL_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -167,6 +169,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
     @Operation(
             summary = STREAM_SUBCEL_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

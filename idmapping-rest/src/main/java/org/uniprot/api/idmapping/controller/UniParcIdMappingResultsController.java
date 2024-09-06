@@ -87,6 +87,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             })
     @Operation(
             summary = IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -144,6 +145,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             })
     @Operation(
             summary = IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

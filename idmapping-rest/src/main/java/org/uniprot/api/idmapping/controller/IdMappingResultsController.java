@@ -138,6 +138,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             })
     @Operation(
             summary = ID_MAPPING_STREAM_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

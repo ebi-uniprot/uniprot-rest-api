@@ -64,6 +64,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     @Operation(
             summary = ID_CROSSREF_OPERATION,
+            description = ID_CROSSREF_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -109,6 +110,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     @Operation(
             summary = SEARCH_CROSSREF_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -136,6 +138,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     @Operation(
             summary = STREAM_CROSSREF_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

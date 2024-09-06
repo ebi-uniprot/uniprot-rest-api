@@ -25,7 +25,7 @@ import lombok.Data;
 @ParameterObject
 public class PublicationRequest {
 
-    @Parameter(description = SIZE_DESCRIPTION)
+    @Parameter(description = SIZE_DESCRIPTION, example = SIZE_EXAMPLE)
     @PositiveOrZero(message = "{search.positive}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

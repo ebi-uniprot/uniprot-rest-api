@@ -92,6 +92,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             })
     @Operation(
             summary = IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -158,6 +159,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             })
     @Operation(
             summary = IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

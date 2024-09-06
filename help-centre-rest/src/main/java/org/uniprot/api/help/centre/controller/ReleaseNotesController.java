@@ -64,6 +64,7 @@ public class ReleaseNotesController extends BasicSearchController<HelpCentreEntr
 
     @Operation(
             summary = ID_RELEASE_NOTES_OPERATION,
+            description = ID_RELEASE_NOTES_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -90,6 +91,7 @@ public class ReleaseNotesController extends BasicSearchController<HelpCentreEntr
 
     @Operation(
             summary = SEARCH_RELEASE_NOTES_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

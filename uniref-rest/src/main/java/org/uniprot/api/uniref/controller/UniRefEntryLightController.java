@@ -91,6 +91,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             summary = ID_UNIREF_LIGHT_OPERATION,
+            description = ID_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -143,6 +144,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             summary = SEARCH_UNIREF_LIGHT_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
