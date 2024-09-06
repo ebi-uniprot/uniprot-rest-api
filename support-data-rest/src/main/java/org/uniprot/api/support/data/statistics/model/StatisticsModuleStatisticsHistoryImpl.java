@@ -15,7 +15,7 @@ public class StatisticsModuleStatisticsHistoryImpl implements StatisticsModuleSt
     StatisticsModuleStatisticsType statisticsType;
     String releaseName;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/London")
     Date releaseDate;
 
     long valueCount;
