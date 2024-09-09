@@ -54,6 +54,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping("/uniparc")
+@SuppressWarnings("squid:S6856")
 public class UniParcController extends BasicSearchController<UniParcEntry> {
     private static final String DATA_TYPE = "uniparc";
 
