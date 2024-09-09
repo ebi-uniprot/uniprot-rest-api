@@ -54,7 +54,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping("/uniparc")
-@SuppressWarnings("squid:S6856")
 public class UniParcController extends BasicSearchController<UniParcEntry> {
     private static final String DATA_TYPE = "uniparc";
 
@@ -274,6 +273,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -322,6 +322,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {
