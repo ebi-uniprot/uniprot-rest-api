@@ -273,6 +273,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -321,6 +322,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {
