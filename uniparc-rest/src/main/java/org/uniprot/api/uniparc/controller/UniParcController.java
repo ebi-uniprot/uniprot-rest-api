@@ -155,6 +155,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})

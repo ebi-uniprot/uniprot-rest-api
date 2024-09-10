@@ -16,7 +16,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService;
 
@@ -30,6 +32,26 @@ import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService
 @ConfigurationProperties(prefix = "id.mapping.job")
 public class IdMappingConfig {
     private static final String PIR_ID_MAPPING_CACHE = "pirIDMappingCache";
+
+    private StreamConcurrencyProperties taskExecutorProperties = new StreamConcurrencyProperties();
+
+    @Bean
+    @Profile("live")
+    public ThreadPoolTaskExecutor jobTaskExecutor(
+            ThreadPoolTaskExecutor configurableJobTaskExecutor) {
+        configurableJobTaskExecutor.setCorePoolSize(taskExecutorProperties.getCorePoolSize());
+        configurableJobTaskExecutor.setMaxPoolSize(taskExecutorProperties.getMaxPoolSize());
+        configurableJobTaskExecutor.setQueueCapacity(taskExecutorProperties.getQueueCapacity());
+        configurableJobTaskExecutor.setKeepAliveSeconds(
+                taskExecutorProperties.getKeepAliveSeconds());
+        configurableJobTaskExecutor.setAllowCoreThreadTimeOut(
+                taskExecutorProperties.isAllowCoreThreadTimeout());
+        configurableJobTaskExecutor.setWaitForTasksToCompleteOnShutdown(
+                taskExecutorProperties.isWaitForTasksToCompleteOnShutdown());
+        configurableJobTaskExecutor.setThreadNamePrefix(
+                taskExecutorProperties.getThreadNamePrefix());
+        return configurableJobTaskExecutor;
+    }
 
     @Bean
     public RestTemplate idMappingRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -48,5 +70,9 @@ public class IdMappingConfig {
         CacheManager cacheManager = new RedissonSpringCacheManager(redissonClient, config);
         Cache mappingCache = cacheManager.getCache(PIR_ID_MAPPING_CACHE);
         return new RedisCacheMappingJobService(mappingCache);
+    }
+
+    public void setTaskExecutorProperties(StreamConcurrencyProperties taskExecutorProperties) {
+        this.taskExecutorProperties = taskExecutorProperties;
     }
 }

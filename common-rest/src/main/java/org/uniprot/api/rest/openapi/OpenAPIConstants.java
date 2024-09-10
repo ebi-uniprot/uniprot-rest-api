@@ -342,6 +342,13 @@ public class OpenAPIConstants {
     public static final String RELEASE_NAME_STATS_EXAMPLE = "2023_05";
     public static final String TYPE_STATS_EXAMPLE = "reviewed";
     public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
+    public static final String
+            GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION =
+                    "Get release statistics by UniProt release name and statistics type.";
+    public static final String GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_DESCRIPTION =
+            "Get release statistics by UniProt release name.";
+    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION =
+            "Get history by attribute and statistics type.";
 
     // SUBCEL
     public static final String TAG_SUBCEL = "Subcellular locations";
@@ -723,4 +730,6 @@ public class OpenAPIConstants {
             "One of the entry versions, whose contents is analysed in the diff.";
     public static final String VERSION2_UNISAVE_DESCRIPTION =
             "The other entry version, whose contents is analysed in the diff.";
+    public static final String RELEASE_NAME_ATTRIBUTE_DESCRIPTION = "attribute type";
+    public static final String RELEASE_NAME_ATTRIBUTE_EXAMPLE = "entry";
 }

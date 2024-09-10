@@ -30,7 +30,7 @@ class StatisticsControllerTest {
     @InjectMocks private StatisticsController statisticsController;
 
     @Test
-    void getAllByVersionAndCategoryIn() {
+    void getAllByVersionAndStatisticsTypeAndCategoryIn() {
         when(statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_0))
                 .thenReturn(results0);
@@ -44,7 +44,18 @@ class StatisticsControllerTest {
     }
 
     @Test
-    void getAllByVersionAndCategoryIn_whenSingleCategoryPassed() {
+    void getAllByVersionAndCategoryIn() {
+        when(statisticsService.findAllByVersionAndCategoryIn(RELEASE, CATEGORIES_0))
+                .thenReturn(results0);
+
+        ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
+                result = statisticsController.getAllByVersionAndCategoryIn(RELEASE, CATEGORIES_0);
+
+        assertSame(results0, result.getBody().getResults());
+    }
+
+    @Test
+    void getAllByVersionAndStatisticsTypeAndCategoryIn_whenSingleCategoryPassed() {
         when(statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_1))
                 .thenReturn(results1);
@@ -58,7 +69,18 @@ class StatisticsControllerTest {
     }
 
     @Test
-    void getAllByVersionAndCategoryIn_whenEmptyCategoryCollectionPassed() {
+    void getAllByVersionAndCategoryIn_whenSingleCategoryPassed() {
+        when(statisticsService.findAllByVersionAndCategoryIn(RELEASE, CATEGORIES_1))
+                .thenReturn(results1);
+
+        ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
+                result = statisticsController.getAllByVersionAndCategoryIn(RELEASE, CATEGORIES_1);
+
+        assertSame(results1, result.getBody().getResults());
+    }
+
+    @Test
+    void getAllByVersionAndStatisticsTypeAndCategoryIn_whenEmptyCategoryCollectionPassed() {
         when(statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_2))
                 .thenReturn(results2);
@@ -67,6 +89,17 @@ class StatisticsControllerTest {
                 result =
                         statisticsController.getAllByVersionAndTypeAndCategoryIn(
                                 RELEASE, STATISTIC_TYPE, CATEGORIES_2);
+
+        assertSame(results2, result.getBody().getResults());
+    }
+
+    @Test
+    void getAllByVersionAndCategoryIn_whenEmptyCategoryCollectionPassed() {
+        when(statisticsService.findAllByVersionAndCategoryIn(RELEASE, CATEGORIES_2))
+                .thenReturn(results2);
+
+        ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
+                result = statisticsController.getAllByVersionAndCategoryIn(RELEASE, CATEGORIES_2);
 
         assertSame(results2, result.getBody().getResults());
     }
