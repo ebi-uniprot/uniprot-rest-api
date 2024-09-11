@@ -322,7 +322,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
-
     @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
