@@ -346,7 +346,8 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
@@ -396,7 +397,8 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
