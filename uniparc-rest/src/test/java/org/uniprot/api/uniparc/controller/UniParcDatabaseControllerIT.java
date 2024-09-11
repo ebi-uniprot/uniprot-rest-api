@@ -1,18 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -43,6 +31,20 @@ import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import javax.xml.xpath.XPathExpressionException;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 /**
  * @author sahmad
@@ -295,13 +297,14 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
     }
 
-    @Test
-    void streamCanReturnSuccess() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideFormatAndMatcher")
+    void streamCanReturnSuccess(MediaType mediaType, ResultMatcher resultMatcher) throws Exception {
         // when
         saveEntry();
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamRequestPath(), getIdPathValue())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+                        .header(ACCEPT, mediaType);
 
         MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
 
@@ -311,7 +314,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(25)));
+                .andExpect(resultMatcher);
     }
 
     @Test
@@ -341,6 +344,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
+    }
+
+    public Stream<Arguments> provideFormatAndMatcher() throws XPathExpressionException {
+        return Stream.of(Arguments.of(MediaType.APPLICATION_JSON, jsonPath("$.results.size()", is(25))),
+                Arguments.of(MediaType.APPLICATION_XML, xpath("count(//dbReferences/dbReference)").number(25.0)));
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -437,6 +445,41 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(emptyString())))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<?xml version=\"1.0\" encoding=\"UTF-8\"  standalone=\"no\" ?>\n" +
+                                                                            "<dbReferences xmlns=\"http://uniprot.org/dbReference\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/dbReference http://www.uniprot.org/docs/dbReference.xsd\">\n" +
+                                                                            "<dbReference type=\"UniProtKB/Swiss-Prot\" id=\"P10001\" version_i=\"3\" active=\"Y\" version=\"7\" created=\"2017-05-17\" last=\"2017-02-27\" xmlns=\"http://uniprot.org/dbReference\">\n" +
+                                                                            "  <property type=\"gene_name\" value=\"geneName01\"/>\n" +
+                                                                            "  <property type=\"protein_name\" value=\"proteinName01\"/>\n" +
+                                                                            "  <property type=\"chain\" value=\"chain\"/>\n" +
+                                                                            "  <property type=\"NCBI_GI\" value=\"ncbiGi1\"/>\n" +
+                                                                            "  <property type=\"proteome_id\" value=\"UP123456701\"/>\n" +
+                                                                            "  <property type=\"component\" value=\"component01\"/>\n" +
+                                                                            "  <property type=\"NCBI_taxonomy_id\" value=\"7787\"/>\n" +
+                                                                            "</dbReference>\n" +
+                                                                            "<dbReference type=\"UniProtKB/TrEMBL\" id=\"P12301\" version_i=\"1\" active=\"Y\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\">\n" +
+                                                                            "  <property type=\"protein_name\" value=\"anotherProteinName01\"/>\n" +
+                                                                            "  <property type=\"proteome_id\" value=\"UP000005640\"/>\n" +
+                                                                            "  <property type=\"component\" value=\"chromosome\"/>\n" +
+                                                                            "  <property type=\"NCBI_taxonomy_id\" value=\"9606\"/>\n" +
+                                                                            "</dbReference>\n" +
+                                                                            "<dbReference type=\"RefSeq\" id=\"WP_168893201\" version_i=\"1\" active=\"Y\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\"/>\n" +
+                                                                            "<dbReference type=\"EMBL\" id=\"embl1\" version_i=\"1\" active=\"Y\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\">\n" +
+                                                                            "  <property type=\"protein_name\" value=\"proteinName1\"/>\n" +
+                                                                            "  <property type=\"NCBI_GI\" value=\"ncbiGi1\"/>\n" +
+                                                                            "</dbReference>\n" +
+                                                                            "<dbReference type=\"UNIMES\" id=\"unimes1\" version_i=\"1\" active=\"N\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\">\n" +
+                                                                            "  <property type=\"protein_name\" value=\"proteinName1\"/>\n" +
+                                                                            "  <property type=\"NCBI_GI\" value=\"ncbiGi1\"/>\n" +
+                                                                            "</dbReference>\n" +
+                                                                            "</dbReferences>")))
+                                    .build())
                     .build();
         }
 
@@ -467,6 +510,14 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><errorInfo><messages>The 'upi' value has invalid format. It should be a valid UniParc UPI</messages><url>http://localhost/uniparc/INVALID/databases</url></errorInfo>"))
                                     .build())
                     .build();
         }

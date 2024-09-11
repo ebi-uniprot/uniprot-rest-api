@@ -1,9 +1,11 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
@@ -61,13 +63,13 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             UniParcCrossReferenceService crossReferenceService,
             MessageConverterContextFactory<UniParcCrossReference> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, CROSSREF);
         this.crossReferenceService = crossReferenceService;
     }
 
     @GetMapping(
             value = "/{upi}/databases",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE})
     @Operation(
             hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
@@ -100,7 +102,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
 
     @GetMapping(
             value = "/{upi}/databases/stream",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @Operation(
             hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
