@@ -20,7 +20,9 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -88,7 +90,8 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                     .map(this::mapToThinEntry)
                     .filter(Objects::nonNull);
         } else {
-            return this.storeStreamer.idsToStoreStream(query);
+            StoreRequest storeRequest = getStoreRequest(request);
+            return this.storeStreamer.idsToStoreStream(query, storeRequest);
         }
     }
 
@@ -133,7 +136,12 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     protected Stream<R> streamEntries(List<String> idsInPage, IdsSearchRequest request) {
-        return this.storeStreamer.streamEntries(idsInPage);
+        StoreRequest storeRequest = getStoreRequest(request);
+        return this.storeStreamer.streamEntries(idsInPage, storeRequest);
+    }
+
+    public StoreRequest getStoreRequest(BasicRequest request) {
+        return StoreRequest.builder().fields(request.getFields()).build();
     }
 
     protected SolrRequest createDownloadSolrRequest(StreamRequest request) {

@@ -7,20 +7,21 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappin
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.IdMappingResultStreamerFacade;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.idmapping.IdMappingListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.idmapping.UniParcIdMappingRDFResultStreamer;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
 public class UniParcIdMappingResultStreamerFacade
-        extends IdMappingResultStreamerFacade<UniParcEntry, UniParcEntryPair> {
+        extends IdMappingResultStreamerFacade<UniParcEntryLight, UniParcEntryLightPair> {
 
     protected UniParcIdMappingResultStreamerFacade(
             UniParcIdMappingRDFResultStreamer idMappingRdfStreamer,
             IdMappingListResultStreamer listResultStreamer,
-            IdMappingBatchResultStreamer<UniParcEntry, UniParcEntryPair> solrIdBatchResultStreamer,
-            MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
+            IdMappingBatchResultStreamer<UniParcEntryLight, UniParcEntryLightPair>
+                    solrIdBatchResultStreamer,
+            MessageConverterContextFactory<UniParcEntryLightPair> converterContextFactory,
             IdMappingJobCacheService idMappingJobCacheService) {
         super(
                 idMappingRdfStreamer,

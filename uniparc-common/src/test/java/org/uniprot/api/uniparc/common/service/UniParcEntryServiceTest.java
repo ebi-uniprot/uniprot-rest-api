@@ -24,7 +24,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
@@ -38,7 +40,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  * @created 13/06/2023
  */
 @ExtendWith(MockitoExtension.class)
-class UniParcQueryServiceTest {
+class UniParcEntryServiceTest {
     @Mock private UniParcQueryRepository repository;
     @Mock private UniParcFacetConfig facetConfig;
     @Mock private UniParcSortClause solrSortClause;
@@ -50,12 +52,14 @@ class UniParcQueryServiceTest {
     @Mock private RdfStreamer uniparcRdfStreamer;
     @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Mock private TupleStreamDocumentIdStream solrIdStreamer;
-    private UniParcQueryService service;
+    @Mock private UniParcLightStoreClient uniParcLightStoreClient;
+    @Mock private UniParcCrossReferenceService uniParcCrossReferenceService;
+    private UniParcEntryService service;
 
     @BeforeEach
     void init() {
         service =
-                new UniParcQueryService(
+                new UniParcEntryService(
                         repository,
                         facetConfig,
                         solrSortClause,
@@ -66,7 +70,9 @@ class UniParcQueryServiceTest {
                         uniParcSearchFieldConfig,
                         uniparcRdfStreamer,
                         facetTupleStreamTemplate,
-                        solrIdStreamer);
+                        solrIdStreamer,
+                        uniParcLightStoreClient,
+                        uniParcCrossReferenceService);
     }
 
     @Test
@@ -154,7 +160,7 @@ class UniParcQueryServiceTest {
                 entries.stream()
                         .map(e -> e.getUniParcId().getValue())
                         .collect(Collectors.toList()));
-        verify(storeStreamer, never()).idsToStoreStream(any());
+        verify(storeStreamer, never()).idsToStoreStream(any(), any());
     }
 
     @Test
@@ -171,7 +177,7 @@ class UniParcQueryServiceTest {
                 upis.stream().map(id -> new UniParcEntryBuilder().uniParcId(id).build());
         request.setQuery("field:value");
         request.setFormat(UniProtMediaType.FASTA_MEDIA_TYPE_VALUE);
-        when(storeStreamer.idsToStoreStream(any())).thenReturn(entriesStream);
+        when(storeStreamer.idsToStoreStream(any(), any())).thenReturn(entriesStream);
         Stream<UniParcEntry> result = service.stream(request);
         List<UniParcEntry> entries = result.collect(Collectors.toList());
         assertEquals(5, entries.size());
@@ -180,6 +186,6 @@ class UniParcQueryServiceTest {
                 entries.stream()
                         .map(e -> e.getUniParcId().getValue())
                         .collect(Collectors.toList()));
-        verify(storeStreamer, times(1)).idsToStoreStream(any());
+        verify(storeStreamer, times(1)).idsToStoreStream(any(), any());
     }
 }

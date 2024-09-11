@@ -1,13 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -66,7 +59,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
         protected GetIdParameter validIdParameter() {
             GetIdParameter.GetIdParameterBuilder idParam = GetIdParameter.builder().id(ACCESSION);
             idParam.resultMatcher(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)));
-            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences", iterableWithSize(6)));
+            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences", iterableWithSize(25)));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].version", notNullValue()));
@@ -212,7 +205,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                                             content()
                                                     .string(
                                                             Matchers.containsString(
-                                                                    "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
+                                                                    "UPI0000083D01\tName 7787; Name 9606; Name 7787; Name 9606; Name 7787; Name 9606; Name 7787; Name 9606; Name 7787\tP10001; P12301; P10001; P12301; P10001; P12301; P10001; P12301; P10001\t2017-02-12\t2017-04-23\t11\n")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

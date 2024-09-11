@@ -99,6 +99,8 @@ public @interface ValidSolrQueryFields {
                     qp.setAllowLeadingWildcard(true);
                     queryString = escapeSpecialCharacters(queryString);
                     Query query = qp.parse(queryString);
+                    if ((query instanceof MatchAllDocsQuery)) {}
+
                     if (!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidQueryField(query, context);
                     }

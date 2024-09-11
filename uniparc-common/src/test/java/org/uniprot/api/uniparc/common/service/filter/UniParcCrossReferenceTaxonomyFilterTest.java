@@ -33,7 +33,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
 
     @BeforeEach
     void createTestData() {
-        this.uniParcEntry = UniParcEntryMocker.createEntry(1, UNIPARC_ID_PREFIX);
+        this.uniParcEntry = UniParcEntryMocker.createUniParcEntry(1, UNIPARC_ID_PREFIX);
         assertNotNull(this.uniParcEntry);
         Assertions.assertTrue(
                 this.uniParcEntry.getUniParcId().getValue().startsWith(UNIPARC_ID_PREFIX));

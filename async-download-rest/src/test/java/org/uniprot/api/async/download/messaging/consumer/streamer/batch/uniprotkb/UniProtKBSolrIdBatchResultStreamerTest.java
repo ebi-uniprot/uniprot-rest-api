@@ -63,7 +63,7 @@ public class UniProtKBSolrIdBatchResultStreamerTest
 
     @Override
     protected void mockBatch() {
-        when(uniProtEntryService.buildStoreRequest(uniProtKBDownloadRequest))
+        when(uniProtEntryService.getStoreRequest(uniProtKBDownloadRequest))
                 .thenReturn(uniprotKBStoreRequest);
         when(uniprotKBStoreRequest.isAddLineage()).thenReturn(ADD_LINEAGE);
         when(uniProtKBEntryStoreStreamerConfig.getStoreClient()).thenReturn(uniProtKBStoreClient);

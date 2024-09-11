@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 

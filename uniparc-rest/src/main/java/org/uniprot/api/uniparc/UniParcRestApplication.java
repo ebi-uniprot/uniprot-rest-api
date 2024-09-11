@@ -14,6 +14,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 @ComponentScan(
         basePackages = {
             "org.uniprot.api.uniparc",
+            "org.uniprot.api.uniparc.common",
             "org.uniprot.api.rest",
             "org.uniprot.api.common.repository.stream.rdf"
         })

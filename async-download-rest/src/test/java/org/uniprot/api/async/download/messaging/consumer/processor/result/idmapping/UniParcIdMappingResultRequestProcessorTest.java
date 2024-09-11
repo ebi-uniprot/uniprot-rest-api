@@ -8,13 +8,13 @@ import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownlo
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.processor.result.IdMappingResultRequestProcessorTest;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.idmapping.UniParcIdMappingResultStreamerFacade;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
 public class UniParcIdMappingResultRequestProcessorTest
-        extends IdMappingResultRequestProcessorTest<UniParcEntry, UniParcEntryPair> {
+        extends IdMappingResultRequestProcessorTest<UniParcEntryLight, UniParcEntryLightPair> {
     @Mock private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
     @Mock private IdMappingHeartbeatProducer idMappingHeartbeatProducer;
     @Mock private UniParcIdMappingResultStreamerFacade uniParcIdMappingResultStreamerFacade;

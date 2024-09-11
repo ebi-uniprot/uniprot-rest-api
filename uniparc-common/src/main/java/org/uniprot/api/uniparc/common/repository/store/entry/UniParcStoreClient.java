@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.repository.store;
+package org.uniprot.api.uniparc.common.repository.store.entry;
 
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;

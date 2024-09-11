@@ -29,7 +29,7 @@ import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingSearchRequest;
 import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingStreamRequest;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -52,7 +52,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @RequestMapping(value = IDMAPPING_PATH + "/" + UNIPARC_ID_MAPPING_PATH)
-public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
+public class UniParcIdMappingResultsController
+        extends BasicSearchController<UniParcEntryLightPair> {
     private static final String DATA_TYPE = "uniparc";
     private final UniParcIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -62,7 +63,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             ApplicationEventPublisher eventPublisher,
             UniParcIdService idService,
             IdMappingJobCacheService cacheService,
-            MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
+            MessageConverterContextFactory<UniParcEntryLightPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
         super(
@@ -82,7 +83,6 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 FASTA_MEDIA_TYPE_VALUE,
                 TSV_MEDIA_TYPE_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
@@ -97,7 +97,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            UniParcEntryPair
+                                                                            UniParcEntryLightPair
                                                                                     .class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
@@ -113,14 +113,14 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
+    public ResponseEntity<MessageConverterContext<UniParcEntryLightPair>> getMappedEntries(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
-        QueryResult<UniParcEntryPair> result =
+        QueryResult<UniParcEntryLightPair> result =
                 this.idService.getMappedEntries(
                         searchRequest,
                         cachedJobResult.getIdMappingResult(),
@@ -135,7 +135,6 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
@@ -154,7 +153,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                                                     schema =
                                                             @Schema(
                                                                     implementation =
-                                                                            UniParcEntryPair
+                                                                            UniParcEntryLightPair
                                                                                     .class))),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
@@ -171,7 +170,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryPair>>>
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryLightPair>>>
             streamMappedEntries(
                     @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                             String jobId,
@@ -197,7 +196,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                                     acceptedRdfContentType.get());
             return super.streamRdf(result, streamRequest, contentType, request);
         } else {
-            Supplier<Stream<UniParcEntryPair>> result =
+            Supplier<Stream<UniParcEntryLightPair>> result =
                     () ->
                             this.idService.streamEntries(
                                     streamRequest, idMappingResult, cachedJobResult.getJobId());
@@ -206,13 +205,13 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
     }
 
     @Override
-    protected String getEntityId(UniParcEntryPair entity) {
-        return entity.getTo().getUniParcId().getValue();
+    protected String getEntityId(UniParcEntryLightPair entity) {
+        return entity.getTo().getUniParcId();
     }
 
     @Override
     protected Optional<String> getEntityRedirectId(
-            UniParcEntryPair entity, HttpServletRequest request) {
+            UniParcEntryLightPair entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

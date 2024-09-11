@@ -8,16 +8,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
 import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -44,8 +48,10 @@ import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.RdfPrologs;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
@@ -66,7 +72,9 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @Autowired private UniParcFacetConfig facetConfig;
 
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> storeClient;
+
+    @Autowired UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient;
 
     @Autowired private MockMvc mockMvc;
 
@@ -130,7 +138,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-        saveEntries(cloudSolrClient, storeClient);
+        saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
     }
 
     @BeforeEach
@@ -156,7 +164,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
@@ -173,17 +181,16 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                         jsonPath(
                                 "$.results.*.to.uniParcId",
                                 contains("UPI0000283A09", "UPI0000283A06", "UPI0000283A03")))
-                .andExpect(jsonPath("$.results.*.to.uniParcCrossReferences.*.database").exists())
-                .andExpect(
-                        jsonPath("$.results.*.to.uniParcCrossReferences.*.organism")
-                                .doesNotExist());
+                .andExpect(jsonPath("$.results.*.to.uniProtKBAccessions").exists())
+                .andExpect(jsonPath("$.results.*.to.oldestCrossRefCreated").exists())
+                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists());
     }
 
     @Test
     void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ;
+
         MockHttpServletRequestBuilder requestBuilder =
                 get(UNIPARC_ID_MAPPING__STREAM_RESULT, job.getJobId())
                         .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
@@ -256,5 +263,19 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
     @Override
     protected String getDefaultSearchQuery() {
         return "9606";
+    }
+
+    @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
     }
 }
