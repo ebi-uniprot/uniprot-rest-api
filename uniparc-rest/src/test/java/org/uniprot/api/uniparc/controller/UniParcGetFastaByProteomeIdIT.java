@@ -206,5 +206,4 @@ class UniParcGetFastaByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(content().string("LEO"));
     }
-
 }

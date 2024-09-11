@@ -357,14 +357,18 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
         // when
         String upid = "UP000005640";
 
-        MvcResult response = mockMvc.perform(MockMvcRequestBuilders.get( "/uniparc/proteome/UP000005640/stream", upid)
-                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE)).andReturn();
+        MvcResult response =
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get(
+                                                "/uniparc/proteome/UP000005640/stream", upid)
+                                        .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE))
+                        .andReturn();
 
         // then
         mockMvc.perform(asyncDispatch(response))
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                //.andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                // .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(content().string("LEO"));
     }
 
