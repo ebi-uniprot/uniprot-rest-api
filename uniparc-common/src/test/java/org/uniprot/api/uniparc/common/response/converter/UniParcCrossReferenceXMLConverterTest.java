@@ -9,11 +9,12 @@ import org.uniprot.api.uniparc.common.response.UniParcMessageConverterConfig;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 
-public  class UniParcCrossReferenceXMLConverterTest extends AbstractXmlValidationTest<UniParcCrossReference> {
+public class UniParcCrossReferenceXMLConverterTest
+        extends AbstractXmlValidationTest<UniParcCrossReference> {
 
     @Override
     public String getXSDUrlLocation() {
-        return "https://www.uniprot.org/docs/dbReference.xsd";
+        return "https://www.uniprot.org/docs/uniparc-dbreference.xsd";
     }
 
     @Override

@@ -1,5 +1,10 @@
 package org.uniprot.api.uniparc.common.response.converter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.xml.bind.Marshaller;
+
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
@@ -8,11 +13,8 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.xml.dbreference.UniParcCrossReferenceConverter;
 import org.uniprot.core.xml.jaxb.dbreference.DbReference;
 
-import javax.xml.bind.Marshaller;
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class UniParcCrossReferenceXMLConverter extends AbstractXmlMessageConverter<UniParcCrossReference, DbReference> {
+public class UniParcCrossReferenceXMLConverter
+        extends AbstractXmlMessageConverter<UniParcCrossReference, DbReference> {
     private String header;
     private final ThreadLocal<UniParcCrossReferenceConverter> XML_CONVERTER = new ThreadLocal<>();
 
@@ -21,11 +23,13 @@ public class UniParcCrossReferenceXMLConverter extends AbstractXmlMessageConvert
     }
 
     public UniParcCrossReferenceXMLConverter(Gatekeeper downloadGatekeeper) {
-        super(UniParcCrossReference.class, ConverterConstants.UNIPARC_CROSS_REFERENCE_XML_CONTEXT, downloadGatekeeper);
+        super(
+                UniParcCrossReference.class,
+                ConverterConstants.UNIPARC_CROSS_REFERENCE_XML_CONTEXT,
+                downloadGatekeeper);
         header = ConverterConstants.UNIPARC_CROSS_REFERENCE_XML_SCHEMA;
         header = ConverterConstants.XML_DECLARATION + header;
     }
-
 
     @Override
     protected DbReference toXml(UniParcCrossReference entity) {
@@ -48,7 +52,8 @@ public class UniParcCrossReferenceXMLConverter extends AbstractXmlMessageConvert
     }
 
     @Override
-    protected void before(MessageConverterContext<UniParcCrossReference> context, OutputStream outputStream)
+    protected void before(
+            MessageConverterContext<UniParcCrossReference> context, OutputStream outputStream)
             throws IOException {
         super.before(context, outputStream);
         XML_CONVERTER.set(new UniParcCrossReferenceConverter());

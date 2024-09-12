@@ -1,5 +1,10 @@
 package org.uniprot.api.uniparc.common.response.converter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.xml.bind.Marshaller;
+
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
@@ -9,11 +14,8 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryLightConverter;
 
-import javax.xml.bind.Marshaller;
-import java.io.IOException;
-import java.io.OutputStream;
-
-public class UniParcLightXMLMessageConverter extends AbstractXmlMessageConverter<UniParcEntryLight, Entry> {
+public class UniParcLightXMLMessageConverter
+        extends AbstractXmlMessageConverter<UniParcEntryLight, Entry> {
     private String header;
     private final ThreadLocal<UniParcEntryLightConverter> XML_CONVERTER = new ThreadLocal<>();
 
@@ -30,7 +32,6 @@ public class UniParcLightXMLMessageConverter extends AbstractXmlMessageConverter
         }
         header = ConverterConstants.XML_DECLARATION + header;
     }
-
 
     @Override
     protected Entry toXml(UniParcEntryLight entity) {
@@ -53,7 +54,8 @@ public class UniParcLightXMLMessageConverter extends AbstractXmlMessageConverter
     }
 
     @Override
-    protected void before(MessageConverterContext<UniParcEntryLight> context, OutputStream outputStream)
+    protected void before(
+            MessageConverterContext<UniParcEntryLight> context, OutputStream outputStream)
             throws IOException {
         super.before(context, outputStream);
         XML_CONVERTER.set(new UniParcEntryLightConverter());

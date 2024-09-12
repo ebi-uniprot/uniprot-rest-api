@@ -19,13 +19,14 @@ public class ConverterConstants {
     public static final String UNIPROTKB_XML_CLOSE_TAG = "</uniprot>";
 
     public static final String UNIPARC_XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniparc";
-    public static final String UNIPARC_CROSS_REFERENCE_XML_CONTEXT = "org.uniprot.core.xml.jaxb.dbreference";
+    public static final String UNIPARC_CROSS_REFERENCE_XML_CONTEXT =
+            "org.uniprot.core.xml.jaxb.dbreference";
 
     public static final String UNIPARC_XML_SCHEMA =
             "<uniparc xmlns=\"http://uniprot.org/uniparc\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/uniparc http://www.uniprot.org/docs/uniparc.xsd\">\n";
 
     public static final String UNIPARC_CROSS_REFERENCE_XML_SCHEMA =
-            "<dbReferences xmlns=\"http://uniprot.org/dbReference\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/dbReference http://www.uniprot.org/docs/dbReference.xsd\">\n";
+            "<dbReferences xmlns=\"http://uniprot.org/dbReference\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://uniprot.org/dbReference http://www.uniprot.org/docs/uniparc-dbreference.xsd\">\n";
 
     public static final String UNIPARC_XML_CLOSE_TAG = "</uniparc>";
     public static final String UNIPARC_CROSS_REFERENCE_XML_CLOSE_TAG = "</dbReferences>";

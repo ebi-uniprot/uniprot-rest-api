@@ -181,7 +181,8 @@ public class UniParcMessageConverterConfig {
                 uniParcCrossRefContext(UniProtMediaType.TSV_MEDIA_TYPE));
         contextFactory.addMessageConverterContext(
                 uniParcCrossRefContext(UniProtMediaType.XLS_MEDIA_TYPE));
-        contextFactory.addMessageConverterContext(uniParcCrossRefContext(MediaType.APPLICATION_XML));
+        contextFactory.addMessageConverterContext(
+                uniParcCrossRefContext(MediaType.APPLICATION_XML));
         return contextFactory;
     }
 

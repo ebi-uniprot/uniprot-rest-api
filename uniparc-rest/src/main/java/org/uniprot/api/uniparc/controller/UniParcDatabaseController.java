@@ -6,7 +6,6 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
 
@@ -69,7 +68,12 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
 
     @GetMapping(
             value = "/{upi}/databases",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
+            })
     @Operation(
             hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
