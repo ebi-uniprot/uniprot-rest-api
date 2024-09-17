@@ -64,6 +64,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
 
     @Operation(
             summary = ID_DISEASE_OPERATION,
+            description = ID_DISEASE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -115,6 +116,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
 
     @Operation(
             summary = SEARCH_DISEASE_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -151,6 +153,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
 
     @Operation(
             summary = STREAM_DISEASE_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

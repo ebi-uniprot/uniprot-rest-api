@@ -85,6 +85,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             })
     @Operation(
             summary = IDMAPPING_UNIREF_RESULT_SEARCH_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -134,6 +135,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             })
     @Operation(
             summary = IDMAPPING_UNIREF_RESULT_STREAM_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

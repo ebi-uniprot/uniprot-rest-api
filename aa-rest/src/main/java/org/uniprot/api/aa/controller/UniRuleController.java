@@ -84,6 +84,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
             })
     @Operation(
             summary = ID_UNIRULE_OPERATION,
+            description = ID_UNIRULE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -122,6 +123,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
             })
     @Operation(
             summary = SEARCH_UNIRULE_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -160,6 +162,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
             })
     @Operation(
             summary = STREAM_UNIRULE_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

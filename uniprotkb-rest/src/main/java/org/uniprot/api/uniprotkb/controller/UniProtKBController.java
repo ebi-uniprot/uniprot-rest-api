@@ -107,6 +107,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     @Operation(
             summary = SEARCH_UNIPROTKB_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -164,6 +165,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     @Operation(
             summary = ID_UNIPROTKB_OPERATION,
+            description = ID_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -325,6 +327,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @Operation(
             hidden = true,
             summary = IDS_UNIPROTKB_OPERATION,
+            description = IDS_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -375,6 +378,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @Operation(
             hidden = true,
             summary = IDS_UNIPROTKB_OPERATION,
+            description = IDS_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

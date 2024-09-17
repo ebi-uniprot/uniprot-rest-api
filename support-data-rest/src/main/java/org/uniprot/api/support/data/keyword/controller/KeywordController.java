@@ -80,6 +80,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             })
     @Operation(
             summary = ID_KEYWORDS_OPERATION,
+            description = ID_KEYWORDS_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -127,6 +128,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             })
     @Operation(
             summary = SEARCH_KEYWORDS_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -166,6 +168,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             })
     @Operation(
             summary = STREAM_KEYWORDS_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

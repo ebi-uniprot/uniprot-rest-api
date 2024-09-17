@@ -21,7 +21,7 @@ public class KeywordSearchRequest extends KeywordBasicRequest implements SearchR
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = SIZE_DESCRIPTION)
+    @Parameter(description = SIZE_DESCRIPTION, example = SIZE_EXAMPLE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

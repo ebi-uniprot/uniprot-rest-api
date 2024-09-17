@@ -70,6 +70,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = ID_TAX_OPERATION,
+            description = ID_TAX_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -120,6 +121,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     @Operation(
             hidden = true,
             summary = IDS_TAX_OPERATION,
+            description = IDS_TAX_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -159,6 +161,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = SEARCH_TAX_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -193,6 +196,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = STREAM_TAX_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

@@ -78,6 +78,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = ID_ARBA_OPERATION,
+            description = ID_ARBA_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -109,6 +110,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = SEARCH_ARBA_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -140,6 +142,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = STREAM_ARBA_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

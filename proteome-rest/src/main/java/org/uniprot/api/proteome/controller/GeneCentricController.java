@@ -80,6 +80,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
 
     @Operation(
             summary = SEARCH_GENECENTRIC_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -131,6 +132,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
             })
     @Operation(
             summary = UPID_GENECENTRIC_OPERATION,
+            description = UPID_GENECENTRIC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -167,6 +169,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
 
     @Operation(
             summary = STREAM_GENECENTRIC_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -212,6 +215,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
 
     @Operation(
             summary = ID_GENECENTRIC_OPERATION,
+            description = ID_GENECENTRIC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

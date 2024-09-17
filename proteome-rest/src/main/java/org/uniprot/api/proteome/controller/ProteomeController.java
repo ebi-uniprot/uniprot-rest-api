@@ -84,6 +84,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = SEARCH_PROTEOME_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -130,6 +131,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = ID_PROTEOME_OPERATION,
+            description = ID_PROTEOME_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -174,6 +176,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = STREAM_PROTEOME_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

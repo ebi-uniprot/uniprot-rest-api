@@ -62,6 +62,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
 
     @Operation(
             summary = ID_HELP_OPERATION,
+            description = ID_HELP_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -94,6 +95,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
 
     @Operation(
             summary = SEARCH_HELP_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

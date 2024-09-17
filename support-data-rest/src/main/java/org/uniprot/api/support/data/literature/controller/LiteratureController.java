@@ -73,6 +73,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Operation(
             summary = ID_LIT_OPERATION,
+            description = ID_LIT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -125,6 +126,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Operation(
             summary = SEARCH_LIT_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -160,6 +162,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Operation(
             summary = STREAM_LIT_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

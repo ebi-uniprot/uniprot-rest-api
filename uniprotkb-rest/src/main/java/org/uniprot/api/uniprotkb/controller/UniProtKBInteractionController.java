@@ -79,6 +79,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
     @Operation(
             hidden = true,
             summary = INTERACTION_UNIPROTKB_OPERATION,
+            description = INTERACTION_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

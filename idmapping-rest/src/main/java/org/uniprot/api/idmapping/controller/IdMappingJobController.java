@@ -62,6 +62,7 @@ public class IdMappingJobController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = RUN_IDMAPPING_OPERATION,
+            description = RUN_IDMAPPING_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -81,6 +82,7 @@ public class IdMappingJobController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = STATUS_IDMAPPING_OPERATION,
+            description = STATUS_IDMAPPING_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -101,6 +103,7 @@ public class IdMappingJobController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = DETAILS_IDMAPPING_OPERATION,
+            description = DETAILS_IDMAPPING_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
