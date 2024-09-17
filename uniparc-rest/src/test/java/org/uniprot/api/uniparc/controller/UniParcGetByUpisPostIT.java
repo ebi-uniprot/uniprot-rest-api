@@ -149,7 +149,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
-        ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12));
+        ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13));
         return List.of(rm1, rm2, rm3, rm4, rm5);
     }
 

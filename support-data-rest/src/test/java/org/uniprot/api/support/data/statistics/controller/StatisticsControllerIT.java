@@ -269,7 +269,7 @@ class StatisticsControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
                 .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-25")))
                 .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
                 .andExpect(jsonPath("$.results[0].entryCount", is(35360)));
     }
@@ -312,12 +312,12 @@ class StatisticsControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
                 .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-25")))
                 .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
                 .andExpect(jsonPath("$.results[0].entryCount", is(35360)))
                 .andExpect(jsonPath("$.results[1].statisticsType", is("UNREVIEWED")))
                 .andExpect(jsonPath("$.results[1].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[1].releaseDate", is("2021-05-24")))
+                .andExpect(jsonPath("$.results[1].releaseDate", is("2021-05-25")))
                 .andExpect(jsonPath("$.results[1].valueCount", is(12793422)))
                 .andExpect(jsonPath("$.results[1].entryCount", is(12793422)));
     }
