@@ -55,18 +55,23 @@ public class OpenAPIConstants {
                     + " The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String IDS_UNIPROTKB_OPERATION =
             "Get UniProtKB entries by a list of accessions. (Max. 1K entries)";
+    public static final String IDS_UNIPROTKB_OPERATION_DESC = "";
     public static final String JOB_RUN_UNIPROTKB_OPERATION =
             "Submit UniProtKB asynchronous download job.";
+    public static final String JOB_RUN_UNIPROTKB_OPERATION_DESC = "";
     public static final String JOB_STATUS_UNIPROTKB_OPERATION =
             "Get progress of UniProtKB asynchronous download job.";
+    public static final String JOB_STATUS_UNIPROTKB_OPERATION_DESC = "";
     public static final String JOB_DETAILS_UNIPROTKB_OPERATION =
             "Get details of UniProtKB asynchronous download job.";
+    public static final String JOB_DETAILS_UNIPROTKB_OPERATION_DESC = "";
     public static final String PUBLICATION_UNIPROTKB_OPERATION =
             "Get publications for a UniProtKB entry by accession.";
     public static final String PUBLICATION_UNIPROTKB_OPERATION_DESC =
             "Get all publication data for a UniProtKB entry by accession, including computationally-mapped and community-mapped sources.";
     public static final String INTERACTION_UNIPROTKB_OPERATION =
             "Get interactions for a UniProtKB entry by accession.";
+    public static final String INTERACTION_UNIPROTKB_OPERATION_DESC = "";
     public static final String TAG_UNIPROTKB_GROUP = "UniProtKB group by";
     public static final String TAG_UNIPROTKB_GROUP_DESC =
             "Allows you to browse your query results using the taxonomy, keyword, Gene Ontology or Enzyme Classification hierarchies and to view the distribution of your search results across the terms within each group.";
@@ -120,14 +125,18 @@ public class OpenAPIConstants {
     public static final String FORMAT_UNIPROTKB_EXAMPLE = "json";
     public static final String GROUP_PARENT_DESCRIPTION =
             "If nothing is passed, the root of the hierarchical tree is returned with all available children. If the parent is specified, only children below the parent node is returned.";
-    public static final String GROUP_EC_DESCRIPTION =
+    public static final String GROUP_EC_OPERATION =
             "List of Enzyme Classification (EC) groups with respect to the given query and parent.";
-    public static final String GROUP_GO_DESCRIPTION =
+    public static final String GROUP_EC_OPERATION_DESC = "";
+    public static final String GROUP_GO_OPERATION =
             "List of Gene Ontology (GO) groups with respect to the given query and parent";
-    public static final String GROUP_KEYWORD_DESCRIPTION =
+    public static final String GROUP_GO_OPERATION_DESC = "";
+    public static final String GROUP_KEYWORD_OPERATION =
             "List of keyword groups with respect to the given query and parent";
-    public static final String GROUP_TAXONOMY_DESCRIPTION =
+    public static final String GROUP_KEYWORD_OPERATION_DESC = "";
+    public static final String GROUP_TAXONOMY_OPERATION =
             "List of taxonomy groups with respect to the given query and parent";
+    public static final String GROUP_TAXONOMY_OPERATION_DESC = "";
 
     // ID Mapping
     public static final String JOB_ID_IDMAPPING_DESCRIPTION =
@@ -146,16 +155,22 @@ public class OpenAPIConstants {
     public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
     public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION =
             "Submit ID Mapping asynchronous download job.";
+    public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC = "";
     public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION =
             "Get progress of ID Mapping asynchronous download job.";
+    public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC = "";
     public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION =
             "Get details of ID Mapping asynchronous download job";
+    public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC = "";
     public static final String TAG_IDMAPPING = "ID Mapping job";
     public static final String TAG_IDMAPPING_DESC =
             "The ID Mapping service can map between the identifiers used in one database, to the identifiers of another, e.g., from UniProt to Ensembl, or to PomBase, etc. If you map to UniProtKB, UniParc or UniRef data, the full entries will be returned to you for convenience.";
     public static final String RUN_IDMAPPING_OPERATION = "Submit ID Mapping job.";
+    public static final String RUN_IDMAPPING_OPERATION_DESC = "";
     public static final String STATUS_IDMAPPING_OPERATION = "Get status of ID Mapping job.";
+    public static final String STATUS_IDMAPPING_OPERATION_DESC = "";
     public static final String DETAILS_IDMAPPING_OPERATION = "Get details of ID Mapping job.";
+    public static final String DETAILS_IDMAPPING_OPERATION_DESC = "";
     public static final String SUB_SEQUENCE_DESCRIPTION =
             "Flag to write subsequences. Only accepted in fasta format";
     public static final String FROM_IDMAPPING_JOB_DESCRIPTION = "Name of the from type";
@@ -378,12 +393,16 @@ public class OpenAPIConstants {
     public static final String TYPE_STATS_EXAMPLE = "reviewed";
     public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
     public static final String
-            GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION =
+            GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION =
                     "Get release statistics by UniProt release name and statistics type.";
-    public static final String GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_DESCRIPTION =
+    public static final String
+            GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION_DESC = "";
+    public static final String GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION =
             "Get release statistics by UniProt release name.";
-    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION =
+    public static final String GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION_DESC = "";
+    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION =
             "Get history by attribute and statistics type.";
+    public static final String GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION_DESC = "";
 
     // SUBCEL
     public static final String TAG_SUBCEL = "Subcellular locations";
@@ -422,6 +441,7 @@ public class OpenAPIConstants {
 
     public static final String SUGGESTER_OPERATION =
             "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
+    public static final String SUGGESTER_OPERATION_DESC = "";
     public static final String DICT_SUGGESTER_DESCRIPTION = "Suggest data dictionary.";
     public static final String DICT_SUGGESTER_EXAMPLE = "ORGANISM";
     public static final String QUERY_SUGGESTER_DESCRIPTION = "Text to look up for auto-complete.";
@@ -437,6 +457,7 @@ public class OpenAPIConstants {
                     + FIELDS_OPERATION_DESC;
     public static final String IDS_TAX_OPERATION =
             "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
+    public static final String IDS_TAX_OPERATION_DESC = "";
     public static final String SEARCH_TAX_OPERATION =
             "Retrieve taxonomy entries by a search query.";
     public static final String STREAM_TAX_OPERATION =
@@ -549,11 +570,14 @@ public class OpenAPIConstants {
                     + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String JOB_RUN_UNIPARC_OPERATION =
             "Submit UniParc asynchronous download job.";
+    public static final String JOB_RUN_UNIPARC_OPERATION_DESC = "";
     public static final String JOB_STATUS_UNIPARC_OPERATION =
             "Get progress of UniParc asynchronous download job.";
+    public static final String JOB_STATUS_UNIPARC_OPERATION_DESC = "";
     public static final String JOB_ID_UNIPARC_DESCRIPTION = JOB_ID_DESCRIPTION;
     public static final String JOB_DETAILS_UNIPARC_OPERATION =
             "Get details of UniParc asynchronous download job.";
+    public static final String JOB_DETAILS_UNIPARC_OPERATION_DESC = "";
     public static final String TAG_UNIPARC = "UniParc";
     public static final String TAG_UNIPARC_DESC =
             "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
@@ -570,20 +594,29 @@ public class OpenAPIConstants {
                     + " The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniParc asynchronous download job' requests described below. The 'UniParc asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String ACCESSION_UNIPARC_OPERATION =
             "Get UniParc entry by UniProtKB accession";
+    public static final String ACCESSION_UNIPARC_OPERATION_DESC = "";
     public static final String DBID_UNIPARC_OPERATION =
             "Get UniParc entries by all UniParc cross reference accessions";
+    public static final String DBID_UNIPARC_OPERATION_DESC = "";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION =
             "Get UniParc entries by Proteome UPID";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION_DESC =
             "Search UniParc entries by proteome id(upid) to return all data associated with these entries. "
                     + FIELDS_OPERATION_DESC;
     public static final String DATABASES_UNIPARC_OPERATION = "Retrieve UniParc databases by a upi.";
+    public static final String DATABASES_UNIPARC_OPERATION_DESC = "";
     public static final String BEST_GUESS_UNIPARC_OPERATION =
             "Best Guess returns UniParc entry with a cross-reference to the longest active UniProtKB sequence.";
     public static final String BEST_GUESS_UNIPARC_OPERATION_DESC =
             "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.";
     public static final String SEQUENCE_UNIPARC_OPERATION = "Get UniParc entry by protein sequence";
+    public static final String SEQUENCE_UNIPARC_OPERATION_DESC = "";
     public static final String IDS_UNIPARC_OPERATION = "Get UniParc entries by a list of upis.";
+    public static final String IDS_UNIPARC_OPERATION_DESC = "";
+
+    public static final String IDS_POST_UNIPARC_OPERATION =
+            "Get UniParc entries by a list of upis.";
+    public static final String IDS_POST_UNIPARC_OPERATION_DESC = "";
     public static final String PROTEOME_UPID_UNIPARC_DESCRIPTION = UPID_PROTEOME_DESCRIPTION;
     public static final String PROTEOME_UPID_UNIPARC_EXAMPLE = UPID_PROTEOME_EXAMPLE;
     public static final String QUERY_UNIPARC_DESCRIPTION =
@@ -706,10 +739,13 @@ public class OpenAPIConstants {
     public static final String JOB_ID_UNIREF_DESCRIPTION = JOB_ID_DESCRIPTION;
     public static final String JOB_RUN_UNIREF_OPERATION =
             "Submit UniRef asynchronous download job.";
+    public static final String JOB_RUN_UNIREF_OPERATION_DESC = "";
     public static final String JOB_STATUS_UNIREF_OPERATION =
             "Get progress of UniRef asynchronous download job.";
+    public static final String JOB_STATUS_UNIREF_OPERATION_DESC = "";
     public static final String JOB_DETAILS_UNIREF_OPERATION =
             "Get details of UniRef asynchronous download job.";
+    public static final String JOB_DETAILS_UNIREF_OPERATION_DESC = "";
     public static final String ID_UNIREF_LIGHT_OPERATION =
             "Get a light UniRef cluster entry by a single cluster id.";
     public static final String ID_UNIREF_LIGHT_OPERATION_DESC =
@@ -724,7 +760,11 @@ public class OpenAPIConstants {
                     + " The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniRef asynchronous download job' requests described below. The 'UniRef asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String IDS_UNIREF_LIGHT_OPERATION =
             "Get UniRef entries by a list of cluster ids.";
+    public static final String IDS_UNIREF_LIGHT_OPERATION_DESC = "";
     public static final String ID_UNIREF_DESCRIPTION = "Unique identifier for the UniRef cluster";
+    public static final String IDS_POST_UNIREF_LIGHT_OPERATION =
+            "Unique identifier for the UniRef cluster";
+    public static final String IDS_POST_UNIREF_LIGHT_OPERATION_DESC = "";
     public static final String ID_UNIREF_EXAMPLE = "UniRef100_P05067";
     public static final String FIELDS_UNIREF_DESCRIPTION =
             FIELDS_DESCRIPTION
@@ -787,8 +827,10 @@ public class OpenAPIConstants {
                     + FIELDS_OPERATION_DESC;
     public static final String DIFF_UNISAVE_OPERATION =
             "Get the differences between the contents of two versions of an entry.";
+    public static final String DIFF_UNISAVE_OPERATION_DESC = "";
     public static final String STATUS_UNISAVE_OPERATION =
             "Get status information a single accession.";
+    public static final String STATUS_UNISAVE_OPERATION_DESC = "";
     public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION =
             "Whether or not to include the entry content (true|false).";
     public static final String VERSIONS_UNISAVE_DESCRIPTION =

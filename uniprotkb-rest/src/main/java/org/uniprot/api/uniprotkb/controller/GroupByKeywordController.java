@@ -37,7 +37,10 @@ public class GroupByKeywordController extends GroupByController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(hidden = true, summary = GROUP_KEYWORD_DESCRIPTION)
+    @Operation(
+            hidden = true,
+            summary = GROUP_KEYWORD_OPERATION,
+            description = GROUP_KEYWORD_OPERATION_DESC)
     @ApiResponse(
             content =
                     @Content(

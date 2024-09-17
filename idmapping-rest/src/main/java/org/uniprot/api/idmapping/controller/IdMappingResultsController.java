@@ -89,6 +89,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
             summary = ID_MAPPING_RESULT_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

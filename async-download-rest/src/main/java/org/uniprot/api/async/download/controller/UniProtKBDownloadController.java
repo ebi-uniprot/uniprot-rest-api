@@ -51,6 +51,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
             summary = JOB_RUN_UNIPROTKB_OPERATION,
+            description = JOB_RUN_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -71,6 +72,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_STATUS_UNIPROTKB_OPERATION,
+            description = JOB_STATUS_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -97,6 +99,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_DETAILS_UNIPROTKB_OPERATION,
+            description = JOB_DETAILS_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

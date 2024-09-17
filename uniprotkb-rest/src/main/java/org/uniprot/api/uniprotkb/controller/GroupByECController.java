@@ -36,7 +36,7 @@ public class GroupByECController extends GroupByController {
         this.uniProtKBGroupByECService = uniProtKBGroupByECService;
     }
 
-    @Operation(hidden = true, summary = GROUP_EC_DESCRIPTION)
+    @Operation(hidden = true, summary = GROUP_EC_OPERATION, description = GROUP_EC_OPERATION_DESC)
     @ApiResponse(
             content =
                     @Content(
