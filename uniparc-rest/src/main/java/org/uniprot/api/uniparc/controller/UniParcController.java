@@ -28,12 +28,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.uniparc.common.service.UniParcQueryService;
-import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.request.*;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -375,6 +370,71 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByUpIdRequest);
 
         return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
+    }
+
+    @SuppressWarnings("squid:S6856")
+    @GetMapping(
+            value = "/proteome/{upId}/stream",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            summary = PROTEOME_UPID_STREAM_UNIPARC_OPERATION,
+            description = PROTEOME_UPID_STREAM_UNIPARC_OPERATION_DESC,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> streamByProteomeId(
+            @Valid @ModelAttribute UniParcStreamByProteomeIdRequest streamRequest,
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
+                    MediaType contentType,
+            HttpServletRequest request) {
+        setBasicRequestFormat(streamRequest, request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            queryService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    streamRequest,
+                    contentType,
+                    request);
+        } else {
+            return super.stream(
+                    () -> queryService.stream(streamRequest), streamRequest, contentType, request);
+        }
     }
 
     @GetMapping(
