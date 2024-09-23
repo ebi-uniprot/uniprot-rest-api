@@ -10,11 +10,11 @@ import org.uniprot.api.common.repository.search.term.TermInfo;
 import lombok.Getter;
 
 /**
- * We had to create this class to document because spring-docs has a bug
- * with @ApiResponse @Content schemaProperties that ignore array items property
- * There is a bug for it that was fixed in release 2.3.0
- * https://github.com/springdoc/springdoc-openapi/pull/2403
- * Once we upgrade spring-doc we can remove it.
+ * We had to create this class to document because spring-docs has a bug with @ApiResponse @Content
+ * schemaProperties that ignore array items property There is a bug for it that was fixed in release
+ * 2.3.0 https://github.com/springdoc/springdoc-openapi/pull/2403 Once we upgrade spring-doc we can
+ * remove it.
+ *
  * @param <T>
  */
 @Getter

@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.openapi;
 
+import static org.uniprot.core.util.Utils.*;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.*;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
-import org.uniprot.core.util.Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,7 +76,7 @@ public class APIDocConfig {
     @Bean
     public OpenApiCustomiser defaultOpenApiCustomiser(OpenAPIConfiguration openAPIConfiguration) {
         return openAPI -> {
-            if (Utils.notNullNotEmpty(openAPIConfiguration.getServer())) {
+            if (notNullNotEmpty(openAPIConfiguration.getServer())) {
                 Server server = new Server();
                 server.setDescription("UniProt REST API Server");
                 server.setUrl(openAPIConfiguration.getServer());
@@ -122,7 +122,8 @@ public class APIDocConfig {
         cleanStringSerialiserSchemaObjects(schemaMap);
     }
 
-    private static void customiseSearchResultEntity(OpenAPI openAPI, Map<String, Schema> schemaMap) {
+    private static void customiseSearchResultEntity(
+            OpenAPI openAPI, Map<String, Schema> schemaMap) {
         List<String> searchEntries =
                 openAPI.getPaths().values().stream()
                         .map(PathItem::getGet)
@@ -134,21 +135,36 @@ public class APIDocConfig {
                         .collect(Collectors.toList());
         if (!searchEntries.isEmpty()) {
             Schema searchResult = schemaMap.get("SearchResult");
-            if(searchResult != null) {
-                ArraySchema searchResults = (ArraySchema) searchResult.getProperties().get("results");
-                searchResults.getItems().set$ref("#/components/schemas/" + searchEntries.get(0));
+            if (notNull(searchResult)) {
+                updateSchemaItemsReference(searchResult, searchEntries);
             }
-            searchResult = schemaMap.get("IdMappingSearchResult");
-            if(searchResult != null) {
-                ArraySchema searchResults = (ArraySchema) searchResult.getProperties().get("results");
-                searchResults.setAllOf(new ArrayList<>());
-                for (String searchEntry: searchEntries) {
-                    Schema allOfSchema = new Schema();
-                    allOfSchema.set$ref("#/components/schemas/" + searchEntry);
-                    searchResults.getAllOf().add(allOfSchema);
-                }
+            Schema idMappingResult = schemaMap.get("IdMappingSearchResult");
+            if (notNull(idMappingResult)) {
+                updateAllOffItemsReference(idMappingResult, searchEntries);
+            }
+            Schema streamResult = schemaMap.get("StreamResult");
+            if (notNull(streamResult) && notNull(idMappingResult)) {
+                updateAllOffItemsReference(streamResult, searchEntries);
+            } else if (notNull(streamResult)) {
+                updateSchemaItemsReference(streamResult, searchEntries);
             }
         }
+    }
+
+    private static void updateAllOffItemsReference(
+            Schema idMappingResult, List<String> searchEntries) {
+        ArraySchema searchResults = (ArraySchema) idMappingResult.getProperties().get("results");
+        searchResults.setAllOf(new ArrayList<>());
+        for (String searchEntry : searchEntries) {
+            Schema allOfSchema = new Schema();
+            allOfSchema.set$ref("#/components/schemas/" + searchEntry);
+            searchResults.getAllOf().add(allOfSchema);
+        }
+    }
+
+    private static void updateSchemaItemsReference(Schema result, List<String> searchEntries) {
+        ArraySchema searchResults = (ArraySchema) result.getProperties().get("results");
+        searchResults.getItems().set$ref("#/components/schemas/" + searchEntries.get(0));
     }
 
     private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {
