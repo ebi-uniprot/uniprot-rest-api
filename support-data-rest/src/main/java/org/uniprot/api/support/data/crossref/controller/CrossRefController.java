@@ -24,6 +24,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -113,15 +114,11 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "CrossRefEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            CrossRefEntry.class)))
+                                    schema = @Schema(implementation = SearchResult.class))
                         })
             })
     @GetMapping(

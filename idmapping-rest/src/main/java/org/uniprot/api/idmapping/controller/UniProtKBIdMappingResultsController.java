@@ -33,6 +33,7 @@ import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.IdMappingSearchResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -95,16 +96,11 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "UniProtKBEntryPair",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniProtKBEntryPair
-                                                                                    .class))),
+                                    schema = @Schema(implementation = IdMappingSearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =

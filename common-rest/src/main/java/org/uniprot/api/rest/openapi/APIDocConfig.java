@@ -3,6 +3,7 @@ package org.uniprot.api.rest.openapi;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
@@ -25,6 +26,8 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
@@ -109,7 +112,7 @@ public class APIDocConfig {
         if (citationParent != null) {
             configureCitationSchema(openAPI, citationParent);
         }
-
+        customiseSearchResultEntity(openAPI, schemaMap);
         for (Schema item : schemaMap.values()) {
             if ("Evidence".equals(item.getName())) {
                 configureEvidenceSchema(item);
@@ -117,6 +120,35 @@ public class APIDocConfig {
             configureStringTypesSerialisers(item);
         }
         cleanStringSerialiserSchemaObjects(schemaMap);
+    }
+
+    private static void customiseSearchResultEntity(OpenAPI openAPI, Map<String, Schema> schemaMap) {
+        List<String> searchEntries =
+                openAPI.getPaths().values().stream()
+                        .map(PathItem::getGet)
+                        .filter(Objects::nonNull)
+                        .map(Operation::getResponses)
+                        .map(ApiResponses::getDefault)
+                        .map(ApiResponse::getDescription)
+                        .filter(s -> !s.equals("default response"))
+                        .collect(Collectors.toList());
+        if (!searchEntries.isEmpty()) {
+            Schema searchResult = schemaMap.get("SearchResult");
+            if(searchResult != null) {
+                ArraySchema searchResults = (ArraySchema) searchResult.getProperties().get("results");
+                searchResults.getItems().set$ref("#/components/schemas/" + searchEntries.get(0));
+            }
+            searchResult = schemaMap.get("IdMappingSearchResult");
+            if(searchResult != null) {
+                ArraySchema searchResults = (ArraySchema) searchResult.getProperties().get("results");
+                searchResults.setAllOf(new ArrayList<>());
+                for (String searchEntry: searchEntries) {
+                    Schema allOfSchema = new Schema();
+                    allOfSchema.set$ref("#/components/schemas/" + searchEntry);
+                    searchResults.getAllOf().add(allOfSchema);
+                }
+            }
+        }
     }
 
     private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {

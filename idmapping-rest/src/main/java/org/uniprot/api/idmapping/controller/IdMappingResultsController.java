@@ -33,6 +33,7 @@ import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.IdMappingSearchResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.util.Utils;
@@ -92,16 +93,11 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "IdMappingStringPair",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            IdMappingStringPair
-                                                                                    .class))),
+                                    schema = @Schema(implementation = IdMappingSearchResult.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
