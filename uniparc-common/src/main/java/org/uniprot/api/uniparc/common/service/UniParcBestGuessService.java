@@ -9,9 +9,11 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
+import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
-import org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
@@ -99,9 +101,13 @@ public class UniParcBestGuessService {
 
     private boolean filterCrossReference(
             UniParcCrossReference xref, List<String> databases, List<String> taxonomyIds) {
-        return UniParcServiceUtils.filterByDatabases(xref, databases)
-                && filterByTaxonomyIds(xref, taxonomyIds)
-                && filterByStatus(xref, true);
+        UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
+        UniParcCrossReferenceTaxonomyFilter taxonFilter = new UniParcCrossReferenceTaxonomyFilter();
+        UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
+
+        return dbFilter.apply(xref, databases)
+                && taxonFilter.apply(xref, taxonomyIds)
+                && statusFilter.apply(xref, true);
     }
 
     private UniParcEntry getBestGuessUniParcEntry(

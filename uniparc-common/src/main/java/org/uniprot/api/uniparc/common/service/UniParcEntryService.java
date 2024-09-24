@@ -98,31 +98,19 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest uniParcIdRequest) {
-        UniParcEntry uniParcEntry = getUniParcEntry(uniParcIdRequest.getUpi());
-
-        return filterUniParcStream(Stream.of(uniParcEntry), uniParcIdRequest)
-                .findFirst()
-                .orElse(null);
+        return getUniParcEntry(uniParcIdRequest.getUpi(), uniParcIdRequest);
     }
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
         String uniParcId = searchUniParcId(ACCESSION_FIELD, getByAccessionRequest.getAccession());
-        UniParcEntry uniParcEntry = getUniParcEntry(uniParcId);
-
-        return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
-                .findFirst()
-                .orElse(null);
+        return getUniParcEntry(uniParcId, getByAccessionRequest);
     }
 
     public UniParcEntry getBySequence(UniParcSequenceRequest sequenceRequest) {
 
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
         String uniParcId = searchUniParcId(CHECKSUM_STR, md5Value);
-        UniParcEntry uniParcEntry = getUniParcEntry(uniParcId);
-
-        return filterUniParcStream(Stream.of(uniParcEntry), sequenceRequest)
-                .findFirst()
-                .orElse(null);
+        return getUniParcEntry(uniParcId, sequenceRequest);
     }
 
     @Override
@@ -164,7 +152,7 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         return builder.build();
     }
 
-    private UniParcEntry getUniParcEntry(String uniParcId) {
+    private UniParcEntry getUniParcEntry(String uniParcId, UniParcGetByIdRequest request) {
         Optional<UniParcEntryLight> optLightEntry =
                 this.uniParcLightStoreClient.getEntry(uniParcId);
         if (optLightEntry.isEmpty()) {
@@ -174,14 +162,16 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         builder.uniParcId(uniParcId).sequence(optLightEntry.get().getSequence());
         builder.sequenceFeaturesSet(optLightEntry.get().getSequenceFeatures());
         // populate cross-references from its own store
-        List<UniParcCrossReference> crossReferences =
-                this.uniParcCrossReferenceService.getCrossReferences(optLightEntry.get()).toList();
-        builder.uniParcCrossReferencesSet(crossReferences);
+        Stream<UniParcCrossReference> crossReferences =
+                this.uniParcCrossReferenceService.getCrossReferences(optLightEntry.get());
+        crossReferences = filterUniParcCrossReferenceStream(crossReferences, request);
+        builder.uniParcCrossReferencesSet(crossReferences.toList());
         return builder.build();
     }
 
-    private Stream<UniParcEntry> filterUniParcStream(
-            Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
+    private Stream<UniParcCrossReference> filterUniParcCrossReferenceStream(
+            Stream<UniParcCrossReference> uniParcCrossReferenceStream,
+            UniParcGetByIdRequest request) {
         // convert comma separated values to list
         List<String> databases = csvToList(request.getDbTypes());
         List<String> taxonomyIds = csvToList(request.getTaxonIds());
@@ -191,10 +181,10 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
 
         // filter the results
-        return uniParcEntryStream
-                .map(uniParcEntry -> dbFilter.apply(uniParcEntry, databases))
-                .map(uniParcEntry -> taxonFilter.apply(uniParcEntry, taxonomyIds))
-                .map(uniParcEntry -> statusFilter.apply(uniParcEntry, request.getActive()));
+        return uniParcCrossReferenceStream
+                .filter(xref -> dbFilter.apply(xref, databases))
+                .filter(xref -> taxonFilter.apply(xref, taxonomyIds))
+                .filter(xref -> statusFilter.apply(xref, request.getActive()));
     }
 
     private List<String> csvToList(String csv) {

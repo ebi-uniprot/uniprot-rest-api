@@ -19,6 +19,9 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesStreamRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
@@ -178,9 +181,13 @@ public class UniParcCrossReferenceService {
         List<String> databases =
                 csvToList(request.getDbTypes()).stream().map(String::toLowerCase).toList();
         List<String> taxonomyIds = csvToList(request.getTaxonIds());
-        return filterByDatabases(xref, databases)
-                && filterByTaxonomyIds(xref, taxonomyIds)
-                && filterByStatus(xref, request.getActive());
+        UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
+        UniParcCrossReferenceTaxonomyFilter taxonFilter = new UniParcCrossReferenceTaxonomyFilter();
+        UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
+
+        return dbFilter.apply(xref, databases)
+                && taxonFilter.apply(xref, taxonomyIds)
+                && statusFilter.apply(xref, request.getActive());
     }
 
     private int getDefaultPageSize() {
