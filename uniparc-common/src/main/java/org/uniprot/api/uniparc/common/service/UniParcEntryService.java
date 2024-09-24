@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -31,10 +32,7 @@ import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcProteomeIdFilter;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -179,7 +177,8 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         return builder.build();
     }
 
-    private UniParcEntry getUniParcEntry(String uniParcId, UniParcGetByIdRequest request) {
+    private UniParcEntry getUniParcEntry(
+            String uniParcId, UniParcGetByIdRequest request, String proteomeId) {
         Optional<UniParcEntryLight> optLightEntry =
                 this.uniParcLightStoreClient.getEntry(uniParcId);
         if (optLightEntry.isEmpty()) {
