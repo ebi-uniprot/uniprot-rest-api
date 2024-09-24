@@ -26,7 +26,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniparc.common.service.UniParcBestGuessService;
-import org.uniprot.api.uniparc.common.service.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.UniParcEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
@@ -54,13 +54,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniParcController extends BasicSearchController<UniParcEntry> {
     private static final String DATA_TYPE = "uniparc";
 
-    private final UniParcQueryService queryService;
+    private final UniParcEntryService queryService;
     private final UniParcBestGuessService bestGuessService;
 
     @Autowired
     public UniParcController(
             ApplicationEventPublisher eventPublisher,
-            UniParcQueryService queryService,
+            UniParcEntryService queryService,
             UniParcBestGuessService bestGuessService,
             MessageConverterContextFactory<UniParcEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
@@ -160,6 +160,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})

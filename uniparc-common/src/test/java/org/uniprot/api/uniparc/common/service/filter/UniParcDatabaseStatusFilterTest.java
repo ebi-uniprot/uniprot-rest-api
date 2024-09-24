@@ -22,17 +22,17 @@ class UniParcDatabaseStatusFilterTest {
     }
 
     @Test
-    void testFilterByDatabaseStatus() {
+    void testFilterByNullStatusReturnTrue() {
         UniParcCrossReference activeXref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, true);
         // filter by status
-        boolean result = uniParcDatabaseStatusFilter.apply(activeXref, true);
+        boolean result = uniParcDatabaseStatusFilter.apply(activeXref, null);
         Assertions.assertTrue(result);
     }
 
     @Test
-    void testFilterByDatabaseStatusFalse() {
+    void testFilterByStatusNotFoundReturnFalse() {
         UniParcCrossReference activeXref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, false);
@@ -42,12 +42,12 @@ class UniParcDatabaseStatusFilterTest {
     }
 
     @Test
-    void testFilterByNullStatus() {
+    void testFilterByStatusFoundReturnTrue() {
         UniParcCrossReference activeXref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, false);
         // filter by status
-        boolean result = uniParcDatabaseStatusFilter.apply(activeXref, null);
+        boolean result = uniParcDatabaseStatusFilter.apply(activeXref, false);
         Assertions.assertTrue(result);
     }
 }

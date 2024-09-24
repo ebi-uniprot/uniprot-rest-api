@@ -41,7 +41,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 @Service
 @Import(UniParcSolrQueryConfig.class)
-public class UniParcLightQueryService
+public class UniParcLightEntryService
         extends StoreStreamerSearchService<UniParcDocument, UniParcEntryLight> {
 
     public static final String UNIPARC_ID_FIELD = "upi";
@@ -53,11 +53,9 @@ public class UniParcLightQueryService
 
     private final SolrQueryConfig solrQueryConfig;
     private final RdfStreamer rdfStreamer;
-    private final UniParcQueryRepository repository;
-    private final UniParcLightQueryResultConverter uniParcLightQueryResultConverter;
 
     @Autowired
-    public UniParcLightQueryService(
+    public UniParcLightEntryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
             UniParcSortClause solrSortClause,
@@ -85,8 +83,6 @@ public class UniParcLightQueryService
         this.uniParcCrossReferenceLazyLoader = uniParcCrossReferenceLazyLoader;
         this.solrQueryConfig = uniParcSolrQueryConf;
         this.rdfStreamer = uniParcRdfStreamer;
-        this.repository = repository;
-        this.uniParcLightQueryResultConverter = uniParcLightQueryResultConverter;
     }
 
     @Override

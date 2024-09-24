@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author lgonzales
@@ -14,7 +15,8 @@ public class UniParcCrossReferenceTaxonomyFilter
 
     @Override
     public Boolean apply(UniParcCrossReference xref, List<String> taxonomyIds) {
-        return taxonomyIds.isEmpty()
-                || taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId()));
+        return Utils.nullOrEmpty(taxonomyIds)
+                || (Utils.notNull(xref.getOrganism())
+                        && taxonomyIds.contains(String.valueOf(xref.getOrganism().getTaxonId())));
     }
 }

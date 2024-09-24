@@ -73,7 +73,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[0].sequence.molWeight", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.crc64", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequence.md5", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)))
+                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures[*].databaseId", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures[*].locations", notNullValue()))

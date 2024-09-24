@@ -269,7 +269,7 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. More than one Best Guess found {UPI0000183A10:trembl0;UPI0000183A13:trembl3;UPI0000183A12:trembl2}. Review your query and/or contact us.")));
+                                        "Invalid request received. More than one Best Guess found {UPI0000183A12:trembl2;UPI0000183A10:trembl0;UPI0000183A13:trembl3}. Review your query and/or contact us.")));
     }
 
     private void saveEntries() throws IOException, SolrServerException {

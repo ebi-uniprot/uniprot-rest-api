@@ -25,7 +25,7 @@ import lombok.Data;
 @ValidUniParcBestGuessRequest
 public class UniParcBestGuessRequest {
     @Parameter(hidden = true)
-    private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
+    private static final String TAXONOMY_ID_LIST_REGEX = "^(\\d+)(,\\d+)*$";
 
     @Parameter(description = "Comma separated UniParc Ids")
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPARC)

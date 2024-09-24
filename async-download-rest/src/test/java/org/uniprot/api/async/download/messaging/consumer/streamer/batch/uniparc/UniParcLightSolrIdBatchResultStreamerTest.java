@@ -25,7 +25,7 @@ import org.uniprot.core.uniparc.UniParcEntryLight;
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-public class UniParcSolrIdBatchResultStreamerTest
+public class UniParcLightSolrIdBatchResultStreamerTest
         extends SolrIdBatchResultStreamerTest<
                 UniParcDownloadRequest, UniParcDownloadJob, UniParcEntryLight> {
     private static final int BATCH_SIZE = 2;
@@ -48,7 +48,7 @@ public class UniParcSolrIdBatchResultStreamerTest
         heartbeatProducer = uniParcHeartbeatProducer;
         jobService = uniParcJobService;
         solrIdBatchResultStreamer =
-                new UniParcSolrIdBatchResultStreamer(
+                new UniParcLightSolrIdBatchResultStreamer(
                         uniParcHeartbeatProducer,
                         uniParcJobService,
                         uniParcEntryStoreStreamerConfig,

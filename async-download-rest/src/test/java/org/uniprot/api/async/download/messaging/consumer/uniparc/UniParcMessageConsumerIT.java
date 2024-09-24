@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.messaging.consumer.uniparc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
@@ -201,6 +202,7 @@ class UniParcMessageConsumerIT
     protected Stream<Arguments> getSupportedFormats() {
         return Stream.of(
                         "json",
+                        APPLICATION_XML_VALUE,
                         FASTA_MEDIA_TYPE_VALUE,
                         TSV_MEDIA_TYPE_VALUE,
                         APPLICATION_JSON_VALUE,

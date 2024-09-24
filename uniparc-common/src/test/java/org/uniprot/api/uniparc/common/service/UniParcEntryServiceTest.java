@@ -40,7 +40,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
  * @created 13/06/2023
  */
 @ExtendWith(MockitoExtension.class)
-class UniParcQueryServiceTest {
+class UniParcEntryServiceTest {
     @Mock private UniParcQueryRepository repository;
     @Mock private UniParcFacetConfig facetConfig;
     @Mock private UniParcSortClause solrSortClause;
@@ -54,12 +54,12 @@ class UniParcQueryServiceTest {
     @Mock private TupleStreamDocumentIdStream solrIdStreamer;
     @Mock private UniParcLightStoreClient uniParcLightStoreClient;
     @Mock private UniParcCrossReferenceService uniParcCrossReferenceService;
-    private UniParcQueryService service;
+    private UniParcEntryService service;
 
     @BeforeEach
     void init() {
         service =
-                new UniParcQueryService(
+                new UniParcEntryService(
                         repository,
                         facetConfig,
                         solrSortClause,

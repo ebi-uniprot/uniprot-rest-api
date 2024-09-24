@@ -23,32 +23,51 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     }
 
     @Test
-    void testFilterByDatabaseStatus() {
-        UniParcCrossReference activeXref =
+    void testFilterByTaxonomyParamEmptyReturnTrue() {
+        UniParcCrossReference xref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, true);
         // filter by status
-        boolean result = uniParcTaxonomyFilter.apply(activeXref, List.of(""));
+        boolean result = uniParcTaxonomyFilter.apply(xref, List.of());
         Assertions.assertTrue(result);
     }
 
     @Test
-    void testFilterByDatabaseStatusFalse() {
-        UniParcCrossReference activeXref =
+    void testFilterByTaxonomyParamNullReturnTrue() {
+        UniParcCrossReference xref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, false);
         // filter by status
-        boolean result = uniParcTaxonomyFilter.apply(activeXref, List.of(""));
+        boolean result = uniParcTaxonomyFilter.apply(xref, null);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    void testFilterByNullTaxonomyXrefReturnFalse() {
+        UniParcCrossReference xref =
+                UniParcCrossReferenceMocker.createUniParcCrossReference(UniParcDatabase.EMBL);
+        // filter by status
+        boolean result = uniParcTaxonomyFilter.apply(xref, List.of("9000"));
         Assertions.assertFalse(result);
     }
 
     @Test
-    void testFilterByNullStatus() {
-        UniParcCrossReference activeXref =
+    void testFilterByTaxonomyNotFoundReturnFalse() {
+        UniParcCrossReference xref =
                 UniParcCrossReferenceMocker.createUniParcCrossReference(
                         UniParcDatabase.EMBL, "AC12345", 9606, false);
         // filter by status
-        boolean result = uniParcTaxonomyFilter.apply(activeXref, List.of());
+        boolean result = uniParcTaxonomyFilter.apply(xref, List.of("9000"));
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void testFilterByTaxonomyFoundReturnTrue() {
+        UniParcCrossReference xref =
+                UniParcCrossReferenceMocker.createUniParcCrossReference(
+                        UniParcDatabase.EMBL, "AC12345", 9606, false);
+        // filter by status
+        boolean result = uniParcTaxonomyFilter.apply(xref, List.of("9606"));
         Assertions.assertTrue(result);
     }
 }

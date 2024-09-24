@@ -29,7 +29,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
@@ -57,7 +57,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
 
     private static final String DATA_TYPE = "uniparc";
     private static final int PREVIEW_SIZE = 10;
-    private final UniParcLightQueryService queryService;
+    private final UniParcLightEntryService queryService;
 
     @Autowired
     protected UniParcEntryLightController(
@@ -65,7 +65,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             MessageConverterContextFactory<UniParcEntryLight> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper,
-            UniParcLightQueryService queryService) {
+            UniParcLightEntryService queryService) {
         super(
                 eventPublisher,
                 converterContextFactory,
@@ -238,6 +238,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         }
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -287,6 +288,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}/light",
             produces = {

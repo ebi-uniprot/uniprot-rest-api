@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad
@@ -14,7 +15,8 @@ public class UniParcDatabaseFilter
 
     @Override
     public Boolean apply(UniParcCrossReference xref, List<String> databases) {
-        return databases.isEmpty()
-                || databases.contains(xref.getDatabase().getDisplayName().toLowerCase());
+        return Utils.nullOrEmpty(databases)
+                || (Utils.notNull(xref.getDatabase())
+                        && databases.contains(xref.getDatabase().getDisplayName().toLowerCase()));
     }
 }

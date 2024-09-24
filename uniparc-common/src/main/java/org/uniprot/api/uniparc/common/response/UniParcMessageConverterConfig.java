@@ -135,8 +135,7 @@ public class UniParcMessageConverterConfig {
     public MessageConverterContextFactory<UniParcEntry> uniparcMessageConverterContextFactory() {
         MessageConverterContextFactory<UniParcEntry> contextFactory =
                 new MessageConverterContextFactory<>();
-
-        asList(
+        List.of(
                         uniParcContext(UniProtMediaType.LIST_MEDIA_TYPE),
                         uniParcContext(MediaType.APPLICATION_XML),
                         uniParcContext(MediaType.APPLICATION_JSON),
@@ -147,7 +146,6 @@ public class UniParcMessageConverterConfig {
                         uniParcContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
-
         return contextFactory;
     }
 

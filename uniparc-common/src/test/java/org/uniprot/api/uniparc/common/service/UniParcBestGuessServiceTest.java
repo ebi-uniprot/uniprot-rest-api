@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
-import org.uniprot.api.uniparc.common.service.light.UniParcLightQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
@@ -34,14 +34,14 @@ import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 @ExtendWith(MockitoExtension.class)
 class UniParcBestGuessServiceTest {
 
-    @Mock private UniParcLightQueryService uniParcLightQueryService;
+    @Mock private UniParcLightEntryService uniParcLightEntryService;
     @Mock private UniParcCrossReferenceService uniParcCrossReferenceService;
     private UniParcBestGuessService bestGuessService;
 
     @BeforeEach
     void setUp() {
         bestGuessService =
-                new UniParcBestGuessService(uniParcLightQueryService, uniParcCrossReferenceService);
+                new UniParcBestGuessService(uniParcLightEntryService, uniParcCrossReferenceService);
     }
 
     @Test
