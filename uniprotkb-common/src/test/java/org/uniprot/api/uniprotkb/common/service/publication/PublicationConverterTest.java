@@ -58,7 +58,7 @@ class PublicationConverterTest {
         pubmedLiteratureEntryMap.put("1", literatureEntry);
         PublicationEntry entry = converter.apply(document, pubmedLiteratureEntryMap);
 
-        // check the journal object is the one from the map
+        // check the journal object is the one from the mapto
         assertSame(entry.getCitation(), journalArticle);
 
         assertThat(entry.getStatistics(), is(notNullValue()));

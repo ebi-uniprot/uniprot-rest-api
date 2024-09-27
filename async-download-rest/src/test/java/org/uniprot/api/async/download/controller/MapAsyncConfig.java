@@ -23,7 +23,7 @@ public class MapAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.map.retryQueueName}")
     private String retryQueue;
 
-    @Value(("${async.download.map.rejectedQueueName}"))
+    @Value(("${async.download.mapto.rejectedQueueName}"))
     private String rejectedQueue;
 
     @Override

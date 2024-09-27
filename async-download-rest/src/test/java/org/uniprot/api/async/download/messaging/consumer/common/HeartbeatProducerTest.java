@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
-import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
+import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 
@@ -29,8 +29,8 @@ class HeartbeatProducerTest {
     public static final String UPDATED = "updated";
     private final UniProtKBDownloadJob downloadJob =
             UniProtKBDownloadJob.builder().id(JOB_ID).build();
-    private final MapDownloadJob mapDownloadJob =
-            MapDownloadJob.builder().id(MAP_DOWNLOAD_JOB_ID).build();
+    private final MapToDownloadJob mapToDownloadJob =
+            MapToDownloadJob.builder().id(MAP_DOWNLOAD_JOB_ID).build();
     @Mock private HeartbeatConfig heartbeatConfig;
     @Mock private UniProtKBJobService jobService;
     @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
@@ -175,15 +175,15 @@ class HeartbeatProducerTest {
     void createForFromIds() {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
-        mapDownloadJob.setTotalFromIds(1000L);
+        mapToDownloadJob.setTotalFromIds(1000L);
 
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
 
         verifySavedMapDownloadJob(null);
 
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
         verify(jobService, times(2)).update(eq(MAP_DOWNLOAD_JOB_ID), any(Map.class));
     }
 
@@ -206,10 +206,10 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.isEnabled()).thenReturn(false);
         when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
 
-        mapDownloadJob.setTotalFromIds(1000L);
+        mapToDownloadJob.setTotalFromIds(1000L);
 
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
-        heartBeatProducer.generateForFromIds(mapDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
+        heartBeatProducer.generateForFromIds(mapToDownloadJob);
 
         verify(jobService, never()).save(any());
         verify(jobService, never()).update(any(), any());
@@ -230,9 +230,9 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
         doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
-        mapDownloadJob.setTotalFromIds(130L);
+        mapToDownloadJob.setTotalFromIds(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.generateForFromIds(mapDownloadJob));
+        assertDoesNotThrow(() -> heartBeatProducer.generateForFromIds(mapToDownloadJob));
     }
 
     @Test

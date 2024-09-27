@@ -1,8 +1,10 @@
 package org.uniprot.api.async.download.model.job;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -21,8 +23,8 @@ import lombok.Data;
  *     <prefix>:1e8e33be0c54af8ba15db116e2e6c63b26acd7cd
  */
 @Data
-@AllArgsConstructor
 public class DownloadJob implements Serializable {
+    @Serial
     private static final long serialVersionUID = 4548782902533470468L;
     @Id private String id;
     private JobStatus status;
@@ -46,8 +48,22 @@ public class DownloadJob implements Serializable {
     private long totalEntries;
     private long processedEntries;
     private long updateCount;
+    private long totalFromIds;
 
-    public void setUpdateCount(long updateCount) {
+    public DownloadJob(String id, JobStatus status, LocalDateTime created, LocalDateTime updated, String error, int retried, String query, String fields, String sort, String resultFile, String format, long totalEntries, long processedEntries, long updateCount) {
+        this.id = id;
+        this.status = status;
+        this.created = created;
+        this.updated = updated;
+        this.error = error;
+        this.retried = retried;
+        this.query = query;
+        this.fields = fields;
+        this.sort = sort;
+        this.resultFile = resultFile;
+        this.format = format;
+        this.totalEntries = totalEntries;
+        this.processedEntries = processedEntries;
         this.updateCount = updateCount;
     }
 }

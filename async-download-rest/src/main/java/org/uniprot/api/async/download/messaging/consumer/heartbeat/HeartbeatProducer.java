@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.LongConsumer;
 
 import org.uniprot.api.async.download.model.job.DownloadJob;
-import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
+import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 import org.uniprot.api.async.download.service.JobService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,6 @@ public class HeartbeatProducer {
 
     public void generateForFromIds(String jobId) {
         generateForFromIds(
-                (MapDownloadJob)
                         jobService
                                 .find(jobId)
                                 .orElseThrow(
@@ -102,7 +101,7 @@ public class HeartbeatProducer {
         }
     }
 
-    public void generateForFromIds(MapDownloadJob downloadJob) {
+    public void generateForFromIds(DownloadJob downloadJob) {
         try {
             generateIfEligible(
                     downloadJob,

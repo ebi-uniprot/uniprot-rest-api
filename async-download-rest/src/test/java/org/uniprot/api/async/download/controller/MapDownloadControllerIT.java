@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
-import org.uniprot.api.async.download.messaging.repository.MapDownloadJobRepository;
-import org.uniprot.api.async.download.model.job.map.MapDownloadJob;
+import org.uniprot.api.async.download.messaging.repository.MapToDownloadJobRepository;
+import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
@@ -23,7 +23,7 @@ public abstract class MapDownloadControllerIT extends AbstractDownloadController
 
     @Autowired protected MapAsyncConfig mapAsyncConfig;
     @Autowired protected SolrClient solrClient;
-    @Autowired protected MapDownloadJobRepository mapDownloadJobRepository;
+    @Autowired protected MapToDownloadJobRepository mapDownloadJobRepository;
     @Autowired protected MockMvc mockMvc;
 
     protected void initBeforeAll() throws Exception {
@@ -61,7 +61,7 @@ public abstract class MapDownloadControllerIT extends AbstractDownloadController
     }
 
     @Override
-    protected MapDownloadJob getDownloadJob(
+    protected MapToDownloadJob getDownloadJob(
             String jobId,
             String errMsg,
             String query,
@@ -70,7 +70,7 @@ public abstract class MapDownloadControllerIT extends AbstractDownloadController
             JobStatus jobStatus,
             String format,
             int retried) {
-        return MapDownloadJob.builder()
+        return MapToDownloadJob.builder()
                 .id(jobId)
                 .status(jobStatus)
                 .error(errMsg)

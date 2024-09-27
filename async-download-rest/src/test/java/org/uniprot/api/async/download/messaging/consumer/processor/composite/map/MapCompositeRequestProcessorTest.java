@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.internal.InOrderImpl;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.composite.CompositeRequestProcessor;
-import org.uniprot.api.async.download.model.request.map.MapDownloadRequest;
+import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
 
-public abstract class MapCompositeRequestProcessorTest<T extends MapDownloadRequest> {
+public abstract class MapCompositeRequestProcessorTest<T extends MapToDownloadRequest> {
     protected RequestProcessor<T> requestProcessor1;
     protected RequestProcessor<T> requestProcessor2;
     protected RequestProcessor<T> requestProcessor3;
