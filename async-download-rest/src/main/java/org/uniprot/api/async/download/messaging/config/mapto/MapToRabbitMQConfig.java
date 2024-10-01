@@ -30,7 +30,8 @@ public class MapToRabbitMQConfig {
     }
 
     @Bean
-    public Queue mapDownloadQueue(MapToAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    public Queue mapDownloadQueue(
+            MapToAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getQueueName())
                 .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
                 .deadLetterRoutingKey(asyncDownloadQConfigProps.getRetryQueueName())

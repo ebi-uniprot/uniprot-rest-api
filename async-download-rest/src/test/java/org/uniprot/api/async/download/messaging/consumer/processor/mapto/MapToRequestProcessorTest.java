@@ -28,8 +28,7 @@ class MapToRequestProcessorTest {
     @Mock private UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
 
     @Mock
-    private UniProtKBToUniRefCompositeRequestProcessor
-            uniProtKBToUniRefCompositeRequestProcessor;
+    private UniProtKBToUniRefCompositeRequestProcessor uniProtKBToUniRefCompositeRequestProcessor;
 
     @Mock private MapToJobService mapToJobService;
     @InjectMocks private MapToRequestProcessor mapToRequestProcessor;

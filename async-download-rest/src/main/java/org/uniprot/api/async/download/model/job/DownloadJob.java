@@ -4,7 +4,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -13,7 +12,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -24,8 +22,7 @@ import lombok.Data;
  */
 @Data
 public class DownloadJob implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 4548782902533470468L;
+    @Serial private static final long serialVersionUID = 4548782902533470468L;
     @Id private String id;
     private JobStatus status;
 
@@ -50,7 +47,21 @@ public class DownloadJob implements Serializable {
     private long updateCount;
     private long totalFromIds;
 
-    public DownloadJob(String id, JobStatus status, LocalDateTime created, LocalDateTime updated, String error, int retried, String query, String fields, String sort, String resultFile, String format, long totalEntries, long processedEntries, long updateCount) {
+    public DownloadJob(
+            String id,
+            JobStatus status,
+            LocalDateTime created,
+            LocalDateTime updated,
+            String error,
+            int retried,
+            String query,
+            String fields,
+            String sort,
+            String resultFile,
+            String format,
+            long totalEntries,
+            long processedEntries,
+            long updateCount) {
         this.id = id;
         this.status = status;
         this.created = created;

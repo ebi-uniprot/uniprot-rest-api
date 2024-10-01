@@ -19,6 +19,7 @@ class MapRabbitMQMessagingServiceTest extends RabbitMQMessagingServiceTest {
         queueConfigProperties = mapToAsyncDownloadQueueConfigProperties;
         rabbitTemplate = mapToRabbitTemplate;
         messagingService =
-                new MapToMessagingService(mapToAsyncDownloadQueueConfigProperties, mapToRabbitTemplate);
+                new MapToMessagingService(
+                        mapToAsyncDownloadQueueConfigProperties, mapToRabbitTemplate);
     }
 }

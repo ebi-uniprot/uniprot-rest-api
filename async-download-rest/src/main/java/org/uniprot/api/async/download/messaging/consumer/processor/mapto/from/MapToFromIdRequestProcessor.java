@@ -14,7 +14,8 @@ public abstract class MapToFromIdRequestProcessor<T extends MapToDownloadRequest
     private final FileHandler fileHandler;
     private final MapToJobService jobService;
 
-    protected MapToFromIdRequestProcessor(FileHandler fileHandler, MapToJobService mapToJobService) {
+    protected MapToFromIdRequestProcessor(
+            FileHandler fileHandler, MapToJobService mapToJobService) {
         this.fileHandler = fileHandler;
         this.jobService = mapToJobService;
     }

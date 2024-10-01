@@ -19,7 +19,7 @@ import net.jodah.failsafe.RetryPolicy;
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefSolrIdBatchResultStreamerTest
         extends MapSolrIdBatchResultStreamerTest<
-        UniProtKBToUniRefDownloadRequest, UniRefEntryLight> {
+                UniProtKBToUniRefDownloadRequest, UniRefEntryLight> {
     @Mock private UniProtKBToUniRefDownloadRequest uniParcDownloadRequest;
     @Mock private UniRefEntryLight uniRef1;
     @Mock private UniRefEntryLight uniRef2;

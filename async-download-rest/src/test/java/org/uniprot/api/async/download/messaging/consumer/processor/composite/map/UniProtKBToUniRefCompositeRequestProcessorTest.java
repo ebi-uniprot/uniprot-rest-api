@@ -12,13 +12,11 @@ import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownl
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefCompositeRequestProcessorTest
         extends MapCompositeRequestProcessorTest<UniProtKBToUniRefDownloadRequest> {
-    @Mock
-    UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
+    @Mock UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
     @Mock private UniProtKBMapToFromIdRequestProcessor uniProtKBMapFromRequestProcessor;
     @Mock private UniRefMapToIdRequestProcessor uniRefMapToRequestProcessor;
 
-    @Mock
-    private UniProtKBToUniRefResultRequestProcessor uniProtKBToUniRefResultRequestProcessor;
+    @Mock private UniProtKBToUniRefResultRequestProcessor uniProtKBToUniRefResultRequestProcessor;
 
     @BeforeEach
     void setUp() {

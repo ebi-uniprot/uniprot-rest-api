@@ -8,7 +8,8 @@ import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 public class MapToToDownloadJobPartialUpdateRepositoryImpl
         extends AbstractDownloadJobPartialUpdateRepository<MapToDownloadJob>
         implements MapToDownloadJobPartialUpdateRepository {
-    public MapToToDownloadJobPartialUpdateRepositoryImpl(RedisKeyValueTemplate redisKeyValueTemplate) {
+    public MapToToDownloadJobPartialUpdateRepositoryImpl(
+            RedisKeyValueTemplate redisKeyValueTemplate) {
         super(redisKeyValueTemplate, MapToDownloadJob.class);
     }
 }

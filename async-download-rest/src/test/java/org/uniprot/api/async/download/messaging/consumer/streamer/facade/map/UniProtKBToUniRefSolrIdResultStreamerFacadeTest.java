@@ -17,14 +17,13 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @ExtendWith(MockitoExtension.class)
 public class UniProtKBToUniRefSolrIdResultStreamerFacadeTest
         extends MapSolrIdResultStreamerFacadeTest<
-        UniProtKBToUniRefDownloadRequest, UniRefEntryLight> {
+                UniProtKBToUniRefDownloadRequest, UniRefEntryLight> {
     @Mock private UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
     @Mock private UniProtKBToUniRefRDFResultStreamer uniProtKBToUniRefRDFResultStreamer;
     @Mock private UniProtKBToUniReToListResultStreamer uniProtKBToUniReListResultStreamer;
 
     @Mock
-    private UniProtKBToUniRefSolrIdBatchResultStreamer
-            uniProtKBToUniRefSolrIdBatchResultStreamer;
+    private UniProtKBToUniRefSolrIdBatchResultStreamer uniProtKBToUniRefSolrIdBatchResultStreamer;
 
     @Mock private Stream<UniRefEntryLight> refEntryLightStream;
     @Mock private MessageConverterContext<UniRefEntryLight> uniRefEntryLightMessageConverterContext;

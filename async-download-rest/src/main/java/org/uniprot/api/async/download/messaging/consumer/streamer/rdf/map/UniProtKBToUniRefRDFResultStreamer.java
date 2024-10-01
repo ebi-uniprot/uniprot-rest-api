@@ -9,17 +9,10 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 @Component
 public class UniProtKBToUniRefRDFResultStreamer
         extends UniRefMapToRDFResultStreamer<UniProtKBToUniRefDownloadRequest> {
-    private static final String UNIREF_DATA_TYPE = "uniref";
-
     public UniProtKBToUniRefRDFResultStreamer(
             MapToHeartbeatProducer heartbeatProducer,
             MapToJobService jobService,
             RdfStreamer uniRefRdfStreamer) {
         super(heartbeatProducer, jobService, uniRefRdfStreamer);
-    }
-
-    @Override
-    protected String getDataType() {
-        return UNIREF_DATA_TYPE;
     }
 }

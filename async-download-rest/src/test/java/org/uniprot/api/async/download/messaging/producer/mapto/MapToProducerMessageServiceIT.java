@@ -48,13 +48,13 @@ public abstract class MapToProducerMessageServiceIT<T extends MapToDownloadReque
 
     @TestConfiguration
     @ComponentScan({
-            "org.uniprot.api.async.download.mq.mapto",
-            "org.uniprot.api.async.download.service.mapto",
-            "org.uniprot.api.async.download.messaging.consumer.mapto",
-            "org.uniprot.api.async.download.messaging.config.mapto",
-            "org.uniprot.api.async.download.messaging.result.mapto",
-            "org.uniprot.api.async.download.messaging.consumer.heartbeat.mapto",
-            "org.uniprot.api.async.download.messaging.producer.mapto"
+        "org.uniprot.api.async.download.mq.mapto",
+        "org.uniprot.api.async.download.service.mapto",
+        "org.uniprot.api.async.download.messaging.consumer.mapto",
+        "org.uniprot.api.async.download.messaging.config.mapto",
+        "org.uniprot.api.async.download.messaging.result.mapto",
+        "org.uniprot.api.async.download.messaging.consumer.heartbeat.mapto",
+        "org.uniprot.api.async.download.messaging.producer.mapto"
     })
     static class MapProducerTestConfig {}
 }

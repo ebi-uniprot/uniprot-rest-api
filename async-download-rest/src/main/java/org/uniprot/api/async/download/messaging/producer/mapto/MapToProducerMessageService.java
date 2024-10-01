@@ -38,7 +38,7 @@ public abstract class MapToProducerMessageService<T extends MapToDownloadRequest
 
     @Override
     protected void createDownloadJob(String jobId, T request) {
-        MapToDownloadJob.MapDownloadJobBuilder jobBuilder = MapToDownloadJob.builder();
+        MapToDownloadJob.MapToDownloadJobBuilder jobBuilder = MapToDownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
         jobBuilder

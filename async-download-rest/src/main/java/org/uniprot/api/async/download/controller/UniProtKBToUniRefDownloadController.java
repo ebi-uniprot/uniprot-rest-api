@@ -30,7 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author supun
  * @created 14/08/2023
  */
-@Tag(name = TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB, description = TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB_DESC)
+@Tag(
+        name = TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB,
+        description = TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB_DESC)
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniProtKBToUniRefDownloadController extends BasicDownloadController {

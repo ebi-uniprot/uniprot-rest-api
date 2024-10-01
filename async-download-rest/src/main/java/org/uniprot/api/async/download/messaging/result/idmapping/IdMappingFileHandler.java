@@ -12,4 +12,9 @@ public class IdMappingFileHandler extends FileHandler {
             IdMappingHeartbeatProducer idMappingHeartbeatProducer) {
         super(idMappingDownloadConfigProperties, idMappingHeartbeatProducer);
     }
+
+    @Override
+    public boolean areAllFilesPresent(String jobId) {
+        return super.isResultFilePresent(jobId);
+    }
 }

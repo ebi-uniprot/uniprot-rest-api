@@ -24,8 +24,7 @@ public class MapToRequestProcessor implements RequestProcessor<MapToDownloadRequ
     private final MapToJobService jobService;
 
     public MapToRequestProcessor(
-            UniProtKBToUniRefCompositeRequestProcessor
-                    uniProtKBToUniRefCompositeRequestProcessor,
+            UniProtKBToUniRefCompositeRequestProcessor uniProtKBToUniRefCompositeRequestProcessor,
             MapToJobService jobService) {
         this.uniProtKBToUniRefCompositeRequestProcessor =
                 uniProtKBToUniRefCompositeRequestProcessor;

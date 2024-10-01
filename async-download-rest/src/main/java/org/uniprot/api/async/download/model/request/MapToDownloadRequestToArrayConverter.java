@@ -1,9 +1,9 @@
 package org.uniprot.api.async.download.model.request;
 
-import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
-
 import java.util.Objects;
 import java.util.function.Function;
+
+import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
 
 public class MapToDownloadRequestToArrayConverter<T extends MapToDownloadRequest>
         implements Function<T, char[]> {
