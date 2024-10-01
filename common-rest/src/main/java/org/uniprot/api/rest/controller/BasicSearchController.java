@@ -155,7 +155,7 @@ public abstract class BasicSearchController<T> {
             HttpServletRequest request,
             HttpServletResponse response) {
         return this.getSearchResponse(
-                result, fields, isDownload, subSequence, null, null, request, response);
+                result, fields, isDownload, subSequence, null, request, response);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
@@ -164,7 +164,6 @@ public abstract class BasicSearchController<T> {
             boolean isDownload,
             boolean subSequence,
             Map<String, List<Pair<String, Boolean>>> accessionSequenceStatus,
-            String proteomeId,
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
@@ -176,7 +175,6 @@ public abstract class BasicSearchController<T> {
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setMatchedFields(result.getMatchedFields());
         context.setSuggestions(result.getSuggestions());
-        context.setProteomeId(proteomeId);
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             Stream<String> accList = result.getContent().map(this::getEntityId);
             context.setEntityIds(accList);
@@ -214,21 +212,11 @@ public abstract class BasicSearchController<T> {
             StreamRequest streamRequest,
             MediaType contentType,
             HttpServletRequest request) {
-        return stream(resultSupplier, streamRequest, contentType, request, null);
-    }
-
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
-            Supplier<Stream<T>> resultSupplier,
-            StreamRequest streamRequest,
-            MediaType contentType,
-            HttpServletRequest request,
-            String proteomeId) {
         Supplier<MessageConverterContext<T>> contextSupplier =
                 () -> {
                     MessageConverterContext<T> context =
                             createStreamContext(streamRequest, contentType, request);
                     context.setFields(streamRequest.getFields());
-                    context.setProteomeId(proteomeId);
                     Stream<T> results = resultSupplier.get();
                     if (contentType.equals(LIST_MEDIA_TYPE)) {
                         context.setEntityIds(results.map(this::getEntityId));

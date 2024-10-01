@@ -18,7 +18,7 @@ import org.uniprot.core.util.Utils;
  */
 public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniParcEntry> {
 
-    private static final ThreadLocal<String> TL_PROTEOME_ID = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> TL_ENTITY_ONLY = new ThreadLocal<>();
 
     public UniParcFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, UniParcEntry.class);
@@ -31,23 +31,22 @@ public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConve
     @Override
     protected void before(
             MessageConverterContext<UniParcEntry> context, OutputStream outputStream) {
-        TL_PROTEOME_ID.set(context.getProteomeId());
+        TL_ENTITY_ONLY.set(context.isEntityOnly());
     }
 
     @Override
     protected void writeEntity(UniParcEntry entity, OutputStream outputStream) throws IOException {
-        String proteomeId = TL_PROTEOME_ID.get();
-        if (Utils.notNullNotEmpty(proteomeId)) {
-            outputStream.write(
-                    (UniParcProteomeFastaParser.toFasta(entity, proteomeId) + "\n").getBytes());
-        } else {
+        Boolean entityOnly = TL_ENTITY_ONLY.get();
+        if (Utils.notNull(entityOnly) && entityOnly) {
             outputStream.write((UniParcFastaParser.toFasta(entity) + "\n").getBytes());
+        } else {
+            outputStream.write((UniParcProteomeFastaParser.toFasta(entity) + "\n").getBytes());
         }
     }
 
     @Override
     protected void cleanUp() {
         super.cleanUp();
-        TL_PROTEOME_ID.remove();
+        TL_ENTITY_ONLY.remove();
     }
 }

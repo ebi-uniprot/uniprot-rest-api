@@ -247,14 +247,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 queryService.searchByProteomeId(getByUpIdRequest, getByUpIdRequest.getUpId());
 
         return super.getSearchResponse(
-                results,
-                getByUpIdRequest.getFields(),
-                false,
-                false,
-                null,
-                getByUpIdRequest.getUpId(),
-                request,
-                response);
+                results, getByUpIdRequest.getFields(), false, false, null, request, response);
     }
 
     @GetMapping(
@@ -272,8 +265,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 () -> queryService.streamByProteomeId(streamRequest, streamRequest.getUpId()),
                 streamRequest,
                 getAcceptHeader(request),
-                request,
-                streamRequest.getUpId());
+                request);
     }
 
     @Override
