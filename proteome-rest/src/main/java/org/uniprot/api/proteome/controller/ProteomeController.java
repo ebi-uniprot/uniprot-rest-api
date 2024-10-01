@@ -28,6 +28,8 @@ import org.uniprot.api.proteome.request.ProteomeSearchRequest;
 import org.uniprot.api.proteome.request.ProteomeStreamRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -84,17 +86,14 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = SEARCH_PROTEOME_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "ProteomeEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            ProteomeEntry.class))),
+                                    schema = @Schema(implementation = SearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -130,6 +129,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = ID_PROTEOME_OPERATION,
+            description = ID_PROTEOME_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -174,17 +174,13 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     @Operation(
             summary = STREAM_PROTEOME_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            ProteomeEntry.class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =

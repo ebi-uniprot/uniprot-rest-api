@@ -60,6 +60,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
             summary = RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION,
+            description = RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -83,6 +84,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION,
+            description = STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -109,6 +111,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION,
+            description = DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

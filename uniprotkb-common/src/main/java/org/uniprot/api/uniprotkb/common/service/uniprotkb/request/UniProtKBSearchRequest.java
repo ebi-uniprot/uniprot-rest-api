@@ -47,7 +47,7 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(description = SIZE_DESCRIPTION)
+    @Parameter(description = SIZE_DESCRIPTION, example = SIZE_EXAMPLE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

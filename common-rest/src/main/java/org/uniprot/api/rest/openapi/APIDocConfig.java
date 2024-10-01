@@ -3,6 +3,7 @@ package org.uniprot.api.rest.openapi;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
-import org.uniprot.core.util.Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,8 +25,12 @@ import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @EnableConfigurationProperties({OpenAPIConfiguration.class})
 public class APIDocConfig {
@@ -73,7 +77,7 @@ public class APIDocConfig {
     @Bean
     public OpenApiCustomiser defaultOpenApiCustomiser(OpenAPIConfiguration openAPIConfiguration) {
         return openAPI -> {
-            if (Utils.notNullNotEmpty(openAPIConfiguration.getServer())) {
+            if (notNullNotEmpty(openAPIConfiguration.getServer())) {
                 Server server = new Server();
                 server.setDescription("UniProt REST API Server");
                 server.setUrl(openAPIConfiguration.getServer());
@@ -109,7 +113,7 @@ public class APIDocConfig {
         if (citationParent != null) {
             configureCitationSchema(openAPI, citationParent);
         }
-
+        customiseSearchResultEntity(openAPI, schemaMap);
         for (Schema item : schemaMap.values()) {
             if ("Evidence".equals(item.getName())) {
                 configureEvidenceSchema(item);
@@ -117,6 +121,60 @@ public class APIDocConfig {
             configureStringTypesSerialisers(item);
         }
         cleanStringSerialiserSchemaObjects(schemaMap);
+    }
+
+    private static void customiseSearchResultEntity(
+            OpenAPI openAPI, Map<String, Schema> schemaMap) {
+        Set<String> resultEntities = getResultEntity(openAPI);
+        if (!resultEntities.isEmpty()) {
+            Schema searchResult = schemaMap.get("SearchResult");
+            setResultsSearchItems(searchResult, resultEntities);
+
+            Schema idMappingResult = schemaMap.get("IdMappingSearchResult");
+            setResultsSearchItems(idMappingResult, resultEntities);
+
+            Schema streamResult = schemaMap.get("StreamResult");
+            setResultsSearchItems(streamResult, resultEntities);
+        } else {
+            log.warn("Unable to customise SearchResult Entity for open API, ");
+        }
+    }
+
+    private static void setResultsSearchItems(Schema resultSchema, Set<String> resultEntities) {
+        if (resultSchema != null) {
+            if (resultEntities.size() > 1) {
+                updateAllOffItemsReference(resultSchema, resultEntities);
+            } else {
+                updateSchemaItemsReference(resultSchema, String.join("", resultEntities));
+            }
+        }
+    }
+
+    private static Set<String> getResultEntity(OpenAPI openAPI) {
+        return openAPI.getPaths().values().stream()
+                .map(PathItem::getGet)
+                .filter(Objects::nonNull)
+                .map(Operation::getResponses)
+                .map(ApiResponses::getDefault)
+                .map(ApiResponse::getDescription)
+                .filter(s -> !s.equals("default response"))
+                .collect(Collectors.toSet());
+    }
+
+    private static void updateAllOffItemsReference(
+            Schema idMappingResult, Set<String> searchEntries) {
+        ArraySchema searchResults = (ArraySchema) idMappingResult.getProperties().get("results");
+        searchResults.setAllOf(new ArrayList<>());
+        for (String searchEntry : searchEntries) {
+            Schema allOfSchema = new Schema();
+            allOfSchema.set$ref("#/components/schemas/" + searchEntry);
+            searchResults.getAllOf().add(allOfSchema);
+        }
+    }
+
+    private static void updateSchemaItemsReference(Schema result, String entity) {
+        ArraySchema searchResults = (ArraySchema) result.getProperties().get("results");
+        searchResults.getItems().set$ref("#/components/schemas/" + entity);
     }
 
     private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {

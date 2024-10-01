@@ -24,6 +24,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -88,17 +90,14 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = SEARCH_UNIPARC_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "UniParcEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
+                                    schema = @Schema(implementation = SearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -140,6 +139,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = ID_UNIPARC_OPERATION,
+            description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -189,17 +189,13 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = STREAM_UNIPARC_OPERATION,
+            description = STREAM_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -249,6 +245,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = ACCESSION_UNIPARC_OPERATION,
+            description = ACCESSION_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -273,6 +270,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -286,6 +284,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = DBID_UNIPARC_OPERATION,
+            description = DBID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -321,6 +320,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {
@@ -334,6 +334,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = PROTEOME_UPID_UNIPARC_OPERATION,
+            description = PROTEOME_UPID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -415,6 +416,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = SEQUENCE_UNIPARC_OPERATION,
+            description = SEQUENCE_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -454,6 +456,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = IDS_UNIPARC_OPERATION,
+            description = IDS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -503,7 +506,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             hidden = true,
-            summary = IDS_UNIPARC_OPERATION,
+            summary = IDS_POST_UNIPARC_OPERATION,
+            description = IDS_POST_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

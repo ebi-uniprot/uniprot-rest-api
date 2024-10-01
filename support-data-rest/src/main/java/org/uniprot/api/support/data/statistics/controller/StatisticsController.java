@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategory;
+import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsHistory;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsResult;
 import org.uniprot.api.support.data.statistics.service.StatisticsService;
 
@@ -21,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Tag(name = TAG_RELEASE_STAT, description = TAG_RELEASE_STAT_DESC)
-@RequestMapping("/statistics/releases")
+@RequestMapping("/statistics")
 public class StatisticsController {
     private final StatisticsService statisticsService;
 
@@ -31,7 +32,8 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = "Get release statistics by UniProt release name and statistics type.",
+            summary = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION,
+            description = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -44,7 +46,7 @@ public class StatisticsController {
                         })
             })
     @GetMapping(
-            value = "/{release}/{statisticType}",
+            value = "/releases/{release}/{statisticType}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
             getAllByVersionAndTypeAndCategoryIn(
@@ -74,5 +76,89 @@ public class StatisticsController {
                         new StatisticsModuleStatisticsResult<>(
                                 statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
                                         release, statisticType, categories)));
+    }
+
+    @Operation(
+            hidden = true,
+            summary = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION,
+            description = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION_DESC,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            StatisticsModuleStatisticsResult.class))
+                        })
+            })
+    @GetMapping(
+            value = "/releases/{release}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsCategory>>
+            getAllByVersionAndCategoryIn(
+                    @Parameter(
+                                    description = RELEASE_NAME_STATS_DESCRIPTION,
+                                    example = RELEASE_NAME_STATS_EXAMPLE,
+                                    required = true)
+                            @PathVariable
+                            String release,
+                    @Parameter(
+                                    description = CATEGORY_STATS_DESCRIPTION,
+                                    example = CATEGORY_STATS_EXAMPLE)
+                            @RequestParam(required = false, defaultValue = "")
+                            Set<String> categories) {
+        return ResponseEntity.ok()
+                .body(
+                        new StatisticsModuleStatisticsResult<>(
+                                statisticsService.findAllByVersionAndCategoryIn(
+                                        release, categories)));
+    }
+
+    @Operation(
+            hidden = true,
+            summary = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION,
+            description = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION_DESC,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            StatisticsModuleStatisticsResult.class))
+                        })
+            })
+    @GetMapping(
+            value = "/history/{attribute}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<StatisticsModuleStatisticsResult<StatisticsModuleStatisticsHistory>>
+            getAllByAttributeAndTypeAndCategory(
+                    @Parameter(
+                                    description = RELEASE_NAME_ATTRIBUTE_DESCRIPTION,
+                                    example = RELEASE_NAME_ATTRIBUTE_EXAMPLE,
+                                    required = true,
+                                    schema =
+                                            @Schema(
+                                                    type = "enum",
+                                                    allowableValues = {"entry"}))
+                            @PathVariable
+                            String attribute,
+                    @Parameter(
+                                    description = TYPE_STATS_DESCRIPTION,
+                                    example = TYPE_STATS_EXAMPLE,
+                                    schema =
+                                            @Schema(
+                                                    type = "enum",
+                                                    allowableValues = {"reviewed", "unreviewed"}))
+                            @RequestParam(required = false, defaultValue = "")
+                            String statisticType) {
+        return ResponseEntity.ok()
+                .body(
+                        new StatisticsModuleStatisticsResult<>(
+                                statisticsService.findAllByAttributeAndStatisticType(
+                                        attribute, statisticType)));
     }
 }
