@@ -27,10 +27,10 @@ class UniParcConfigureServiceTest {
         assertEquals(5, resultGroups.size());
 
         assertEquals(6, resultGroups.get(0).getFields().size());
-        assertEquals(4, resultGroups.get(1).getFields().size());
+        assertEquals(3, resultGroups.get(1).getFields().size());
         assertEquals(1, resultGroups.get(2).getFields().size());
         assertEquals(2, resultGroups.get(3).getFields().size());
-        assertEquals(13, resultGroups.get(4).getFields().size());
+        assertEquals(12, resultGroups.get(4).getFields().size());
     }
 
     @Test

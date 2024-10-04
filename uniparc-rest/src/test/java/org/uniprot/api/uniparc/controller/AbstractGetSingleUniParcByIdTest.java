@@ -21,7 +21,6 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
-import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -48,7 +47,6 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
     protected static final String UPI_PREF = "UPI0000083D";
     protected static String ACCESSION = "P12301";
     protected static String UNIPARC_ID = "UPI0000083D01";
-    private UniParcStoreClient storeClient;
 
     protected abstract String getIdPathValue();
 

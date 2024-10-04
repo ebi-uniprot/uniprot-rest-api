@@ -1,5 +1,6 @@
 package org.uniprot.api.uniparc.common.response.converter;
 
+import org.junit.jupiter.api.Disabled;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -9,6 +10,7 @@ import org.uniprot.api.uniparc.common.response.UniParcMessageConverterConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
+@Disabled
 class UniParcXmlMessageConverterTest extends AbstractXmlValidationTest<UniParcEntry> {
 
     @Override

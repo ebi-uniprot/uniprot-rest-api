@@ -563,7 +563,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
