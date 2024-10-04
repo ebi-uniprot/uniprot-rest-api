@@ -83,7 +83,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = ID_UNIPARC_OPERATION,
+            summary = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -130,7 +130,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             hidden = true,
-            summary = ACCESSION_UNIPARC_OPERATION,
+            summary = ACCESSION_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -202,6 +202,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @Operation(
             hidden = true,
             summary = SEQUENCE_UNIPARC_OPERATION,
+            description = SEQUENCE_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

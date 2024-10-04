@@ -52,6 +52,7 @@ public class UniRefDownloadController extends BasicDownloadController {
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
             summary = JOB_RUN_UNIREF_OPERATION,
+            description = JOB_RUN_UNIREF_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -71,6 +72,7 @@ public class UniRefDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_STATUS_UNIREF_OPERATION,
+            description = JOB_STATUS_UNIREF_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -98,6 +100,7 @@ public class UniRefDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_DETAILS_UNIREF_OPERATION,
+            description = JOB_DETAILS_UNIREF_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

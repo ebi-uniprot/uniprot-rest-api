@@ -48,6 +48,7 @@ public class UniParcDownloadController extends BasicDownloadController {
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
             summary = JOB_RUN_UNIPARC_OPERATION,
+            description = JOB_RUN_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -67,6 +68,7 @@ public class UniParcDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_STATUS_UNIPARC_OPERATION,
+            description = JOB_STATUS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -94,6 +96,7 @@ public class UniParcDownloadController extends BasicDownloadController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = JOB_DETAILS_UNIPARC_OPERATION,
+            description = JOB_DETAILS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

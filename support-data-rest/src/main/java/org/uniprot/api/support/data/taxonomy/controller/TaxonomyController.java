@@ -23,6 +23,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -70,6 +72,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = ID_TAX_OPERATION,
+            description = ID_TAX_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -120,6 +123,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     @Operation(
             hidden = true,
             summary = IDS_TAX_OPERATION,
+            description = IDS_TAX_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -159,17 +163,14 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = SEARCH_TAX_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "TaxonomyEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            TaxonomyEntry.class))),
+                                    schema = @Schema(implementation = SearchResult.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
@@ -193,17 +194,13 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     @Operation(
             summary = STREAM_TAX_OPERATION,
+            description = STREAM_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            TaxonomyEntry.class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),

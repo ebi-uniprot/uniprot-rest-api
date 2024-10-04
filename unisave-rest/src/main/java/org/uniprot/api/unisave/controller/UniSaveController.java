@@ -57,6 +57,7 @@ public class UniSaveController {
 
     @Operation(
             summary = ID_UNISAVE_OPERATION,
+            description = ID_UNISAVE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -105,6 +106,7 @@ public class UniSaveController {
 
     @Operation(
             summary = DIFF_UNISAVE_OPERATION,
+            description = DIFF_UNISAVE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -144,6 +146,7 @@ public class UniSaveController {
 
     @Operation(
             summary = STATUS_UNISAVE_OPERATION,
+            description = STATUS_UNISAVE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

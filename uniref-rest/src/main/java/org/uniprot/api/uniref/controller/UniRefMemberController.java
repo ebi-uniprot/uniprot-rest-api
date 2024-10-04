@@ -62,6 +62,7 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
             })
     @Operation(
             summary = ID_UNIREF_MEMBER_OPERATION,
+            description = ID_UNIREF_MEMBER_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

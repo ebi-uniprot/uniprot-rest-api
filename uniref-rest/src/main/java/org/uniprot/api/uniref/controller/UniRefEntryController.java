@@ -71,6 +71,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             })
     @Operation(
             summary = ID_UNIREF_OPERATION,
+            description = ID_UNIREF_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

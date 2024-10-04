@@ -161,6 +161,10 @@ class UniProtKBPublicationControllerIT {
                                         "source P12312")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
+                                "$.results[0].references[*].communityAnnotation.submissionDate",
+                                contains("2024-09-16")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[0].statistics.reviewedProteinCount", is(10)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(

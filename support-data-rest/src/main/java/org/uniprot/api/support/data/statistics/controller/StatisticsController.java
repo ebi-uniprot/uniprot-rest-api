@@ -32,8 +32,8 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary =
-                    GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_AND_STATISTICS_TYPE_DESCRIPTION,
+            summary = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION,
+            description = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_AND_STATISTICS_TYPE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -80,7 +80,8 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = GET_RELEASE_STATISTICS_BY_UNI_PROT_RELEASE_NAME_DESCRIPTION,
+            summary = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION,
+            description = GET_RELEASE_STATISTICS_BY_RELEASE_NAME_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -117,7 +118,8 @@ public class StatisticsController {
 
     @Operation(
             hidden = true,
-            summary = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_DESCRIPTION,
+            summary = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION,
+            description = GET_HISTORY_BY_ATTRIBUTE_AND_STATISTICS_TYPE_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

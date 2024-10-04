@@ -36,7 +36,7 @@ public class GroupByGOController extends GroupByController {
         this.uniProtKBGroupByGoService = uniProtKBGroupByGoService;
     }
 
-    @Operation(hidden = true, summary = GROUP_GO_DESCRIPTION)
+    @Operation(hidden = true, summary = GROUP_GO_OPERATION, description = GROUP_GO_OPERATION_DESC)
     @ApiResponse(
             content =
                     @Content(

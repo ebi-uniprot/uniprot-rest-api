@@ -25,6 +25,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -91,6 +93,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             summary = ID_UNIREF_LIGHT_OPERATION,
+            description = ID_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -143,17 +146,14 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             summary = SEARCH_UNIREF_LIGHT_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "UniRefEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniRefEntry.class))),
+                                    schema = @Schema(implementation = SearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -204,12 +204,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniRefEntry.class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -261,6 +256,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     @Operation(
             hidden = true,
             summary = IDS_UNIREF_LIGHT_OPERATION,
+            description = IDS_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -299,7 +295,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             hidden = true,
-            summary = IDS_UNIREF_LIGHT_OPERATION,
+            summary = IDS_POST_UNIREF_LIGHT_OPERATION,
+            description = IDS_POST_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
