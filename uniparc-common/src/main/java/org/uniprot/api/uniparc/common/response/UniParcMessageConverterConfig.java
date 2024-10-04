@@ -14,9 +14,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
-import org.uniprot.api.uniparc.common.response.converter.UniParcFastaMessageConverter;
-import org.uniprot.api.uniparc.common.response.converter.UniParcLightFastaMessageConverter;
-import org.uniprot.api.uniparc.common.response.converter.UniParcXmlMessageConverter;
+import org.uniprot.api.uniparc.common.response.converter.*;
 import org.uniprot.core.json.parser.uniparc.UniParcCrossRefJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcEntryLightJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
@@ -92,6 +90,7 @@ public class UniParcMessageConverterConfig {
                                 uniParcCrossRefReturnField,
                                 downloadGatekeeper);
                 converters.add(2, uniParcCrossRefJsonConverter);
+                converters.add(3, new UniParcCrossReferenceXMLConverter());
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniParcCrossReference.class,
@@ -126,7 +125,8 @@ public class UniParcMessageConverterConfig {
                                 UniParcEntryLight.class,
                                 returnFieldConfig,
                                 downloadGatekeeper);
-                converters.add(0, uniparcLightJsonConverter);
+                converters.add(4, uniparcLightJsonConverter);
+                converters.add(5, new UniParcLightXMLMessageConverter("", downloadGatekeeper));
             }
         };
     }
@@ -163,7 +163,8 @@ public class UniParcMessageConverterConfig {
                         uniParcLightContext(UniProtMediaType.XLS_MEDIA_TYPE),
                         uniParcLightContext(UniProtMediaType.RDF_MEDIA_TYPE),
                         uniParcLightContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
-                        uniParcLightContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                        uniParcLightContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE),
+                        uniParcLightContext(MediaType.APPLICATION_XML))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -180,6 +181,7 @@ public class UniParcMessageConverterConfig {
                 uniParcCrossRefContext(UniProtMediaType.TSV_MEDIA_TYPE));
         contextFactory.addMessageConverterContext(
                 uniParcCrossRefContext(UniProtMediaType.XLS_MEDIA_TYPE));
+        contextFactory.addMessageConverterContext(uniParcCrossRefContext(MediaType.APPLICATION_XML));
         return contextFactory;
     }
 
@@ -200,7 +202,7 @@ public class UniParcMessageConverterConfig {
     private MessageConverterContext<UniParcCrossReference> uniParcCrossRefContext(
             MediaType contentType) {
         return MessageConverterContext.<UniParcCrossReference>builder()
-                .resource(MessageConverterContextFactory.Resource.UNIPARC)
+                .resource(MessageConverterContextFactory.Resource.CROSSREF)
                 .contentType(contentType)
                 .build();
     }
