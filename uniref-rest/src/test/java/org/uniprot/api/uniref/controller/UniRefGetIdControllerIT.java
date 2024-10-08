@@ -32,7 +32,7 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
@@ -63,7 +63,7 @@ import org.uniprot.store.search.SolrCollection;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniRefGetIdControllerIT.UniRefGetIdParameterResolver.class,
+            UniRefGetIdControllerIT.UniRefGetByIdParameterResolver.class,
             UniRefGetIdControllerIT.UniRefGetIdContentTypeParamResolver.class
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -141,7 +141,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 });
     }
 
-    static class UniRefGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class UniRefGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {

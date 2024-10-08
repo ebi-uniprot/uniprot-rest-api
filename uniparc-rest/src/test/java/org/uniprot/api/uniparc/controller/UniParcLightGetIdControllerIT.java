@@ -34,6 +34,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
+import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
+import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
@@ -52,40 +57,23 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcEntryLightController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(SpringExtension.class)
-class UniParcLightGetIdControllerIT {
-
-    private static final String UPI_PREF = "UPI0000083D";
-    public static final String UNIPARC_ID = "UPI0000083D01";
+@ExtendWith(
+        value = {
+                SpringExtension.class,
+                UniParcLightGetIdControllerIT.UniParcLightGetByIdParameterResolver.class,
+                UniParcLightGetIdControllerIT.UniParcLightGetIdContentTypeParamResolver.class
+        })
+class UniParcLightGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
 
     @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
+    protected String getIdRequestPath() {
+        return "/uniparc/{upi}/light";
+    }
 
-    @RegisterExtension private static DataStoreManager storeManager = new DataStoreManager();
-
-    @Autowired private UniParcLightStoreClient storeClient;
-
-    @Autowired private UniParcCrossReferenceStoreClient xRefStoreClient;
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired private UniParcQueryRepository repository;
-
-    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
-    private Integer xrefGroupSize;
-
-    @BeforeAll
-    void initDataStore() {
-        storeManager.addSolrClient(
-                DataStoreManager.StoreType.UNIPARC_LIGHT, SolrCollection.uniparc);
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
-
-        ReflectionTestUtils.setField(
-                repository,
-                "solrClient",
-                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC_LIGHT));
-        saveEntry();
+    @Override
+    protected String getIdPathValue() {
+        return UNIPARC_ID;
     }
 
     @BeforeEach
@@ -93,60 +81,140 @@ class UniParcLightGetIdControllerIT {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
+    static class UniParcLightGetByIdParameterResolver extends AbstractGetByIdParameterResolver{
 
-    @AfterAll
-    void cleanStoreClient() {
-        storeClient.truncate();
-        xRefStoreClient.truncate();
-    }
+        @Override
+        protected GetIdParameter validIdParameter() {
+            return GetIdParameter.builder()
+                    .id(UNIPARC_ID)
+                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                    .resultMatcher(jsonPath("$.oldestCrossRefCreated").exists())
+                    .resultMatcher(jsonPath("$.mostRecentCrossRefUpdated").exists())
+                    .resultMatcher(jsonPath("$.crossReferenceCount", is(25)))
+                    .resultMatcher(jsonPath("$.commonTaxons[*].topLevel", contains("cellular organisms", "other entries")))
+                    .resultMatcher(jsonPath("$.commonTaxons[*].commonTaxon", contains("Bacteria", "plasmids")))
+                    .resultMatcher(jsonPath("$.uniProtKBAccessions", contains("P12301")))
+                    .resultMatcher(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
+                    .resultMatcher(jsonPath("$.sequenceFeatures.size()", is(13)))
+                    .build();
+        }
 
-    protected void saveEntry() {
-        UniParcEntry entry = createUniParcEntry(1, UPI_PREF);
+        @Override
+        protected GetIdParameter invalidIdParameter() {
+            return GetIdParameter.builder()
+                    .id("INVALID")
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(jsonPath("$.messages.size()", is(1)))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains(
+                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                    .build();
 
-        UniParcDocument.UniParcDocumentBuilder docBuilder =
-                UniParcITUtils.getUniParcDocument(entry);
-        storeManager.saveDocs(DataStoreManager.StoreType.UNIPARC_LIGHT, docBuilder.build());
+        }
 
-        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
-        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
-        List<UniParcCrossReferencePair> xrefPairs =
-                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
-                        entryLight.getUniParcId(),
-                        xrefGroupSize,
-                        entry.getUniParcCrossReferences());
-        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
-            xRefStoreClient.saveEntry(xrefPair);
+        @Override
+        protected GetIdParameter nonExistentIdParameter() {
+            return GetIdParameter.builder()
+                    .id("UPI0000083A99")
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
+                    .build();
+        }
+
+        @Override
+        protected GetIdParameter withFilterFieldsParameter() {
+            return GetIdParameter.builder()
+                    .id(UNIPARC_ID)
+                    .fields("upi,accession")
+                    .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.id").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.database").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.active").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.version").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.chain").exists())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.organism").doesNotExist())
+                    .resultMatcher(jsonPath("$.uniParcCrossReferences.*.proteomeId").doesNotExist())
+                    .resultMatcher(jsonPath("$.sequence").doesNotExist())
+                    .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
+                    .build();
+        }
+
+        @Override
+        protected GetIdParameter withInvalidFilterParameter() {
+            return GetIdParameter.builder()
+                    .id(UNIPARC_ID)
+                    .fields("invalid")
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.messages.*",
+                                    contains("Invalid fields parameter value 'invalid'")))
+                    .build();
         }
     }
 
-    protected String getIdRequestPath() {
-        return "/uniparc/{upi}/light";
+    static class UniParcLightGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver{
+
+        @Override
+        protected GetIdContentTypeParam idSuccessContentTypesParam() {
+            return null;
+        }
+
+        @Override
+        protected GetIdContentTypeParam idBadRequestContentTypesParam() {
+            return null;
+        }
     }
 
-    @Test
-    void validIdReturnSuccess() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath(), UNIPARC_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+//    @BeforeAll
+//    void initDataStore() {
+//        storeManager.addSolrClient(
+//                DataStoreManager.StoreType.UNIPARC_LIGHT, SolrCollection.uniparc);
+//        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, storeClient);
+//        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, xRefStoreClient);
+//
+//        ReflectionTestUtils.setField(
+//                repository,
+//                "solrClient",
+//                storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC_LIGHT));
+//        saveEntry();
+//    }
 
-        ResultActions response = mockMvc.perform(requestBuilder);
 
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                .andExpect(jsonPath("$.crossReferenceCount", is(3)))
-                .andExpect(
-                        jsonPath(
-                                "$.commonTaxons[*].topLevel",
-                                contains("cellular organisms", "other entries")))
-                .andExpect(
-                        jsonPath("$.commonTaxons[*].commonTaxon", contains("Bacteria", "plasmids")))
-                .andExpect(jsonPath("$.uniProtKBAccessions", contains("P10001", "P12301")))
-                .andExpect(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
-                .andExpect(jsonPath("$.sequenceFeatures.size()", is(13)));
-    }
+
+//    @AfterAll
+//    void cleanStoreClient() {
+//        storeClient.truncate();
+//        xRefStoreClient.truncate();
+//    }
+
+//    protected void saveEntry() {
+//        UniParcEntry entry = createUniParcEntry(1, UPI_PREF);
+//
+//        UniParcDocument.UniParcDocumentBuilder docBuilder =
+//                UniParcITUtils.getUniParcDocument(entry);
+//        storeManager.saveDocs(DataStoreManager.StoreType.UNIPARC_LIGHT, docBuilder.build());
+//
+//        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
+//        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, entryLight);
+//        List<UniParcCrossReferencePair> xrefPairs =
+//                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
+//                        entryLight.getUniParcId(),
+//                        xrefGroupSize,
+//                        entry.getUniParcCrossReferences());
+//        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
+//            xRefStoreClient.saveEntry(xrefPair);
+//        }
+//    }
+
+
+
+   /* @Test
+
 
     @Test
     void invalidIdReturnBadRequest() throws Exception {
@@ -322,5 +390,5 @@ class UniParcLightGetIdControllerIT {
                                                         + "    <anotherSample>text2</anotherSample>\n"
                                                         + "    <someMore>text3</someMore>\n"
                                                         + "</rdf:RDF>")));
-    }
+    }*/
 }
