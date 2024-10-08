@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,11 +20,11 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class MapDownloadControllerIT extends AbstractDownloadControllerIT {
+public abstract class MapToDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Autowired protected MapAsyncConfig mapAsyncConfig;
     @Autowired protected SolrClient solrClient;
-    @Autowired protected MapToDownloadJobRepository mapDownloadJobRepository;
+    @Autowired protected MapToDownloadJobRepository mapToDownloadJobRepository;
     @Autowired protected MockMvc mockMvc;
 
     protected void initBeforeAll() throws Exception {
@@ -83,11 +84,26 @@ public abstract class MapDownloadControllerIT extends AbstractDownloadController
     }
 
     protected DownloadJobRepository getDownloadJobRepository() {
-        return this.mapDownloadJobRepository;
+        return this.mapToDownloadJobRepository;
     }
 
     @Override
     protected TestAsyncConfig getTestAsyncConfig() {
         return mapAsyncConfig;
+    }
+
+    @Override
+    protected @NotNull String getJobHashAlreadyFinished() {
+        return "7a2333c31382de4421a2e103c1d83fcfa730c7f6";
+    }
+
+    @Override
+    protected @NotNull String getJobHashForForceOnFailedJobAfterMaxRetryWillRunAgain() {
+        return "8251d3411850c4410b05de6b7078302a1367d93c";
+    }
+
+    @Override
+    protected @NotNull String getJobHashForForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() {
+        return "f4a367d599f94183aac3d6c61143f6fea0c0f105";
     }
 }

@@ -23,7 +23,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
             RedisConfigTest.class
         })
 @EnableConfigurationProperties({MapToDownloadConfigProperties.class})
-public class UniProtKBMapToProducerMessageServiceIT
+public class UniProtKToUnRefMapProducerMessageServiceIT
         extends MapToProducerMessageServiceIT<UniProtKBToUniRefDownloadRequest> {
     @Autowired private UniProtKBMapToProducerMessageService service;
 

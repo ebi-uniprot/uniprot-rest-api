@@ -94,7 +94,7 @@ public class MapToRabbitMQConfig {
 
     @Bean
     public HashGenerator<UniProtKBToUniRefDownloadRequest> mapDownloadHashGenerator(
-            @Value("${async.download.map.hash.salt}") String hashSalt) {
+            @Value("${async.download.mapto.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new MapToDownloadRequestToArrayConverter<>(), hashSalt);
     }
 }

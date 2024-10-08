@@ -62,7 +62,7 @@ import com.jayway.jsonpath.JsonPath;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBToUniRefDownloadControllerIT extends MapDownloadControllerIT {
+class UniProtKBToUniRefToDownloadControllerIT extends MapToDownloadControllerIT {
 
     @Qualifier("uniProtKBFacetTupleStreamTemplate")
     @Autowired

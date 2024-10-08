@@ -9,8 +9,8 @@ import org.uniprot.api.async.download.service.mapto.MapToJobService;
 public class UniProtKBMapToJobSubmissionRules
         extends MapToJobSubmissionRules<UniProtKBToUniRefDownloadRequest> {
     protected UniProtKBMapToJobSubmissionRules(
-            @Value("${async.download.map.retryMaxCount}") int maxRetryCount,
-            @Value("${async.download.map.waitingMaxTime}") int maxWaitingTime,
+            @Value("${async.download.mapto.retryMaxCount}") int maxRetryCount,
+            @Value("${async.download.mapto.waitingMaxTime}") int maxWaitingTime,
             MapToJobService jobService) {
         super(maxRetryCount, maxWaitingTime, jobService);
     }

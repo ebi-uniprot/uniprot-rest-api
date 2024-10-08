@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.messaging.producer.mapto;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -57,4 +58,24 @@ public abstract class MapToProducerMessageServiceIT<T extends MapToDownloadReque
         "org.uniprot.api.async.download.messaging.producer.mapto"
     })
     static class MapProducerTestConfig {}
+
+    @Override
+    protected @NotNull String getJobHashForSuccess() {
+        return "7df83695b95d9ff02f48227ef77d433da524e29f";
+    }
+
+    @Override
+    protected @NotNull String getJobHashForSuccessForceAndIdleJobAllowedAndCleanResources() {
+        return "394c4291a376a0abcc0970e98df9e9a508b08097";
+    }
+
+    @Override
+    protected @NotNull String getJobHashForWithoutFormatDefaultToJson() {
+        return "5109e0bb83845063663bd7e6862610269490f298";
+    }
+
+    @Override
+    protected @NotNull String getJobHashForAlreadyRunning() {
+        return "5762160d06e543cf019fad87a720d8676d5410d6";
+    }
 }

@@ -81,7 +81,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @Test
     void onMessage_jobCurrentlyRunning() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         Message message = new Message("body".getBytes(), messageHeader);
@@ -98,7 +98,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @Test
     void onMessage_alreadyFinished() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         Message message = new Message("body".getBytes(), messageHeader);
@@ -116,7 +116,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @Test
     void onMessage_retryLoop() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         messageHeader.setHeader(CURRENT_RETRIED_COUNT_HEADER, 1);
@@ -180,7 +180,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @Test
     void onMessage_successOnRemainingAttempt() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         messageHeader.setHeader(CURRENT_RETRIED_COUNT_HEADER, 1);
@@ -214,7 +214,8 @@ public abstract class SolrIdMessageConsumerIT<
         return downloadJobRepository.findById(id).get().getStatus();
     }
 
-    private void createIdAndResultFiles(String id) throws Exception {
+    private void createAllFiles(String id) throws Exception {
+        createFromIdFile(id);
         createIdFile(id);
         createResultFile(id);
     }
@@ -226,6 +227,10 @@ public abstract class SolrIdMessageConsumerIT<
 
     private void createIdFile(String jobId) throws Exception {
         createFile(downloadConfigProperties.getIdFilesFolder(), jobId);
+    }
+
+    private void createFromIdFile(String jobId) throws Exception {
+        createFile(downloadConfigProperties.getFromIdFilesFolder(), jobId);
     }
 
     private void createFile(String folder, String fileName) throws Exception {

@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 
 @Component
-public class MapToToDownloadJobPartialUpdateRepositoryImpl
+public class MapToDownloadJobPartialUpdateRepositoryImpl
         extends AbstractDownloadJobPartialUpdateRepository<MapToDownloadJob>
         implements MapToDownloadJobPartialUpdateRepository {
-    public MapToToDownloadJobPartialUpdateRepositoryImpl(
+    public MapToDownloadJobPartialUpdateRepositoryImpl(
             RedisKeyValueTemplate redisKeyValueTemplate) {
         super(redisKeyValueTemplate, MapToDownloadJob.class);
     }

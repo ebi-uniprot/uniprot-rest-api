@@ -23,20 +23,17 @@ public abstract class MapToIdRequestProcessor<T extends MapToDownloadRequest>
 
     @Override
     public void process(T request) {
-        writeToIdentifiers(request, getFromIds(request));
+        writeToIdentifiers(request);
     }
 
-    private void writeToIdentifiers(T request, Stream<String> ids) {
-        String query = getQuery(ids);
-        updateTotalEntries(request, getSolrHits(query));
-        writeIdentifiers(request, mapIds(query));
+    private void writeToIdentifiers(T request) {
+        updateTotalEntries(request, getSolrHits(getFromIds(request)));
+        writeIdentifiers(request, mapIds(getFromIds(request)));
     }
 
-    protected abstract long getSolrHits(String query);
+    protected abstract long getSolrHits(Stream<String> query);
 
-    protected abstract String getQuery(Stream<String> ids);
-
-    protected abstract Stream<String> mapIds(String query);
+    protected abstract Stream<String> mapIds(Stream<String> query);
 
     private void writeIdentifiers(T request, Stream<String> ids) {
         fileHandler.writeIds(request.getDownloadJobId(), ids);

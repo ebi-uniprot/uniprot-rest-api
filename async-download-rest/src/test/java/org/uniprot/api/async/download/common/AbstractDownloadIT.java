@@ -99,6 +99,7 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @AfterAll
     public void cleanUpData() throws Exception {
+        cleanUpFolder(getTestAsyncConfig().getFromIdsFolder());
         cleanUpFolder(getTestAsyncConfig().getIdsFolder());
         cleanUpFolder(getTestAsyncConfig().getResultFolder());
         getDownloadJobRepository().deleteAll();

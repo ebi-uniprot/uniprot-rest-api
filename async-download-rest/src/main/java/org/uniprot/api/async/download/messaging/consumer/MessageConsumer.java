@@ -101,7 +101,7 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
     }
 
     private boolean isConsumedBefore(R downloadJob) {
-        return fileHandler.areIdAndResultFilesPresent(downloadJob.getId())
+        return fileHandler.areAllFilesPresent(downloadJob.getId())
                 && ERROR != downloadJob.getStatus();
     }
 

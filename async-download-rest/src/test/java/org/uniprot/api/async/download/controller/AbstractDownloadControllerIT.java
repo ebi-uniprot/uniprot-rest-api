@@ -259,7 +259,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void submitJobAlreadyFinished() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "alreadyFinishedQuery";
-        String jobId = "ffe6065308aaf065329b3eb4d0b7e4c64cbf6108";
+        String jobId = getJobHashAlreadyFinished();
 
         DownloadJob job =
                 getDownloadJob(
@@ -280,12 +280,17 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                                         "Job with id " + jobId + " has already been submitted")));
     }
 
+    @NotNull
+    protected String getJobHashAlreadyFinished() {
+        return "ffe6065308aaf065329b3eb4d0b7e4c64cbf6108";
+    }
+
     @Test
     protected void resubmit_withForceOnFailedJobBeforeMaxRetryWillReturnJobRunning()
             throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "retryingAgain";
-        String jobId = "adc348da40f5426ee9ed5456b1ca6aeefbe24a6c";
+        String jobId = getJobHashForForceOnFailedJobBeforeMaxRetryWillReturnJobRunning();
 
         DownloadJob job =
                 getDownloadJob(
@@ -313,11 +318,16 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                                         "Job with id " + jobId + " has already been submitted")));
     }
 
+    @NotNull
+    protected String getJobHashForForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() {
+        return "adc348da40f5426ee9ed5456b1ca6aeefbe24a6c";
+    }
+
     @Test
     protected void resubmit_withForceOnFailedJobAfterMaxRetryWillRunAgain() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "*:*";
-        String jobId = "79e028f4feb1b97956152356aa92bb12aa95d8b7";
+        String jobId = getJobHashForForceOnFailedJobAfterMaxRetryWillRunAgain();
 
         // Create Error Job in Redis
         DownloadJob job =
@@ -367,6 +377,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andExpect(jsonPath("$.totalEntries", equalTo(12)))
                 .andExpect(jsonPath("$.processedEntries", equalTo(12)));
         verifyIdsAndResultFiles(jobId);
+    }
+
+    @NotNull
+    protected String getJobHashForForceOnFailedJobAfterMaxRetryWillRunAgain() {
+        return "79e028f4feb1b97956152356aa92bb12aa95d8b7";
     }
 
     @Test

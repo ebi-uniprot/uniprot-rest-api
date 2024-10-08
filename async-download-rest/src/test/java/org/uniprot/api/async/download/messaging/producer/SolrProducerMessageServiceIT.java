@@ -5,6 +5,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.valueOf;
 
 import java.time.LocalDateTime;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
@@ -32,7 +33,7 @@ public abstract class SolrProducerMessageServiceIT<
 
         String jobId = getService().sendMessage(request);
 
-        assertEquals("e0457b3cf8130f3d374bf4e889ef01586caf6a51", jobId);
+        assertEquals(getJobHashForSuccess(), jobId);
         Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
                 .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
@@ -46,10 +47,15 @@ public abstract class SolrProducerMessageServiceIT<
         validateDownloadJob(jobId, downloadJob, request);
     }
 
+    @NotNull
+    protected String getJobHashForSuccess() {
+        return "e0457b3cf8130f3d374bf4e889ef01586caf6a51";
+    }
+
     @Test
     void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         T request = getSuccessDownloadRequestWithForce();
-        String jobId = "f98973831cfe2ba1a41cfb08151047f0c1a0d4f9";
+        String jobId = getJobHashForSuccessForceAndIdleJobAllowedAndCleanResources();
 
         // Reproduce Idle Job in Running Status in and files created
         createJobFiles(jobId);
@@ -78,11 +84,16 @@ public abstract class SolrProducerMessageServiceIT<
         assertFalse(getMapFileHandler().isResultFilePresent(jobId));
     }
 
+    @NotNull
+    protected String getJobHashForSuccessForceAndIdleJobAllowedAndCleanResources() {
+        return "f98973831cfe2ba1a41cfb08151047f0c1a0d4f9";
+    }
+
     @Test
     void sendMessage_jobAlreadyRunningAndNotAllowed() {
         T request = getAlreadyRunningRequest();
 
-        String jobId = "bca57aa8e6ae2c6ab771633215666a23d725c738";
+        String jobId = getJobHashForAlreadyRunning();
         R runningJob = getDownloadJob(jobId, LocalDateTime.now(), request);
         getMapDownloadJobRepository().save(runningJob);
 
@@ -95,11 +106,16 @@ public abstract class SolrProducerMessageServiceIT<
                 submissionError.getMessage());
     }
 
+    @NotNull
+    protected String getJobHashForAlreadyRunning() {
+        return "bca57aa8e6ae2c6ab771633215666a23d725c738";
+    }
+
     @Test
     void sendMessage_WithoutFormatDefaultToJson() {
         T request = getWithoutFormatRequest();
 
-        String jobId = "d93243dd48e4a179052fd42f8478a3e2b9902327";
+        String jobId = getJobHashForWithoutFormatDefaultToJson();
         String resultJobId = getService().sendMessage(request);
         assertEquals(jobId, resultJobId);
         request.setFormat("json");
@@ -108,6 +124,11 @@ public abstract class SolrProducerMessageServiceIT<
                 .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
         validateMessage(message, jobId, request);
+    }
+
+    @NotNull
+    protected String getJobHashForWithoutFormatDefaultToJson() {
+        return "d93243dd48e4a179052fd42f8478a3e2b9902327";
     }
 
     protected abstract R getDownloadJob(String jobId, LocalDateTime idleSince, T request);
