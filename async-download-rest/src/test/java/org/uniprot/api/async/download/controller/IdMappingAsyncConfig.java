@@ -17,8 +17,16 @@ public class IdMappingAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.idmapping.result.idFilesFolder}")
     private String idsFolder;
 
+    @Value("${async.download.idmapping.result.fromIdFilesFolder}")
+    private String fromIdsFolder;
+
     @Value("${async.download.idmapping.result.resultFilesFolder}")
     private String resultFolder;
+
+    @Override
+    public String getFromIdsFolder() {
+        return fromIdsFolder;
+    }
 
     @Override
     public String getIdsFolder() {

@@ -9,7 +9,6 @@ import org.uniprot.api.async.download.model.job.DownloadJob;
 public class AbstractDownloadJobPartialUpdateRepository<R extends DownloadJob>
         implements DownloadJobPartialUpdateRepository {
     private final RedisKeyValueTemplate redisKeyValueTemplate;
-
     private final Class<R> type;
 
     public AbstractDownloadJobPartialUpdateRepository(

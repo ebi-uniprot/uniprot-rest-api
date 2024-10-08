@@ -47,6 +47,6 @@ class IdMappingMessageConsumerTest
 
     @Override
     protected void mockFileExistence() {
-        when(fileHandler.isResultFilePresent(ID)).thenReturn(true);
+        when(fileHandler.areAllFilesPresent(ID)).thenReturn(true);
     }
 }

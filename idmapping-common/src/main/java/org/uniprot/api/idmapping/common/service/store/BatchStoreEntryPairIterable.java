@@ -84,7 +84,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         if (tos.size() >= 100) { // temp code block
             logTiming(tos.size(), start, end);
         }
-        // entry -> map <entryId, entry>
+        // entry -> mapto <entryId, entry>
         Map<String, S> idEntryMap =
                 entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));
 

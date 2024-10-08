@@ -284,7 +284,7 @@ public abstract class BasicIdService<T, U> {
                         .map(IdMappingStringPair::getTo)
                         .collect(Collectors.toSet());
         Stream<T> entries = getEntries(new ArrayList<>(toIds), searchRequest.getFields());
-        // accession -> entry map
+        // accession -> entry mapto
         Map<String, T> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry
         return mappedIdsInPage.stream().map(mId -> convertToPair(mId, idEntryMap));
@@ -294,7 +294,7 @@ public abstract class BasicIdService<T, U> {
      * This method is responsible to sort mappedIdPairs by solrToIds.
      *
      * <p>Initially we create a Map<To,List<From>> to expose our order attribute "to" Then we
-     * iterate over solrToIds (that is our sort reference) and map to all possible "from" that was
+     * iterate over solrToIds (that is our sort reference) and mapto to all possible "from" that was
      * previously created (Map<To,List<From>>).
      *
      * @param mappedIdPairs Mapped Ids returned by PIR service

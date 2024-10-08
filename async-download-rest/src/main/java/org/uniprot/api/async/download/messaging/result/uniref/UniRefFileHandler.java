@@ -12,4 +12,9 @@ public class UniRefFileHandler extends FileHandler {
             UniRefHeartbeatProducer uniRefHeartbeatProducer) {
         super(uniRefDownloadConfigProperties, uniRefHeartbeatProducer);
     }
+
+    @Override
+    public boolean areAllFilesPresent(String jobId) {
+        return super.areIdAndResultFilesPresent(jobId);
+    }
 }
