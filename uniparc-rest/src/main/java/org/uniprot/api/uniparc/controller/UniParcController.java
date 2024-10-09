@@ -388,12 +388,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntry.class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
