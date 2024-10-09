@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniParcController.class)
+@WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
@@ -237,11 +237,11 @@ class UniParcProteomeStreamControllerIT extends UniParcStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcCrossReferences.*.geneName",
-                                hasItems("geneName01", "geneName02")))
+                                empty()))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.uniParcCrossReferences.*.organism.taxonId",
-                                hasItems(9606, 7787, 9606, 7787)))
+                                empty()))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
     }
