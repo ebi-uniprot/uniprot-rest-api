@@ -21,6 +21,7 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
 import org.uniprot.api.help.centre.service.HelpCentreService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -28,7 +29,6 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -98,15 +98,11 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
             description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "HelpCentreEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            HelpCentreEntry.class)))
+                                    schema = @Schema(implementation = SearchResult.class))
                         })
             })
     @GetMapping(

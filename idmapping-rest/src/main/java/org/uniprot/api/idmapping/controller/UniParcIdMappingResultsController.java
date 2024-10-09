@@ -33,6 +33,8 @@ import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.IdMappingSearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -90,16 +92,11 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "UniParcEntryPair",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntryPair
-                                                                                    .class))),
+                                    schema = @Schema(implementation = IdMappingSearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -151,13 +148,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntryPair
-                                                                                    .class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
