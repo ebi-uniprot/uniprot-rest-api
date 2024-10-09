@@ -8,7 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.controller.ControllerITUtils.*;
+import static org.uniprot.api.rest.controller.ControllerITUtils.CACHE_VALUE;
+import static org.uniprot.api.rest.controller.ControllerITUtils.verifyIdContentTypes;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 import org.junit.jupiter.api.BeforeAll;

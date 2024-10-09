@@ -23,8 +23,8 @@ import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -41,7 +41,7 @@ import org.uniprot.store.search.document.help.HelpDocument;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            ReleaseNotesGetIdControllerIT.ReleaseNotesGetIdParameterResolver.class,
+            ReleaseNotesGetIdControllerIT.ReleaseNotesGetByIdParameterResolver.class,
             ReleaseNotesGetIdControllerIT.ReleaseNotesGetIdContentTypeParamResolver.class
         })
 class ReleaseNotesGetIdControllerIT extends AbstractGetByIdControllerIT {
@@ -93,7 +93,7 @@ class ReleaseNotesGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Disabled
     void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {}
 
-    static class ReleaseNotesGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class ReleaseNotesGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {

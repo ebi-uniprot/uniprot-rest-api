@@ -8,33 +8,39 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappin
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.idmapping.common.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.idmapping.common.service.store.impl.UniParcBatchStoreEntryPairIterable;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.api.idmapping.common.service.store.impl.UniParcLightBatchStoreEntryPairIterable;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
-public class UniParcIdMappingBatchResultStreamer
-        extends IdMappingBatchResultStreamer<UniParcEntry, UniParcEntryPair> {
-    protected final StoreStreamerConfig<UniParcEntry> storeStreamerConfig;
+public class UniParcLightIdMappingBatchResultStreamer
+        extends IdMappingBatchResultStreamer<UniParcEntryLight, UniParcEntryLightPair> {
+    protected final StoreStreamerConfig<UniParcEntryLight> storeStreamerConfig;
+    private final UniParcCrossReferenceLazyLoader lazyLoader;
 
-    protected UniParcIdMappingBatchResultStreamer(
+    protected UniParcLightIdMappingBatchResultStreamer(
             IdMappingHeartbeatProducer heartbeatProducer,
             IdMappingJobService jobService,
-            StoreStreamerConfig<UniParcEntry> storeStreamerConfig) {
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,
+            UniParcCrossReferenceLazyLoader lazyLoader) {
         super(heartbeatProducer, jobService);
-        this.storeStreamerConfig = storeStreamerConfig;
+        this.storeStreamerConfig = storeLightStreamerConfig;
+        this.lazyLoader = lazyLoader;
     }
 
     @Override
-    public BatchStoreEntryPairIterable<UniParcEntryPair, UniParcEntry>
+    public BatchStoreEntryPairIterable<UniParcEntryLightPair, UniParcEntryLight>
             getBatchStoreEntryPairIterable(
                     Iterator<IdMappingStringPair> mappedIds, IdMappingDownloadRequest request) {
-        return new UniParcBatchStoreEntryPairIterable(
+        return new UniParcLightBatchStoreEntryPairIterable(
                 mappedIds,
                 storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
                 storeStreamerConfig.getStoreClient(),
-                storeStreamerConfig.getStoreFetchRetryPolicy());
+                storeStreamerConfig.getStoreFetchRetryPolicy(),
+                this.lazyLoader,
+                request.getFields());
     }
 }

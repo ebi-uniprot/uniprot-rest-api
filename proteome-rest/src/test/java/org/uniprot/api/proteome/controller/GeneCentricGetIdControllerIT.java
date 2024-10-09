@@ -20,8 +20,8 @@ import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.core.genecentric.GeneCentricEntry;
@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            GeneCentricGetIdControllerIT.GeneCentricGetIdParameterResolver.class,
+            GeneCentricGetIdControllerIT.GeneCentricGetByIdParameterResolver.class,
             GeneCentricGetIdControllerIT.GeneCentricGetIdContentTypeParamResolver.class
         })
 public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
@@ -154,7 +154,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/genecentric/{accession}";
     }
 
-    static class GeneCentricGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class GeneCentricGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {

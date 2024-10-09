@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcProteomeStreamControllerIT extends UniParcStreamControllerIT {
     private static final String streamByProteomeIdRequestPath = "/uniparc/proteome/{upId}/stream";
+    private static final String UP_ID = "UP000005640";
 
     @Test
     void streamByProteomeIdRdfCanReturnSuccess() throws Exception {

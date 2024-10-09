@@ -8,22 +8,24 @@ import org.uniprot.api.async.download.messaging.consumer.streamer.batch.IdMappin
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.IdMappingResultStreamerFacadeTest;
 import org.uniprot.api.async.download.messaging.consumer.streamer.list.idmapping.IdMappingListResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.rdf.idmapping.UniParcIdMappingRDFResultStreamer;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
-public class UniParcIdMappingResultStreamerFacadeTest
-        extends IdMappingResultStreamerFacadeTest<UniParcEntry, UniParcEntryPair> {
+public class UniParcLightIdMappingResultStreamerFacadeTest
+        extends IdMappingResultStreamerFacadeTest<UniParcEntryLight, UniParcEntryLightPair> {
     @Mock private UniParcIdMappingRDFResultStreamer rdfResultStreamer;
     @Mock private IdMappingListResultStreamer listResultStreamer;
 
     @Mock
-    private IdMappingBatchResultStreamer<UniParcEntry, UniParcEntryPair>
+    private IdMappingBatchResultStreamer<UniParcEntryLight, UniParcEntryLightPair>
             uniParcIdMappingBatchResultStreamer;
 
-    @Mock private MessageConverterContextFactory<UniParcEntryPair> uniParcConverterContextFactory;
+    @Mock
+    private MessageConverterContextFactory<UniParcEntryLightPair> uniParcConverterContextFactory;
+
     @Mock private IdMappingJobCacheService idMappingJobCacheService;
 
     @BeforeEach
@@ -34,7 +36,7 @@ public class UniParcIdMappingResultStreamerFacadeTest
         converterContextFactory = uniParcConverterContextFactory;
         idMappingBatchResultStreamer = uniParcIdMappingBatchResultStreamer;
         idMappingResultStreamerFacade =
-                new UniParcIdMappingResultStreamerFacade(
+                new UniParcLightIdMappingResultStreamerFacade(
                         rdfResultStreamer,
                         listResultStreamer,
                         uniParcIdMappingBatchResultStreamer,

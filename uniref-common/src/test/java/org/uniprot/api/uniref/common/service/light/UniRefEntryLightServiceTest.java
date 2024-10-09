@@ -151,7 +151,7 @@ class UniRefEntryLightServiceTest {
         assertEquals(5, entries.size());
         assertEquals(
                 ids, entries.stream().map(e -> e.getId().getValue()).collect(Collectors.toList()));
-        verify(storeStreamer, never()).idsToStoreStream(any());
+        verify(storeStreamer, never()).idsToStoreStream(any(), any());
     }
 
     @Test
@@ -168,12 +168,12 @@ class UniRefEntryLightServiceTest {
                 ids.stream().map(id -> new UniRefEntryLightBuilder().id(id).build());
         request.setQuery("field:value");
         request.setFormat(FASTA_MEDIA_TYPE_VALUE);
-        when(storeStreamer.idsToStoreStream(any())).thenReturn(entriesStream);
+        when(storeStreamer.idsToStoreStream(any(), any())).thenReturn(entriesStream);
         Stream<UniRefEntryLight> result = service.stream(request);
         List<UniRefEntryLight> entries = result.collect(Collectors.toList());
         assertEquals(5, entries.size());
         assertEquals(
                 ids, entries.stream().map(e -> e.getId().getValue()).collect(Collectors.toList()));
-        verify(storeStreamer, times(1)).idsToStoreStream(any());
+        verify(storeStreamer, times(1)).idsToStoreStream(any(), any());
     }
 }

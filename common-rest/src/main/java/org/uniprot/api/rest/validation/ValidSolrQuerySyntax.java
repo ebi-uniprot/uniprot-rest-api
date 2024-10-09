@@ -49,7 +49,7 @@ public @interface ValidSolrQuerySyntax {
                     qp.setAllowLeadingWildcard(true);
                     queryString = escapeSpecialCharacters(queryString);
                     Query parsedQuery = qp.parse(queryString);
-                    if (!validateWildcard(parsedQuery)) {
+                    if (!isValidWildcardQuery(parsedQuery)) {
                         String errorMessage = "{search.invalid.query.wildcard}";
                         context.disableDefaultConstraintViolation();
                         context.buildConstraintViolationWithTemplate(errorMessage)
@@ -63,7 +63,7 @@ public @interface ValidSolrQuerySyntax {
             return isValid;
         }
 
-        private boolean validateWildcard(Query inputQuery) {
+        private boolean isValidWildcardQuery(Query inputQuery) {
             boolean isValid = true;
             if (inputQuery instanceof WildcardQuery) {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
@@ -74,7 +74,7 @@ public @interface ValidSolrQuerySyntax {
             } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
-                    if (!validateWildcard(clause.getQuery())) {
+                    if (!isValidWildcardQuery(clause.getQuery())) {
                         isValid = false;
                     }
                 }

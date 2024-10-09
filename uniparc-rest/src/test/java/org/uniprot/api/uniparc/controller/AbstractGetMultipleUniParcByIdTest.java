@@ -1,20 +1,15 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -29,6 +24,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,17 +34,21 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortInMemoryUniParcEntryLightStore;
+import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortInMemoryUniParcCrossReferenceStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.converters.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -63,8 +63,6 @@ import lombok.extern.slf4j.Slf4j;
 abstract class AbstractGetMultipleUniParcByIdTest {
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
-
     @Autowired protected MockMvc mockMvc;
 
     private static final String UPI_PREF = "UPI0000083C";
@@ -77,6 +75,9 @@ abstract class AbstractGetMultipleUniParcByIdTest {
 
     protected abstract String getSearchValue();
 
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
+
     @BeforeAll
     void initDataStore() {
         storeManager.addSolrClient(DataStoreManager.StoreType.UNIPARC, SolrCollection.uniparc);
@@ -84,15 +85,21 @@ abstract class AbstractGetMultipleUniParcByIdTest {
                 repository,
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIPARC));
-        storeClient =
-                new UniParcStoreClient(
-                        VoldemortInMemoryUniParcEntryStore.getInstance("avro-uniparc"));
-        storeManager.addStore(DataStoreManager.StoreType.UNIPARC, storeClient);
 
         storeManager.addDocConverter(
                 DataStoreManager.StoreType.UNIPARC,
                 new UniParcDocumentConverter(
                         TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
+        UniParcLightStoreClient uniParcLightStoreClient =
+                new UniParcLightStoreClient(
+                        VoldemortInMemoryUniParcEntryLightStore.getInstance("uniparc-light"));
+        VoldemortInMemoryUniParcCrossReferenceStore xrefVDClient =
+                VoldemortInMemoryUniParcCrossReferenceStore.getInstance("uniparc-cross-reference");
+        UniParcCrossReferenceStoreClient crossRefStoreClient =
+                new UniParcCrossReferenceStoreClient(xrefVDClient);
+        storeManager.addStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcLightStoreClient);
+        storeManager.addStore(
+                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossRefStoreClient);
 
         // create 5 entries
         IntStream.rangeClosed(1, 5).forEach(this::saveEntry);
@@ -127,7 +134,6 @@ abstract class AbstractGetMultipleUniParcByIdTest {
     @ValueSource(
             strings = {
                 "",
-                MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
                 TSV_MEDIA_TYPE_VALUE,
@@ -201,27 +207,40 @@ abstract class AbstractGetMultipleUniParcByIdTest {
         }
     }
 
-    private void saveEntry(int i) {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
-        // append two more cross ref
-        UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, i);
+    private void saveEntry(int qualifier) {
+        int xrefCount = 25;
+        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(qualifier, UPI_PREF, xrefCount);
         UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(updatedEntry);
+        Entry xmlEntry = converter.toXml(entry);
         storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
-        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC, updatedEntry);
+        // uniparc light and its cross references in voldemort
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
+        storeManager.saveToStore(DataStoreManager.StoreType.UNIPARC_LIGHT, uniParcEntryLight);
+        List<UniParcCrossReferencePair> crossReferencePairs =
+                UniParcCrossReferenceMocker.createUniParcCrossReferencePairs(
+                        uniParcEntryLight.getUniParcId(), qualifier, xrefCount, xrefGroupSize);
+        storeManager.saveToStore(
+                DataStoreManager.StoreType.UNIPARC_CROSS_REFERENCE, crossReferencePairs);
     }
 
     protected static Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC)
                 .getReturnFields()
                 .stream()
-                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
     }
 
     protected String extractCursor(ResultActions response) {
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
+        String cursor = linkHeader.split("\\?")[1].split("&")[1].split("=")[1];
         assertThat(cursor, notNullValue());
         return cursor;
     }

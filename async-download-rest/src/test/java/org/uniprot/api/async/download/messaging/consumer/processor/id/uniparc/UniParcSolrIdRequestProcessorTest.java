@@ -14,16 +14,16 @@ import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadReque
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.Page;
-import org.uniprot.api.uniparc.common.service.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcSolrIdRequestProcessorTest
         extends SolrIdRequestProcessorTest<UniParcDownloadRequest, UniParcDownloadJob> {
     private static final String QUERY = "uniParcQuery";
-    @Mock private QueryResult<UniParcEntry> searchResults;
-    @Mock private UniParcQueryService uniParcQueryService;
+    @Mock private QueryResult<UniParcEntryLight> searchResults;
+    @Mock private UniParcLightEntryService uniParcLightEntryService;
     @Mock private UniParcFileHandler uniParcAsyncDownloadFileHandler;
     @Mock private UniParcJobService uniParcJobService;
     @Mock private UniParcDownloadRequest uniParcDownloadRequest;
@@ -36,10 +36,12 @@ class UniParcSolrIdRequestProcessorTest
         downloadRequest = uniParcDownloadRequest;
         requestProcessor =
                 new UniParcSolrIdRequestProcessor(
-                        uniParcAsyncDownloadFileHandler, uniParcJobService, uniParcQueryService);
+                        uniParcAsyncDownloadFileHandler,
+                        uniParcJobService,
+                        uniParcLightEntryService);
         when(downloadRequest.getQuery()).thenReturn(QUERY);
-        when(uniParcQueryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
-        when(uniParcQueryService.search(
+        when(uniParcLightEntryService.streamIdsForDownload(downloadRequest)).thenReturn(idStream);
+        when(uniParcLightEntryService.search(
                         argThat(
                                 sr ->
                                         QUERY.equals(((UniParcSearchRequest) sr).getQuery())
