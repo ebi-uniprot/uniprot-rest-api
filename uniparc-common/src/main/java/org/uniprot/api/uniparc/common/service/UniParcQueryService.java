@@ -147,10 +147,25 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     public Stream<String> streamRdf(
             UniParcStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return getRdfStream(
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig),
+                dataType,
+                format);
+    }
+
+    private Stream<String> getRdfStream(
+            SolrRequest.SolrRequestBuilder streamRequest, String dataType, String format) {
+        SolrRequest solrRequest = streamRequest.build();
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
+    }
+
+    public Stream<String> streamRdf(
+            UniParcStreamByProteomeIdRequest streamRequest, String dataType, String format) {
+        return getRdfStream(
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig),
+                dataType,
+                format);
     }
 
     @Override

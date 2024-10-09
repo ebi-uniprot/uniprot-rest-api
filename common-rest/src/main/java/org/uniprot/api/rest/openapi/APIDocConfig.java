@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
+import org.uniprot.core.util.Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,7 +30,6 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.servers.Server;
 import lombok.extern.slf4j.Slf4j;
-import org.uniprot.core.util.Utils;
 
 @Slf4j
 @Configuration
@@ -187,7 +187,7 @@ public class APIDocConfig {
     }
 
     private static void configureStringTypesSerialisers(Schema item) {
-        if(Utils.notNullNotEmpty(item.getProperties())) {
+        if (Utils.notNullNotEmpty(item.getProperties())) {
             for (Object prop : item.getProperties().values()) {
                 Schema propSchema = (Schema) prop;
                 if (prop instanceof ArraySchema) {
