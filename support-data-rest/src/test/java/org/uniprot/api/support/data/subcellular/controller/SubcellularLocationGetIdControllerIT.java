@@ -126,7 +126,8 @@ public class SubcellularLocationGetIdControllerIT
         return "/locations/";
     }
 
-    static class SubcellularLocationGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
+    static class SubcellularLocationGetByIdParameterResolver
+            extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {
