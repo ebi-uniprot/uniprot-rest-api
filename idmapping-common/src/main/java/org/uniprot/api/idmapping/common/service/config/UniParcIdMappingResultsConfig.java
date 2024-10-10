@@ -1,6 +1,8 @@
 package org.uniprot.api.idmapping.common.service.config;
 
-import net.jodah.failsafe.RetryPolicy;
+import java.io.IOException;
+import java.time.Duration;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -30,8 +32,7 @@ import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortRemoteUniPar
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortRemoteUniParcCrossReferenceStore;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.time.Duration;
+import net.jodah.failsafe.RetryPolicy;
 
 /**
  * @author lgonzales

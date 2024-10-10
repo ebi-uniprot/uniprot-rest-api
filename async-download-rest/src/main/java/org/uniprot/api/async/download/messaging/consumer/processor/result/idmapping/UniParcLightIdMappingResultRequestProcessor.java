@@ -14,9 +14,9 @@ import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
-public class UniParcIdMappingResultRequestProcessor
+public class UniParcLightIdMappingResultRequestProcessor
         extends IdMappingResultRequestProcessor<UniParcEntryLight, UniParcEntryLightPair> {
-    protected UniParcIdMappingResultRequestProcessor(
+    protected UniParcLightIdMappingResultRequestProcessor(
             IdMappingDownloadConfigProperties downloadConfigProperties,
             IdMappingHeartbeatProducer heartbeatProducer,
             UniParcLightIdMappingResultStreamerFacade resultStreamerFacade,
