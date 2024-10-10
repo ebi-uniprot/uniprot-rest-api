@@ -79,7 +79,7 @@ import lombok.extern.slf4j.Slf4j;
             SpringExtension.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcStreamControllerIT extends AbstractStreamControllerIT {
+class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
 
     private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";

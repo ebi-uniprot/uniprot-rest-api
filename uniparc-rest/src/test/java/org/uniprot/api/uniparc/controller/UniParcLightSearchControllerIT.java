@@ -6,10 +6,14 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniparc.controller.UniParcITUtils.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+import static org.uniprot.api.uniparc.controller.UniParcITUtils.getUniParcDocument;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createUniParcEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -71,14 +75,14 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniParcController.class)
+@WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
-            UniParcSearchControllerIT.UniParcSearchParameterResolver.class
+            UniParcLightSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
+            UniParcLightSearchControllerIT.UniParcSearchParameterResolver.class
         })
-class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
+class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;

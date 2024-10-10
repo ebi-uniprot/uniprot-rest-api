@@ -105,6 +105,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
     @Operation(
             hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
+            description = DATABASES_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

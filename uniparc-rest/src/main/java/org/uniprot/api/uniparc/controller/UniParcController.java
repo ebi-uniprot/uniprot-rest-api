@@ -84,6 +84,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             summary = ID_UNIPARC_OPERATION_DESC,
+            description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -130,7 +131,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             hidden = true,
-            summary = ACCESSION_UNIPARC_OPERATION_DESC,
+            summary = ACCESSION_UNIPARC_OPERATION,
+            description = ACCESSION_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
