@@ -1,8 +1,6 @@
 package org.uniprot.api.idmapping.common.service.config;
 
-import java.io.IOException;
-import java.time.Duration;
-
+import net.jodah.failsafe.RetryPolicy;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -32,7 +30,8 @@ import org.uniprot.store.datastore.voldemort.light.uniparc.VoldemortRemoteUniPar
 import org.uniprot.store.datastore.voldemort.light.uniparc.crossref.VoldemortRemoteUniParcCrossReferenceStore;
 import org.uniprot.store.search.SolrCollection;
 
-import net.jodah.failsafe.RetryPolicy;
+import java.io.IOException;
+import java.time.Duration;
 
 /**
  * @author lgonzales
@@ -84,13 +83,6 @@ public class UniParcIdMappingResultsConfig {
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())
                 .build();
-    }
-
-    @Bean("uniParcEntryStoreStreamer")
-    public StoreStreamer<UniParcEntryLight> uniParcEntryStoreStreamer(
-            @Qualifier("uniParcStoreStreamerConfig")
-                    StoreStreamerConfig<UniParcEntryLight> uniParcStoreStreamerConfig) {
-        return new StoreStreamer<>(uniParcStoreStreamerConfig);
     }
 
     @Bean("uniParcStoreStreamerConfig")
