@@ -30,10 +30,6 @@ public class StoreStreamer<T> {
         this.config = config;
     }
 
-    public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
-        return idsToStoreStream(solrRequest, StoreRequest.builder().build());
-    }
-
     @SuppressWarnings("squid:S2095")
     public Stream<T> idsToStoreStream(SolrRequest solrRequest, StoreRequest storeRequest) {
         TupleStream tupleStream = config.getTupleStreamTemplate().create(solrRequest);
@@ -54,10 +50,6 @@ public class StoreStreamer<T> {
 
     public Stream<String> idsStream(SolrRequest solrRequest) {
         return config.getDocumentIdStream().fetchIds(solrRequest);
-    }
-
-    public Stream<T> streamEntries(List<String> accessions) {
-        return streamEntries(accessions, StoreRequest.builder().build());
     }
 
     public Stream<T> streamEntries(List<String> accessions, StoreRequest storeRequest) {
