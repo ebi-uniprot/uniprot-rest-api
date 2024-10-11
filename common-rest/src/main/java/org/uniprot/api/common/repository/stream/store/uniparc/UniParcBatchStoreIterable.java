@@ -84,7 +84,8 @@ public class UniParcBatchStoreIterable extends BatchIterable<UniParcEntry> {
         int groupSize = this.crossRefConfigProperties.getGroupSize();
         // We support the full UniParc object via async download in XML format,
         // but we limit it to a maximum of 50k cross-references per UniParc entry to avoid OOM
-        int crossReferencesCount = Math.min(MAX_NUMBER_CROSS_REF_ALLOWED, uniParcEntryLight.getCrossReferenceCount());
+        int crossReferencesCount =
+                Math.min(MAX_NUMBER_CROSS_REF_ALLOWED, uniParcEntryLight.getCrossReferenceCount());
         // Calculate the number of batches required
         return crossReferencesCount / groupSize + (crossReferencesCount % groupSize == 0 ? 0 : 1);
     }

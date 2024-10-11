@@ -1,7 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -9,10 +8,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -178,28 +177,6 @@ class UniParcLightGetIdControllerIT extends BaseUniParcGetByIdControllerTest {
                                                             containsString(
                                                                     "UPI0000083D01\t\tP12301\t")))
                                     .build())
-                    //                    .contentTypeParam(
-                    //                            ContentTypeParam.builder()
-                    //                                    .contentType(MediaType.APPLICATION_XML)
-                    //                                    .resultMatcher(
-                    //                                            content()
-                    //                                                    .string(
-                    //                                                            startsWith(
-                    //
-                    // XML_DECLARATION
-                    //                                                                            +
-                    // UNIPARC_XML_SCHEMA)))
-                    //
-                    // .resultMatcher(content().string(containsString(UNIPARC_ID)))
-                    //                                    .resultMatcher(
-                    //                                            content()
-                    //                                                    .string(
-                    //                                                            endsWith(
-                    //
-                    // COPYRIGHT_TAG
-                    //                                                                            +
-                    // UNIPARC_XML_CLOSE_TAG)))
-                    //                                    .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)

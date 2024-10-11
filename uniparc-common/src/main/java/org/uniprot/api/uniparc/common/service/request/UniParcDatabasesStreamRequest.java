@@ -1,17 +1,17 @@
 package org.uniprot.api.uniparc.common.service.request;
 
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.store.config.UniProtDataType;
-
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
