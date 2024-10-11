@@ -343,6 +343,35 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
     }
 
+    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
+    @MethodSource("getAllReturnedFields")
+    void testGetDatabasesStreamWithAllAvailableReturnedFields(String name, List<String> paths)
+            throws Exception {
+        // given
+        saveEntry();
+        assertThat(name, notNullValue());
+        assertThat(paths, notNullValue());
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamRequestPath(), getIdPathValue())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
+        //then
+        ResultActions resultActions = getMockMvc()
+                .perform(asyncDispatch(response)).andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value())).andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.results.*.database").exists())
+                .andExpect(jsonPath("$.results.*.id").exists());
+
+        for (String path : paths) {
+            String returnFieldValidatePath = "$.results[*]." + path;
+            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
+        }
+    }
+
     static class UniParcGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override

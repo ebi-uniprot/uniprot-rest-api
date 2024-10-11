@@ -19,6 +19,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 @Slf4j
 public class UniParcBatchStoreIterable extends BatchIterable<UniParcEntry> {
+    private static final int MAX_NUMBER_CROSS_REF_ALLOWED = 50_000;
     private final UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient;
     private final UniProtStoreClient<UniParcCrossReferencePair> uniParcCrossRefStoreClient;
     private final RetryPolicy<Object> retryPolicy;
@@ -56,11 +57,7 @@ public class UniParcBatchStoreIterable extends BatchIterable<UniParcEntry> {
     }
 
     private UniParcEntry getUniParcEntry(UniParcEntryLight uniParcEntryLight) {
-        int groupSize = this.crossRefConfigProperties.getGroupSize();
-        int crossReferencesCount = uniParcEntryLight.getCrossReferenceCount();
-        // Calculate the number of batches required
-        int storePageCount =
-                crossReferencesCount / groupSize + (crossReferencesCount % groupSize == 0 ? 0 : 1);
+        int storePageCount = getCrossRefStorePageCount(uniParcEntryLight);
         String uniParcId = uniParcEntryLight.getUniParcId();
         List<UniParcCrossReference> crossReferences =
                 IntStream.range(0, storePageCount)
@@ -81,5 +78,14 @@ public class UniParcBatchStoreIterable extends BatchIterable<UniParcEntry> {
         // populate cross-references from its own store
         builder.uniParcCrossReferencesSet(crossReferences);
         return builder.build();
+    }
+
+    private int getCrossRefStorePageCount(UniParcEntryLight uniParcEntryLight) {
+        int groupSize = this.crossRefConfigProperties.getGroupSize();
+        // We support the full UniParc object via async download in XML format,
+        // but we limit it to a maximum of 50k cross-references per UniParc entry to avoid OOM
+        int crossReferencesCount = Math.min(MAX_NUMBER_CROSS_REF_ALLOWED, uniParcEntryLight.getCrossReferenceCount());
+        // Calculate the number of batches required
+        return crossReferencesCount / groupSize + (crossReferencesCount % groupSize == 0 ? 0 : 1);
     }
 }
