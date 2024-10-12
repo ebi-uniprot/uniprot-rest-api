@@ -6,9 +6,11 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.controller.ControllerITUtils.*;
+import static org.uniprot.api.rest.controller.ControllerITUtils.CACHE_VALUE;
+import static org.uniprot.api.rest.controller.ControllerITUtils.verifyIdContentTypes;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -307,7 +309,7 @@ public abstract class AbstractGetByIdControllerIT {
                 mockMvc.perform(get(getIdRequestPath() + "." + extension, idParameter.getId()));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
