@@ -12,4 +12,9 @@ public class UniParcFileHandler extends FileHandler {
             UniParcHeartbeatProducer uniParcHeartbeatProducer) {
         super(uniParcDownloadConfigProperties, uniParcHeartbeatProducer);
     }
+
+    @Override
+    public boolean areAllFilesPresent(String jobId) {
+        return super.areIdAndResultFilesPresent(jobId);
+    }
 }

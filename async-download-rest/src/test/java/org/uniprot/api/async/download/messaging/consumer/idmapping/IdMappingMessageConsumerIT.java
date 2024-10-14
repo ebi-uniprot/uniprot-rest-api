@@ -674,7 +674,7 @@ public class IdMappingMessageConsumerIT {
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(asyncDownloadFileHandler.areAllFilesPresent(ID));
+        assertFalse(asyncDownloadFileHandler.areIdAndResultFilesPresent(ID));
     }
 
     @Test

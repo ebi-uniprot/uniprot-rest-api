@@ -128,7 +128,7 @@ public class HttpServletRequestContentTypeMutator {
                                         .getPatterns()
                                         .forEach(
                                                 pattern ->
-                                                        // .. update map with: resource path ->
+                                                        // .. update mapto with: resource path ->
                                                         // its valid mediatypes
                                                         resourcePath2MediaTypes.put(
                                                                 pattern,

@@ -509,7 +509,7 @@ class IdMappingJobControllerIT {
         request.setTo("UniProtKB");
         request.setIds("Q00001,Q00002");
 
-        // map more than allowed enrich ids
+        // mapto more than allowed enrich ids
         IdMappingResult idMappingResult =
                 IdMappingResult.builder()
                         .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))

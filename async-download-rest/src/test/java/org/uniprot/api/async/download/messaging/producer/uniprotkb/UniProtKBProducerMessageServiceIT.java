@@ -68,7 +68,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected DownloadJobRepository<UniProtKBDownloadJob> getJobRepository() {
+    protected DownloadJobRepository<UniProtKBDownloadJob> getMapDownloadJobRepository() {
         return jobRepository;
     }
 
@@ -120,7 +120,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected FileHandler getFileHandler() {
+    protected FileHandler getMapFileHandler() {
         return fileHandler;
     }
 
