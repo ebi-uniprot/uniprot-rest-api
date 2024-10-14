@@ -13,7 +13,7 @@ import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
-public class UniParcIdMappingResultRequestProcessorTest
+public class UniParcLightIdMappingResultRequestProcessorTest
         extends IdMappingResultRequestProcessorTest<UniParcEntryLight, UniParcEntryLightPair> {
     @Mock private IdMappingDownloadConfigProperties idMappingDownloadConfigProperties;
     @Mock private IdMappingHeartbeatProducer idMappingHeartbeatProducer;
@@ -30,7 +30,7 @@ public class UniParcIdMappingResultRequestProcessorTest
         solrIdResultStreamerFacade = uniParcLightIdMappingResultStreamerFacade;
         messageConverterFactory = uuwMessageConverterFactory;
         solrIdResultRequestProcessor =
-                new UniParcIdMappingResultRequestProcessor(
+                new UniParcLightIdMappingResultRequestProcessor(
                         idMappingDownloadConfigProperties,
                         idMappingHeartbeatProducer,
                         uniParcLightIdMappingResultStreamerFacade,

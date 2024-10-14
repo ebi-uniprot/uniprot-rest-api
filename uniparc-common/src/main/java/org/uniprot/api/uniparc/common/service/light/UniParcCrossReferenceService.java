@@ -1,6 +1,6 @@
 package org.uniprot.api.uniparc.common.service.light;
 
-import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.*;
+import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.csvToList;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -109,6 +109,18 @@ public class UniParcCrossReferenceService {
         return getFilteredCrossReferences(uniParcEntryLight, streamRequest);
     }
 
+    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight) {
+        BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
+                new BatchStoreIterable<>(
+                        generateUniParcCrossReferenceKeys(uniParcEntryLight),
+                        this.crossReferenceStoreClient,
+                        this.crossReferenceStoreRetryPolicy,
+                        1);
+        return StreamSupport.stream(batchIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .flatMap(pair -> pair.getValue().stream());
+    }
+
     private Stream<UniParcCrossReference> getFilteredCrossReferences(
             UniParcEntryLight uniParcEntryLight, UniParcGetByIdRequest request) {
 
@@ -162,18 +174,6 @@ public class UniParcCrossReferenceService {
         int offset = page.getOffset().intValue();
         int nextOffset = CursorPage.getNextOffset(page);
         return xrefs.subList(offset, nextOffset);
-    }
-
-    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight) {
-        BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
-                new BatchStoreIterable<>(
-                        generateUniParcCrossReferenceKeys(uniParcEntryLight),
-                        this.crossReferenceStoreClient,
-                        this.crossReferenceStoreRetryPolicy,
-                        1);
-        return StreamSupport.stream(batchIterable.spliterator(), false)
-                .flatMap(Collection::stream)
-                .flatMap(pair -> pair.getValue().stream());
     }
 
     private boolean filterCrossReference(

@@ -91,6 +91,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             })
     @Operation(
             summary = ID_UNIPARC_LIGHT_OPERATION,
+            description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -246,6 +247,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
     @Operation(
             hidden = true,
             summary = DBID_UNIPARC_OPERATION,
+            description = DBID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -295,6 +297,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
     @Operation(
             hidden = true,
             summary = PROTEOME_UPID_UNIPARC_OPERATION,
+            description = PROTEOME_UPID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -340,11 +343,13 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
             summary = IDS_UNIPARC_OPERATION,
+            description = IDS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -390,11 +395,13 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
             summary = IDS_UNIPARC_OPERATION,
+            description = IDS_POST_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

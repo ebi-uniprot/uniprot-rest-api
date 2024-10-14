@@ -72,29 +72,14 @@ import lombok.extern.slf4j.Slf4j;
  * @since 15/06/2020
  */
 @Slf4j
-@ActiveProfiles(profiles = "offline") /*
-<<<<<<< HEAD
-@WebMvcTest(UniParcController.class)
-=======*/
+@ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcStreamControllerIT extends AbstractStreamControllerIT {
-    /*
-
-    <<<<<<< HEAD
-        protected static final String UPI_PREF = "UPI0000283A";
-        protected static final String UP_ID = "UP000005640";
-        protected static final String streamRequestPath = "/uniparc/stream";
-
-        @Autowired protected MockMvc mockMvc;
-        private final UniParcDocumentConverter documentConverter =
-                new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
-        @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
-    =======*/
+class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     private static final String UPI_PREF = "UPI0000283A";
     private static final String streamRequestPath = "/uniparc/stream";
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();

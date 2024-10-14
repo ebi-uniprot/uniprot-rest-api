@@ -9,15 +9,17 @@ import org.uniprot.api.common.repository.search.EntryPair;
 
 @Component
 public class IdMappingResultRequestProcessorFactory {
-    private final UniParcIdMappingResultRequestProcessor uniParcIdMappingResultRequestProcessor;
+    private final UniParcLightIdMappingResultRequestProcessor
+            uniParcLightIdMappingResultRequestProcessor;
     private final UniRefIdMappingResultRequestProcessor uniRefIdMappingResultRequestProcessor;
     private final UniProtKBMappingResultRequestProcessor uniProtKBMappingResultRequestProcessor;
 
     public IdMappingResultRequestProcessorFactory(
-            UniParcIdMappingResultRequestProcessor uniParcIdMappingResultRequestProcessor,
+            UniParcLightIdMappingResultRequestProcessor uniParcLightIdMappingResultRequestProcessor,
             UniRefIdMappingResultRequestProcessor uniRefIdMappingResultRequestProcessor,
             UniProtKBMappingResultRequestProcessor uniProtKBMappingResultRequestProcessor) {
-        this.uniParcIdMappingResultRequestProcessor = uniParcIdMappingResultRequestProcessor;
+        this.uniParcLightIdMappingResultRequestProcessor =
+                uniParcLightIdMappingResultRequestProcessor;
         this.uniRefIdMappingResultRequestProcessor = uniRefIdMappingResultRequestProcessor;
         this.uniProtKBMappingResultRequestProcessor = uniProtKBMappingResultRequestProcessor;
     }
@@ -26,7 +28,7 @@ public class IdMappingResultRequestProcessorFactory {
             String type) {
         return switch (type) {
             case UNIPROTKB_STR -> uniProtKBMappingResultRequestProcessor;
-            case UNIPARC_STR -> uniParcIdMappingResultRequestProcessor;
+            case UNIPARC_STR -> uniParcLightIdMappingResultRequestProcessor;
             case UNIREF_50_STR,
                     UNIREF_90_STR,
                     UNIREF_100_STR -> uniRefIdMappingResultRequestProcessor;

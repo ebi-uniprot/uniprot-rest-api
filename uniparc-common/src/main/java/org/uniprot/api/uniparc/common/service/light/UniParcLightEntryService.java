@@ -86,6 +86,29 @@ public class UniParcLightEntryService
     }
 
     @Override
+    public UniParcEntryLight findByUniqueId(String uniqueId, String filters) {
+        UniParcEntryLight entryLight = findByUniqueId(uniqueId);
+        List<String> lazyFields = uniParcCrossReferenceLazyLoader.getLazyFields(filters);
+        if (Utils.notNullNotEmpty(lazyFields)) {
+            entryLight = uniParcCrossReferenceLazyLoader.populateLazyFields(entryLight, lazyFields);
+        }
+        return entryLight;
+    }
+
+    public Stream<String> streamRdf(
+            UniParcStreamRequest streamRequest, String dataType, String format) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
+    }
+
+    public QueryResult<UniParcEntryLight> searchByFieldId(
+            UniParcGetByIdPageSearchRequest searchRequest) {
+        return super.search(searchRequest);
+    }
+
+    @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
     }
@@ -100,16 +123,6 @@ public class UniParcLightEntryService
     @Override
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return uniParcQueryProcessorConfig;
-    }
-
-    @Override
-    public UniParcEntryLight findByUniqueId(String uniqueId, String filters) {
-        UniParcEntryLight entryLight = findByUniqueId(uniqueId);
-        List<String> lazyFields = uniParcCrossReferenceLazyLoader.getLazyFields(filters);
-        if (Utils.notNullNotEmpty(lazyFields)) {
-            entryLight = uniParcCrossReferenceLazyLoader.populateLazyFields(entryLight, lazyFields);
-        }
-        return entryLight;
     }
 
     @Override
@@ -159,18 +172,5 @@ public class UniParcLightEntryService
     @Override
     protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
-    }
-
-    public Stream<String> streamRdf(
-            UniParcStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
-    }
-
-    public QueryResult<UniParcEntryLight> searchByFieldId(
-            UniParcGetByIdPageSearchRequest searchRequest) {
-        return super.search(searchRequest);
     }
 }

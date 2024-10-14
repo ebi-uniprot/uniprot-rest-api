@@ -13,7 +13,9 @@ import org.uniprot.api.async.download.messaging.consumer.processor.result.Result
 
 @ExtendWith(MockitoExtension.class)
 class IdMappingResultRequestProcessorFactoryTest {
-    @Mock private UniParcIdMappingResultRequestProcessor uniParcIdMappingResultRequestProcessor;
+    @Mock
+    private UniParcLightIdMappingResultRequestProcessor uniParcLightIdMappingResultRequestProcessor;
+
     @Mock private UniRefIdMappingResultRequestProcessor uniRefIdMappingResultRequestProcessor;
     @Mock private UniProtKBMappingResultRequestProcessor uniProtKBMappingResultRequestProcessor;
 
@@ -30,7 +32,7 @@ class IdMappingResultRequestProcessorFactoryTest {
     @Test
     void getRequestProcessor_uniParc() {
         assertSame(
-                uniParcIdMappingResultRequestProcessor,
+                uniParcLightIdMappingResultRequestProcessor,
                 idMappingResultRequestProcessorFactory.getRequestProcessor(UNIPARC_STR));
     }
 

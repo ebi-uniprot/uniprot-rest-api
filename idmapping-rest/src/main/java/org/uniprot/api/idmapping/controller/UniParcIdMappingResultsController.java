@@ -31,7 +31,7 @@ import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingSearchRe
 import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingStreamRequest;
 import org.uniprot.api.idmapping.common.response.model.UniParcEntryLightPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
+import org.uniprot.api.idmapping.common.service.impl.UniParcLightIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.openapi.IdMappingSearchResult;
 import org.uniprot.api.rest.openapi.StreamResult;
@@ -57,13 +57,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniParcIdMappingResultsController
         extends BasicSearchController<UniParcEntryLightPair> {
     private static final String DATA_TYPE = "uniparc";
-    private final UniParcIdService idService;
+    private final UniParcLightIdService idService;
     private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public UniParcIdMappingResultsController(
             ApplicationEventPublisher eventPublisher,
-            UniParcIdService idService,
+            UniParcLightIdService idService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniParcEntryLightPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,

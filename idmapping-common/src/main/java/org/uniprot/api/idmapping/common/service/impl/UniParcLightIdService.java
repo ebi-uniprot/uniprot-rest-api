@@ -32,7 +32,8 @@ import net.jodah.failsafe.RetryPolicy;
  * @created 16/02/2021
  */
 @Service
-public class UniParcIdService extends BasicIdService<UniParcEntryLight, UniParcEntryLightPair> {
+public class UniParcLightIdService
+        extends BasicIdService<UniParcEntryLight, UniParcEntryLightPair> {
 
     private final UniProtStoreClient<UniParcEntryLight> storeClient;
 
@@ -41,7 +42,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntryLight, UniParcE
     private final StreamerConfigProperties streamConfig;
     private final UniParcCrossReferenceLazyLoader lazyLoader;
 
-    public UniParcIdService(
+    public UniParcLightIdService(
             @Qualifier("uniParcEntryLightStoreStreamer")
                     StoreStreamer<UniParcEntryLight> storeStreamer,
             @Qualifier("uniParcFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,

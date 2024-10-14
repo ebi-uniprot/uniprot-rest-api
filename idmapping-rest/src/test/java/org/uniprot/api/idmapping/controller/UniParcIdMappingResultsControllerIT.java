@@ -1,22 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +37,22 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
 
 /**
  * @author lgonzales
@@ -158,13 +157,13 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 get(getIdMappingResultPath(), job.getJobId())
                                         .param("query", "database:EnsemblMetazoa")
                                         .param("facets", "organism_name,database_facet")
-                                        .param("fields", "upi,accession")
+                                        .param("fields", "upi,accession,gene")
                                         .param("sort", "length desc")
                                         .param("size", "10")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
@@ -183,7 +182,8 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 contains("UPI0000283A09", "UPI0000283A06", "UPI0000283A03")))
                 .andExpect(jsonPath("$.results.*.to.uniProtKBAccessions").exists())
                 .andExpect(jsonPath("$.results.*.to.oldestCrossRefCreated").exists())
-                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists());
+                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists())
+                .andExpect(jsonPath("$.results.*.to.geneNames").exists());
     }
 
     @Test
