@@ -28,6 +28,7 @@ import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.request.UniParcBasicRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcStreamByProteomeIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -99,8 +100,19 @@ public class UniParcLightEntryService
             UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return getRdfStream(dataType, format, solrRequest);
+    }
+
+    private Stream<String> getRdfStream(String dataType, String format, SolrRequest solrRequest) {
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
+    }
+
+    public Stream<String> streamRdf(
+            UniParcStreamByProteomeIdRequest streamRequest, String dataType, String format) {
+        SolrRequest solrRequest =
+                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return getRdfStream(dataType, format, solrRequest);
     }
 
     public QueryResult<UniParcEntryLight> searchByFieldId(
