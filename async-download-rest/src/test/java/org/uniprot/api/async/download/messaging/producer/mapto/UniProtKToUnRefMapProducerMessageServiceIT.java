@@ -25,7 +25,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 @EnableConfigurationProperties({MapToDownloadConfigProperties.class})
 public class UniProtKToUnRefMapProducerMessageServiceIT
         extends MapToProducerMessageServiceIT<UniProtKBToUniRefDownloadRequest> {
-    @Autowired private UniProtKBMapToProducerMessageService service;
+    @Autowired private UniProtKBToUniRefProducerMessageService service;
 
     @Override
     protected MapToDownloadJob getDownloadJob(

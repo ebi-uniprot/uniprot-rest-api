@@ -6,7 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.mapto.MapToDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.mapto.MapToHeartbeatProducer;
-import org.uniprot.api.async.download.messaging.consumer.streamer.facade.map.UniProtKBToUniRefSolrIdResultStreamerFacade;
+import org.uniprot.api.async.download.messaging.consumer.streamer.facade.mapto.UniProtKBToUniRefSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.UUWMessageConverterFactory;

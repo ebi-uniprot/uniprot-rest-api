@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.composite.map.UniProtKBToUniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.composite.mapto.UniProtKBToUniRefCompositeRequestProcessor;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
 

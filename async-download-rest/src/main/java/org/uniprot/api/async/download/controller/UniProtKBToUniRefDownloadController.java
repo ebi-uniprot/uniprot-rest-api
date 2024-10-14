@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
-import org.uniprot.api.async.download.messaging.producer.mapto.UniProtKBMapToProducerMessageService;
+import org.uniprot.api.async.download.messaging.producer.mapto.UniProtKBToUniRefProducerMessageService;
 import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
@@ -39,11 +39,11 @@ public class UniProtKBToUniRefDownloadController extends BasicDownloadController
 
     static final String UNIPROTKB_TO_UNIREF_MAP_RESOURCE = "/mapto/uniprotkb/uniref";
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_TO_UNIREF_MAP_RESOURCE + "/download";
-    private final UniProtKBMapToProducerMessageService messageService;
+    private final UniProtKBToUniRefProducerMessageService messageService;
     private final MapToJobService jobService;
 
     public UniProtKBToUniRefDownloadController(
-            UniProtKBMapToProducerMessageService uniRefRabbitProducerMessageService,
+            UniProtKBToUniRefProducerMessageService uniRefRabbitProducerMessageService,
             HeartbeatConfig heartbeatConfig,
             MapToJobService jobService) {
         super(heartbeatConfig);

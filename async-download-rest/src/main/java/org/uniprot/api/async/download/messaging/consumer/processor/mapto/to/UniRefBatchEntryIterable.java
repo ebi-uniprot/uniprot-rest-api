@@ -1,14 +1,15 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.mapto.to;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import java.util.Iterator;
+import java.util.List;
+
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
 import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 
-import java.util.Iterator;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 @Slf4j
 public class UniRefBatchEntryIterable extends BatchIterable<Long> {
@@ -48,10 +49,11 @@ public class UniRefBatchEntryIterable extends BatchIterable<Long> {
                             UniRefSearchRequest searchRequest = new UniRefSearchRequest();
                             searchRequest.setQuery(getQuery(batch));
                             searchRequest.setSize(0);
-                            return List.of(uniRefEntryLightService
-                                    .search(searchRequest)
-                                    .getPage()
-                                    .getTotalElements());
+                            return List.of(
+                                    uniRefEntryLightService
+                                            .search(searchRequest)
+                                            .getPage()
+                                            .getTotalElements());
                         });
     }
 
