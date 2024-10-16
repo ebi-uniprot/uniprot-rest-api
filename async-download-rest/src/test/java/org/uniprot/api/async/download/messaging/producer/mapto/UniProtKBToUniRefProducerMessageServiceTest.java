@@ -30,7 +30,7 @@ public class UniProtKBToUniRefProducerMessageServiceTest
             uniProtKBMapDownloadRequestHashGenerator;
 
     @Mock
-    private MapToJobSubmissionRules<UniProtKBToUniRefDownloadRequest>
+    private UniProtKBToUniRefJobSubmissionRules
             uniProtKBMapDownloadRequestMapToJobSubmissionRules;
 
     @BeforeEach
