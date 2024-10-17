@@ -17,16 +17,6 @@ public class UniRefBatchIdIterable extends BatchIterable<String> {
     private final RetryPolicy<Object> retryPolicy;
 
     public UniRefBatchIdIterable(
-            Iterable<String> sourceIterable,
-            UniRefEntryLightService uniRefEntryLightService,
-            RetryPolicy<Object> retryPolicy,
-            int batchSize) {
-        super(sourceIterable, batchSize);
-        this.uniRefEntryLightService = uniRefEntryLightService;
-        this.retryPolicy = retryPolicy;
-    }
-
-    public UniRefBatchIdIterable(
             Iterator<String> sourceIterator,
             UniRefEntryLightService uniRefEntryLightService,
             RetryPolicy<Object> retryPolicy,
@@ -44,15 +34,13 @@ public class UniRefBatchIdIterable extends BatchIterable<String> {
                                         log.warn(
                                                 "Batch call to Solr server failed. Failure #{}. Retrying...",
                                                 e.getAttemptCount())))
-                .get(
-                        () -> {
-                            UniRefDownloadRequest uniRefDownloadRequest =
-                                    new UniRefDownloadRequest();
-                            uniRefDownloadRequest.setQuery(getQuery(batch));
-                            return uniRefEntryLightService
-                                    .streamIdsForDownload(uniRefDownloadRequest)
-                                    .toList();
-                        });
+                .get(() -> getStreamResults(batch));
+    }
+
+    private List<String> getStreamResults(List<String> batch) {
+        UniRefDownloadRequest uniRefDownloadRequest = new UniRefDownloadRequest();
+        uniRefDownloadRequest.setQuery(getQuery(batch));
+        return uniRefEntryLightService.streamIdsForDownload(uniRefDownloadRequest).toList();
     }
 
     private String getQuery(List<String> batch) {

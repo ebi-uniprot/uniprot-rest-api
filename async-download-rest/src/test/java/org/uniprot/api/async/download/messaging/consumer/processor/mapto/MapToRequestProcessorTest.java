@@ -2,8 +2,6 @@ package org.uniprot.api.async.download.messaging.consumer.processor.mapto;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.mapto.MapToRequestProcessor.RESULT_FILE;
-import static org.uniprot.api.async.download.messaging.consumer.processor.mapto.MapToRequestProcessor.STATUS;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -17,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.processor.composite.mapto.UniProtKBToUniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.repository.JobFields;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
 
@@ -44,10 +43,17 @@ class MapToRequestProcessorTest {
         InOrderImpl inOrder =
                 new InOrderImpl(
                         List.of(mapToJobService, uniProtKBToUniRefCompositeRequestProcessor));
-        inOrder.verify(mapToJobService).update(ID, Map.of(STATUS, RUNNING));
+        inOrder.verify(mapToJobService).update(ID, Map.of(JobFields.STATUS.getName(), RUNNING));
         inOrder.verify(uniProtKBToUniRefCompositeRequestProcessor)
                 .process(uniProtKBToUniRefMapDownloadRequest);
-        inOrder.verify(mapToJobService).update(ID, Map.of(STATUS, FINISHED, RESULT_FILE, ID));
+        inOrder.verify(mapToJobService)
+                .update(
+                        ID,
+                        Map.of(
+                                JobFields.STATUS.getName(),
+                                FINISHED,
+                                JobFields.RESULT_FILE.getName(),
+                                ID));
     }
 
     @Test

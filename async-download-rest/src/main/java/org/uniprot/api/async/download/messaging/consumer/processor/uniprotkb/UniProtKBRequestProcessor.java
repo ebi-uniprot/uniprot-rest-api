@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.uniprotkb;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 import java.util.Map;
@@ -15,8 +16,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 
 @Component
 public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDownloadRequest> {
-    protected static final String RESULT_FILE = "resultFile";
-    protected static final String STATUS = "status";
     private final UniProtKBSolrIdHD5RequestProcessor uniProtKBSolrIdHD5RequestProcessor;
     private final UniProtKBCompositeRequestProcessor uniProtKBCompositeRequestProcessor;
     private final UniProtKBJobService jobService;
@@ -33,7 +32,7 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
     @Override
     public void process(UniProtKBDownloadRequest request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        jobService.update(request.getDownloadJobId(), Map.of(STATUS, RUNNING));
+        jobService.update(request.getDownloadJobId(), Map.of(STATUS.getName(), RUNNING));
 
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
             uniProtKBSolrIdHD5RequestProcessor.process(request);
@@ -41,7 +40,11 @@ public class UniProtKBRequestProcessor implements RequestProcessor<UniProtKBDown
             uniProtKBCompositeRequestProcessor.process(request);
             jobService.update(
                     request.getDownloadJobId(),
-                    Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
+                    Map.of(
+                            STATUS.getName(),
+                            FINISHED,
+                            RESULT_FILE.getName(),
+                            request.getDownloadJobId()));
         }
     }
 }

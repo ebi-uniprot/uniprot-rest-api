@@ -5,6 +5,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
+import org.uniprot.api.rest.download.model.StoreType;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -27,7 +28,7 @@ public class UniRefIdMappingDownloadRequestValidator
 
     @Override
     protected String getType() {
-        return "UniRef";
+        return StoreType.UNI_REF.getName();
     }
 
     @Override

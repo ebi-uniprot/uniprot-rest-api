@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.messaging.consumer.processor.result.idmap
 
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping.IdMappingRequestProcessor.*;
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -57,11 +58,17 @@ class IdMappingRequestProcessorTest {
 
         InOrderImpl inOrder = new InOrderImpl(List.of(idMappingJobService, requestProcessor));
         inOrder.verify(idMappingJobService)
-                .update(ID, Map.of(STATUS, RUNNING, TOTAL_ENTRIES, (long) SIZE));
+                .update(
+                        ID,
+                        Map.of(STATUS.getName(), RUNNING, TOTAL_ENTRIES.getName(), (long) SIZE));
         inOrder.verify(requestProcessor).process(request);
         inOrder.verify(idMappingJobService)
                 .update(
                         request.getDownloadJobId(),
-                        Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
+                        Map.of(
+                                STATUS.getName(),
+                                FINISHED,
+                                RESULT_FILE.getName(),
+                                request.getDownloadJobId()));
     }
 }

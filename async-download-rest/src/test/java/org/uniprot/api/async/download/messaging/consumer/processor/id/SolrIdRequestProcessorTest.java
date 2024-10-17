@@ -2,7 +2,7 @@ package org.uniprot.api.async.download.messaging.consumer.processor.id;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.id.SolrIdRequestProcessor.TOTAL_ENTRIES;
+import static org.uniprot.api.async.download.messaging.repository.JobFields.TOTAL_ENTRIES;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -30,7 +30,7 @@ public abstract class SolrIdRequestProcessorTest<
 
         requestProcessor.process(downloadRequest);
 
-        verify(jobService).update(ID, Map.of(TOTAL_ENTRIES, SOLR_HITS));
+        verify(jobService).update(ID, Map.of(TOTAL_ENTRIES.getName(), SOLR_HITS));
         verify(fileHandler).writeIds(ID, idStream);
     }
 }

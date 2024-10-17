@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.id.uniprotkb;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 import java.util.Map;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class UniProtKBSolrIdHD5RequestProcessor
         implements IdRequestProcessor<UniProtKBDownloadRequest> {
-    protected static final String STATUS = "status";
     protected static final String JOB_ID_HEADER = "jobId";
     private final UniProtKBJobService jobService;
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties;
@@ -50,13 +50,13 @@ public class UniProtKBSolrIdHD5RequestProcessor
         if (solrHits <= maxEntryCount) {
             uniProtKBSolrIdRequestProcessor.process(request);
             sendMessageToEmbeddingsQueue(request.getDownloadJobId());
-            jobService.update(request.getDownloadJobId(), Map.of(STATUS, UNFINISHED));
+            jobService.update(request.getDownloadJobId(), Map.of(STATUS.getName(), UNFINISHED));
         } else {
             log.warn("Embeddings limit exceeded {}. Max allowed {}", solrHits, maxEntryCount);
             jobService.update(
                     request.getDownloadJobId(),
                     Map.of(
-                            STATUS,
+                            STATUS.getName(),
                             ABORTED,
                             "error",
                             "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s"

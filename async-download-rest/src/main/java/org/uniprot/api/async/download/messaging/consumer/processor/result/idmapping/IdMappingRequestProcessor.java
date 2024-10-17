@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.result.idmapping;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 import java.util.Map;
@@ -13,9 +14,6 @@ import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 
 @Component
 public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDownloadRequest> {
-    protected static final String TOTAL_ENTRIES = "totalEntries";
-    protected static final String RESULT_FILE = "resultFile";
-    protected static final String STATUS = "status";
     private final IdMappingResultRequestProcessorFactory idMappingResultRequestProcessorFactory;
     private final IdMappingJobCacheService idMappingJobCacheService;
     private final IdMappingJobService jobService;
@@ -35,15 +33,19 @@ public class IdMappingRequestProcessor implements RequestProcessor<IdMappingDown
         jobService.update(
                 request.getDownloadJobId(),
                 Map.of(
-                        STATUS,
+                        STATUS.getName(),
                         RUNNING,
-                        TOTAL_ENTRIES,
+                        TOTAL_ENTRIES.getName(),
                         (long) (idMappingJob.getIdMappingResult().getMappedIds().size())));
         idMappingResultRequestProcessorFactory
                 .getRequestProcessor(idMappingJob.getIdMappingRequest().getTo())
                 .process(request);
         jobService.update(
                 request.getDownloadJobId(),
-                Map.of(STATUS, FINISHED, RESULT_FILE, request.getDownloadJobId()));
+                Map.of(
+                        STATUS.getName(),
+                        FINISHED,
+                        RESULT_FILE.getName(),
+                        request.getDownloadJobId()));
     }
 }

@@ -3,7 +3,7 @@ package org.uniprot.api.async.download.messaging.consumer.processor.id.uniprotkb
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.async.download.messaging.consumer.processor.id.uniprotkb.UniProtKBSolrIdHD5RequestProcessor.STATUS;
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.ABORTED;
 import static org.uniprot.api.rest.download.model.JobStatus.UNFINISHED;
 
@@ -69,7 +69,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
                         argThat(msg -> ID.equals(msg.getMessageProperties().getHeader("jobId"))),
                         eq(EMBEDDINGS_EXCHANGE),
                         eq(EMBEDDINGS_ROUTING_KEY));
-        verify(uniProtKBJobService).update(ID, Map.of(STATUS, UNFINISHED));
+        verify(uniProtKBJobService).update(ID, Map.of(STATUS.getName(), UNFINISHED));
     }
 
     private void mock(long solrHits) {
@@ -108,7 +108,7 @@ class UniProtKBSolrIdHD5RequestProcessorTest {
                 .update(
                         ID,
                         Map.of(
-                                STATUS,
+                                STATUS.getName(),
                                 ABORTED,
                                 "error",
                                 "Embeddings Limit Exceeded. Embeddings download must be under %d entries. Current download: %d"

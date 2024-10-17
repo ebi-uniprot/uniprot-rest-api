@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.id;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.TOTAL_ENTRIES;
+
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -11,7 +13,6 @@ import org.uniprot.api.async.download.service.JobService;
 public abstract class SolrIdRequestProcessor<
                 T extends SolrStreamDownloadRequest, R extends DownloadJob>
         implements IdRequestProcessor<T> {
-    protected static final String TOTAL_ENTRIES = "totalEntries";
     private final FileHandler fileHandler;
     private final JobService<R> jobService;
 
@@ -27,7 +28,8 @@ public abstract class SolrIdRequestProcessor<
     }
 
     protected void updateTotalEntries(T request, long totalEntries) {
-        jobService.update(request.getDownloadJobId(), Map.of(TOTAL_ENTRIES, totalEntries));
+        jobService.update(
+                request.getDownloadJobId(), Map.of(TOTAL_ENTRIES.getName(), totalEntries));
     }
 
     protected abstract long getSolrHits(T downloadRequest);

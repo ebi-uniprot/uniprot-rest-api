@@ -164,7 +164,7 @@ public class OpenAPIConstants {
     public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION_DESC = "";
     public static final String TAG_IDMAPPING = "ID Mapping job";
     public static final String TAG_IDMAPPING_DESC =
-            "The ID Mapping service can mapto between the identifiers used in one database, to the identifiers of another, e.g., from UniProt to Ensembl, or to PomBase, etc. If you mapto to UniProtKB, UniParc or UniRef data, the full entries will be returned to you for convenience.";
+            "The ID Mapping service can map between the identifiers used in one database, to the identifiers of another, e.g., from UniProt to Ensembl, or to PomBase, etc. If you map to UniProtKB, UniParc or UniRef data, the full entries will be returned to you for convenience.";
     public static final String RUN_IDMAPPING_OPERATION = "Submit ID Mapping job.";
     public static final String RUN_IDMAPPING_OPERATION_DESC = "";
     public static final String STATUS_IDMAPPING_OPERATION = "Get status of ID Mapping job.";
@@ -718,7 +718,7 @@ public class OpenAPIConstants {
             "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
     public static final String TAG_UNIREF_JOB = "UniRef async download";
     public static final String TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB =
-            "UniProtKB to UniRef mapto async download";
+            "UniProtKB to UniRef map async download";
     public static final String TAG_UNIREF_JOB_DESC =
             "UniRef asynchronous download jobs are different from synchronous downloads offered via stream API. "
                     + "First, a job must be submitted for download. "
@@ -726,7 +726,7 @@ public class OpenAPIConstants {
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
                     + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String TAG_UNIPROTKB_TO_UNIREF_MAP_TO_JOB_DESC =
-            "UniProtKB to UniRef mapto asynchronous download jobs are different from synchronous downloads offered via stream API. "
+            "UniProtKB to UniRef map asynchronous download jobs are different from synchronous downloads offered via stream API. "
                     + "First, a job must be submitted for download. "
                     + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
@@ -749,15 +749,15 @@ public class OpenAPIConstants {
     public static final String JOB_RUN_UNIREF_OPERATION =
             "Submit UniRef asynchronous download job.";
     public static final String JOB_RUN_UNIPROTKB_TO_UNIREF_MAP_OPERATION =
-            "Submit UniProtKB to UniRef mapto asynchronous download job.";
+            "Submit UniProtKB to UniRef map asynchronous download job.";
     public static final String JOB_STATUS_UNIREF_OPERATION =
             "Get progress of UniRef asynchronous download job.";
     public static final String JOB_STATUS_UNIPROTKB_TO_UNIREF_MAP_OPERATION =
-            "Get progress of UniProtKB to UniRef mapto asynchronous download job.";
+            "Get progress of UniProtKB to UniRef map asynchronous download job.";
     public static final String JOB_DETAILS_UNIREF_OPERATION =
             "Get details of UniRef asynchronous download job.";
     public static final String JOB_DETAILS_UNIPROTKB_TO_UNIREF_MAP_OPERATION =
-            "Get details of UniProtKB to UniRef mapto asynchronous download job.";
+            "Get details of UniProtKB to UniRef map asynchronous download job.";
     public static final String JOB_RUN_UNIREF_OPERATION_DESC = "";
     public static final String JOB_STATUS_UNIREF_OPERATION_DESC = "";
     public static final String JOB_DETAILS_UNIREF_OPERATION_DESC = "";

@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
+import org.uniprot.api.rest.download.model.StoreType;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
@@ -51,12 +52,12 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
 
     @Override
     public String getFrom() {
-        return "UniProtKB";
+        return StoreType.UNIPROT_KB.getName();
     }
 
     @Override
     public String getTo() {
-        return "UniRef";
+        return StoreType.UNI_REF.getName();
     }
 
     @Override

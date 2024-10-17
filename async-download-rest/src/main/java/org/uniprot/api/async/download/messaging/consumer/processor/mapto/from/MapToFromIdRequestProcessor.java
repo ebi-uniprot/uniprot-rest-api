@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.mapto.from;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.TOTAL_FROM_IDS;
+
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -10,7 +12,6 @@ import org.uniprot.api.async.download.service.mapto.MapToJobService;
 
 public abstract class MapToFromIdRequestProcessor<T extends MapToDownloadRequest>
         implements IdRequestProcessor<T> {
-    private static final String TOTAL_FROM_IDS = "totalFromIds";
     private final FileHandler fileHandler;
     private final MapToJobService jobService;
 
@@ -23,16 +24,17 @@ public abstract class MapToFromIdRequestProcessor<T extends MapToDownloadRequest
     @Override
     public void process(T request) {
         updateTotalFromIds(request, getSolrHits(request.getQuery()));
-        writeFromIdentifiers(request, streamIds(request));
+        writeFromIds(request, streamIds(request));
     }
 
     private void updateTotalFromIds(T request, long totalFromIds) {
-        jobService.update(request.getDownloadJobId(), Map.of(TOTAL_FROM_IDS, totalFromIds));
+        jobService.update(
+                request.getDownloadJobId(), Map.of(TOTAL_FROM_IDS.getName(), totalFromIds));
     }
 
     protected abstract long getSolrHits(String query);
 
-    private void writeFromIdentifiers(T request, Stream<String> ids) {
+    private void writeFromIds(T request, Stream<String> ids) {
         fileHandler.writeFromIds(request.getDownloadJobId(), ids);
     }
 
