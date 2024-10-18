@@ -5,7 +5,7 @@ import static org.uniprot.api.async.download.messaging.repository.JobFields.TOTA
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.uniprot.api.async.download.messaging.consumer.processor.id.IdRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.IdRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;

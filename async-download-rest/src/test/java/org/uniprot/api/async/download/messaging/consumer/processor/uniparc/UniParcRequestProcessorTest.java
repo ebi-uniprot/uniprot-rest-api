@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.composite.uniparc.UniParcCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.uniparc.composite.UniParcCompositeRequestProcessor;
 import org.uniprot.api.async.download.messaging.repository.JobFields;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;

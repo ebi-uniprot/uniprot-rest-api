@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.processor.composite.uniparc.UniParcCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.uniparc.composite.UniParcCompositeRequestProcessor;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 
