@@ -175,20 +175,6 @@ public class UniProtEntryService
         }
     }
 
-    @Override
-    public Stream<UniProtKBEntry> stream(StreamRequest request) {
-        SolrRequest query = createDownloadSolrRequest(request);
-        if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
-            return this.solrIdStreamer
-                    .fetchIds(query)
-                    .map(this::mapToThinEntry)
-                    .filter(Objects::nonNull);
-        } else {
-            StoreRequest storeRequest = buildStoreRequest(request);
-            return super.storeStreamer.idsToStoreStream(query, storeRequest);
-        }
-    }
-
     public List<FacetField> getFacets(String query, Map<String, String> facetFields) {
         SolrQuery solrQuery = new SolrQuery(query);
         facetFields.forEach(solrQuery::set);
@@ -299,13 +285,6 @@ public class UniProtEntryService
     }
 
     @Override
-    protected Stream<UniProtKBEntry> streamEntries(
-            List<String> idsInPage, IdsSearchRequest request) {
-        StoreRequest storeRequest = buildStoreRequest(request);
-        return this.storeStreamer.streamEntries(idsInPage, storeRequest);
-    }
-
-    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
@@ -396,10 +375,12 @@ public class UniProtEntryService
         solrRequest.setFilterQueries(queries);
     }
 
-    public StoreRequest buildStoreRequest(BasicRequest request) {
+    @Override
+    public StoreRequest getStoreRequest(BasicRequest request) {
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();
+        storeRequest.fields(request.getFields());
         if (resultsConverter.hasLineage(fieldList)) {
             storeRequest.addLineage(true);
         }

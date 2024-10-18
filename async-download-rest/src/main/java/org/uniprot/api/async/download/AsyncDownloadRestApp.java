@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniRefIdMappingResultsConfig;
-import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
+import org.uniprot.api.idmapping.common.service.impl.UniParcLightIdService;
 import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
@@ -48,7 +48,7 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                         UniProtKBIdMappingResultsConfig.class,
                         UniRefIdMappingResultsConfig.class,
                         UniParcIdMappingResultsConfig.class,
-                        UniParcIdService.class,
+                        UniParcLightIdService.class,
                         UniProtKBIdService.class,
                         UniRefIdService.class,
                         UniProtKBEntryVersionService.class,

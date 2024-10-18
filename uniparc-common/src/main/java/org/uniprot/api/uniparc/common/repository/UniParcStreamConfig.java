@@ -3,7 +3,6 @@ package org.uniprot.api.uniparc.common.repository;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +15,12 @@ import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdSt
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
+import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
-import org.uniprot.api.uniparc.common.repository.store.UniParcStoreClient;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,14 +48,16 @@ public class UniParcStreamConfig {
     }
 
     @Bean
-    public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
-            StoreStreamerConfig<UniParcEntry> storeStreamerConfig) {
-        return new StoreStreamer<>(storeStreamerConfig);
+    public StoreStreamer<UniParcEntryLight> uniParcEntryLightStoreStreamer(
+            StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,
+            UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader) {
+        return new UniParcLightStoreStreamer(
+                storeLightStreamerConfig, uniParcCrossReferenceLazyLoader);
     }
 
     @Bean
-    public StoreStreamerConfig<UniParcEntry> storeStreamerConfig(
-            UniParcStoreClient uniParcClient,
+    public StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig(
+            UniParcLightStoreClient uniParcLightClient,
             TupleStreamTemplate uniParcTupleStreamTemplate,
             StreamerConfigProperties uniParcStreamerConfigProperties,
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
@@ -66,8 +69,8 @@ public class UniParcStreamConfig {
                                         uniParcStreamerConfigProperties
                                                 .getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(uniParcStreamerConfigProperties.getStoreFetchMaxRetries());
-        return StoreStreamerConfig.<UniParcEntry>builder()
-                .storeClient(uniParcClient)
+        return StoreStreamerConfig.<UniParcEntryLight>builder()
+                .storeClient(uniParcLightClient)
                 .streamConfig(uniParcStreamerConfigProperties)
                 .tupleStreamTemplate(uniParcTupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)
@@ -83,7 +86,7 @@ public class UniParcStreamConfig {
 
     @Bean
     public FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())

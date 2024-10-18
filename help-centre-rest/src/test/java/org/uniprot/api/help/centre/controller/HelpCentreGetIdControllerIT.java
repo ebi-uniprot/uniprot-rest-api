@@ -22,8 +22,8 @@ import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -40,7 +40,7 @@ import org.uniprot.store.search.document.help.HelpDocument;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            HelpCentreGetIdControllerIT.HelpCentreGetIdParameterResolver.class,
+            HelpCentreGetIdControllerIT.HelpCentreGetByIdParameterResolver.class,
             HelpCentreGetIdControllerIT.HelpCentreGetIdContentTypeParamResolver.class
         })
 class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
@@ -86,7 +86,7 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/help/{id}";
     }
 
-    static class HelpCentreGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class HelpCentreGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {

@@ -27,8 +27,8 @@ import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControlle
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
@@ -52,7 +52,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            TaxonomyGetIdControllerIT.TaxonomyGetIdParameterResolver.class,
+            TaxonomyGetIdControllerIT.TaxonomyGetByIdParameterResolver.class,
             TaxonomyGetIdControllerIT.TaxonomyGetIdContentTypeParamResolver.class
         })
 class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
@@ -247,7 +247,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
         return "/taxonomy/";
     }
 
-    static class TaxonomyGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class TaxonomyGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {

@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.messaging.consumer.uniparc;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
@@ -46,7 +47,8 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
@@ -71,9 +73,9 @@ class UniParcMessageConsumerIT
     @Autowired private UniParcQueryRepository uniParcQueryRepository;
     @Autowired private SolrClient solrClient;
 
-    @Autowired()
-    @Qualifier("uniParcStoreClient")
-    private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> uniParcLightStoreClient;
+
+    @Autowired private UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient;
 
     @Autowired private UniParcAsyncConfig uniParcAsyncConfig;
     @Autowired private UniParcDownloadJobRepository uniParcDownloadJobRepository;
@@ -95,7 +97,11 @@ class UniParcMessageConsumerIT
     void beforeAll() throws Exception {
         prepareDownloadFolders();
         UniParcAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniParcQueryRepository, cloudSolrClient, solrClient, storeClient);
+                uniParcQueryRepository,
+                cloudSolrClient,
+                solrClient,
+                uniParcLightStoreClient,
+                xrefStoreClient);
     }
 
     @BeforeEach
@@ -159,9 +165,8 @@ class UniParcMessageConsumerIT
         List<Map<String, Integer>> sequences = JsonPath.read(resultsJson, "$.results.*.sequence");
         sequences.forEach(s -> assertTrue(s.containsKey("length")));
         assertEquals(12, sequences.size());
-        List<Map<String, Integer>[]> crossRefs =
-                JsonPath.read(resultsJson, "$.results.*.uniParcCrossReferences");
-        assertEquals(12, crossRefs.size());
+        List<Map<String, Integer>> organisms = JsonPath.read(resultsJson, "$.results.*.organisms");
+        assertEquals(12, organisms.size());
         List<String> mostRecentCrossRefUpdated =
                 JsonPath.read(resultsJson, "$.results.*.mostRecentCrossRefUpdated");
         assertEquals(12, mostRecentCrossRefUpdated.size());
@@ -199,6 +204,7 @@ class UniParcMessageConsumerIT
     protected Stream<Arguments> getSupportedFormats() {
         return Stream.of(
                         "json",
+                        APPLICATION_XML_VALUE,
                         FASTA_MEDIA_TYPE_VALUE,
                         TSV_MEDIA_TYPE_VALUE,
                         APPLICATION_JSON_VALUE,

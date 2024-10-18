@@ -51,8 +51,9 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
@@ -91,9 +92,11 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired private UniParcQueryRepository uniParcQueryRepository;
     @Autowired private SolrClient solrClient;
 
-    @Qualifier("uniParcStoreClient")
     @Autowired
-    private UniProtStoreClient<UniParcEntry> storeClient; // in memory voldemort store client
+    private UniProtStoreClient<UniParcEntryLight>
+            uniParcLightStoreClient; // in memory voldemort store client
+
+    @Autowired private UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient;
 
     @MockBean(name = "uniParcRdfRestTemplate")
     private RestTemplate restTemplate;
@@ -104,7 +107,11 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
         UniParcAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniParcQueryRepository, cloudSolrClient, solrClient, storeClient);
+                uniParcQueryRepository,
+                cloudSolrClient,
+                solrClient,
+                uniParcLightStoreClient,
+                uniParcCrossReferenceStoreClient);
     }
 
     @BeforeEach
@@ -135,9 +142,8 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
         List<Map<String, Integer>> sequences = JsonPath.read(resultsJson, "$.results.*.sequence");
         sequences.forEach(s -> assertTrue(s.containsKey("length")));
         assertEquals(12, sequences.size());
-        List<Map<String, Integer>[]> crossRefs =
-                JsonPath.read(resultsJson, "$.results.*.uniParcCrossReferences");
-        assertEquals(12, crossRefs.size());
+        List<Map<String, Integer>> organisms = JsonPath.read(resultsJson, "$.results.*.organisms");
+        assertEquals(12, organisms.size());
         List<String> mostRecentCrossRefUpdated =
                 JsonPath.read(resultsJson, "$.results.*.mostRecentCrossRefUpdated");
         assertEquals(12, mostRecentCrossRefUpdated.size());
@@ -281,7 +287,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected String getUnsupportedFormatErrorMsg() {
-        return "Invalid format received, 'text/plain;format=obo'. Expected one of [text/plain;format=fasta, text/plain;format=tsv, application/json, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain;format=list, application/rdf+xml, text/turtle, application/n-triples].";
+        return "Invalid format received, 'text/plain;format=obo'. Expected one of [text/plain;format=fasta, text/plain;format=tsv, application/json, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain;format=list, application/rdf+xml, text/turtle, application/n-triples, application/xml].";
     }
 
     @Override
