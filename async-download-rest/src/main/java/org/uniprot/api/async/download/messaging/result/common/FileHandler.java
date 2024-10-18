@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -27,7 +28,10 @@ public abstract class FileHandler {
     }
 
     public void writeIds(String jobId, Stream<String> ids) {
-        Path idsFile = getIdFile(jobId);
+        writeIds(jobId, ids, getIdFile(jobId));
+    }
+
+    private void writeIds(String jobId, Stream<String> ids, Path idsFile) {
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
                         idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -38,7 +42,24 @@ public abstract class FileHandler {
                 heartbeatProducer.generateForIds(jobId);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
+        } finally {
+            heartbeatProducer.stop(jobId);
+        }
+    }
+
+    private void writeFromIds(String jobId, Stream<String> ids, Path idsFile) {
+        try (BufferedWriter writer =
+                Files.newBufferedWriter(
+                        idsFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            Iterable<String> iterator = ids::iterator;
+            for (String id : iterator) {
+                writer.append(id);
+                writer.newLine();
+                heartbeatProducer.generateForFromIds(jobId);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         } finally {
             heartbeatProducer.stop(jobId);
         }
@@ -52,12 +73,24 @@ public abstract class FileHandler {
         return Files.exists(getResultFile(jobId));
     }
 
-    public boolean areAllFilesPresent(String jobId) {
+    public boolean isFromIdFilePresent(String jobId) {
+        return Files.exists(getFromIdFile(jobId));
+    }
+
+    public boolean areIdAndResultFilesPresent(String jobId) {
         return isIdFilePresent(jobId) && isResultFilePresent(jobId);
+    }
+
+    public boolean areAllFilesPresent(String jobId) {
+        return isFromIdFilePresent(jobId) && isIdFilePresent(jobId) && isResultFilePresent(jobId);
     }
 
     public Path getIdFile(String jobId) {
         return getPath(downloadConfigProperties.getIdFilesFolder(), jobId);
+    }
+
+    public Path getFromIdFile(String jobId) {
+        return getPath(downloadConfigProperties.getFromIdFilesFolder(), jobId);
     }
 
     public Path getResultFile(String jobId) {
@@ -70,17 +103,27 @@ public abstract class FileHandler {
     }
 
     public void deleteIdFile(String jobId) {
-        Path idsFile = getIdFile(jobId);
-        deleteFile(idsFile, jobId);
+        if (!Objects.isNull(downloadConfigProperties.getIdFilesFolder())) {
+            deleteFile(getIdFile(jobId), jobId);
+        }
     }
 
     public void deleteResultFile(String jobId) {
-        deleteFile(getResultFile(jobId), jobId);
+        if (!Objects.isNull(downloadConfigProperties.getResultFilesFolder())) {
+            deleteFile(getResultFile(jobId), jobId);
+        }
+    }
+
+    public void deleteFromIdFile(String jobId) {
+        if (!Objects.isNull(downloadConfigProperties.getFromIdFilesFolder())) {
+            deleteFile(getFromIdFile(jobId), jobId);
+        }
     }
 
     public void deleteAllFiles(String jobId) {
         deleteIdFile(jobId);
         deleteResultFile(jobId);
+        deleteFromIdFile(jobId);
     }
 
     private void deleteFile(Path file, String jobId) {
@@ -93,5 +136,9 @@ public abstract class FileHandler {
                     jobId);
             throw new FileHandelerException(e);
         }
+    }
+
+    public void writeFromIds(String jobId, Stream<String> ids) {
+        writeFromIds(jobId, ids, getFromIdFile(jobId));
     }
 }

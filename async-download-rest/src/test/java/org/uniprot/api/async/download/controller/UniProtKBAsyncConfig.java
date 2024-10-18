@@ -8,6 +8,9 @@ public class UniProtKBAsyncConfig implements TestAsyncConfig {
     @Value("${async.download.uniprotkb.result.idFilesFolder}")
     private String idsFolder;
 
+    @Value("${async.download.uniprotkb.result.fromIdFilesFolder}")
+    private String fromIdsFolder;
+
     @Value("${async.download.uniprotkb.result.resultFilesFolder}")
     private String resultFolder;
 
@@ -22,6 +25,11 @@ public class UniProtKBAsyncConfig implements TestAsyncConfig {
 
     @Value("${async.download.uniprotkb.retryMaxCount}")
     private int maxRetry;
+
+    @Override
+    public String getFromIdsFolder() {
+        return fromIdsFolder;
+    }
 
     @Override
     public String getIdsFolder() {

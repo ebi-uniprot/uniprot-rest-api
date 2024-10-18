@@ -68,7 +68,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected DownloadJobRepository<UniRefDownloadJob> getJobRepository() {
+    protected DownloadJobRepository<UniRefDownloadJob> getMapDownloadJobRepository() {
         return jobRepository;
     }
 
@@ -119,7 +119,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected FileHandler getFileHandler() {
+    protected FileHandler getMapFileHandler() {
         return fileHandler;
     }
 
