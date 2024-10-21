@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,8 @@ import org.uniprot.api.async.download.service.mapto.MapToJobService;
 @ExtendWith(MockitoExtension.class)
 class MapToRequestProcessorTest {
     public static final String ID = "someId";
-    public static final String UNI_PROT_KB = "UniProtKB";
-    public static final String UNI_REF = "UniRef";
+    public static final String UNI_PROT_KB = uniprot.name();
+    public static final String UNI_REF = uniref.name();
     @Mock private UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
 
     @Mock

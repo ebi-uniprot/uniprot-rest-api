@@ -12,7 +12,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
     void canGetType() {
         UniProtKBIdMappingDownloadRequestValidator validator =
                 new UniProtKBIdMappingDownloadRequestValidator();
-        assertEquals("UniProtKB", validator.getType());
+        assertEquals("uniprot", validator.getType());
     }
 
     @Test
@@ -75,7 +75,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid UniProtKB fields parameter values: [upi, identity].",
+                "Invalid uniprot fields parameter values: [upi, identity].",
                 exception.getMessage());
     }
 
@@ -91,7 +91,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid UniProtKB fields parameter value: [invalid].", exception.getMessage());
+                "Invalid uniprot fields parameter value: [invalid].", exception.getMessage());
     }
 
     @Test

@@ -94,16 +94,16 @@ public abstract class MapToDownloadControllerIT extends AbstractDownloadControll
 
     @Override
     protected @NotNull String getJobHashAlreadyFinished() {
-        return "7a2333c31382de4421a2e103c1d83fcfa730c7f6";
+        return "c83aae3998969a1b38fa4a72066c196a8a72db77";
     }
 
     @Override
     protected @NotNull String getJobHashForForceOnFailedJobAfterMaxRetryWillRunAgain() {
-        return "8251d3411850c4410b05de6b7078302a1367d93c";
+        return "2b5cdf1e983c8766bc63108f2bc2e4232002f55d";
     }
 
     @Override
     protected @NotNull String getJobHashForForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() {
-        return "f4a367d599f94183aac3d6c61143f6fea0c0f105";
+        return "39d24482eb412445796f112a0262b0c4e62feafc";
     }
 }

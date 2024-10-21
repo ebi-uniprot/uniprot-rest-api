@@ -61,21 +61,21 @@ public abstract class MapToProducerMessageServiceIT<T extends MapToDownloadReque
 
     @Override
     protected @NotNull String getJobHashForSuccess() {
-        return "7df83695b95d9ff02f48227ef77d433da524e29f";
+        return "e01159046a85cbd920622f34511d9e4c198c6ca4";
     }
 
     @Override
     protected @NotNull String getJobHashForSuccessForceAndIdleJobAllowedAndCleanResources() {
-        return "394c4291a376a0abcc0970e98df9e9a508b08097";
+        return "7a5b14e8b59dd20dcbd27ba8cad1fb45c4806575";
     }
 
     @Override
     protected @NotNull String getJobHashForWithoutFormatDefaultToJson() {
-        return "5109e0bb83845063663bd7e6862610269490f298";
+        return "964a9c6154896d88132b6082d397dc6ca9d9f733";
     }
 
     @Override
     protected @NotNull String getJobHashForAlreadyRunning() {
-        return "5762160d06e543cf019fad87a720d8676d5410d6";
+        return "ab3f9709a8a59b7241901f13167686bf124fdd81";
     }
 }
