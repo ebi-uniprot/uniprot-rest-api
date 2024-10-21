@@ -99,6 +99,10 @@ public class UniParcLightEntryService
             UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        return getRdfStream(dataType, format, solrRequest);
+    }
+
+    private Stream<String> getRdfStream(String dataType, String format, SolrRequest solrRequest) {
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
