@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.messaging.consumer.processor.mapto;
 import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.Map;
 import java.util.Objects;
@@ -13,12 +14,11 @@ import org.uniprot.api.async.download.messaging.consumer.processor.mapto.composi
 import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
-import org.uniprot.api.rest.download.model.StoreType;
 
 @Component
 public class MapToRequestProcessor implements RequestProcessor<MapToDownloadRequest> {
-    public static final String UNIPROT_KB = StoreType.UNIPROT_KB.getName();
-    public static final String UNIREF = StoreType.UNI_REF.getName();
+    public static final String UNIPROT_KB = uniprot.name();
+    public static final String UNIREF = uniref.name();
     private final UniProtKBToUniRefCompositeRequestProcessor
             uniProtKBToUniRefCompositeRequestProcessor;
     private final MapToJobService jobService;

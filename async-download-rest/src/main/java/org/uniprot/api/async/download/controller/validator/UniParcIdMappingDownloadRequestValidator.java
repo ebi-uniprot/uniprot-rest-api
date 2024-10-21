@@ -3,10 +3,10 @@ package org.uniprot.api.async.download.controller.validator;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.List;
 
-import org.uniprot.api.rest.download.model.StoreType;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -30,7 +30,7 @@ public class UniParcIdMappingDownloadRequestValidator
 
     @Override
     protected String getType() {
-        return StoreType.UNI_PARC.getName();
+        return uniparc.name();
     }
 
     @Override
