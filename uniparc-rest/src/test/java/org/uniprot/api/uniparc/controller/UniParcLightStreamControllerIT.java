@@ -336,7 +336,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
-    @MethodSource("getContentTypes")
+    @MethodSource("getContentTypesForUniParcStream")
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -365,31 +365,6 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
-    }
-
-    @Test
-    void streamByProteomeIdRdfCanReturnSuccess() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n\n"
-                                                        + "</rdf:RDF>")));
     }
 
     @Test
@@ -565,7 +540,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
-    @MethodSource("getContentTypes")
+    @MethodSource("getContentTypesForUniParcStreamByByProteomeId")
     void streamByProteomeIdAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -615,7 +590,11 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
                 .map(Arguments::of);
     }
 
-    private Stream<Arguments> getContentTypes() {
+    private Stream<Arguments> getContentTypesForUniParcStream() {
         return super.getContentTypes(streamRequestPath);
+    }
+
+    private Stream<Arguments> getContentTypesForUniParcStreamByByProteomeId() {
+        return super.getContentTypes(streamByProteomeIdRequestPath);
     }
 }

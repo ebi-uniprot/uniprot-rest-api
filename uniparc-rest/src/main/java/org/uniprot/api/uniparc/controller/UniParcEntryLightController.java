@@ -449,9 +449,6 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE,
-                TURTLE_MEDIA_TYPE_VALUE,
-                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             hidden = true,
@@ -485,19 +482,8 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                             MediaType contentType,
                     HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);
-        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
-        if (acceptedRdfContentType.isPresent()) {
-            return super.streamRdf(
-                    () ->
-                            queryService.streamRdf(
-                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
-                    streamRequest,
-                    contentType,
-                    request);
-        } else {
-            return super.stream(
-                    () -> queryService.stream(streamRequest), streamRequest, contentType, request);
-        }
+        return super.stream(
+                () -> queryService.stream(streamRequest), streamRequest, contentType, request);
     }
 
     @Override
