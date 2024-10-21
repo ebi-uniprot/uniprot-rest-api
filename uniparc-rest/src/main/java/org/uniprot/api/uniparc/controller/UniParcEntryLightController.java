@@ -386,6 +386,20 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         return getByUpis(idsSearchRequest, request, response);
     }
 
+    private ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpis(
+            IdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
+    }
+
     @SuppressWarnings("squid:S3752")
     @RequestMapping(
             value = "/upis",
@@ -501,19 +515,5 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
-    }
-
-    private ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpis(
-            IdsSearchRequest idsSearchRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
-
-        return super.getSearchResponse(
-                results,
-                idsSearchRequest.getFields(),
-                idsSearchRequest.isDownload(),
-                request,
-                response);
     }
 }

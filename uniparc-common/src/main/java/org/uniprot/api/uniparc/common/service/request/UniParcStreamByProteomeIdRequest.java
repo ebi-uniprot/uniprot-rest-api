@@ -40,15 +40,15 @@ public class UniParcStreamByProteomeIdRequest implements StreamRequest, BasicReq
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPARC,
             messagePrefix = "search.uniparc")
-    protected String query;
+    private String query;
 
     @Parameter(description = SORT_UNIPARC_DESCRIPTION, example = SORT_UNIPARC_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
-    protected String sort;
+    private String sort;
 
     @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
-    protected String fields;
+    private String fields;
 
     @Parameter(hidden = true)
     private String format;
