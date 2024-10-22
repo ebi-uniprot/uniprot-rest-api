@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.mq.uniprotkb;
+package org.uniprot.api.async.download.messaging.service.uniprotkb;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBAsyncDownloadQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.UniProtKBRabbitTemplate;
-import org.uniprot.api.async.download.mq.RabbitMQMessagingServiceTest;
+import org.uniprot.api.async.download.messaging.service.RabbitMQMessagingServiceTest;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBRabbitMQMessagingServiceTest extends RabbitMQMessagingServiceTest {

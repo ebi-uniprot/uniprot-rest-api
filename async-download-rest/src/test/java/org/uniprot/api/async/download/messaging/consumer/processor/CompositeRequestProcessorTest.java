@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.InOrderImpl;
-import org.uniprot.api.async.download.messaging.consumer.processor.CompositeRequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 
 public abstract class CompositeRequestProcessorTest<T extends DownloadRequest> {

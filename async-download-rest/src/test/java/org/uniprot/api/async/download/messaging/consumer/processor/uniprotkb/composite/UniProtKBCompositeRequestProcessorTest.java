@@ -7,7 +7,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.processor.CompositeRequestProcessorTest;
 import org.uniprot.api.async.download.messaging.consumer.processor.uniprotkb.id.UniProtKBSolrIdRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.uniprotkb.result.UniProtKBSolrIdResultRequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.processor.uniprotkb.composite.UniProtKBCompositeRequestProcessor;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
 
 @ExtendWith(MockitoExtension.class)

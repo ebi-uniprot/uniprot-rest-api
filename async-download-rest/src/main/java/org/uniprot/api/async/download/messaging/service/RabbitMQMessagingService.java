@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.mq;
+package org.uniprot.api.async.download.messaging.service;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

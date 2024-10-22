@@ -49,7 +49,7 @@ public abstract class MapToProducerMessageServiceIT<T extends MapToDownloadReque
 
     @TestConfiguration
     @ComponentScan({
-        "org.uniprot.api.async.download.mq.mapto",
+        "org.uniprot.api.async.download.messaging.service.mapto",
         "org.uniprot.api.async.download.service.mapto",
         "org.uniprot.api.async.download.messaging.consumer.mapto",
         "org.uniprot.api.async.download.messaging.config.mapto",

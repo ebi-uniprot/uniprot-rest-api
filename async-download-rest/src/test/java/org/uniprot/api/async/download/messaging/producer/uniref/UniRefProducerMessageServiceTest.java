@@ -16,9 +16,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
+import org.uniprot.api.async.download.messaging.service.uniref.UniRefMessagingService;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
-import org.uniprot.api.async.download.mq.uniref.UniRefMessagingService;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 import org.uniprot.api.rest.request.HashGenerator;
 

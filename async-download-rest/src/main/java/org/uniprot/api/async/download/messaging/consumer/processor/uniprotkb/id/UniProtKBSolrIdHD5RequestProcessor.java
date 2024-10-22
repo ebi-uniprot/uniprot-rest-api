@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.async.download.messaging.config.uniprotkb.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.processor.IdRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.uniprotkb.UniProtKBFileHandler;
+import org.uniprot.api.async.download.messaging.service.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadRequest;
-import org.uniprot.api.async.download.mq.uniprotkb.UniProtKBMessagingService;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 

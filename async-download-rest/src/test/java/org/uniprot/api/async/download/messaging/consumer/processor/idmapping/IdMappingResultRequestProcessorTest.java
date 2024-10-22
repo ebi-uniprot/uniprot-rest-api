@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.idmapping.IdMappingHeartbeatProducer;
 import org.uniprot.api.async.download.messaging.consumer.processor.ResultProcessingException;
-import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.IdMappingResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.IdMappingResultStreamerFacade;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
 import org.uniprot.api.common.repository.search.EntryPair;

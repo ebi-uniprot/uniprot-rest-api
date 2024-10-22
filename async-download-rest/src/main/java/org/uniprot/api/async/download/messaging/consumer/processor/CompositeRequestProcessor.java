@@ -2,7 +2,6 @@ package org.uniprot.api.async.download.messaging.consumer.processor;
 
 import java.util.List;
 
-import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
 
 public class CompositeRequestProcessor<T extends DownloadRequest> implements RequestProcessor<T> {

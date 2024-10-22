@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.mq;
+package org.uniprot.api.async.download.messaging.service;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;

@@ -9,10 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.IdMappingResultRequestProcessorFactory;
-import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.UniParcIdMappingResultRequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.UniProtKBMappingResultRequestProcessor;
-import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.UniRefIdMappingResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.ResultProcessingException;
 
 @ExtendWith(MockitoExtension.class)

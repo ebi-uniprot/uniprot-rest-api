@@ -90,8 +90,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
         InvalidRequestException exception =
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
-        assertEquals(
-                "Invalid uniprot fields parameter value: [invalid].", exception.getMessage());
+        assertEquals("Invalid uniprot fields parameter value: [invalid].", exception.getMessage());
     }
 
     @Test

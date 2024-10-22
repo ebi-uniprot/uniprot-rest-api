@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.mapto.composite.MapCompositeRequestProcessorTest;
-import org.uniprot.api.async.download.messaging.consumer.processor.mapto.composite.UniProtKBToUniRefCompositeRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.mapto.from.UniProtKBToUniRefFromIdRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.mapto.result.UniProtKBToUniRefResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.processor.mapto.to.UniProtKBToUniRefToIdRequestProcessor;

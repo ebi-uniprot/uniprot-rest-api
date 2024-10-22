@@ -10,9 +10,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.MessageConsumerTest;
 import org.uniprot.api.async.download.messaging.consumer.processor.idmapping.IdMappingRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
+import org.uniprot.api.async.download.messaging.service.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 
 @ExtendWith(MockitoExtension.class)

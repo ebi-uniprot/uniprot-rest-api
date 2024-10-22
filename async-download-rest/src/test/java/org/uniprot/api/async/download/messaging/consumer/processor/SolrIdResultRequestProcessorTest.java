@@ -20,8 +20,6 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatProducer;
-import org.uniprot.api.async.download.messaging.consumer.processor.ResultProcessingException;
-import org.uniprot.api.async.download.messaging.consumer.processor.SolrIdResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;

@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.uniprot.api.async.download.messaging.consumer.processor.SolrIdRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
