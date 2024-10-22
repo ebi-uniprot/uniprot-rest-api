@@ -76,12 +76,12 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
     }
 
     @Test
     void onMessage_jobCurrentlyRunning() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         Message message = new Message("body".getBytes(), messageHeader);
@@ -93,12 +93,12 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(RUNNING, job.getStatus());
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
-        assertTrue(fileHandler.areAllFilesPresent(ID));
+        assertTrue(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     @Test
     void onMessage_alreadyFinished() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         Message message = new Message("body".getBytes(), messageHeader);
@@ -111,12 +111,12 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(0, job.getRetried());
         assertEquals(UPDATE_COUNT, job.getUpdateCount());
         assertEquals(PROCESSED_ENTRIES, job.getProcessedEntries());
-        assertTrue(fileHandler.areAllFilesPresent(ID));
+        assertTrue(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     @Test
     void onMessage_retryLoop() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         messageHeader.setHeader(CURRENT_RETRIED_COUNT_HEADER, 1);
@@ -132,7 +132,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(MAX_RETRY_COUNT, job.getRetried());
         assertEquals(0, job.getUpdateCount());
         assertEquals(0, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
@@ -153,12 +153,16 @@ public abstract class SolrIdMessageConsumerIT<
         R job = downloadJobRepository.findById(ID).get();
         assertEquals(0, job.getRetried());
         assertEquals(12, job.getTotalEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
         assertJobSpecifics(job, format);
         verifyIdsFiles(ID);
         if (Objects.equals(format, "json")) {
             verifyResultFile(ID);
         }
+    }
+
+    protected void areFilesPresent() {
+        assertFalse(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
     protected abstract void verifyIdsFiles(String id) throws Exception;
@@ -176,7 +180,7 @@ public abstract class SolrIdMessageConsumerIT<
 
     @Test
     void onMessage_successOnRemainingAttempt() throws Exception {
-        createIdAndResultFiles(ID);
+        createAllFiles(ID);
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID_HEADER, ID);
         messageHeader.setHeader(CURRENT_RETRIED_COUNT_HEADER, 1);
@@ -190,7 +194,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertEquals(1, job.getRetried());
         assertEquals(12, job.getTotalEntries());
         assertEquals(12, job.getProcessedEntries());
-        assertFalse(fileHandler.areAllFilesPresent(ID));
+        areFilesPresent();
         assertJobSpecifics(job, "json");
     }
 
@@ -210,7 +214,8 @@ public abstract class SolrIdMessageConsumerIT<
         return downloadJobRepository.findById(id).get().getStatus();
     }
 
-    private void createIdAndResultFiles(String id) throws Exception {
+    private void createAllFiles(String id) throws Exception {
+        createFromIdFile(id);
         createIdFile(id);
         createResultFile(id);
     }
@@ -222,6 +227,10 @@ public abstract class SolrIdMessageConsumerIT<
 
     private void createIdFile(String jobId) throws Exception {
         createFile(downloadConfigProperties.getIdFilesFolder(), jobId);
+    }
+
+    private void createFromIdFile(String jobId) throws Exception {
+        createFile(downloadConfigProperties.getFromIdFilesFolder(), jobId);
     }
 
     private void createFile(String folder, String fileName) throws Exception {

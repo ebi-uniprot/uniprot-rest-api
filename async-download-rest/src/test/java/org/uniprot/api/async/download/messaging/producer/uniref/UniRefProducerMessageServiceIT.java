@@ -68,7 +68,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected DownloadJobRepository<UniRefDownloadJob> getJobRepository() {
+    protected DownloadJobRepository<UniRefDownloadJob> getMapDownloadJobRepository() {
         return jobRepository;
     }
 
@@ -119,7 +119,7 @@ public class UniRefProducerMessageServiceIT
     }
 
     @Override
-    protected FileHandler getFileHandler() {
+    protected FileHandler getMapFileHandler() {
         return fileHandler;
     }
 
@@ -131,7 +131,7 @@ public class UniRefProducerMessageServiceIT
     @TestConfiguration
     @ComponentScan({
         "org.uniprot.api.async.download.messaging.producer.uniref",
-        "org.uniprot.api.async.download.mq.uniref",
+        "org.uniprot.api.async.download.messaging.service.uniref",
         "org.uniprot.api.async.download.service.uniref",
         "org.uniprot.api.async.download.messaging.consumer.uniref",
         "org.uniprot.api.async.download.messaging.config.uniref",

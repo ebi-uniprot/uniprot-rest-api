@@ -12,4 +12,9 @@ public class UniProtKBFileHandler extends FileHandler {
             UniProtKBHeartbeatProducer uniProtKBHeartbeatProducer) {
         super(uniProtKBDownloadConfigProperties, uniProtKBHeartbeatProducer);
     }
+
+    @Override
+    public boolean areAllFilesPresent(String jobId) {
+        return super.areIdAndResultFilesPresent(jobId);
+    }
 }

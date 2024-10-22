@@ -68,7 +68,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected DownloadJobRepository<UniProtKBDownloadJob> getJobRepository() {
+    protected DownloadJobRepository<UniProtKBDownloadJob> getMapDownloadJobRepository() {
         return jobRepository;
     }
 
@@ -120,7 +120,7 @@ class UniProtKBProducerMessageServiceIT
     }
 
     @Override
-    protected FileHandler getFileHandler() {
+    protected FileHandler getMapFileHandler() {
         return fileHandler;
     }
 
@@ -132,7 +132,7 @@ class UniProtKBProducerMessageServiceIT
     @TestConfiguration
     @ComponentScan({
         "org.uniprot.api.async.download.messaging.producer.uniprotkb",
-        "org.uniprot.api.async.download.mq.uniprotkb",
+        "org.uniprot.api.async.download.messaging.service.uniprotkb",
         "org.uniprot.api.async.download.service.uniprotkb",
         "org.uniprot.api.async.download.messaging.consumer.uniprotkb",
         "org.uniprot.api.async.download.messaging.config.uniprotkb",

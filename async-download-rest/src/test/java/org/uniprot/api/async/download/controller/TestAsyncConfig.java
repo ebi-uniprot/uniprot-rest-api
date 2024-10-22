@@ -5,6 +5,8 @@ public interface TestAsyncConfig {
 
     String getResultFolder();
 
+    String getFromIdsFolder();
+
     String getDownloadQueue();
 
     String getRetryQueue();
