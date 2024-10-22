@@ -60,16 +60,6 @@ class HeartbeatProducerTest {
                         .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
-    /*private void verifySavedMapDownloadJob(Long processedEntries) {
-        verify(jobService).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
-        Map<String, Object> savedJob = downloadJobArgumentCaptor.getValue();
-        assertEquals(1L, savedJob.get(UPDATE_COUNT));
-        assertEquals(processedEntries, savedJob.get(PROCESSED_ENTRIES));
-        assertTrue(
-                ((LocalDateTime) savedJob.get(UPDATED))
-                        .isAfter(LocalDateTime.now().minusMinutes(2)));
-    }*/
-
     @Test
     void createForResults_whenHeartBeatEnabledAndIntervalIsSmallerThanBatchSize() {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
