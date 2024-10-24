@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
@@ -28,6 +29,8 @@ class UniParcCrossReferenceServiceTest {
     @Mock private UniParcLightStoreClient uniParcLightStoreClient;
     @Mock private UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient;
     @Mock private UniParcCrossReferenceStoreConfigProperties storeConfigProperties;
+
+    @Mock private UniParcCrossReferenceFacetConfig uniParcCrossReferenceFacetConfig;
     private UniParcCrossReferenceService service;
 
     @BeforeEach
@@ -37,7 +40,8 @@ class UniParcCrossReferenceServiceTest {
                 new UniParcCrossReferenceService(
                         uniParcLightStoreClient,
                         uniParcCrossReferenceStoreClient,
-                        storeConfigProperties);
+                        storeConfigProperties,
+                        uniParcCrossReferenceFacetConfig);
     }
 
     @Test

@@ -799,6 +799,10 @@ public class OpenAPIConstants {
             "Facet filter query for UniRef Cluster Members";
     public static final String FACET_FILTER_UNIREF_EXAMPLE = "member_id_type:uniprotkb_id";
 
+    public static final String FACET_FILTER_UNIPARC_CROSS_REF_DESCRIPTION =
+            "Facet filter query for UniParc Cross References";
+    public static final String FACET_FILTER_UNIPARC_CROSS_REF_EXAMPLE = "active:true";
+
     // HELP
     public static final String TAG_HELP = "help";
     public static final String TAG_HELP_DESC = "UniProt Help centre API";
