@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
+import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -390,6 +391,173 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
             String returnFieldValidatePath = "$.results[*]." + path;
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
+    }
+
+    @Test
+    void testGetDatabasesWithFacetsSuccess() throws Exception {
+        // when
+        saveEntry();
+        String facets = "status,organisms,databases";
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facets)
+                                        .param("size", "0"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results").isEmpty())
+                .andExpect(jsonPath("$.facets.size()", is(3)))
+                .andExpect(jsonPath("$.facets[0].label", is("Status")))
+                .andExpect(jsonPath("$.facets[0].name", is(ACTIVE_FIELD)))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(2)))
+                .andExpect(jsonPath("$.facets[0].values[*].value", hasItems("true", "false")))
+                .andExpect(
+                        jsonPath("$.facets[0].values[*].label", hasItems(ACTIVE_STR, INACTIVE_STR)))
+                .andExpect(jsonPath("$.facets[0].values[*].count", hasItems(21, 4)))
+                .andExpect(jsonPath("$.facets[1].label", is("Organisms")))
+                .andExpect(jsonPath("$.facets[1].name", is(TAXONIDS_FIELD)))
+                .andExpect(jsonPath("$.facets[1].values.size()", is(2)))
+                .andExpect(
+                        jsonPath("$.facets[1].values[*].label", hasItems("Name 7787", "Name 9606")))
+                .andExpect(jsonPath("$.facets[1].values[*].value", hasItems("7787", "9606")))
+                .andExpect(jsonPath("$.facets[1].values[*].count", hasItems(5, 4)))
+                .andExpect(jsonPath("$.facets[2].label", is("Databases")))
+                .andExpect(jsonPath("$.facets[2].name", is(DBTYPES_FIELD)))
+                .andExpect(jsonPath("$.facets[2].values.size()", is(6)))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values[*].label",
+                                hasItems(
+                                        "UniProtKB/Swiss-Prot",
+                                        "UniProtKB/TrEMBL",
+                                        "UNIMES",
+                                        "RefSeq",
+                                        "VectorBase",
+                                        "EMBL")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[2].values[*].value",
+                                hasItems(
+                                        "UniProtKB/Swiss-Prot",
+                                        "UniProtKB/TrEMBL",
+                                        "UNIMES",
+                                        "RefSeq",
+                                        "VectorBase",
+                                        "EMBL")))
+                .andExpect(jsonPath("$.facets[2].values[*].count", hasItems(5, 4, 4, 4, 4, 4)));
+    }
+
+    @Test
+    void testGetDatabasesWithFacetsAndOtherFilterSuccess() throws Exception {
+        // when
+        saveEntry();
+        String facets = "status,organisms,databases";
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facets)
+                                        .param("dbTypes", "UniProtKB/Swiss-Prot"));
+        // then
+        verifyResponse(response);
+    }
+
+    @Test
+    void testGetDatabasesWithFacetsAndMoreThanOneFilter() throws Exception {
+        // when
+        saveEntry();
+        String facets = "status,organisms,databases";
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facets)
+                                        .param("dbTypes", "UniProtKB/Swiss-Prot")
+                                        .param("taxonIds", "7787")
+                                        .param("active", "true"));
+        // then
+        verifyResponse(response);
+    }
+
+    @Test
+    void testGetDatabasesWithoutFacetsAndOtherFilterSuccess() throws Exception {
+        // when
+        saveEntry();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("dbTypes", "UniProtKB/Swiss-Prot"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].database",
+                                everyItem(equalTo("UniProtKB/Swiss-Prot"))))
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void testGetDatabasesWithInvalidFacets() throws Exception {
+        // when
+        saveEntry();
+        String facets = "status,invalidfacet,databases";
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), getIdPathValue())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facets)
+                                        .param("size", "0"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages").exists())
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid facet name 'invalidfacet'. Expected value can be [status, organisms, databases].")));
+    }
+
+    private void verifyResponse(ResultActions response) throws Exception {
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(jsonPath("$.facets.size()", is(3)))
+                .andExpect(jsonPath("$.facets[0].label", is("Status")))
+                .andExpect(jsonPath("$.facets[0].name", is(ACTIVE_FIELD)))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].values[*].value", hasItems("true")))
+                .andExpect(jsonPath("$.facets[0].values[*].label", hasItems(ACTIVE_STR)))
+                .andExpect(jsonPath("$.facets[0].values[*].count", hasItems(5)))
+                .andExpect(jsonPath("$.facets[1].label", is("Organisms")))
+                .andExpect(jsonPath("$.facets[1].name", is(TAXONIDS_FIELD)))
+                .andExpect(jsonPath("$.facets[1].values.size()", is(1)))
+                .andExpect(jsonPath("$.facets[1].values[*].label", hasItems("Name 7787")))
+                .andExpect(jsonPath("$.facets[1].values[*].value", hasItems("7787")))
+                .andExpect(jsonPath("$.facets[1].values[*].count", hasItems(5)))
+                .andExpect(jsonPath("$.facets[2].label", is("Databases")))
+                .andExpect(jsonPath("$.facets[2].name", is(DBTYPES_FIELD)))
+                .andExpect(jsonPath("$.facets[2].values.size()", is(1)))
+                .andExpect(
+                        jsonPath("$.facets[2].values[*].label", hasItems("UniProtKB/Swiss-Prot")))
+                .andExpect(
+                        jsonPath("$.facets[2].values[*].value", hasItems("UniProtKB/Swiss-Prot")))
+                .andExpect(jsonPath("$.facets[2].values[*].count", hasItems(5)));
     }
 
     static class UniParcGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
