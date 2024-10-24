@@ -22,12 +22,11 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
-import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -41,15 +40,14 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 class UniParcQueryServiceTest {
     @Mock private UniParcQueryRepository repository;
     @Mock private UniParcFacetConfig facetConfig;
-    @Mock private UniParcSortClause solrSortClause;
     @Mock private UniParcQueryResultConverter uniParcQueryResultConverter;
     @Mock private StoreStreamer<UniParcEntry> storeStreamer;
     @Mock private SolrQueryConfig uniParcSolrQueryConf;
-    @Mock private UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     @Mock private SearchFieldConfig uniParcSearchFieldConfig;
     @Mock private RdfStreamer uniparcRdfStreamer;
     @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Mock private TupleStreamDocumentIdStream solrIdStreamer;
+    @Mock private RequestConverter requestConverter;
     private UniParcQueryService service;
 
     @BeforeEach
@@ -58,15 +56,14 @@ class UniParcQueryServiceTest {
                 new UniParcQueryService(
                         repository,
                         facetConfig,
-                        solrSortClause,
                         uniParcQueryResultConverter,
                         storeStreamer,
                         uniParcSolrQueryConf,
-                        uniParcQueryProcessorConfig,
                         uniParcSearchFieldConfig,
                         uniparcRdfStreamer,
                         facetTupleStreamTemplate,
-                        solrIdStreamer);
+                        solrIdStreamer,
+                        requestConverter);
     }
 
     @Test

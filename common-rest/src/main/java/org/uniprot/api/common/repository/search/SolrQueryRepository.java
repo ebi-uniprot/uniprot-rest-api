@@ -44,7 +44,7 @@ public abstract class SolrQueryRepository<T extends Document> {
     private final SolrClient solrClient;
     private final SolrCollection collection;
     private final Class<T> tClass;
-    private final FacetResponseConverter facetConverter;
+    private final FacetConfig facetConfig;
     private final SuggestionConverter suggestionConverter;
 
     protected SolrQueryRepository(
@@ -56,7 +56,7 @@ public abstract class SolrQueryRepository<T extends Document> {
         this.solrClient = solrClient;
         this.collection = collection;
         this.tClass = tClass;
-        this.facetConverter = new FacetResponseConverter(facetConfig);
+        this.facetConfig = facetConfig;
         this.requestConverter = requestConverter;
         this.termInfoConverter = new TermInfoConverter();
         this.suggestionConverter = new SuggestionConverter();
@@ -71,6 +71,7 @@ public abstract class SolrQueryRepository<T extends Document> {
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
+            FacetResponseConverter facetConverter = new FacetResponseConverter(facetConfig);
             List<Facet> facets = facetConverter.convert(solrResponse, request.getFacets());
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
             List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
@@ -97,7 +98,8 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
-            JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request, true);
+            JsonQueryRequest solrQuery =
+                    requestConverter.toJsonQueryRequest(request, facetConfig, true);
             QueryResponse response = solrQuery.process(solrClient, collection.toString());
             if (!response.getResults().isEmpty()) {
                 if (response.getResults().size() > 1) {
@@ -120,7 +122,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                 new SolrResultsIterator<>(
                         solrClient,
                         collection,
-                        requestConverter.toJsonQueryRequest(request),
+                        requestConverter.toJsonQueryRequest(request, facetConfig),
                         tClass);
         return StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
@@ -143,7 +145,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     private QueryResponse search(SolrRequest request, String cursor)
             throws IOException, SolrServerException {
-        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
+        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request, facetConfig);
         if (cursor != null && !cursor.isEmpty()) {
             ((ModifiableSolrParams) solrQuery.getParams())
                     .set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);

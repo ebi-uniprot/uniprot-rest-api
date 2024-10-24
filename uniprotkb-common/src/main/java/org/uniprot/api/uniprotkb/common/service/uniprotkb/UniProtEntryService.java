@@ -1,19 +1,17 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.*;
+import static org.uniprot.api.common.repository.search.SolrQueryConverterUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.request.UniProtKBRequestUtil.DASH;
+import static org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverterImpl.*;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
@@ -33,15 +31,12 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.*;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.api.uniprotkb.common.repository.search.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
-import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBBasicRequest;
-import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverter;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -53,38 +48,24 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
-    public static final String ACCESSION_ID = "accession_id";
-    public static final String ACCESSION = "accession";
-    public static final String PROTEIN_ID = "id";
-    public static final String IS_ISOFORM = "is_isoform";
-    public static final String ACTIVE = "active";
-    public static final String CANONICAL_ISOFORM = "-1";
     private final UniProtEntryQueryResultsConverter resultsConverter;
-    private final SolrQueryConfig solrQueryConfig;
     private final UniProtQueryProcessorConfig uniProtQueryProcessorConfig;
-    private final UniProtTermsConfig uniProtTermsConfig;
     private final UniprotQueryRepository repository;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     private final RdfStreamer rdfStreamer;
-
-    private static final Pattern ACCESSION_REGEX_ISOFORM =
-            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
+    private final UniProtKBRequestConverter uniProtKBRequestConverter;
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniProtKBFacetConfig uniprotKBFacetConfig,
-            UniProtTermsConfig uniProtTermsConfig,
-            UniProtSolrSortClause uniProtSolrSortClause,
             SolrQueryConfig uniProtKBSolrQueryConf,
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
@@ -92,32 +73,30 @@ public class UniProtEntryService
             FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
-            @Qualifier("uniProtKBTupleStreamDocumentIdStream")
-                    TupleStreamDocumentIdStream solrIdStreamer,
-            RdfStreamer uniProtRdfStreamer) {
+            TupleStreamDocumentIdStream uniProtKBTupleStreamDocumentIdStream,
+            RdfStreamer uniProtRdfStreamer,
+            UniProtKBRequestConverter uniProtKBRequestConverter) {
         super(
                 repository,
                 uniprotKBFacetConfig,
-                uniProtSolrSortClause,
                 uniProtEntryStoreStreamer,
                 uniProtKBSolrQueryConf,
                 uniProtKBFacetTupleStreamTemplate,
-                solrIdStreamer);
+                uniProtKBTupleStreamDocumentIdStream,
+                uniProtKBRequestConverter);
         this.repository = repository;
-        this.uniProtTermsConfig = uniProtTermsConfig;
-        this.solrQueryConfig = uniProtKBSolrQueryConf;
         this.uniProtQueryProcessorConfig = uniProtKBQueryProcessorConfig;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         this.rdfStreamer = uniProtRdfStreamer;
+        this.uniProtKBRequestConverter = uniProtKBRequestConverter;
     }
 
     @Override
     public QueryResult<UniProtKBEntry> search(SearchRequest request) {
-
-        SolrRequest solrRequest = createSearchSolrRequest(request);
+        SolrRequest solrRequest = uniProtKBRequestConverter.createSearchSolrRequest(request);
 
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
@@ -143,7 +122,6 @@ public class UniProtEntryService
         return searchFieldConfig.getSearchFieldItemByName(ACCESSION_ID);
     }
 
-    @Override
     public UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return uniProtQueryProcessorConfig;
     }
@@ -153,11 +131,12 @@ public class UniProtEntryService
         try {
             List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
             accession = accession.toUpperCase();
-            SolrRequest solrRequest = buildSolrRequest(accession);
+            SolrRequest solrRequest =
+                    uniProtKBRequestConverter.createAccessionSolrRequest(accession);
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
             if (accession.endsWith(CANONICAL_ISOFORM) && optionalDoc.isEmpty()) {
                 accession = accession.substring(0, accession.indexOf(CANONICAL_ISOFORM));
-                solrRequest = buildSolrRequest(accession);
+                solrRequest = uniProtKBRequestConverter.createAccessionSolrRequest(accession);
                 optionalDoc = repository.getEntry(solrRequest);
             }
             Optional<UniProtKBEntry> optionalUniProtEntry =
@@ -177,7 +156,7 @@ public class UniProtEntryService
 
     @Override
     public Stream<UniProtKBEntry> stream(StreamRequest request) {
-        SolrRequest query = createDownloadSolrRequest(request);
+        SolrRequest query = uniProtKBRequestConverter.createStreamSolrRequest(request);
         if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
             return this.solrIdStreamer
                     .fetchIds(query)
@@ -194,34 +173,17 @@ public class UniProtEntryService
         facetFields.forEach(solrQuery::set);
         solrQuery.set(FacetParams.FACET, true);
         solrQuery.set(DEF_TYPE, "edismax");
-        solrQuery.add(QUERY_FIELDS, getQueryFields(query));
+        solrQuery.add(QUERY_FIELDS, uniProtKBRequestConverter.getQueryFields(query));
         if (UniProtKBRequestUtil.needsToFilterIsoform(ACCESSION, IS_ISOFORM, query, false)) {
             solrQuery.add(FILTER_QUERY, getQueryFieldName(IS_ISOFORM) + ":" + false);
         }
         return repository.query(solrQuery).getFacetFields();
     }
 
-    private SolrRequest buildSolrRequest(String accession) {
-        return SolrRequest.builder()
-                .query(ACCESSION_ID + ":" + accession)
-                .rows(NumberUtils.INTEGER_ONE)
-                .build();
-    }
-
     public String findAccessionByProteinId(String proteinId) {
         try {
             SolrRequest solrRequest =
-                    SolrRequest.builder()
-                            .query(
-                                    PROTEIN_ID
-                                            + ":"
-                                            + proteinId.toUpperCase()
-                                            + " AND  "
-                                            + IS_ISOFORM
-                                            + ":false")
-                            .sorts(solrSortClause.getSort(null))
-                            .rows(NumberUtils.INTEGER_TWO)
-                            .build();
+                    uniProtKBRequestConverter.createProteinIdSolrRequest(proteinId);
             QueryResult<UniProtDocument> queryResult = repository.searchPage(solrRequest, null);
             if (queryResult.getPage().getTotalElements() == 0) {
                 throw new ResourceNotFoundException("{search.not.found}");
@@ -273,29 +235,9 @@ public class UniProtEntryService
 
     public Stream<String> streamRdf(
             UniProtKBStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
+        SolrRequest solrRequest = uniProtKBRequestConverter.createStreamSolrRequest(streamRequest);
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
-    }
-
-    @Override
-    public SolrRequest createDownloadSolrRequest(StreamRequest request) {
-        UniProtKBStreamRequest uniProtRequest = (UniProtKBStreamRequest) request;
-        SolrRequest solrRequest = super.createDownloadSolrRequest(request);
-        boolean filterIsoform =
-                UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION_ID),
-                        getQueryFieldName(IS_ISOFORM),
-                        uniProtRequest.getQuery(),
-                        uniProtRequest.isIncludeIsoform());
-        if (filterIsoform) {
-            addIsoformFilter(solrRequest);
-        }
-        if (isSearchAll(uniProtRequest)) {
-            solrRequest.setQuery(getQueryFieldName(ACTIVE) + ":" + true);
-        }
-        solrRequest.setLargeSolrStreamRestricted(uniProtRequest.isLargeSolrStreamRestricted());
-        return solrRequest;
     }
 
     @Override
@@ -325,55 +267,6 @@ public class UniProtEntryService
     }
 
     @Override
-    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request,
-            AbstractSolrSortClause solrSortClause,
-            SolrQueryConfig queryBoosts) {
-        UniProtKBBasicRequest uniProtRequest = (UniProtKBBasicRequest) request;
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
-        if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
-            uniProtRequest.setQuery(cleanQuery.toUpperCase());
-        }
-        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
-    }
-
-    @Override
-    public SolrRequest createSearchSolrRequest(SearchRequest request) {
-
-        UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
-
-        if (isSearchAll(uniProtRequest)) {
-            uniProtRequest.setQuery(getQueryFieldName(ACTIVE) + ":" + true);
-        } else if (needToAddActiveFilter(uniProtRequest)) {
-            uniProtRequest.setQuery(
-                    uniProtRequest.getQuery() + " AND " + getQueryFieldName(ACTIVE) + ":" + true);
-        }
-
-        // fill the common params from the basic service class
-        SolrRequest solrRequest = super.createSearchSolrRequest(uniProtRequest);
-
-        // uniprotkb related stuff
-        solrRequest.setQueryConfig(solrQueryConfig);
-        boolean filterIsoform =
-                UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION_ID),
-                        getQueryFieldName(IS_ISOFORM),
-                        solrRequest.getQuery(),
-                        uniProtRequest.isIncludeIsoform());
-        if (filterIsoform) {
-            addIsoformFilter(solrRequest);
-        }
-
-        if (uniProtRequest.getShowSingleTermMatchedFields()) {
-            solrRequest.setTermQuery(uniProtRequest.getQuery());
-            List<String> termFields = new ArrayList<>(uniProtTermsConfig.getFields());
-            solrRequest.setTermFields(termFields);
-        }
-
-        return solrRequest;
-    }
-
-    @Override
     protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
@@ -390,12 +283,6 @@ public class UniProtEntryService
         return ids.stream().anyMatch(id -> id.contains(DASH));
     }
 
-    private void addIsoformFilter(SolrRequest solrRequest) {
-        List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
-        queries.add(getQueryFieldName(IS_ISOFORM) + ":" + false);
-        solrRequest.setFilterQueries(queries);
-    }
-
     public StoreRequest buildStoreRequest(BasicRequest request) {
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
@@ -404,17 +291,6 @@ public class UniProtEntryService
             storeRequest.addLineage(true);
         }
         return storeRequest.build();
-    }
-
-    private boolean isSearchAll(UniProtKBBasicRequest uniProtRequest) {
-        return "*".equals(uniProtRequest.getQuery().strip())
-                || "(*)".equals(uniProtRequest.getQuery().strip())
-                || "*:*".equals(uniProtRequest.getQuery().strip())
-                || "(*:*)".equals(uniProtRequest.getQuery().strip());
-    }
-
-    private boolean needToAddActiveFilter(UniProtKBSearchRequest uniProtRequest) {
-        return SolrQueryUtil.hasNegativeTerm(uniProtRequest.getQuery());
     }
 
     public String getQueryFieldName(String active) {

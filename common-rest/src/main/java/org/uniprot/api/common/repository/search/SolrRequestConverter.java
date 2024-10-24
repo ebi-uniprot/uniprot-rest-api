@@ -1,13 +1,13 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.*;
-import static org.uniprot.core.util.Utils.notNull;
+import static org.uniprot.api.common.repository.search.SolrQueryConverterUtils.*;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,11 +24,12 @@ public class SolrRequestConverter {
      * @param request the request that specifies the query
      * @return the solr query
      */
-    public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
-        return toJsonQueryRequest(request, false);
+    public JsonQueryRequest toJsonQueryRequest(SolrRequest request, FacetConfig facetConfig) {
+        return toJsonQueryRequest(request, facetConfig, false);
     }
 
-    public JsonQueryRequest toJsonQueryRequest(SolrRequest request, boolean isEntry) {
+    public JsonQueryRequest toJsonQueryRequest(
+            SolrRequest request, FacetConfig facetConfig, boolean isEntry) {
         final ModifiableSolrParams solrQuery = new ModifiableSolrParams();
         solrQuery.add("q", request.getQuery());
 
@@ -46,18 +47,16 @@ public class SolrRequestConverter {
             setTermFields(solrQuery, request.getTermQuery(), request.getTermFields());
         }
 
-        if (notNull(request.getQueryConfig())) {
-            if (request.getRows() > 1) {
-                setQueryBoostConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
-                setHighlightFieldsConfigs(solrQuery, request.getQueryConfig());
-            }
-            setQueryFields(solrQuery, request);
+        if (request.getRows() > 1) {
+            setQueryBoostConfigs(solrQuery, request);
+            setHighlightFieldsConfigs(solrQuery, request);
         }
+        setQueryFields(solrQuery, request);
 
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
-            setFacets(result, request.getFacets(), request.getFacetConfig());
+            setFacets(result, request.getFacets(), facetConfig);
         }
 
         log.debug("Solr Query without facet and sort details: " + solrQuery);

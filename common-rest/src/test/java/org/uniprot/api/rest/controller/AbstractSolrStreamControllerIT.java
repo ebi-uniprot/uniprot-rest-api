@@ -46,10 +46,10 @@ public abstract class AbstractSolrStreamControllerIT {
 
     @Autowired protected MockMvc mockMvc;
 
-    @Value("${search.default.page.size}")
+    @Value("${search.request.converter.default-page-size}")
     protected String defaultPageSize;
 
-    @Value("${solr.query.batchSize}")
+    @Value("${search.request.converter.default-solr-batch-size}")
     protected String solrBatchSize;
 
     private int totalSavedEntries;

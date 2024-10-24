@@ -24,7 +24,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
@@ -36,43 +36,45 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     private final FacetTupleStreamTemplate tupleStreamTemplate;
     private final FacetTupleStreamConverter tupleStreamConverter;
     private final SolrQueryConfig solrQueryConfig;
+    private final FacetConfig facetConfig;
 
     public StoreStreamerSearchService(
             SolrQueryRepository<D> repository,
             FacetConfig facetConfig,
-            AbstractSolrSortClause solrSortClause,
             StoreStreamer<R> storeStreamer,
             SolrQueryConfig solrQueryConfig,
             FacetTupleStreamTemplate tupleStreamTemplate,
-            TupleStreamDocumentIdStream solrIdStreamer) {
+            TupleStreamDocumentIdStream solrIdStreamer,
+            RequestConverter requestConverter) {
 
         this(
                 repository,
                 null,
-                solrSortClause,
                 facetConfig,
                 storeStreamer,
                 solrQueryConfig,
                 tupleStreamTemplate,
-                solrIdStreamer);
+                solrIdStreamer,
+                requestConverter);
     }
 
     public StoreStreamerSearchService(
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,
-            AbstractSolrSortClause solrSortClause,
             FacetConfig facetConfig,
             StoreStreamer<R> storeStreamer,
             SolrQueryConfig solrQueryConfig,
             FacetTupleStreamTemplate tupleStreamTemplate,
-            TupleStreamDocumentIdStream solrIdStreamer) {
+            TupleStreamDocumentIdStream solrIdStreamer,
+            RequestConverter requestConverter) {
 
-        super(repository, entryConverter, solrSortClause, solrQueryConfig, facetConfig);
+        super(repository, entryConverter, requestConverter);
         this.storeStreamer = storeStreamer;
         this.solrQueryConfig = solrQueryConfig;
         this.tupleStreamTemplate = tupleStreamTemplate;
         this.tupleStreamConverter = new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
         this.solrIdStreamer = solrIdStreamer;
+        this.facetConfig = facetConfig;
     }
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
@@ -81,7 +83,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     @Override
     public Stream<R> stream(StreamRequest request) {
-        SolrRequest query = createDownloadSolrRequest(request);
+        SolrRequest query = getRequestConverter().createStreamSolrRequest(request);
         if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
             return this.solrIdStreamer
                     .fetchIds(query)
@@ -93,7 +95,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     public Stream<String> streamIdsForDownload(StreamRequest request) {
-        SolrRequest solrRequest = createDownloadSolrRequest(request);
+        SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(request);
         return this.storeStreamer.idsStream(solrRequest);
     }
 
@@ -134,10 +136,6 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     protected Stream<R> streamEntries(List<String> idsInPage, IdsSearchRequest request) {
         return this.storeStreamer.streamEntries(idsInPage);
-    }
-
-    protected SolrRequest createDownloadSolrRequest(StreamRequest request) {
-        return createSolrRequestBuilder(request, solrSortClause, queryBoosts).build();
     }
 
     protected abstract UniProtDataType getUniProtDataType();

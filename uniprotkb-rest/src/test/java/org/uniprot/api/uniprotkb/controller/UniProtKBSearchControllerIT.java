@@ -114,7 +114,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.default-page-size:#{null}}")
     private Integer solrBatchSize;
 
     private UniProtKBStoreClient storeClient;

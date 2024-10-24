@@ -69,7 +69,6 @@ class SolrRequestConverterTest {
                             .facet(facet1)
                             .facet(facet2)
                             .termQuery(queryString)
-                            .facetConfig(facetConfig)
                             .termField(termField1)
                             .termField(termField2)
                             .filterQuery(filterQuery1)
@@ -80,7 +79,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, facetConfig);
 
             // then
             SolrParams queryParams = solrQuery.getParams();
@@ -141,7 +140,7 @@ class SolrRequestConverterTest {
             SolrRequest request = SolrRequest.builder().query(queryString).build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, true);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null, true);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -156,7 +155,8 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder().query("too long").termField("field 1").build();
             assertThrows(
-                    InvalidRequestException.class, () -> converter.toJsonQueryRequest(request));
+                    InvalidRequestException.class,
+                    () -> converter.toJsonQueryRequest(request, null));
         }
 
         @Test
@@ -167,7 +167,7 @@ class SolrRequestConverterTest {
                             .termQuery("multi word")
                             .termField("field 1")
                             .build();
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             assertNotNull(solrQuery);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -187,18 +187,18 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("value1 value2")
                             .rows(0)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1:value3^3")
-                                            .boostFunctions("f1,f2")
-                                            .highlightFields("h1,h2")
-                                            .queryFields("field1 field2")
-                                            .build())
+                            /*                            .queryConfig(
+                            SolrQueryConfig.builder()
+                                    .addBoost("field1:value3^3")
+                                    .boostFunctions("f1,f2")
+                                    .highlightFields("h1,h2")
+                                    .queryFields("field1 field2")
+                                    .build())*/
                             .queryField("field1 field2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -217,15 +217,12 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("value1 value2")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1:{query}^3")
-                                            .addBoost("field2:value3^2")
-                                            .build())
+                            .fieldBoost("field1:{query}^3")
+                            .staticBoost("field2:value3^2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
             // then
@@ -244,14 +241,11 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("9606")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1=number:{query}^3")
-                                            .build())
+                            .fieldBoost("field1=number:{query}^3")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -267,14 +261,14 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("hello")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1=number:{query}^3")
-                                            .build())
+                            /*                            .queryConfig(
+                            SolrQueryConfig.builder()
+                                    .addBoost("field1=number:{query}^3")
+                                    .build())*/
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -290,22 +284,19 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("value1 value2")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1:value3^3")
-                                            .addBoost("field2:value4^2")
-                                            .boostFunctions("f1,f2")
-                                            .build())
+                            .staticBoost("field1:value3^3")
+                            .staticBoost("field2:value4^2")
+                            .boostFunctions("f1,f2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
             // then
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
-            assertThat(boostQuery, contains("field1:value3^3", "field2:value4^2"));
+            assertThat(boostQuery, containsInAnyOrder("field1:value3^3", "field2:value4^2"));
             assertThat(queryParams.get("boost"), is("f1,f2"));
         }
 
@@ -315,13 +306,13 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1")
-                            .queryConfig(
-                                    SolrQueryConfig.builder().queryFields("field1 field2").build())
+                            /*                            .queryConfig(
+                            SolrQueryConfig.builder().queryFields("field1 field2").build())*/
                             .queryField("field1 field2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -336,16 +327,13 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("field1:value1 value2")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1:value3^3")
-                                            .addBoost("field2:value4^2")
-                                            .boostFunctions("f1,f2")
-                                            .build())
+                            .fieldBoost("field1:value3^3")
+                            .fieldBoost("field2:value4^2")
+                            .boostFunctions("f1,f2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
 
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -363,16 +351,13 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("field1:value1 value2")
                             .rows(10)
-                            .queryConfig(
-                                    SolrQueryConfig.builder()
-                                            .addBoost("field1:value3^3")
-                                            .addBoost("field2:value4^2")
-                                            .addBoost("field3:{query}^4")
-                                            .build())
+                            .fieldBoost("field1:value3^3")
+                            .fieldBoost("field2:value4^2")
+                            .fieldBoost("field3:{query}^4")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
 
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -381,7 +366,7 @@ class SolrRequestConverterTest {
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
             assertThat(
                     boostQuery,
-                    contains("field3:(value2)^4", "field1:value3^3", "field2:value4^2"));
+                    contains("field1:value3^3", "field2:value4^2", "field3:(value2)^4"));
         }
 
         @Test
@@ -391,11 +376,11 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("value1 value2")
                             .rows(10)
-                            .queryConfig(SolrQueryConfig.builder().highlightFields("h1,h2").build())
+                            .highlightFields("h1,h2")
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 

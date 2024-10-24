@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
+import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -44,6 +47,19 @@ public class UniRuleSolrQueryConfig {
                 .whiteListFields(uniRuleWhiteListFields)
                 .searchFieldConfig(uniRuleSearchFieldConfig)
                 .build();
+    }
+
+    @Bean
+    public RequestConverter uniRuleRequestConverter(
+            SolrQueryConfig uniRuleSolrQueryConf,
+            UniRuleSortClause uniRuleSortClause,
+            UniProtQueryProcessorConfig uniRuleQueryProcessorConfig,
+            RequestConverterConfigProperties requestConverterConfigProperties) {
+        return new RequestConverterImpl(
+                uniRuleSolrQueryConf,
+                uniRuleSortClause,
+                uniRuleQueryProcessorConfig,
+                requestConverterConfigProperties);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
