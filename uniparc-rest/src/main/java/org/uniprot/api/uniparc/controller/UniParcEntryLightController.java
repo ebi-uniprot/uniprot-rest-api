@@ -83,6 +83,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
@@ -98,6 +99,9 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniParcEntryLight.class)),
+                                @Content(
+                                        mediaType = APPLICATION_XML_VALUE,
+                                        schema = @Schema(implementation = UniParcEntryLight.class)),
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
@@ -135,6 +139,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
@@ -149,6 +154,9 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = SearchResult.class)),
+                            @Content(
+                                        mediaType = APPLICATION_XML_VALUE,
+                                        schema = @Schema(implementation = SearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -181,6 +189,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
@@ -203,7 +212,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
-                                                                    implementation = Entry.class,
+                                                                    implementation = StreamResult.class,
                                                                     name = "entries"))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
