@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
 
 /**
  * The purpose of this class is to apply the boosts of a {@link SolrQueryConfig} to a Solr query
@@ -23,12 +24,12 @@ public class BoostApplier {
     private static final String BOOST_QUERY = "bq";
     private static final String BOOST_FUNCTIONS = "boost";
 
-    public static void addBoosts(
-            ModifiableSolrParams solrQuery, String query, SolrQueryConfig boosts) {
-        List<String> fieldBoosts = boosts.getFieldBoosts();
-        List<String> staticBoosts = boosts.getStaticBoosts();
+    public static void addBoosts(ModifiableSolrParams solrQuery, SolrRequest request) {
+        List<String> fieldBoosts = request.getFieldBoosts();
+        List<String> staticBoosts = request.getStaticBoosts();
 
-        Set<String> defaultTermsInQuery = DefaultTermExtractor.extractDefaultTerms(query);
+        Set<String> defaultTermsInQuery =
+                DefaultTermExtractor.extractDefaultTerms(request.getQuery());
 
         // for every default term, e.g., kinase
         for (String term : defaultTermsInQuery) {
@@ -61,8 +62,8 @@ public class BoostApplier {
         staticBoosts.forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
 
         // set boost functions
-        if (!nullOrEmpty(boosts.getBoostFunctions())) {
-            solrQuery.add(BOOST_FUNCTIONS, boosts.getBoostFunctions());
+        if (!nullOrEmpty(request.getBoostFunctions())) {
+            solrQuery.add(BOOST_FUNCTIONS, request.getBoostFunctions());
         }
     }
 }

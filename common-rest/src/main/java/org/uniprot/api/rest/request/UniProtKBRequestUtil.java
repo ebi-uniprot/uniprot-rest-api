@@ -37,10 +37,6 @@ public class UniProtKBRequestUtil {
             String isIsoformField,
             String query,
             boolean isIncludeIsoform) {
-
-        if (queryVerifiesAccessionRegexAndHasDash(query)) {
-            return false;
-        }
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(query, accessionIdField, isIsoformField);
 
@@ -49,12 +45,14 @@ public class UniProtKBRequestUtil {
         boolean hasIsoforms =
                 !accessionValues.isEmpty()
                         && accessionValues.stream().allMatch(acc -> acc.contains("-"));
-
-        if (!hasIdFieldTerms && !hasIsoforms) {
-            return !isIncludeIsoform;
-        } else {
-            return false;
+        boolean result = true;
+        if (isIncludeIsoform
+                || queryVerifiesAccessionRegexAndHasDash(query)
+                || hasIdFieldTerms
+                || hasIsoforms) {
+            result = false;
         }
+        return result;
     }
 
     private static boolean queryVerifiesAccessionRegexAndHasDash(String query) {

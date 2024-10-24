@@ -1,12 +1,9 @@
 package org.uniprot.api.uniparc.common.service;
 
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_REGEX;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,19 +19,16 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.request.*;
-import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
@@ -57,43 +51,36 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String CHECKSUM_STR = "checksum";
     private static final String COMMA_STR = ",";
-    private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
-    private final SolrQueryConfig solrQueryConfig;
     private final RdfStreamer rdfStreamer;
-
-    private static final Pattern UNIPARC_UPI_REGEX_PATTERN = Pattern.compile(UNIPARC_UPI_REGEX);
 
     @Autowired
     public UniParcQueryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
-            UniParcSortClause solrSortClause,
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
             SolrQueryConfig uniParcSolrQueryConf,
-            UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
             RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
-            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
+            TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
+            RequestConverter uniParcRequestConverter) {
 
         super(
                 repository,
                 uniParcQueryResultConverter,
-                solrSortClause,
                 facetConfig,
                 storeStreamer,
                 uniParcSolrQueryConf,
                 uniParcFacetTupleStreamTemplate,
-                uniParcTupleStreamDocumentIdStream);
-        this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
+                uniParcTupleStreamDocumentIdStream,
+                uniParcRequestConverter);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
-        this.solrQueryConfig = uniParcSolrQueryConf;
         this.rdfStreamer = uniParcRdfStreamer;
     }
 
@@ -129,7 +116,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public QueryResult<UniParcEntry> searchByFieldId(
             UniParcGetByIdPageSearchRequest searchRequest) {
         // search uniparc entries from solr
-        SolrRequest solrRequest = createSearchSolrRequest(searchRequest);
+        SolrRequest solrRequest = getRequestConverter().createSearchSolrRequest(searchRequest);
         QueryResult<UniParcDocument> results =
                 repository.searchPage(solrRequest, searchRequest.getCursor());
 
@@ -147,8 +134,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
     public Stream<String> streamRdf(
             UniParcStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
@@ -156,11 +142,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return uniParcQueryProcessorConfig;
     }
 
     @Override
@@ -200,7 +181,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                         .orElseThrow(() -> new ServiceException("Unable to filter UniParc entry"));
 
         List<UniParcCrossReference> databases = filteredUniParcEntry.getUniParcCrossReferences();
-        int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
+        int pageSize =
+                Objects.isNull(request.getSize())
+                        ? getRequestConverter().getDefaultPageSize()
+                        : request.getSize();
         CursorPage cursorPage = CursorPage.of(request.getCursor(), pageSize, databases.size());
         List<UniParcCrossReference> entries =
                 databases.subList(
@@ -221,22 +205,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         UniParcEntryBuilder builder = new UniParcEntryBuilder();
         builder.uniParcId(uniParcId);
         return builder.build();
-    }
-
-    @Override
-    protected SolrRequest.SolrRequestBuilder createSolrRequestBuilder(
-            BasicRequest request,
-            AbstractSolrSortClause solrSortClause,
-            SolrQueryConfig queryBoosts) {
-        if (request instanceof UniParcBasicRequest uniParcBasicRequest) {
-            String cleanQuery =
-                    CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
-            if (UNIPARC_UPI_REGEX_PATTERN.matcher(cleanQuery.toUpperCase()).matches()) {
-                uniParcBasicRequest.setQuery(cleanQuery.toUpperCase());
-            }
-            return super.createSolrRequestBuilder(uniParcBasicRequest, solrSortClause, queryBoosts);
-        }
-        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

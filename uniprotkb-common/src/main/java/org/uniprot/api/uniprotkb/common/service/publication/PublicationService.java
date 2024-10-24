@@ -9,7 +9,6 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -21,6 +20,7 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.common.repository.search.LiteratureRepository;
 import org.uniprot.api.uniprotkb.common.repository.search.PublicationRepository;
@@ -53,6 +53,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
     private final UniProtQueryProcessorConfig literatureQueryProcessorConfig;
     private final LiteratureEntryConverter literatureEntryConverter;
     private final SolrQueryConfig literatureSolrQueryConf;
+    private final RequestConverter publicationRequestConverter;
     private final String idFieldName;
     private final String accessionFieldName;
 
@@ -60,19 +61,18 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
             PublicationRepository publicationRepository,
             LiteratureRepository literatureRepository,
             PublicationConverter publicationConverter,
-            UniProtKBPublicationsSolrSortClause solrSortClause,
             LiteratureEntryConverter literatureEntryConverter,
-            @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
-            PublicationFacetConfig facetConfig,
             UniProtQueryProcessorConfig literatureQueryProcessorConfig,
-            SolrQueryConfig literatureSolrQueryConf) {
-        super(publicationRepository, null, solrSortClause, publicationSolrQueryConf, facetConfig);
+            SolrQueryConfig literatureSolrQueryConf,
+            RequestConverter publicationRequestConverter) {
+        super(publicationRepository, null, publicationRequestConverter);
         this.publicationRepository = publicationRepository;
         this.literatureRepository = literatureRepository;
         this.publicationConverter = publicationConverter;
         this.literatureQueryProcessorConfig = literatureQueryProcessorConfig;
         this.literatureEntryConverter = literatureEntryConverter;
         this.literatureSolrQueryConf = literatureSolrQueryConf;
+        this.publicationRequestConverter = publicationRequestConverter;
         this.idFieldName =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.LITERATURE)
                         .getSearchFieldItemByName("id")
@@ -85,7 +85,8 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
 
     @Override
     public QueryResult<PublicationEntry> search(SearchRequest request) {
-        SolrRequest pubDocsForAccessionSolrRequest = createSearchSolrRequest(request);
+        SolrRequest pubDocsForAccessionSolrRequest =
+                publicationRequestConverter.createSearchSolrRequest(request);
 
         QueryResult<PublicationDocument> results =
                 publicationRepository.searchPage(
@@ -134,11 +135,6 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return literatureQueryProcessorConfig;
-    }
-
     private Map<String, LiteratureEntry> getPubMedLiteratureEntryMap(
             List<PublicationDocument> content) {
         Map<String, LiteratureEntry> result = new HashMap<>();
@@ -170,7 +166,6 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
     private SolrRequest getSolrRequest(String query) {
         return SolrRequest.builder()
                 .query(query)
-                .queryConfig(literatureSolrQueryConf)
                 .queryField(literatureSolrQueryConf.getQueryFields())
                 .sort(SolrQuery.SortClause.asc(idFieldName))
                 .defaultQueryOperator(QueryOperator.OR)

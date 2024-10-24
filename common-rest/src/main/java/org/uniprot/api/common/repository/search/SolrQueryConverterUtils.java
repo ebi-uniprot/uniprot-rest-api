@@ -18,7 +18,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.common.repository.search.request.BoostApplier;
 import org.uniprot.core.util.Utils;
 
-public class SolrQueryConverter {
+public class SolrQueryConverterUtils {
     private static final String QUERY_OPERATOR = "q.op";
     private static final Pattern SINGLE_TERM_PATTERN = Pattern.compile("^\\w+$");
     public static final String TERMS_LIST = "terms.list";
@@ -36,7 +36,7 @@ public class SolrQueryConverter {
     public static final String HIGHLIGHT_PRE = "hl.simple.pre";
     public static final String HIGHLIGHT_POST = "hl.simple.post";
 
-    private SolrQueryConverter() {}
+    private SolrQueryConverterUtils() {}
 
     static void setTermFields(
             ModifiableSolrParams solrQuery, String termQuery, List<String> termFields) {
@@ -113,18 +113,17 @@ public class SolrQueryConverter {
         solrQuery.setSort(sort);
     }
 
-    static void setHighlightFieldsConfigs(ModifiableSolrParams solrQuery, SolrQueryConfig config) {
-        if (Utils.notNullNotEmpty(config.getHighlightFields())) {
+    static void setHighlightFieldsConfigs(ModifiableSolrParams solrQuery, SolrRequest solrRequest) {
+        if (Utils.notNullNotEmpty(solrRequest.getHighlightFields())) {
             solrQuery.add(HIGHLIGHT, "on");
-            solrQuery.add(HIGHLIGHT_FIELDS, config.getHighlightFields());
+            solrQuery.add(HIGHLIGHT_FIELDS, solrRequest.getHighlightFields());
             solrQuery.add(HIGHLIGHT_PRE, "<span class=\"match-highlight\">");
             solrQuery.add(HIGHLIGHT_POST, "</span>");
         }
     }
 
-    static void setQueryBoostConfigs(
-            ModifiableSolrParams solrQuery, String query, SolrQueryConfig boosts) {
-        BoostApplier.addBoosts(solrQuery, query, boosts);
+    static void setQueryBoostConfigs(ModifiableSolrParams solrQuery, SolrRequest solrRequest) {
+        BoostApplier.addBoosts(solrQuery, solrRequest);
     }
 
     static void setQueryFields(ModifiableSolrParams solrQuery, SolrRequest request) {

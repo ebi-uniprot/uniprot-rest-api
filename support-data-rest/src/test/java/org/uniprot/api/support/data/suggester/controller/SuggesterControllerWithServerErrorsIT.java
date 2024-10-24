@@ -36,6 +36,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 
@@ -102,8 +103,9 @@ class SuggesterControllerWithServerErrorsIT {
         public SolrRequestConverter requestConverter() {
             return new SolrRequestConverter() {
                 @Override
-                public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
-                    JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
+                public JsonQueryRequest toJsonQueryRequest(
+                        SolrRequest request, FacetConfig facetConfig) {
+                    JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
 
                     // required for tests, because EmbeddedSolrServer is not sharded
                     ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");

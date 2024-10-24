@@ -1,12 +1,18 @@
 package org.uniprot.api.support.data.crossref.request;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.CROSS_REF_REGEX;
+
 import java.util.*;
+import java.util.regex.Pattern;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
+import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.store.config.UniProtDataType;
@@ -17,6 +23,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @Configuration
 public class CrossRefSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/crossref-query.config";
+    private static final Pattern CROSS_REF_REGEX_PATTERN = Pattern.compile(CROSS_REF_REGEX);
 
     @Bean
     public SolrQueryConfig crossRefSolrQueryConf() {
@@ -42,6 +49,20 @@ public class CrossRefSolrQueryConfig {
                 .whiteListFields(crossRefWhiteListFields)
                 .searchFieldConfig(crossRefSearchFieldConfig)
                 .build();
+    }
+
+    @Bean
+    public RequestConverter crossRefRequestConverter(
+            SolrQueryConfig crossRefSolrQueryConf,
+            CrossRefSolrSortClause crossRefSortClause,
+            UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
+            RequestConverterConfigProperties requestConverterConfigProperties) {
+        return new RequestConverterImpl(
+                crossRefSolrQueryConf,
+                crossRefSortClause,
+                crossRefQueryProcessorConfig,
+                requestConverterConfigProperties,
+                CROSS_REF_REGEX_PATTERN);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

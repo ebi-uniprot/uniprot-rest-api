@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -25,6 +24,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.response.converter.UniRefLightQueryResultConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
@@ -45,7 +45,6 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 @Import(UniRefSolrQueryConfig.class)
 public class UniRefEntryLightService
         extends StoreStreamerSearchService<UniRefDocument, UniRefEntryLight> {
-    private final SolrQueryConfig solrQueryConfig;
     public static final String UNIREF_ID = "id";
     private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
@@ -55,28 +54,26 @@ public class UniRefEntryLightService
     public UniRefEntryLightService(
             UniRefQueryRepository repository,
             UniRefFacetConfig facetConfig,
-            UniRefSortClause uniRefSortClause,
             UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
             RdfStreamer uniRefRdfStreamer,
-            @Qualifier("uniRefFacetTupleStreamTemplate")
-                    FacetTupleStreamTemplate facetTupleStreamTemplate,
-            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream solrIdStreamer) {
+            FacetTupleStreamTemplate uniRefFacetTupleStreamTemplate,
+            TupleStreamDocumentIdStream uniRefDocumentIdStream,
+            RequestConverter uniRefRequestConverter) {
         super(
                 repository,
                 uniRefQueryResultConverter,
-                uniRefSortClause,
                 facetConfig,
                 storeStreamer,
                 uniRefSolrQueryConf,
-                facetTupleStreamTemplate,
-                solrIdStreamer);
+                uniRefFacetTupleStreamTemplate,
+                uniRefDocumentIdStream,
+                uniRefRequestConverter);
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
-        this.solrQueryConfig = uniRefSolrQueryConf;
         this.rdfStreamer = uniRefRdfStreamer;
     }
 
@@ -157,8 +154,7 @@ public class UniRefEntryLightService
 
     public Stream<String> streamRdf(
             UniRefStreamRequest streamRequest, String dataType, String format) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
@@ -166,11 +162,6 @@ public class UniRefEntryLightService
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(UNIREF_ID);
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return uniRefQueryProcessorConfig;
     }
 
     @Override

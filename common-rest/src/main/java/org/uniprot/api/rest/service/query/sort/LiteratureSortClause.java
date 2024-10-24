@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service.light;
+package org.uniprot.api.rest.service.query.sort;
 
 import javax.annotation.PostConstruct;
 
@@ -8,11 +8,11 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
 
 /**
- * @author jluo
- * @date: 20 Aug 2019
+ * @author lgonzales
+ * @since 2019-07-04
  */
 @Component
-public class UniRefSortClause extends AbstractSolrSortClause {
+public class LiteratureSortClause extends AbstractSolrSortClause {
     private static final String DOC_ID = "id";
 
     @PostConstruct
@@ -27,6 +27,6 @@ public class UniRefSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.UNIREF;
+        return UniProtDataType.LITERATURE;
     }
 }

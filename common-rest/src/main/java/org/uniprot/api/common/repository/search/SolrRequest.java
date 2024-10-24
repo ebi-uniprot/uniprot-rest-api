@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 import lombok.*;
 
@@ -13,19 +12,16 @@ import lombok.*;
  *
  * @author Edd
  */
-@Data
+@Getter
+@AllArgsConstructor
 @Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
 public class SolrRequest {
     public static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     private String query;
 
-    @Setter(AccessLevel.NONE)
     private QueryOperator defaultQueryOperator;
 
-    private FacetConfig facetConfig;
     private String termQuery;
-    // TODO: check it to replace it with required config
-    private SolrQueryConfig queryConfig;
 
     private String queryField;
 
@@ -37,6 +33,11 @@ public class SolrRequest {
     private int totalRows;
 
     private boolean largeSolrStreamRestricted = true;
+    private String highlightFields;
+
+    private String boostFunctions;
+    @Singular private List<String> fieldBoosts = new ArrayList<>();
+    @Singular private List<String> staticBoosts = new ArrayList<>();
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();
@@ -47,5 +48,9 @@ public class SolrRequest {
     // https://www.baeldung.com/lombok-builder-default-value
     public static class SolrRequestBuilder {
         private QueryOperator defaultQueryOperator = DEFAULT_OPERATOR;
+
+        public String getQuery() {
+            return query;
+        }
     }
 }
