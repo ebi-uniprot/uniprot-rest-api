@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -608,6 +609,15 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                                             containsString(
                                                                     ">UPI0000083A11 status=active")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(MediaType.APPLICATION_XML))
+                                    .resultMatcher(
+                                            content().string(containsString("UPI0000083A11")))
+                                    .build())
                     .build();
         }
 
@@ -654,6 +664,14 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                             content()
                                                     .string(
                                                             "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(containsString(
+                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .build();
         }
