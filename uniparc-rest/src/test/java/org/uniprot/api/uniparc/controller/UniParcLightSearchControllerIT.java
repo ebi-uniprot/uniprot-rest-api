@@ -612,11 +612,27 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(content().contentType(MediaType.APPLICATION_XML))
                                     .resultMatcher(
                                             content()
-                                                    .contentType(MediaType.APPLICATION_XML))
+                                                    .string(
+                                                            containsString(
+                                                                    "<accession>UPI0000083A11</accession>")))
                                     .resultMatcher(
-                                            content().string(containsString("UPI0000083A11")))
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sequence length=\"30\" checksum=\"F1F61B3F5B5121E3\">MLMPKRTKYRAAAAAAAAAAAAAAAAAAAA</sequence>")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<accession>UPI0000083A20</accession>\n"
+                                                                            + "  <signatureSequenceMatch database=\"CDD\" id=\"SIG000020\">\n"
+                                                                            + "    <ipr name=\"Inter Pro Name20\" id=\"IP000020\"/>\n"
+                                                                            + "    <lcn start=\"12\" end=\"23\" alignment=\"55M\"/>\n"
+                                                                            + "    <lcn start=\"45\" end=\"89\"/>\n"
+                                                                            + "  </signatureSequenceMatch>")))
                                     .build())
                     .build();
         }
@@ -670,8 +686,9 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
                                             content()
-                                                    .string(containsString(
-                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .build();
         }

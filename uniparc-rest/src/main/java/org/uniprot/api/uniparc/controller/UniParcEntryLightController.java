@@ -99,9 +99,9 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniParcEntryLight.class)),
-                                @Content(
-                                        mediaType = APPLICATION_XML_VALUE,
-                                        schema = @Schema(implementation = UniParcEntryLight.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
@@ -155,8 +155,11 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = SearchResult.class)),
                             @Content(
-                                        mediaType = APPLICATION_XML_VALUE,
-                                        schema = @Schema(implementation = SearchResult.class)),
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation = Entry.class,
+                                                    name = "entries")),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -212,7 +215,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
-                                                                    implementation = StreamResult.class,
+                                                                    implementation = Entry.class,
                                                                     name = "entries"))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),

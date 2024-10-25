@@ -243,11 +243,8 @@ class UniParcLightGetIdControllerIT extends BaseUniParcGetByIdControllerTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
-                                    .resultMatcher(
-                                            content()
-                                                    .contentType(MediaType.APPLICATION_XML))
-                                    .resultMatcher(
-                                            content().string(containsString(UNIPARC_ID)))
+                                    .resultMatcher(content().contentType(MediaType.APPLICATION_XML))
+                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -336,8 +333,9 @@ class UniParcLightGetIdControllerIT extends BaseUniParcGetByIdControllerTest {
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
                                             content()
-                                                    .string(containsString(
-                                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                                     .build())
                     .build();
         }
