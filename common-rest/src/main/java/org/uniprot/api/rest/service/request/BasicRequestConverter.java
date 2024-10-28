@@ -124,14 +124,14 @@ public class BasicRequestConverter {
     }
 
     public Integer getDefaultPageSize() {
-        return requestConverterConfigProperties.getDefaultPageSize() == null
+        return requestConverterConfigProperties.getDefaultRestPageSize() == null
                 ? DEFAULT_PAGE_SIZE
-                : requestConverterConfigProperties.getDefaultPageSize();
+                : requestConverterConfigProperties.getDefaultRestPageSize();
     }
 
     public Integer getDefaultBatchSize() {
-        return requestConverterConfigProperties.getDefaultSolrBatchSize() == null
+        return requestConverterConfigProperties.getDefaultSolrPageSize() == null
                 ? DEFAULT_SOLR_BATCH_SIZE
-                : requestConverterConfigProperties.getDefaultSolrBatchSize();
+                : requestConverterConfigProperties.getDefaultSolrPageSize();
     }
 }

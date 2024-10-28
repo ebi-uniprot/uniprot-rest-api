@@ -59,7 +59,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Autowired private TaxonomyRepository repository;
 
-    @Value("${search.request.converter.default-page-size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer solrBatchSize;
 
     @Override

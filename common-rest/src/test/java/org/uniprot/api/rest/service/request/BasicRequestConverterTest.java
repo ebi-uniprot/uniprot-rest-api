@@ -110,7 +110,7 @@ class BasicRequestConverterTest {
         Mockito.when(queryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
         RequestConverterConfigProperties convertProps =
                 Mockito.mock(RequestConverterConfigProperties.class);
-        Mockito.when(convertProps.getDefaultPageSize()).thenReturn(defaultPageSize);
+        Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
                         queryConfig, null, queryProcessorConfig, convertProps, null);
@@ -138,7 +138,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(UniProtQueryProcessorConfig.class);
         RequestConverterConfigProperties convertProps =
                 Mockito.mock(RequestConverterConfigProperties.class);
-        Mockito.when(convertProps.getDefaultPageSize()).thenReturn(defaultPageSize);
+        Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
                         queryConfig, null, queryProcessorConfig, convertProps, null);
@@ -271,7 +271,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(UniProtQueryProcessorConfig.class);
         RequestConverterConfigProperties convertProps =
                 Mockito.mock(RequestConverterConfigProperties.class);
-        Mockito.when(convertProps.getDefaultSolrBatchSize()).thenReturn(defaultSolrBatchSize);
+        Mockito.when(convertProps.getDefaultSolrPageSize()).thenReturn(defaultSolrBatchSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
                         queryConfig, null, queryProcessorConfig, convertProps, null);

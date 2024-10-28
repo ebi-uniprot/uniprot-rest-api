@@ -43,7 +43,7 @@ public class UniRefEntryStoreRepository {
     private final UniRefMemberStoreClient unirefMemberStore;
     private final UniRefLightStoreClient uniRefLightStore;
 
-    @Value("${search.request.converter.default-page-size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     protected Integer defaultPageSize;
 
     public UniRefEntryStoreRepository(

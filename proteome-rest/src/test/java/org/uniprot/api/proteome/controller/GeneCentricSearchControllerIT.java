@@ -56,7 +56,7 @@ public class GeneCentricSearchControllerIT extends AbstractSearchWithFacetContro
 
     @Autowired private GeneCentricFacetConfig facetConfig;
 
-    @Value("${search.request.converter.default-page-size}")
+    @Value("${search.request.converter.defaultRestPageSize}")
     protected String defaultPageSize;
 
     @Override

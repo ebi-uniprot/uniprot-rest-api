@@ -52,7 +52,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
     public static List<String> SORTED_ACCESSIONS =
             new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
-    @Value("${search.request.converter.default-page-size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer solrBatchSize;
 
     @Override

@@ -48,7 +48,7 @@ public abstract class BasicIdService<T, U> {
     private final SolrQueryConfig queryConfig;
     private final FacetConfig facetConfig;
 
-    @Value("${search.request.converter.default-page-size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     // the maximum number of ids allowed in `to` field after mapped by `from` fields

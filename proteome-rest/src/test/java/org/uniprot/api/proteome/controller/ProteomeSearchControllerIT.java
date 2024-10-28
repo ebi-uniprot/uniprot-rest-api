@@ -75,7 +75,7 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
 
     @Autowired private ProteomeFacetConfig facetConfig;
 
-    @Value("${search.request.converter.default-page-size}")
+    @Value("${search.request.converter.defaultRestPageSize}")
     protected String defaultPageSize;
 
     @Override

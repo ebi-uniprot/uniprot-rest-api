@@ -50,7 +50,7 @@ import org.uniprot.store.search.document.publication.PublicationDocument;
 @TestPropertySource(
         locations = "/common-message.properties",
         properties = {
-            "search.request.converter.default-page-size=25",
+            "search.request.converter.defaultRestPageSize=25",
         })
 class PublicationServiceTest {
     @MockBean private PublicationRepository publicationRepository;

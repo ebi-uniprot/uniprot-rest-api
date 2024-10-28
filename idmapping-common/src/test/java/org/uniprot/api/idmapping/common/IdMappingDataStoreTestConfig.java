@@ -88,7 +88,7 @@ public class IdMappingDataStoreTestConfig {
     @Bean
     @Profile("offline")
     public IdMappingPIRService pirService(
-            @Value("${search.request.converter.default-page-size:#{null}}")
+            @Value("${search.request.converter.defaultRestPageSize:#{null}}")
                     Integer defaultPageSize) {
         return new IdMappingPIRService(defaultPageSize) {
             @Override

@@ -89,54 +89,6 @@ class UniProtEntryServiceTest {
                         uniProtRdfStreamer,
                         uniProtKBRequestConverter);
     }
-    /*
-    @Test
-    void changeLowercaseAccessionToUppercase() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
-        verifyValidSearchRequest.setQuery("p12345");
-        verifyValidSearchRequest.setSize(10);
-        SolrRequest verifyValidSolrRequest =
-                entryService.createSearchSolrRequest(verifyValidSearchRequest);
-        assertNotNull(verifyValidSolrRequest);
-        assertEquals("P12345", verifyValidSolrRequest.getQuery());
-    }
-
-    @Test
-    void changeQueryToUpperCaseOnlyIfItIsAccession() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
-        verifyFailingRequest.setQuery("hexdecimalString134");
-        verifyFailingRequest.setSize(10);
-        SolrRequest verifyFailingSolrRequestCase =
-                entryService.createSearchSolrRequest(verifyFailingRequest);
-        assertNotNull(verifyFailingSolrRequestCase);
-        assertEquals("hexdecimalString134", verifyFailingSolrRequestCase.getQuery());
-    }
-
-    @Test
-    void verifyQueryHasAccessionRegexAndHasDash() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
-        verifyValidSearchRequest.setQuery("p12345-1");
-        verifyValidSearchRequest.setSize(10);
-        SolrRequest verifyValidSolrRequest =
-                entryService.createSearchSolrRequest(verifyValidSearchRequest);
-        assertNotNull(verifyValidSolrRequest);
-        assertTrue(verifyValidSolrRequest.getFilterQueries().isEmpty());
-    }
-
-    @Test
-    void addIsoFormFalseFilterOnlyIfQueryHasNoAccessionValue() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
-        verifyFailingRequest.setQuery("accession:hexdecimalString134");
-        verifyFailingRequest.setSize(10);
-        SolrRequest verifyFailingSolrRequestCase =
-                entryService.createSearchSolrRequest(verifyFailingRequest);
-        assertNotNull(verifyFailingSolrRequestCase);
-        assertTrue(!verifyFailingSolrRequestCase.getFilterQueries().isEmpty());
-    }*/
 
     @Test
     void search_in_list_format_without_voldemort_being_called() {

@@ -8,7 +8,7 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "search.request.converter")
 public class RequestConverterConfigProperties {
 
-    private Integer defaultPageSize;
+    private Integer defaultRestPageSize;
 
-    private Integer defaultSolrBatchSize;
+    private Integer defaultSolrPageSize;
 }
