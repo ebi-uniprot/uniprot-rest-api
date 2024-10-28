@@ -43,7 +43,7 @@ import org.uniprot.store.search.SolrCollection;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            ArbaGetByIdControllerIT.ArbaGetByByIdParameterResolver.class,
+            ArbaGetByIdControllerIT.ArbaGetByIdParameterResolver.class,
             ArbaGetByIdControllerIT.ArbaGetByIdContentTypeParamResolver.class
         })
 public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
@@ -95,7 +95,7 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
         return PATH;
     }
 
-    static class ArbaGetByByIdParameterResolver extends AbstractGetByIdParameterResolver {
+    static class ArbaGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {
