@@ -287,6 +287,7 @@ public class UniProtEntryService
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();
+        storeRequest.fields(request.getFields());
         if (resultsConverter.hasLineage(fieldList)) {
             storeRequest.addLineage(true);
         }

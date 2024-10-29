@@ -26,7 +26,7 @@ class UniParcConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(5, resultGroups.size());
 
-        assertEquals(6, resultGroups.get(0).getFields().size());
+        assertEquals(7, resultGroups.get(0).getFields().size());
         assertEquals(3, resultGroups.get(1).getFields().size());
         assertEquals(1, resultGroups.get(2).getFields().size());
         assertEquals(2, resultGroups.get(3).getFields().size());
@@ -46,7 +46,7 @@ class UniParcConfigureServiceTest {
                         .findFirst()
                         .orElseThrow(AssertionFailedError::new);
         assertNotNull(database.getValues());
-        assertTrue(database.getValues().size() > 0);
+        assertFalse(database.getValues().isEmpty());
 
         AdvancedSearchTerm active =
                 result.stream()

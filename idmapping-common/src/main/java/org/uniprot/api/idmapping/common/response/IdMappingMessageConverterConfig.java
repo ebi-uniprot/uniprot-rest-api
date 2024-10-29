@@ -15,10 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.common.response.converter.uniparc.UniParcMessageConverterConfig;
 import org.uniprot.api.idmapping.common.response.converter.uniref.UniRefMessageConverterConfig;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
-import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
-import org.uniprot.api.idmapping.common.response.model.UniRefEntryPair;
+import org.uniprot.api.idmapping.common.response.model.*;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -151,22 +148,21 @@ public class IdMappingMessageConverterConfig {
         return contextFactory;
     }
 
-    @Bean("uniParcEntryPairMessageConverterContextFactory")
-    public MessageConverterContextFactory<UniParcEntryPair>
-            uniParcEntryPairMessageConverterContextFactory() {
-        MessageConverterContextFactory<UniParcEntryPair> contextFactory =
+    @Bean("uniParcEntryLightPairMessageConverterContextFactory")
+    public MessageConverterContextFactory<UniParcEntryLightPair>
+            uniParcEntryLightPairMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniParcEntryLightPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
         List.of(
-                        uniParcContext(MediaType.APPLICATION_JSON),
-                        uniParcContext(UniProtMediaType.FASTA_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.TSV_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.XLS_MEDIA_TYPE),
-                        uniParcContext(MediaType.APPLICATION_XML),
-                        uniParcContext(UniProtMediaType.LIST_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.RDF_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                        uniParcLightContext(MediaType.APPLICATION_JSON),
+                        uniParcLightContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.XLS_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.RDF_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        uniParcLightContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -192,8 +188,9 @@ public class IdMappingMessageConverterConfig {
         return contextFactory;
     }
 
-    private MessageConverterContext<UniParcEntryPair> uniParcContext(MediaType contentType) {
-        return MessageConverterContext.<UniParcEntryPair>builder()
+    private MessageConverterContext<UniParcEntryLightPair> uniParcLightContext(
+            MediaType contentType) {
+        return MessageConverterContext.<UniParcEntryLightPair>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPARC)
                 .contentType(contentType)
                 .build();

@@ -48,8 +48,8 @@ import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControlle
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.service.NTriplesPrologs;
@@ -83,7 +83,7 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+            UniProtKBByAccessionControllerIT.UniprotKBGetByIdParameterResolver.class,
             UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class,
             MockitoExtension.class
         })
@@ -563,7 +563,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1092,7 +1092,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         return "/uniprotkb/";
     }
 
-    static class UniprotKBGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class UniprotKBGetByIdParameterResolver extends AbstractGetByIdParameterResolver {
 
         private static final String NON_EXISTENT_ACCESSION_ID = "Q12345";
 

@@ -584,12 +584,20 @@ public class OpenAPIConstants {
     public static final String SEARCH_UNIPARC_OPERATION =
             "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
+
+    public static final String ID_UNIPARC_LIGHT_OPERATION =
+            "Get UniParc light entry by a single upi.";
+    public static final String STREAM_UNIPARC_OPERATION =
+            "Download UniParc entries retrieved by a search query.";
     public static final String ID_UNIPARC_OPERATION_DESC =
             "Search UniParc entry by id(upi) to return all data associated with that entry. "
                     + FIELDS_OPERATION_DESC;
-    public static final String STREAM_UNIPARC_OPERATION =
-            "Download UniParc entries retrieved by a search query.";
     public static final String STREAM_UNIPARC_OPERATION_DESC =
+            STREAM_OPERATION_DESC
+                    + " The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniParc asynchronous download job' requests described below. The 'UniParc asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
+    public static final String PROTEOME_UPID_STREAM_UNIPARC_OPERATION =
+            "Download UniParc entries retrieved by a proteome id.";
+    public static final String PROTEOME_UPID_STREAM_UNIPARC_OPERATION_DESC =
             STREAM_OPERATION_DESC
                     + " The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniParc asynchronous download job' requests described below. The 'UniParc asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String ACCESSION_UNIPARC_OPERATION =
