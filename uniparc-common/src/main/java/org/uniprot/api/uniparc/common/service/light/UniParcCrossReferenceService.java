@@ -42,7 +42,7 @@ public class UniParcCrossReferenceService {
     private final RetryPolicy<Object> crossReferenceStoreRetryPolicy;
     private final UniParcCrossReferenceStoreConfigProperties storeConfigProperties;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     @Autowired

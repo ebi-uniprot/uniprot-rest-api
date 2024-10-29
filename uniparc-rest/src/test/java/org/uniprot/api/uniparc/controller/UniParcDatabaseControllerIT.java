@@ -68,7 +68,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
         })
 class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer searchBatchSize;
 
     @Override
