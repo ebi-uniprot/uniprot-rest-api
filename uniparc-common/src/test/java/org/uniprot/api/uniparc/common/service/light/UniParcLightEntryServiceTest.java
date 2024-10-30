@@ -25,11 +25,10 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.response.converter.UniParcLightQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
-import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcEntryLightBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -40,16 +39,15 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 public class UniParcLightEntryServiceTest {
     @Mock private UniParcQueryRepository repository;
     @Mock private UniParcFacetConfig facetConfig;
-    @Mock private UniParcSortClause solrSortClause;
     @Mock private UniParcLightQueryResultConverter uniParcLightQueryResultConverter;
     @Mock private StoreStreamer<UniParcEntryLight> storeStreamer;
     @Mock private SolrQueryConfig uniParcSolrQueryConf;
-    @Mock private UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     @Mock private SearchFieldConfig uniParcSearchFieldConfig;
     @Mock private RdfStreamer uniParcRdfStreamer;
     @Mock private FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate;
     @Mock private TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream;
     @Mock private UniParcCrossReferenceLazyLoader uniParcCrossReferenceLazyLoader;
+    @Mock private RequestConverter requestConverter;
 
     private UniParcLightEntryService lightEntryService;
 
@@ -59,16 +57,15 @@ public class UniParcLightEntryServiceTest {
                 new UniParcLightEntryService(
                         repository,
                         facetConfig,
-                        solrSortClause,
                         uniParcLightQueryResultConverter,
                         storeStreamer,
                         uniParcSolrQueryConf,
-                        uniParcQueryProcessorConfig,
                         uniParcSearchFieldConfig,
                         uniParcRdfStreamer,
                         uniParcFacetTupleStreamTemplate,
                         uniParcTupleStreamDocumentIdStream,
-                        uniParcCrossReferenceLazyLoader);
+                        uniParcCrossReferenceLazyLoader,
+                        requestConverter);
     }
 
     @Test
@@ -106,7 +103,6 @@ public class UniParcLightEntryServiceTest {
         Mockito.lenient()
                 .when(uniParcRdfStreamer.stream(any(), any(), any()))
                 .thenReturn(rdfStream);
-        Mockito.when(request.getQuery()).thenReturn("*:*");
         Stream<String> result = this.lightEntryService.streamRdf(request, datatype, format);
         Assertions.assertNotNull(result);
         List<String> resultList = result.toList();

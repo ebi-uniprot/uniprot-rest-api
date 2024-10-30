@@ -45,7 +45,7 @@ public class UniParcCrossReferenceService {
     private final UniParcCrossReferenceStoreConfigProperties storeConfigProperties;
     private final UniParcCrossReferenceFacetConfig uniParcCrossReferenceFacetConfig;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     @Autowired

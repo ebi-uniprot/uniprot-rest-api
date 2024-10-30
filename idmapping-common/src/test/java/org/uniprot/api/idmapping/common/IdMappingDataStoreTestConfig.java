@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
@@ -81,8 +82,9 @@ public class IdMappingDataStoreTestConfig {
     public SolrRequestConverter idMappingSolrRequestConverter() {
         return new SolrRequestConverter() {
             @Override
-            public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
-                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
+            public JsonQueryRequest toJsonQueryRequest(
+                    SolrRequest request, FacetConfig facetConfig) {
+                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
 
                 // required for tests, because EmbeddedSolrServer is not sharded
                 ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");
@@ -96,7 +98,8 @@ public class IdMappingDataStoreTestConfig {
     @Bean
     @Profile("offline")
     public IdMappingPIRService pirService(
-            @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
+            @Value("${search.request.converter.defaultRestPageSize:#{null}}")
+                    Integer defaultPageSize) {
         return new IdMappingPIRService(defaultPageSize) {
             @Override
             public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
