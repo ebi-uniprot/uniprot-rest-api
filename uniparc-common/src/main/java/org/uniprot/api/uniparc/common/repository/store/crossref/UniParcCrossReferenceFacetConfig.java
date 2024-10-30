@@ -54,7 +54,7 @@ public class UniParcCrossReferenceFacetConfig extends FacetConfig {
         return null;
     }
 
-    public List<Facet> getUniParcLightFacets(
+    public List<Facet> getUniParcCrossReferenceFacets(
             Stream<UniParcCrossReference> crossReferences, String commaSeparatedFacetNames) {
 
         // keep only active, database and organism for facet count
@@ -129,42 +129,24 @@ public class UniParcCrossReferenceFacetConfig extends FacetConfig {
                                 Collectors.groupingBy(
                                         crossRef -> crossRef.isActive() ? ACTIVE_STR : INACTIVE_STR,
                                         Collectors.counting()));
-        Map<String, String> labelNameMap =
-                Map.of(ACTIVE_STR, Boolean.TRUE.toString(), INACTIVE_STR, Boolean.FALSE.toString());
         return statusCount.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .map(entry -> getStatusFacetItem(entry, labelNameMap))
+                .map(this::getStatusFacetItem)
                 .toList();
     }
 
     List<FacetItem> getFacetItemOrganisms(List<UniParcCrossReference> crossReferences) {
-        // taxonId to count map
-        Map<Long, Long> taxonIdCount =
+        // taxon to count map
+        Map<Organism, Long> taxonCount =
                 crossReferences.stream()
                         .filter(crossRef -> Objects.nonNull(crossRef.getOrganism()))
                         .collect(
                                 Collectors.groupingBy(
-                                        crossRef -> crossRef.getOrganism().getTaxonId(),
-                                        Collectors.counting()));
-        // taxonId to common/scientific name map
-        Map<Long, String> taxonIdName =
-                crossReferences.stream()
-                        .map(UniParcCrossReference::getOrganism)
-                        .filter(Objects::nonNull)
-                        .filter(
-                                organism ->
-                                        organism.hasCommonName() || organism.hasScientificName())
-                        .collect(
-                                Collectors.toMap(
-                                        Organism::getTaxonId,
-                                        organism ->
-                                                organism.hasCommonName()
-                                                        ? organism.getCommonName()
-                                                        : organism.getScientificName(),
-                                        (e1, e2) -> e1));
-        return taxonIdCount.entrySet().stream()
-                .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
-                .map(entry -> getOrganismFacetItem(entry, taxonIdName))
+                                        UniParcCrossReference::getOrganism, Collectors.counting()));
+
+        return taxonCount.entrySet().stream()
+                .sorted(Map.Entry.<Organism, Long>comparingByValue().reversed())
+                .map(this::getOrganismFacetItem)
                 .filter(Objects::nonNull)
                 .toList();
     }
@@ -205,22 +187,25 @@ public class UniParcCrossReferenceFacetConfig extends FacetConfig {
         return Long.compare(entry2.getValue(), entry1.getValue());
     }
 
-    private FacetItem getOrganismFacetItem(
-            Map.Entry<Long, Long> taxonIdCount, Map<Long, String> taxonIdName) {
-        if (!taxonIdName.containsKey(taxonIdCount.getKey())) {
+    private FacetItem getOrganismFacetItem(Map.Entry<Organism, Long> taxonCount) {
+        Organism organism = taxonCount.getKey();
+        String organismName =
+                organism.hasCommonName() ? organism.getCommonName() : organism.getScientificName();
+        if (Utils.nullOrEmpty(organismName)) {
             return null;
         }
-        String label = taxonIdName.get(taxonIdCount.getKey());
         return FacetItem.builder()
-                .label(label)
-                .value(String.valueOf(taxonIdCount.getKey()))
-                .count(taxonIdCount.getValue())
+                .label(organismName)
+                .value(String.valueOf(organism.getTaxonId()))
+                .count(taxonCount.getValue())
                 .build();
     }
 
-    private FacetItem getStatusFacetItem(
-            Map.Entry<String, Long> statusCount, Map<String, String> labelNameMap) {
-        String value = labelNameMap.get(statusCount.getKey());
+    private FacetItem getStatusFacetItem(Map.Entry<String, Long> statusCount) {
+        String value =
+                ACTIVE_STR.equals(statusCount.getKey())
+                        ? Boolean.TRUE.toString()
+                        : Boolean.FALSE.toString();
         return FacetItem.builder()
                 .label(statusCount.getKey())
                 .value(value)
