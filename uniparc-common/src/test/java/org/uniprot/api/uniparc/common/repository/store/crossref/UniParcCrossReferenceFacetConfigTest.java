@@ -23,7 +23,7 @@ class UniParcCrossReferenceFacetConfigTest {
         UniParcCrossReferenceFacetConfig facetConfig = new UniParcCrossReferenceFacetConfig();
         String commaSeparatedFacetNames = String.join(",", facetConfig.getFacetNames());
         List<Facet> facets =
-                facetConfig.getUniParcCrossReferenceFacets(Stream.of(), commaSeparatedFacetNames);
+                facetConfig.getUniParcLightFacets(Stream.of(), commaSeparatedFacetNames);
         assertNotNull(facets);
         assertTrue(facets.isEmpty());
     }
@@ -35,7 +35,7 @@ class UniParcCrossReferenceFacetConfigTest {
         List<UniParcCrossReference> crossReferences =
                 UniParcCrossReferenceMocker.createCrossReferences(43, 25);
         List<Facet> facets =
-                facetConfig.getUniParcCrossReferenceFacets(
+                facetConfig.getUniParcLightFacets(
                         crossReferences.stream(), commaSeparatedFacetNames);
         assertNotNull(facets);
         assertEquals(3, facets.size());
@@ -160,7 +160,7 @@ class UniParcCrossReferenceFacetConfigTest {
         xrefWithoutName =
                 UniParcCrossReferenceBuilder.from(xrefWithoutName).organism(organism).build();
         List<Facet> facets =
-                facetConfig.getUniParcCrossReferenceFacets(
+                facetConfig.getUniParcLightFacets(
                         Stream.of(xrefWithoutName), commaSeparatedFacetNames);
         assertEquals(2, facets.size());
         assertEquals(
@@ -179,7 +179,7 @@ class UniParcCrossReferenceFacetConfigTest {
         xrefWithoutDatabase =
                 UniParcCrossReferenceBuilder.from(xrefWithoutDatabase).database(null).build();
         List<Facet> facets =
-                facetConfig.getUniParcCrossReferenceFacets(
+                facetConfig.getUniParcLightFacets(
                         Stream.of(xrefWithoutDatabase), commaSeparatedFacetNames);
         assertEquals(2, facets.size());
         assertEquals(

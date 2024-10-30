@@ -103,7 +103,7 @@ public class UniParcCrossReferenceService {
             Stream<UniParcCrossReference> allCrossReferences =
                     getFilteredCrossReferences(uniParcEntryLight, request);
             facets =
-                    this.uniParcCrossReferenceFacetConfig.getUniParcCrossReferenceFacets(
+                    this.uniParcCrossReferenceFacetConfig.getUniParcLightFacets(
                             allCrossReferences, request.getFacets());
         }
 
