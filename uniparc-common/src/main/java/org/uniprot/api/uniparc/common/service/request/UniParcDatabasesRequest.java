@@ -7,9 +7,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,10 +33,6 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
     @Max(value = SearchRequest.MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(hidden = true)
-    @ValidFacets(facetConfig = UniParcCrossReferenceFacetConfig.class)
-    private String facets;
-
     @Override
     public String getQuery() {
         return null;
@@ -46,6 +40,11 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
 
     @Override
     public String getSort() {
+        return null;
+    }
+
+    @Override
+    public String getFacets() {
         return null;
     }
 }
