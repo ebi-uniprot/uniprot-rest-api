@@ -89,13 +89,6 @@ public class UniProtKBToUniRefDownloadController extends BasicDownloadController
         return getAsyncDownloadStatus(job);
     }
 
-    private MapToDownloadJob getDownloadJob(String jobId) {
-        return this.jobService
-                .find(jobId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException(getDownloadJobNotExistMessage(jobId)));
-    }
-
     @GetMapping(
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
@@ -121,5 +114,12 @@ public class UniProtKBToUniRefDownloadController extends BasicDownloadController
         String requestURL = servletRequest.getRequestURL().toString();
 
         return getDownloadJobDetails(requestURL, job);
+    }
+
+    private MapToDownloadJob getDownloadJob(String jobId) {
+        return this.jobService
+                .find(jobId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(getDownloadJobNotExistMessage(jobId)));
     }
 }

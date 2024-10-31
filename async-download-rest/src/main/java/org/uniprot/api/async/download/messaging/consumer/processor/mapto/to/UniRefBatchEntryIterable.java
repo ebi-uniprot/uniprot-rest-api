@@ -17,16 +17,6 @@ public class UniRefBatchEntryIterable extends BatchIterable<Long> {
     private final RetryPolicy<Object> retryPolicy;
 
     public UniRefBatchEntryIterable(
-            Iterable<String> sourceIterable,
-            UniRefEntryLightService uniRefEntryLightService,
-            RetryPolicy<Object> retryPolicy,
-            int batchSize) {
-        super(sourceIterable, batchSize);
-        this.uniRefEntryLightService = uniRefEntryLightService;
-        this.retryPolicy = retryPolicy;
-    }
-
-    public UniRefBatchEntryIterable(
             Iterator<String> sourceIterator,
             UniRefEntryLightService uniRefEntryLightService,
             RetryPolicy<Object> retryPolicy,
@@ -44,17 +34,14 @@ public class UniRefBatchEntryIterable extends BatchIterable<Long> {
                                         log.warn(
                                                 "Batch call to Solr server failed. Failure #{}. Retrying...",
                                                 e.getAttemptCount())))
-                .get(
-                        () -> {
-                            UniRefSearchRequest searchRequest = new UniRefSearchRequest();
-                            searchRequest.setQuery(getQuery(batch));
-                            searchRequest.setSize(0);
-                            return List.of(
-                                    uniRefEntryLightService
-                                            .search(searchRequest)
-                                            .getPage()
-                                            .getTotalElements());
-                        });
+                .get(() -> getTotalNoOfResults(batch));
+    }
+
+    private List<Long> getTotalNoOfResults(List<String> batch) {
+        UniRefSearchRequest searchRequest = new UniRefSearchRequest();
+        searchRequest.setQuery(getQuery(batch));
+        searchRequest.setSize(0);
+        return List.of(uniRefEntryLightService.search(searchRequest).getPage().getTotalElements());
     }
 
     private String getQuery(List<String> batch) {

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,21 +17,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.HeartbeatConfig;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.uniprotkb.UniProtKBHeartbeatProducer;
-import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
+import org.uniprot.api.async.download.messaging.repository.JobFields;
 import org.uniprot.api.async.download.model.job.uniprotkb.UniProtKBDownloadJob;
 import org.uniprot.api.async.download.service.uniprotkb.UniProtKBJobService;
 
 @ExtendWith(MockitoExtension.class)
 class HeartbeatProducerTest {
     public static final String JOB_ID = "downloadJobId";
-    public static final String MAP_DOWNLOAD_JOB_ID = "mapDownloadJobId";
-    public static final String UPDATE_COUNT = "updateCount";
-    public static final String PROCESSED_ENTRIES = "processedEntries";
-    public static final String UPDATED = "updated";
     private final UniProtKBDownloadJob downloadJob =
             UniProtKBDownloadJob.builder().id(JOB_ID).build();
-    private final MapToDownloadJob mapToDownloadJob =
-            MapToDownloadJob.builder().id(MAP_DOWNLOAD_JOB_ID).build();
     @Mock private HeartbeatConfig heartbeatConfig;
     @Mock private UniProtKBJobService jobService;
     @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
@@ -58,20 +53,10 @@ class HeartbeatProducerTest {
     private void verifySavedJob(Long processedEntries) {
         verify(jobService).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         Map<String, Object> savedJob = downloadJobArgumentCaptor.getValue();
-        assertEquals(1L, savedJob.get(UPDATE_COUNT));
-        assertEquals(processedEntries, savedJob.get(PROCESSED_ENTRIES));
+        assertEquals(1L, savedJob.get(JobFields.UPDATE_COUNT.getName()));
+        assertEquals(processedEntries, savedJob.get(JobFields.PROCESSED_ENTRIES.getName()));
         assertTrue(
-                ((LocalDateTime) savedJob.get(UPDATED))
-                        .isAfter(LocalDateTime.now().minusMinutes(2)));
-    }
-
-    private void verifySavedMapDownloadJob(Long processedEntries) {
-        verify(jobService).update(eq(MAP_DOWNLOAD_JOB_ID), downloadJobArgumentCaptor.capture());
-        Map<String, Object> savedJob = downloadJobArgumentCaptor.getValue();
-        assertEquals(1L, savedJob.get(UPDATE_COUNT));
-        assertEquals(processedEntries, savedJob.get(PROCESSED_ENTRIES));
-        assertTrue(
-                ((LocalDateTime) savedJob.get(UPDATED))
+                ((LocalDateTime) savedJob.get(JobFields.UPDATED.getName()))
                         .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -90,10 +75,10 @@ class HeartbeatProducerTest {
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> lastCall = savedJobs.get(2);
-        assertEquals(2L, lastCall.get(UPDATE_COUNT));
-        assertEquals(140L, lastCall.get(PROCESSED_ENTRIES));
+        assertEquals(2L, lastCall.get(JobFields.UPDATE_COUNT.getName()));
+        assertEquals(140L, lastCall.get(JobFields.PROCESSED_ENTRIES.getName()));
         assertTrue(
-                ((LocalDateTime) lastCall.get(UPDATED))
+                ((LocalDateTime) lastCall.get(JobFields.UPDATED.getName()))
                         .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -112,10 +97,10 @@ class HeartbeatProducerTest {
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> lastCall = savedJobs.get(2);
-        assertEquals(2L, lastCall.get(UPDATE_COUNT));
-        assertEquals(100L, lastCall.get(PROCESSED_ENTRIES));
+        assertEquals(2L, lastCall.get(JobFields.UPDATE_COUNT.getName()));
+        assertEquals(100L, lastCall.get(JobFields.PROCESSED_ENTRIES.getName()));
         assertTrue(
-                ((LocalDateTime) lastCall.get(UPDATED))
+                ((LocalDateTime) lastCall.get(JobFields.UPDATED.getName()))
                         .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -175,16 +160,16 @@ class HeartbeatProducerTest {
     void createForFromIds() {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
-        mapToDownloadJob.setTotalFromIds(1000L);
+        downloadJob.setTotalFromIds(1000L);
 
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
+        heartBeatProducer.generateForFromIds(downloadJob);
+        heartBeatProducer.generateForFromIds(downloadJob);
 
-        verifySavedMapDownloadJob(null);
+        verifySavedJob(null);
 
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
-        verify(jobService, times(2)).update(eq(MAP_DOWNLOAD_JOB_ID), any(Map.class));
+        heartBeatProducer.generateForFromIds(downloadJob);
+        heartBeatProducer.generateForFromIds(downloadJob);
+        verify(jobService, times(2)).update(eq(JOB_ID), any(Map.class));
     }
 
     @Test
@@ -202,14 +187,61 @@ class HeartbeatProducerTest {
     }
 
     @Test
+    void createForIdsWhenIdIsPassed() {
+        when(heartbeatConfig.isEnabled()).thenReturn(true);
+        when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
+        downloadJob.setTotalEntries(1000L);
+        when(jobService.find(JOB_ID)).thenReturn(Optional.of(downloadJob));
+
+        heartBeatProducer.generateForIds(JOB_ID);
+        heartBeatProducer.generateForIds(JOB_ID);
+
+        verifySavedJob(null);
+
+        heartBeatProducer.generateForIds(downloadJob);
+        heartBeatProducer.generateForIds(downloadJob);
+        verify(jobService, times(2)).update(eq(JOB_ID), any(Map.class));
+    }
+
+    @Test
+    void createForIds_WhenWrongIdIsPassed() {
+        when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class, () -> heartBeatProducer.generateForIds(JOB_ID));
+    }
+
+    @Test
+    void createForFromIds_WhenWrongIdIsPassed() {
+        when(jobService.find(JOB_ID)).thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class, () -> heartBeatProducer.generateForFromIds(JOB_ID));
+    }
+
+    @Test
+    void createForIdsWhenIdIsPassed_whenHeartBeatIsDisabled() {
+        when(heartbeatConfig.isEnabled()).thenReturn(false);
+        when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
+        downloadJob.setTotalEntries(1000L);
+        when(jobService.find(JOB_ID)).thenReturn(Optional.of(downloadJob));
+
+        heartBeatProducer.generateForIds(JOB_ID);
+        heartBeatProducer.generateForIds(JOB_ID);
+
+        verify(jobService, never()).save(any());
+        verify(jobService, never()).update(any(), any());
+    }
+
+    @Test
     void createForFromIds_whenHeartBeatIsDisabled() {
         when(heartbeatConfig.isEnabled()).thenReturn(false);
         when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
 
-        mapToDownloadJob.setTotalFromIds(1000L);
+        downloadJob.setTotalFromIds(1000L);
 
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
-        heartBeatProducer.generateForFromIds(mapToDownloadJob);
+        heartBeatProducer.generateForFromIds(downloadJob);
+        heartBeatProducer.generateForFromIds(downloadJob);
 
         verify(jobService, never()).save(any());
         verify(jobService, never()).update(any(), any());
@@ -230,9 +262,45 @@ class HeartbeatProducerTest {
         when(heartbeatConfig.isEnabled()).thenReturn(true);
         when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
         doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
-        mapToDownloadJob.setTotalFromIds(130L);
+        downloadJob.setTotalFromIds(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.generateForFromIds(mapToDownloadJob));
+        assertDoesNotThrow(() -> heartBeatProducer.generateForFromIds(downloadJob));
+    }
+
+    @Test
+    void createForFromIdsWhenIdIsPassed_whenHeartBeatIsDisabled() {
+        when(heartbeatConfig.isEnabled()).thenReturn(false);
+        when(heartbeatConfig.getIdsInterval()).thenReturn(2L);
+        downloadJob.setTotalFromIds(1000L);
+        when(jobService.find(JOB_ID)).thenReturn(Optional.of(downloadJob));
+
+        heartBeatProducer.generateForFromIds(JOB_ID);
+        heartBeatProducer.generateForFromIds(JOB_ID);
+
+        verify(jobService, never()).save(any());
+        verify(jobService, never()).update(any(), any());
+    }
+
+    @Test
+    void createForIdsWhenIdIsPassed_whenExceptionsOccurs() {
+        when(heartbeatConfig.isEnabled()).thenReturn(true);
+        when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
+        doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
+        downloadJob.setTotalEntries(130L);
+        when(jobService.find(JOB_ID)).thenReturn(Optional.of(downloadJob));
+
+        assertDoesNotThrow(() -> heartBeatProducer.generateForIds(JOB_ID));
+    }
+
+    @Test
+    void createForFromIdsWhenIdIsPassed_whenExceptionsOccurs() {
+        when(heartbeatConfig.isEnabled()).thenReturn(true);
+        when(heartbeatConfig.getIdsInterval()).thenReturn(1L);
+        doThrow(RuntimeException.class).when(jobService).update(any(String.class), any(Map.class));
+        downloadJob.setTotalFromIds(130L);
+        when(jobService.find(JOB_ID)).thenReturn(Optional.of(downloadJob));
+
+        assertDoesNotThrow(() -> heartBeatProducer.generateForFromIds(JOB_ID));
     }
 
     @Test
@@ -249,10 +317,10 @@ class HeartbeatProducerTest {
         verify(jobService, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
         List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
         Map<String, Object> afterStopped = savedJobs.get(1);
-        assertEquals(2L, afterStopped.get(UPDATE_COUNT));
-        assertEquals(70L, afterStopped.get(PROCESSED_ENTRIES));
+        assertEquals(2L, afterStopped.get(JobFields.UPDATE_COUNT.getName()));
+        assertEquals(70L, afterStopped.get(JobFields.PROCESSED_ENTRIES.getName()));
         assertTrue(
-                ((LocalDateTime) afterStopped.get(UPDATED))
+                ((LocalDateTime) afterStopped.get(JobFields.UPDATED.getName()))
                         .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 }

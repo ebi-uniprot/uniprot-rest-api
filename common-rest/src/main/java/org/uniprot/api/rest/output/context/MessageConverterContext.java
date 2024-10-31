@@ -41,7 +41,7 @@ public class MessageConverterContext<T> {
     private boolean isLargeDownload;
     private boolean subsequence;
     /**
-     * A mapto to store accessions along with their associated sequence ranges and a flag indicating
+     * A map to store accessions along with their associated sequence ranges and a flag indicating
      * if they have been processed. Accessions can be repeated, allowing multiple sequence ranges
      * for the same accession. For example, "P12345[20-30], P12345[0-10]". The isProcessed flag is
      * set to true once a sequence range is handled.

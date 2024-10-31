@@ -1,8 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.uniref;
 
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.uniref.UniRefRequestProcessor.RESULT_FILE;
-import static org.uniprot.api.async.download.messaging.consumer.processor.uniref.UniRefRequestProcessor.STATUS;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -15,7 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.composite.uniref.UniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.uniref.composite.UniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.repository.JobFields;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.service.uniref.UniRefJobService;
 
@@ -35,8 +34,15 @@ class UniRefRequestProcessorTest {
 
         InOrderImpl inOrder =
                 new InOrderImpl(List.of(uniRefJobService, unirefCompositeRequestProcessor));
-        inOrder.verify(uniRefJobService).update(ID, Map.of(STATUS, RUNNING));
+        inOrder.verify(uniRefJobService).update(ID, Map.of(JobFields.STATUS.getName(), RUNNING));
         inOrder.verify(unirefCompositeRequestProcessor).process(unirefDownloadRequest);
-        inOrder.verify(uniRefJobService).update(ID, Map.of(STATUS, FINISHED, RESULT_FILE, ID));
+        inOrder.verify(uniRefJobService)
+                .update(
+                        ID,
+                        Map.of(
+                                JobFields.STATUS.getName(),
+                                FINISHED,
+                                JobFields.RESULT_FILE.getName(),
+                                ID));
     }
 }

@@ -131,7 +131,7 @@ public class UniParcProducerMessageServiceIT
     @TestConfiguration
     @ComponentScan({
         "org.uniprot.api.async.download.messaging.producer.uniparc",
-        "org.uniprot.api.async.download.mq.uniparc",
+        "org.uniprot.api.async.download.messaging.service.uniparc",
         "org.uniprot.api.async.download.service.uniparc",
         "org.uniprot.api.async.download.messaging.consumer.uniparc",
         "org.uniprot.api.async.download.messaging.config.uniparc",

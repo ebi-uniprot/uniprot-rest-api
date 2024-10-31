@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.controller.validator;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class UniProtKBIdMappingDownloadRequestValidator
 
     @Override
     protected String getType() {
-        return "UniProtKB";
+        return uniprot.name();
     }
 
     @Override

@@ -2,10 +2,9 @@ package org.uniprot.api.async.download.messaging.consumer.processor.mapto;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.async.download.messaging.consumer.processor.mapto.MapToRequestProcessor.RESULT_FILE;
-import static org.uniprot.api.async.download.messaging.consumer.processor.mapto.MapToRequestProcessor.STATUS;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.List;
 import java.util.Map;
@@ -16,15 +15,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.internal.InOrderImpl;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.consumer.processor.composite.mapto.UniProtKBToUniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.mapto.composite.UniProtKBToUniRefCompositeRequestProcessor;
+import org.uniprot.api.async.download.messaging.repository.JobFields;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
 
 @ExtendWith(MockitoExtension.class)
 class MapToRequestProcessorTest {
     public static final String ID = "someId";
-    public static final String UNI_PROT_KB = "UniProtKB";
-    public static final String UNI_REF = "UniRef";
+    public static final String UNI_PROT_KB = uniprot.name();
+    public static final String UNI_REF = uniref.name();
     @Mock private UniProtKBToUniRefDownloadRequest uniProtKBToUniRefMapDownloadRequest;
 
     @Mock
@@ -44,10 +44,17 @@ class MapToRequestProcessorTest {
         InOrderImpl inOrder =
                 new InOrderImpl(
                         List.of(mapToJobService, uniProtKBToUniRefCompositeRequestProcessor));
-        inOrder.verify(mapToJobService).update(ID, Map.of(STATUS, RUNNING));
+        inOrder.verify(mapToJobService).update(ID, Map.of(JobFields.STATUS.getName(), RUNNING));
         inOrder.verify(uniProtKBToUniRefCompositeRequestProcessor)
                 .process(uniProtKBToUniRefMapDownloadRequest);
-        inOrder.verify(mapToJobService).update(ID, Map.of(STATUS, FINISHED, RESULT_FILE, ID));
+        inOrder.verify(mapToJobService)
+                .update(
+                        ID,
+                        Map.of(
+                                JobFields.STATUS.getName(),
+                                FINISHED,
+                                JobFields.RESULT_FILE.getName(),
+                                ID));
     }
 
     @Test

@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.model.request.mapto;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
@@ -36,7 +37,7 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
+    @Parameter(description = FORMAT_UNIREF_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
     private String format;
 
     private boolean force;
@@ -51,12 +52,12 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
 
     @Override
     public String getFrom() {
-        return "UniProtKB";
+        return uniprot.name();
     }
 
     @Override
     public String getTo() {
-        return "UniRef";
+        return uniref.name();
     }
 
     @Override

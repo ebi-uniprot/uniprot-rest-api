@@ -118,7 +118,7 @@ public class UniRefAsyncDownloadUtils {
             UniProtStoreClient<UniRefEntryLight> storeClient,
             String[] accessions)
             throws Exception {
-        UniRefEntry entry = UniRefEntryMocker.createEntryForMapping(i, type, accessions);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type, accessions);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();

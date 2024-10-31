@@ -16,6 +16,8 @@ import org.uniprot.store.config.UniProtDataType;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.uniprot;
+import static org.uniprot.store.search.SolrCollection.uniref;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -35,12 +37,12 @@ public class UniRefToUniProtKBDownloadRequest extends UniRefStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     private String format;
 
     private boolean force;
 
-    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;
@@ -50,12 +52,12 @@ public class UniRefToUniProtKBDownloadRequest extends UniRefStreamRequest
 
     @Override
     public String getTo() {
-        return "UniProtKB";
+        return uniprot.name();
     }
 
     @Override
     public String getFrom() {
-        return "UniRef";
+        return uniref.name();
     }
 
     @Override
