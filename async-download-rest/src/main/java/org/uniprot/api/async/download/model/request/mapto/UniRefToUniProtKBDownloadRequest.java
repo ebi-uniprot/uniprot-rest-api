@@ -35,12 +35,12 @@ public class UniRefToUniProtKBDownloadRequest extends UniRefStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     private String format;
 
     private boolean force;
 
-    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;

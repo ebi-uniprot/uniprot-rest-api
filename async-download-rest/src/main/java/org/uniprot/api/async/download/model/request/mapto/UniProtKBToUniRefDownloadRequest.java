@@ -36,7 +36,7 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
+    @Parameter(description = FORMAT_UNIREF_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
     private String format;
 
     private boolean force;
