@@ -142,11 +142,11 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
             case "length":
                 value = "[* TO *]";
                 break;
-            case "uniprotkb":
+            case "accession":
             case "isoform":
                 value = "P10011";
                 break;
-            case "upid":
+            case "proteome":
                 value = "UP000005640";
                 break;
             case "proteomecomponent":
@@ -473,7 +473,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                             "query",
                             List.of(
                                     "upi:INVALID OR taxonomy_id:INVALID "
-                                            + "OR length:INVALID OR upid:INVALID"))
+                                            + "OR length:INVALID OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -482,7 +482,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI",
                                             "'length' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The taxonomy id filter value should be a number",
-                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                            "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                     .build();
         }
 
@@ -640,7 +640,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
         @Override
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("upid:invalid")
+                    .query("proteome:invalid")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -649,7 +649,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                                            "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -657,7 +657,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -665,7 +665,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -679,7 +679,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -688,7 +688,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                                                    "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .build();
         }

@@ -32,7 +32,7 @@ public class IdMappingUniParcITUtils {
     public static String getUniParcFieldValueForValidatedField(String fieldName) {
         String value = "";
         switch (fieldName) {
-            case "upid":
+            case "proteome":
                 value = "UP000005640";
                 break;
             case "upi":
@@ -44,7 +44,7 @@ public class IdMappingUniParcITUtils {
             case "taxonomy_id":
                 value = "9606";
                 break;
-            case "uniprotkb":
+            case "accession":
             case "isoform":
                 value = "P10011";
                 break;

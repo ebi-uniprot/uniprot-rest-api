@@ -109,7 +109,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
 
     @Test
     void getByUIdsWithQueryFilterSuccess() throws Exception {
-        String queryFilter = "uniprotkb:P10001 OR uniprotkb:P10002";
+        String queryFilter = "accession:P10001 OR accession:P10002";
         // when
         ResultActions response =
                 mockMvc.perform(

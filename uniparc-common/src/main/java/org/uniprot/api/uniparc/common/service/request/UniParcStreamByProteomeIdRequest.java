@@ -23,7 +23,7 @@ import lombok.EqualsAndHashCode;
 @ParameterObject
 public class UniParcStreamByProteomeIdRequest implements StreamRequest, BasicRequest {
     @Parameter(hidden = true)
-    private static final String PROTEOME_ID_STR = "upid";
+    private static final String PROTEOME_ID_STR = "proteome";
 
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(regexp = "^true$|^false$", message = "{search.uniparc.invalid.download}")
