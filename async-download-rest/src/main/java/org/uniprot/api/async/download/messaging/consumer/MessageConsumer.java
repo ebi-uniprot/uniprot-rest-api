@@ -1,5 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -13,9 +14,9 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
+import org.uniprot.api.async.download.messaging.service.MessagingService;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
-import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,6 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
     public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     protected static final String JOB_ID_HEADER = "jobId";
-    protected static final String UPDATE_COUNT = "updateCount";
-    protected static final String UPDATED = "updated";
-    protected static final String PROCESSED_ENTRIES = "processedEntries";
-    protected static final String STATUS = "status";
-    protected static final String RETRIED = "retried";
     private final MessagingService messagingService;
     private final RequestProcessor<T> requestProcessor;
     private final FileHandler fileHandler;
@@ -86,7 +82,12 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
                 log.error("Download job id {} failed with error {}", jobId, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
-                        jobId, Map.of(RETRIED, getRetryCount(updatedMessage), STATUS, ERROR));
+                        jobId,
+                        Map.of(
+                                RETRIED.getName(),
+                                getRetryCount(updatedMessage),
+                                STATUS.getName(),
+                                ERROR));
                 log.warn("Sending message for jobId {} to retry queue", jobId);
                 messagingService.sendToRetry(updatedMessage);
             } else {
@@ -184,9 +185,9 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
         jobService.update(
                 jobId,
                 Map.of(
-                        UPDATE_COUNT, 0L,
-                        UPDATED, LocalDateTime.now(),
-                        PROCESSED_ENTRIES, 0L));
+                        UPDATE_COUNT.getName(), 0L,
+                        UPDATED.getName(), LocalDateTime.now(),
+                        PROCESSED_ENTRIES.getName(), 0L));
         fileHandler.deleteAllFiles(jobId);
     }
 }

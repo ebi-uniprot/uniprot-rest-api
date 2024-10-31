@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.uniprot.api.async.download.messaging.config.mapto.MapToAsyncDownloadToIdConfigProperties;
 import org.uniprot.api.async.download.messaging.result.mapto.MapToFileHandler;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
@@ -19,30 +19,34 @@ public class UniProtKBToUniRefToIdRequestProcessor
         extends MapToIdRequestProcessor<UniProtKBToUniRefDownloadRequest> {
     private final UniRefEntryLightService uniRefEntryLightService;
     private final RetryPolicy<Object> retryPolicy;
-    private final int batchSize;
+    private final MapToAsyncDownloadToIdConfigProperties mapToAsyncDownloadToIdConfigProperties;
 
     protected UniProtKBToUniRefToIdRequestProcessor(
             MapToFileHandler fileHandler,
             MapToJobService jobService,
             UniRefEntryLightService uniRefEntryLightService,
-            @Value("${async.download.mapto.toid.retryMaxCount}") int maxRetryCount,
-            @Value("${async.download.mapto.toid.waitingMaxTime}") int maxWaitingTime,
-            @Value("${async.download.mapto.toid.batchSize}") int batchSize) {
+            MapToAsyncDownloadToIdConfigProperties mapToAsyncDownloadToIdConfigProperties) {
         super(fileHandler, jobService);
         this.uniRefEntryLightService = uniRefEntryLightService;
-        this.batchSize = batchSize;
+        this.mapToAsyncDownloadToIdConfigProperties = mapToAsyncDownloadToIdConfigProperties;
         this.retryPolicy =
                 new RetryPolicy<>()
                         .handle(Exception.class)
-                        .withMaxRetries(maxRetryCount)
-                        .withDelay(Duration.ofMillis(maxWaitingTime));
+                        .withMaxRetries(mapToAsyncDownloadToIdConfigProperties.getRetryMaxCount())
+                        .withDelay(
+                                Duration.ofMillis(
+                                        mapToAsyncDownloadToIdConfigProperties
+                                                .getWaitingMaxTime()));
     }
 
     @Override
     protected long getSolrHits(Stream<String> ids) {
         UniRefBatchEntryIterable uniRefBatchEntryIterable =
                 new UniRefBatchEntryIterable(
-                        ids.iterator(), uniRefEntryLightService, retryPolicy, batchSize);
+                        ids.iterator(),
+                        uniRefEntryLightService,
+                        retryPolicy,
+                        mapToAsyncDownloadToIdConfigProperties.getBatchSize());
         return StreamSupport.stream(uniRefBatchEntryIterable.spliterator(), false)
                 .flatMap(Collection::stream)
                 .mapToLong(Long::longValue)
@@ -53,7 +57,10 @@ public class UniProtKBToUniRefToIdRequestProcessor
     protected Stream<String> mapIds(Stream<String> ids) {
         UniRefBatchIdIterable uniRefBatchIdIterable =
                 new UniRefBatchIdIterable(
-                        ids.iterator(), uniRefEntryLightService, retryPolicy, batchSize);
+                        ids.iterator(),
+                        uniRefEntryLightService,
+                        retryPolicy,
+                        mapToAsyncDownloadToIdConfigProperties.getBatchSize());
         return StreamSupport.stream(uniRefBatchIdIterable.spliterator(), false)
                 .flatMap(Collection::stream);
     }

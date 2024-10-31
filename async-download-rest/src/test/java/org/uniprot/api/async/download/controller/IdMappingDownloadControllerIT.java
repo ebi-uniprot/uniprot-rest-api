@@ -790,7 +790,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid UniParc fields parameter value: [invalid].")));
+                                        "Invalid request received. Invalid uniparc fields parameter value: [invalid].")));
     }
 
     @Test
@@ -988,7 +988,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid UniRef fields parameter value: [invalid].")));
+                                        "Invalid request received. Invalid uniref fields parameter value: [invalid].")));
     }
 
     @Test
@@ -1212,7 +1212,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid UniProtKB fields parameter value: [invalid].")));
+                                        "Invalid request received. Invalid uniprot fields parameter value: [invalid].")));
     }
 
     @Test

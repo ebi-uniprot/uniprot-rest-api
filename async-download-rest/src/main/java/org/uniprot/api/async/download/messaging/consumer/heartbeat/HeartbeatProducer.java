@@ -1,5 +1,7 @@
 package org.uniprot.api.async.download.messaging.consumer.heartbeat;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
+
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -17,9 +19,6 @@ import net.jodah.failsafe.RetryPolicy;
 
 @Slf4j
 public class HeartbeatProducer {
-    private static final String UPDATE_COUNT = "updateCount";
-    private static final String UPDATED = "updated";
-    private static final String PROCESSED_ENTRIES = "processedEntries";
     private final RetryPolicy<Object> retryPolicy;
     // number processed entries so far for a given job id
     private final Map<String, Long> processedEntries = new HashMap<>();
@@ -95,9 +94,9 @@ public class HeartbeatProducer {
                                 jobService.update(
                                         downloadJob.getId(),
                                         Map.of(
-                                                UPDATE_COUNT,
+                                                UPDATE_COUNT.getName(),
                                                 newUpdateCount,
-                                                UPDATED,
+                                                UPDATED.getName(),
                                                 LocalDateTime.now())));
         log.info(
                 MessageFormat.format(
@@ -213,9 +212,9 @@ public class HeartbeatProducer {
                                 jobService.update(
                                         downloadJob.getId(),
                                         Map.of(
-                                                UPDATE_COUNT, newUpdateCount,
-                                                UPDATED, LocalDateTime.now(),
-                                                PROCESSED_ENTRIES, pe)));
+                                                UPDATE_COUNT.getName(), newUpdateCount,
+                                                UPDATED.getName(), LocalDateTime.now(),
+                                                PROCESSED_ENTRIES.getName(), pe)));
         log.info(
                 MessageFormat.format(
                         "{0}: Job ID: {1} updated in Voldemort phase. Entries processed: {2}",

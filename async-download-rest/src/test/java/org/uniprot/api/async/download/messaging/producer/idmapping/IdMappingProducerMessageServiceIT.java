@@ -268,7 +268,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
     @TestConfiguration
     @ComponentScan({
         "org.uniprot.api.async.download.messaging.producer.idmapping",
-        "org.uniprot.api.async.download.mq.idmapping",
+        "org.uniprot.api.async.download.messaging.service.idmapping",
         "org.uniprot.api.async.download.service.idmapping",
         "org.uniprot.api.async.download.messaging.config.idmapping",
         "org.uniprot.api.async.download.messaging.result.idmapping",

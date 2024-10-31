@@ -1,18 +1,19 @@
 package org.uniprot.api.async.download.messaging.consumer.processor.mapto.to;
 
+import static org.uniprot.api.async.download.messaging.repository.JobFields.TOTAL_ENTRIES;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.uniprot.api.async.download.messaging.consumer.processor.id.IdRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.IdRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.mapto.MapToFileHandler;
 import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;
 import org.uniprot.api.async.download.service.mapto.MapToJobService;
 
 public abstract class MapToIdRequestProcessor<T extends MapToDownloadRequest>
         implements IdRequestProcessor<T> {
-    protected static final String TOTAL_ENTRIES = "totalEntries";
     private final MapToFileHandler fileHandler;
     private final MapToJobService jobService;
 
@@ -48,6 +49,7 @@ public abstract class MapToIdRequestProcessor<T extends MapToDownloadRequest>
     }
 
     private void updateTotalEntries(T request, long totalEntries) {
-        jobService.update(request.getDownloadJobId(), Map.of(TOTAL_ENTRIES, totalEntries));
+        jobService.update(
+                request.getDownloadJobId(), Map.of(TOTAL_ENTRIES.getName(), totalEntries));
     }
 }

@@ -5,7 +5,7 @@ import java.lang.reflect.Type;
 import org.springframework.core.ParameterizedTypeReference;
 import org.uniprot.api.async.download.messaging.config.mapto.MapToDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.consumer.heartbeat.mapto.MapToHeartbeatProducer;
-import org.uniprot.api.async.download.messaging.consumer.processor.result.SolrIdResultRequestProcessor;
+import org.uniprot.api.async.download.messaging.consumer.processor.SolrIdResultRequestProcessor;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.mapto.UniRefMapToSolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.model.job.mapto.MapToDownloadJob;
 import org.uniprot.api.async.download.model.request.mapto.MapToDownloadRequest;

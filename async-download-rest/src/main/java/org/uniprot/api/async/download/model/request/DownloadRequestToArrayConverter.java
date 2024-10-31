@@ -8,6 +8,11 @@ public class DownloadRequestToArrayConverter<T extends SolrStreamDownloadRequest
 
     @Override
     public char[] apply(T request) {
+        StringBuilder builder = buildString(request);
+        return builder.toString().toCharArray();
+    }
+
+    public static <T extends SolrStreamDownloadRequest> StringBuilder buildString(T request) {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getQuery().strip().toLowerCase());
         if (Objects.nonNull(request.getFields())) {
@@ -16,10 +21,9 @@ public class DownloadRequestToArrayConverter<T extends SolrStreamDownloadRequest
         if (Objects.nonNull(request.getSort())) {
             builder.append(request.getSort().strip().toLowerCase());
         }
-
         if (Objects.nonNull(request.getFormat())) {
             builder.append(request.getFormat().toLowerCase());
         }
-        return builder.toString().toCharArray();
+        return builder;
     }
 }

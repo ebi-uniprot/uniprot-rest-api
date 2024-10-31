@@ -12,7 +12,7 @@ class UniRefIdMappingDownloadRequestValidatorTest {
     void canGetType() {
         UniRefIdMappingDownloadRequestValidator validator =
                 new UniRefIdMappingDownloadRequestValidator();
-        assertEquals("UniRef", validator.getType());
+        assertEquals("uniref", validator.getType());
     }
 
     @Test
@@ -75,7 +75,7 @@ class UniRefIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid UniRef fields parameter values: [accession, checksum].",
+                "Invalid uniref fields parameter values: [accession, checksum].",
                 exception.getMessage());
     }
 
@@ -90,7 +90,7 @@ class UniRefIdMappingDownloadRequestValidatorTest {
         InvalidRequestException exception =
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
-        assertEquals("Invalid UniRef fields parameter value: [invalid].", exception.getMessage());
+        assertEquals("Invalid uniref fields parameter value: [invalid].", exception.getMessage());
     }
 
     @Test
