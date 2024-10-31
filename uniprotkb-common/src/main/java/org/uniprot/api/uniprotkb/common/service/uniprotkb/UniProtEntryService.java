@@ -163,7 +163,7 @@ public class UniProtEntryService
                     .map(this::mapToThinEntry)
                     .filter(Objects::nonNull);
         } else {
-            StoreRequest storeRequest = buildStoreRequest(request);
+            StoreRequest storeRequest = getStoreRequest(request);
             return super.storeStreamer.idsToStoreStream(query, storeRequest);
         }
     }
@@ -243,7 +243,7 @@ public class UniProtEntryService
     @Override
     protected Stream<UniProtKBEntry> streamEntries(
             List<String> idsInPage, IdsSearchRequest request) {
-        StoreRequest storeRequest = buildStoreRequest(request);
+        StoreRequest storeRequest = getStoreRequest(request);
         return this.storeStreamer.streamEntries(idsInPage, storeRequest);
     }
 
@@ -283,7 +283,8 @@ public class UniProtEntryService
         return ids.stream().anyMatch(id -> id.contains(DASH));
     }
 
-    public StoreRequest buildStoreRequest(BasicRequest request) {
+    @Override
+    public StoreRequest getStoreRequest(BasicRequest request) {
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();
