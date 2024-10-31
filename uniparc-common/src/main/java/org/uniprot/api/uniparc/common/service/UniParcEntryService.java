@@ -23,7 +23,7 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
@@ -34,7 +34,6 @@ import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionReque
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -58,7 +57,6 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     private static final String ACCESSION_FIELD = "accession";
     public static final String CHECKSUM_STR = "checksum";
     private static final String COMMA_STR = ",";
-    private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcQueryRepository repository;
     private final UniParcLightStoreClient uniParcLightStoreClient;
@@ -69,26 +67,23 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     public UniParcEntryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
-            UniParcSortClause solrSortClause,
             SolrQueryConfig uniParcSolrQueryConf,
-            UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
             RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
             UniParcLightStoreClient uniParcLightStoreClient,
-            UniParcCrossReferenceService uniParcCrossReferenceService) {
+            UniParcCrossReferenceService uniParcCrossReferenceService,
+            RequestConverter uniParcRequestConverter) {
 
         super(
                 repository,
-                null,
-                solrSortClause,
                 facetConfig,
                 null,
                 uniParcSolrQueryConf,
                 uniParcFacetTupleStreamTemplate,
-                uniParcTupleStreamDocumentIdStream);
-        this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
+                uniParcTupleStreamDocumentIdStream,
+                uniParcRequestConverter);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.repository = repository;
         this.uniParcLightStoreClient = uniParcLightStoreClient;
@@ -119,11 +114,6 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(UNIPARC_ID_FIELD);
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return uniParcQueryProcessorConfig;
     }
 
     @Override

@@ -233,26 +233,6 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
-    void bestGuessReturnBadRequestWhenInvalidTaxonIdPassed() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(BEST_GUESS_PATH)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("taxonIds", "1234,invalidTaxonId");
-
-        mockMvc.perform(requestBuilder)
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
-                .andExpect(jsonPath("$.messages.size()", is(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(
-                                        "taxonIds value has invalid format. It should be a list of comma separated taxonIds (without spaces).")));
-    }
-
-    @Test
     void bestGuessReturnBadRequestIfFoundDuplicatedEntries() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =

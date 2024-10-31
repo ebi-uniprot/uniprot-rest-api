@@ -82,13 +82,12 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                 SolrRequest.builder()
                         .query(request.getQuery())
                         .filterQueries(request.getFilterQueries())
-                        .queryConfig(request.getQueryConfig())
                         .queryField(request.getQueryField())
                         .rows(0)
                         .build();
         try {
             JsonQueryRequest jsonQueryRequest =
-                    solrRequestConverter.toJsonQueryRequest(slimRequest);
+                    solrRequestConverter.toJsonQueryRequest(slimRequest, null);
             QueryResponse response =
                     jsonQueryRequest.process(solrClient, streamConfig.getCollection());
             return response.getResults().getNumFound();
@@ -148,10 +147,9 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
 
                 requestExpression.addParameter(
                         new StreamExpressionNamedParameter("defType", DEF_TYPE_VALUE));
-                if (Utils.notNullNotEmpty(request.getQueryConfig().getQueryFields())) {
+                if (Utils.notNullNotEmpty(request.getQueryField())) {
                     requestExpression.addParameter(
-                            new StreamExpressionNamedParameter(
-                                    "qf", request.getQueryConfig().getQueryFields()));
+                            new StreamExpressionNamedParameter("qf", request.getQueryField()));
                 } else {
                     requestExpression.addParameter(
                             new StreamExpressionNamedParameter("df", "content"));

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 @TestConfiguration
 public class CommonDataStoreTestConfig {
@@ -41,8 +42,9 @@ public class CommonDataStoreTestConfig {
     public SolrRequestConverter requestConverter() {
         return new SolrRequestConverter() {
             @Override
-            public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
-                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
+            public JsonQueryRequest toJsonQueryRequest(
+                    SolrRequest request, FacetConfig facetConfig) {
+                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
 
                 // required for tests, because EmbeddedSolrServer is not sharded
                 ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");

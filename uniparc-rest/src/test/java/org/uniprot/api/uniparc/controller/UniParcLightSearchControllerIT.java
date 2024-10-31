@@ -92,7 +92,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
     @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     private UniParcLightStoreClient storeClient;
