@@ -16,6 +16,8 @@ import org.uniprot.store.config.UniProtDataType;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.uniprot;
+import static org.uniprot.store.search.SolrCollection.uniref;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -50,12 +52,12 @@ public class UniRefToUniProtKBDownloadRequest extends UniRefStreamRequest
 
     @Override
     public String getTo() {
-        return "UniProtKB";
+        return uniprot.name();
     }
 
     @Override
     public String getFrom() {
-        return "UniRef";
+        return uniref.name();
     }
 
     @Override
