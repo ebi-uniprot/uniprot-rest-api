@@ -9,14 +9,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -36,8 +39,10 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
-import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
@@ -55,7 +60,9 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
     private static final String UNIPARC_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniparc/results/stream/{jobId}";
 
-    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntryLight> storeClient;
+
+    @Autowired UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient;
 
     @Qualifier("uniParcFacetTupleStreamTemplate")
     @Autowired
@@ -118,7 +125,7 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
                 .thenReturn(new DefaultUriBuilderFactory());
         when(idMappingRdfRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
 
-        saveEntries(cloudSolrClient, storeClient);
+        saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
     }
 
     @Test
@@ -129,7 +136,7 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
                 performRequest(
                         get(getIdMappingResultPath(), job.getJobId())
                                 .param("query", "database:EnsemblMetazoa")
-                                .param("fields", "upi,accession")
+                                .param("fields", "upi,accession,organism")
                                 .param("sort", "length desc")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -154,9 +161,23 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
                                         "UPI0000283A09",
                                         "UPI0000283A06",
                                         "UPI0000283A03")))
-                .andExpect(jsonPath("$.results.*.to.uniParcCrossReferences.*.database").exists())
-                .andExpect(
-                        jsonPath("$.results.*.to.uniParcCrossReferences.*.organism")
-                                .doesNotExist());
+                .andExpect(jsonPath("$.results.*.to.uniProtKBAccessions").exists())
+                .andExpect(jsonPath("$.results.*.to.oldestCrossRefCreated").exists())
+                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists())
+                .andExpect(jsonPath("$.results.*.to.organisms").exists());
+    }
+
+    @Override
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
+                .stream()
+                .map(
+                        returnField -> {
+                            String lightPath =
+                                    returnField.getPaths().get(returnField.getPaths().size() - 1);
+                            return Arguments.of(
+                                    returnField.getName(), Collections.singletonList(lightPath));
+                        });
     }
 }

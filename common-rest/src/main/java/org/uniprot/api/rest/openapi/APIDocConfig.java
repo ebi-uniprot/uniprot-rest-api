@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
+import org.uniprot.core.util.Utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -164,11 +165,11 @@ public class APIDocConfig {
     private static void updateAllOffItemsReference(
             Schema idMappingResult, Set<String> searchEntries) {
         ArraySchema searchResults = (ArraySchema) idMappingResult.getProperties().get("results");
-        searchResults.setAllOf(new ArrayList<>());
+        searchResults.getItems().anyOf(new ArrayList<>());
         for (String searchEntry : searchEntries) {
             Schema allOfSchema = new Schema();
             allOfSchema.set$ref("#/components/schemas/" + searchEntry);
-            searchResults.getAllOf().add(allOfSchema);
+            searchResults.getItems().getAnyOf().add(allOfSchema);
         }
     }
 
@@ -186,16 +187,18 @@ public class APIDocConfig {
     }
 
     private static void configureStringTypesSerialisers(Schema item) {
-        for (Object prop : item.getProperties().values()) {
-            Schema propSchema = (Schema) prop;
-            if (prop instanceof ArraySchema) {
-                propSchema = propSchema.getItems();
-            }
-            if (propSchema.get$ref() != null
-                    && STRING_SERIALISER_LIST.contains(propSchema.get$ref())) {
-                // changing type from object to string
-                propSchema.set$ref(null);
-                propSchema.type("string");
+        if (Utils.notNullNotEmpty(item.getProperties())) {
+            for (Object prop : item.getProperties().values()) {
+                Schema propSchema = (Schema) prop;
+                if (prop instanceof ArraySchema) {
+                    propSchema = propSchema.getItems();
+                }
+                if (propSchema.get$ref() != null
+                        && STRING_SERIALISER_LIST.contains(propSchema.get$ref())) {
+                    // changing type from object to string
+                    propSchema.set$ref(null);
+                    propSchema.type("string");
+                }
             }
         }
     }

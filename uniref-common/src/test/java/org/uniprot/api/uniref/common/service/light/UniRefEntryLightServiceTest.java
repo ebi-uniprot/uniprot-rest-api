@@ -27,6 +27,7 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.response.converter.UniRefLightQueryResultConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
@@ -44,7 +45,6 @@ import org.uniprot.store.search.document.uniref.UniRefDocument;
 class UniRefEntryLightServiceTest {
     @Mock private UniRefQueryRepository repository;
     @Mock private UniRefFacetConfig facetConfig;
-    @Mock private UniRefSortClause uniRefSortClause;
     @Mock private UniRefLightQueryResultConverter uniRefQueryResultConverter;
     @Mock private StoreStreamer<UniRefEntryLight> storeStreamer;
     @Mock private SolrQueryConfig uniRefSolrQueryConf;
@@ -53,7 +53,7 @@ class UniRefEntryLightServiceTest {
     @Mock private RdfStreamer unirefRdfStreamer;
     @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Mock private TupleStreamDocumentIdStream solrIdStreamer;
-
+    @Mock private RequestConverter requestConverter;
     UniRefEntryLightService service;
 
     @BeforeEach
@@ -62,7 +62,6 @@ class UniRefEntryLightServiceTest {
                 new UniRefEntryLightService(
                         repository,
                         facetConfig,
-                        uniRefSortClause,
                         uniRefQueryResultConverter,
                         storeStreamer,
                         uniRefSolrQueryConf,
@@ -70,7 +69,8 @@ class UniRefEntryLightServiceTest {
                         uniRefSearchFieldConfig,
                         unirefRdfStreamer,
                         facetTupleStreamTemplate,
-                        solrIdStreamer);
+                        solrIdStreamer,
+                        requestConverter);
     }
 
     @Test
@@ -151,7 +151,7 @@ class UniRefEntryLightServiceTest {
         assertEquals(5, entries.size());
         assertEquals(
                 ids, entries.stream().map(e -> e.getId().getValue()).collect(Collectors.toList()));
-        verify(storeStreamer, never()).idsToStoreStream(any());
+        verify(storeStreamer, never()).idsToStoreStream(any(), any());
     }
 
     @Test
@@ -168,12 +168,12 @@ class UniRefEntryLightServiceTest {
                 ids.stream().map(id -> new UniRefEntryLightBuilder().id(id).build());
         request.setQuery("field:value");
         request.setFormat(FASTA_MEDIA_TYPE_VALUE);
-        when(storeStreamer.idsToStoreStream(any())).thenReturn(entriesStream);
+        when(storeStreamer.idsToStoreStream(any(), any())).thenReturn(entriesStream);
         Stream<UniRefEntryLight> result = service.stream(request);
         List<UniRefEntryLight> entries = result.collect(Collectors.toList());
         assertEquals(5, entries.size());
         assertEquals(
                 ids, entries.stream().map(e -> e.getId().getValue()).collect(Collectors.toList()));
-        verify(storeStreamer, times(1)).idsToStoreStream(any());
+        verify(storeStreamer, times(1)).idsToStoreStream(any(), any());
     }
 }

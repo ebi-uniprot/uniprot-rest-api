@@ -1,7 +1,9 @@
 package org.uniprot.api.async.download.model.request.uniparc;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPARC_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPARC_EXAMPLE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import org.springdoc.api.annotations.ParameterObject;
@@ -29,7 +31,8 @@ public class UniParcDownloadRequest extends UniParcStreamRequest
                 LIST_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
                 TURTLE_MEDIA_TYPE_VALUE,
-                N_TRIPLES_MEDIA_TYPE_VALUE
+                N_TRIPLES_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Parameter(description = FORMAT_UNIPARC_DESCRIPTION, example = FORMAT_UNIPARC_EXAMPLE)
     private String format;

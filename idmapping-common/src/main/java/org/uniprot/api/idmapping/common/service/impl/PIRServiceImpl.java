@@ -66,7 +66,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
     @Autowired
     public PIRServiceImpl(
             RestTemplate idMappingRestTemplate,
-            @Value("${search.default.page.size:#{null}}") Integer defaultPageSize,
+            @Value("${search.request.converter.defaultRestPageSize:#{null}}")
+                    Integer defaultPageSize,
             @Value(
                             "${id.mapping.pir.url:https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async}")
                     String pirMappingUrl,

@@ -20,6 +20,7 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
@@ -48,7 +49,7 @@ public abstract class BasicIdService<T, U> {
     private final SolrQueryConfig queryConfig;
     private final FacetConfig facetConfig;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     // the maximum number of ids allowed in `to` field after mapped by `from` fields
@@ -193,7 +194,8 @@ public abstract class BasicIdService<T, U> {
             List<IdMappingStringPair> mappedIds, StreamRequest streamRequest);
 
     protected Stream<T> getEntries(List<String> toIds, String fields) {
-        return this.storeStreamer.streamEntries(toIds);
+        StoreRequest storeRequest = StoreRequest.builder().fields(fields).build();
+        return this.storeStreamer.streamEntries(toIds, storeRequest);
     }
 
     protected List<IdMappingStringPair> streamFilterAndSortEntries(
