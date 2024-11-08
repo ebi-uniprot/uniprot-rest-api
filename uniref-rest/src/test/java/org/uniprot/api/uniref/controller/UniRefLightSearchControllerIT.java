@@ -347,7 +347,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
             case "created":
                 value = "[2000-01-01 TO *]";
                 break;
-            case "upi":
+            case "uniparc":
                 value = "UPI0000083A11";
                 break;
         }
@@ -447,7 +447,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                             "query",
                             Collections.singletonList(
                                     "id:INVALID OR taxonomy_id:INVALID "
-                                            + "OR length:INVALID OR count:INVALID  OR upi:INVALID"))
+                                            + "OR length:INVALID OR count:INVALID  OR uniparc:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -457,7 +457,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                             "The taxonomy id filter value should be a number",
                                             "'length' filter type 'general' is invalid. Expected 'range' filter type",
                                             "'count' filter type 'general' is invalid. Expected 'range' filter type",
-                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                            "The 'uniparc' value has invalid format. It should be a valid UniParc UPI")))
                     .build();
         }
 
@@ -571,7 +571,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("upi:invalid")
+                    .query("uniparc:invalid")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -580,7 +580,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                                            "The 'uniparc' value has invalid format. It should be a valid UniParc UPI")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -588,7 +588,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
+                                                            "Error messages\nThe 'uniparc' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -596,7 +596,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
+                                                            "Error messages\nThe 'uniparc' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -610,7 +610,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
+                                                            "Error messages\nThe 'uniparc' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .build();
         }
