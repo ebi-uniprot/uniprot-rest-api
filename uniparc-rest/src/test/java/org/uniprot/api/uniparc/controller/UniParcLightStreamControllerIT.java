@@ -308,7 +308,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "accession:P10006 OR accession:P10005")
+                        .param("query", "uniprotkb:P10006 OR uniprotkb:P10005")
                         .param("fields", "gene,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();

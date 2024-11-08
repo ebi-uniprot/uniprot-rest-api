@@ -44,7 +44,7 @@ public class IdMappingUniParcITUtils {
             case "taxonomy_id":
                 value = "9606";
                 break;
-            case "accession":
+            case "uniprotkb":
             case "isoform":
                 value = "P10011";
                 break;

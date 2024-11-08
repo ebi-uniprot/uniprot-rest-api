@@ -54,7 +54,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @Import(UniParcSolrQueryConfig.class)
 public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocument, UniParcEntry> {
     public static final String UNIPARC_ID_FIELD = "upi";
-    private static final String ACCESSION_FIELD = "accession";
+    private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String CHECKSUM_STR = "checksum";
     private static final String COMMA_STR = ",";
     private final SearchFieldConfig searchFieldConfig;
