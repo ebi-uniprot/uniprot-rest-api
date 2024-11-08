@@ -32,7 +32,7 @@ public class IdMappingUniRefITUtils {
             case "id":
                 value = ID_PREF_50 + 11;
                 break;
-            case "upi":
+            case "uniparc":
                 value = "UPI0000083A11";
                 break;
             case "taxonomy_id":

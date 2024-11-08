@@ -22,7 +22,7 @@ import lombok.EqualsAndHashCode;
 public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchRequest
         implements SearchRequest {
     @Parameter(hidden = true)
-    private static final String PROTEOME_ID_STR = "upid";
+    private static final String PROTEOME_ID_STR = "proteome";
 
     @Parameter(
             description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
