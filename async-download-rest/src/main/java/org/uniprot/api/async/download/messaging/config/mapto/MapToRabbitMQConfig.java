@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfigUtils;
 import org.uniprot.api.async.download.messaging.consumer.mapto.MapToMessageConsumer;
 import org.uniprot.api.async.download.model.request.MapToDownloadRequestToArrayConverter;
+import org.uniprot.api.async.download.model.request.mapto.UniParcToUniProtKBMapDownloadRequest;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -94,6 +95,12 @@ public class MapToRabbitMQConfig {
 
     @Bean
     public HashGenerator<UniProtKBToUniRefDownloadRequest> mapDownloadHashGenerator(
+            @Value("${async.download.mapto.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new MapToDownloadRequestToArrayConverter<>(), hashSalt);
+    }
+
+    @Bean
+    public HashGenerator<UniParcToUniProtKBMapDownloadRequest> parcToKBMapDownloadHashGenerator(
             @Value("${async.download.mapto.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new MapToDownloadRequestToArrayConverter<>(), hashSalt);
     }
