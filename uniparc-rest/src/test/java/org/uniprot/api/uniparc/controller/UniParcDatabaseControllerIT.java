@@ -137,7 +137,9 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
+                .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
+                .andExpect(jsonPath("$.results[1].created", Matchers.is("2017-02-12")))
+                .andExpect(jsonPath("$.results[1].lastUpdated", Matchers.is("2017-04-23")));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
