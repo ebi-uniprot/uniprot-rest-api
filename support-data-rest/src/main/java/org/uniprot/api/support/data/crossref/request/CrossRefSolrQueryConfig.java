@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -56,12 +57,14 @@ public class CrossRefSolrQueryConfig {
             SolrQueryConfig crossRefSolrQueryConf,
             CrossRefSolrSortClause crossRefSortClause,
             UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig crossRefFacetConfig) {
         return new RequestConverterImpl(
                 crossRefSolrQueryConf,
                 crossRefSortClause,
                 crossRefQueryProcessorConfig,
                 requestConverterConfigProperties,
+                crossRefFacetConfig,
                 CROSS_REF_REGEX_PATTERN);
     }
 

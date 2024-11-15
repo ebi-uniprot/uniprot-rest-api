@@ -1,13 +1,10 @@
 package org.uniprot.api.common.repository.solrstream;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.common.repository.search.SolrFacetRequest;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.core.util.Utils;
 
 import lombok.Getter;
@@ -19,6 +16,9 @@ import lombok.Getter;
  */
 @Getter
 public class FacetStreamExpression extends UniProtStreamExpression {
+    static final String DEFAULT_BUCKET_SIZE = "1000";
+    static final String DEFAULT_BUCKET_SORTS = "count(*) desc";
+
     public enum MetricFunctionName {
         avg,
         count,
@@ -28,31 +28,21 @@ public class FacetStreamExpression extends UniProtStreamExpression {
     }
 
     public FacetStreamExpression(
-            String collection,
-            String facet,
-            SolrStreamFacetRequest request,
-            FacetConfig facetConfig) {
+            String collection, SolrRequest request, SolrFacetRequest facetRequest) {
         super("facet");
-        validateParams(
-                collection,
-                request.getQuery(),
-                facet,
-                request.getMetrics(),
-                request.getBucketSorts(),
-                request.getBucketSizeLimit());
 
-        FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facet);
+        validateParams(collection, request, facetRequest.getName());
         this.addParameter(new StreamExpressionValue(collection));
-        this.addParameter(new StreamExpressionNamedParameter("q", request.getQuery()));
-        this.addParameter(new StreamExpressionNamedParameter("buckets", facet));
+        this.addParameter(new StreamExpressionNamedParameter("q", constructQuery(request)));
+        this.addParameter(new StreamExpressionNamedParameter("buckets", facetRequest.getName()));
+        this.addParameter(
+                new StreamExpressionNamedParameter("bucketSorts", getBucketSorts(facetRequest)));
         this.addParameter(
                 new StreamExpressionNamedParameter(
-                        "bucketSorts", getBucketSorts(request, facetProperty)));
-        this.addParameter(
-                new StreamExpressionNamedParameter(
-                        "bucketSizeLimit", String.valueOf(request.getBucketSizeLimit())));
-        List<StreamExpression> metricExpressions = parseMetrics(request.getMetrics());
-        this.getParameters().addAll(metricExpressions);
+                        "bucketSizeLimit", getBucketSizeLimit(facetRequest)));
+        StreamExpression expression =
+                new StreamExpression(MetricFunctionName.count.name()).withParameter("*");
+        this.getParameters().add(expression);
 
         // order of params is important. this code should be in the end
         if (queryFilteredQuerySet(request)) {
@@ -60,67 +50,32 @@ public class FacetStreamExpression extends UniProtStreamExpression {
         }
     }
 
-    private String getBucketSorts(SolrStreamFacetRequest request, FacetProperty facetProperty) {
-        String bucketSorts = request.getBucketSorts();
-        if (facetProperty.getSort() != null) {
-            bucketSorts = facetProperty.getSort();
+    private String getBucketSizeLimit(SolrFacetRequest facetRequest) {
+        String bucketSize = DEFAULT_BUCKET_SIZE;
+        if (facetRequest.getLimit() > 0 && Utils.nullOrEmpty(facetRequest.getInterval())) {
+            bucketSize = String.valueOf(facetRequest.getLimit());
+        }
+        return bucketSize;
+    }
+
+    private String getBucketSorts(SolrFacetRequest facetRequest) {
+        String bucketSorts = DEFAULT_BUCKET_SORTS;
+        if (facetRequest.getSort() != null) {
+            bucketSorts = facetRequest.getSort();
         }
         return bucketSorts;
     }
 
-    private void validateParams(
-            String collection,
-            String query,
-            String buckets,
-            String metrics,
-            String bucketSorts,
-            int bucketSizeLimit) {
+    private void validateParams(String collection, SolrRequest solrRequest, String buckets) {
         if (Utils.nullOrEmpty(collection)) {
             throw new IllegalArgumentException("collection is a mandatory param");
         }
-        if (Utils.nullOrEmpty(query)) {
-            throw new IllegalArgumentException("query is a mandatory param");
+        if (Utils.nullOrEmpty(solrRequest.getQuery())
+                && Utils.nullOrEmpty(solrRequest.getIdsQuery())) {
+            throw new IllegalArgumentException("query or Ids is a mandatory param");
         }
         if (Utils.nullOrEmpty(buckets)) {
             throw new IllegalArgumentException("buckets is a mandatory param");
-        }
-        if (Utils.nullOrEmpty(metrics)) {
-            throw new IllegalArgumentException("metrics is a mandatory param");
-        }
-        if (Utils.nullOrEmpty(bucketSorts)) {
-            throw new IllegalArgumentException("bucketSorts is a mandatory param");
-        }
-        if (bucketSizeLimit <= 0) {
-            throw new IllegalArgumentException("bucketSizeLimit should be a positive integer");
-        }
-    }
-
-    private List<StreamExpression> parseMetrics(String metrics) {
-        String[] metricTokens = metrics.split(",");
-        List<StreamExpression> expressions = new ArrayList<>();
-        for (String token : metricTokens) {
-            String functionName = getFunctionName(token);
-            String columnName = token.substring(token.indexOf("(") + 1, token.indexOf(")"));
-            StreamExpression expression =
-                    new StreamExpression(functionName).withParameter(columnName);
-            expressions.add(expression);
-        }
-        return expressions;
-    }
-
-    private String getFunctionName(String token) {
-        if (token.toLowerCase().startsWith(MetricFunctionName.count.name())) {
-            return MetricFunctionName.count.name();
-        } else if (token.toLowerCase().startsWith(MetricFunctionName.avg.name())) {
-            return MetricFunctionName.avg.name();
-        } else if (token.toLowerCase().startsWith(MetricFunctionName.max.name())) {
-            return MetricFunctionName.max.name();
-        } else if (token.toLowerCase().startsWith(MetricFunctionName.min.name())) {
-            return MetricFunctionName.min.name();
-        } else if (token.toLowerCase().startsWith(MetricFunctionName.sum.name())) {
-            return MetricFunctionName.sum.name();
-        } else {
-            throw new IllegalArgumentException("Unknown function " + token);
         }
     }
 }

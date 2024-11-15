@@ -9,7 +9,8 @@ import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.core.util.Utils;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,13 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final String zookeeperHost;
     private final String collection;
 
-    public TupleStream create(SolrStreamFacetRequest request, FacetConfig facetConfig) {
+    public TupleStream create(SolrRequest request) {
         try {
             List<StreamExpression> expressions = new ArrayList<>();
             // add search function if needed
-            if (request.isSearchAccession()) {
+            if (Utils.notNullNotEmpty(request.getQuery())
+                    || Utils.notNullNotEmpty(request.getSorts())
+                    || Utils.nullOrEmpty(request.getFacets())) {
                 StreamExpression searchExpression =
                         new SearchStreamExpression(this.collection, request);
                 expressions.add(searchExpression);
@@ -48,7 +51,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .map(
                                     facet ->
                                             new FacetStreamExpression(
-                                                    this.collection, facet, request, facetConfig))
+                                                    this.collection, request, facet))
                             .collect(Collectors.toList());
 
             expressions.addAll(facetExpressions);

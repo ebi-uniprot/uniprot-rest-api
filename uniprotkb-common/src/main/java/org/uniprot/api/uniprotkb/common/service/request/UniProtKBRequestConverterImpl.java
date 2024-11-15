@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.request;
 
+import static org.uniprot.api.rest.service.request.BasicRequestConverter.getIdsTermQuery;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -7,6 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
@@ -18,6 +21,7 @@ import org.uniprot.api.uniprotkb.common.repository.search.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBBasicRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -40,6 +44,7 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
             UniProtQueryProcessorConfig queryProcessorConfig,
             RequestConverterConfigProperties requestConverterConfigProperties,
             UniProtTermsConfig uniProtTermsConfig,
+            FacetConfig facetConfig,
             Pattern idPattern) {
         basicConverter =
                 new BasicRequestConverter(
@@ -47,6 +52,7 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
                         solrSortClause,
                         queryProcessorConfig,
                         requestConverterConfigProperties,
+                        facetConfig,
                         idPattern);
         this.uniProtTermsConfig = uniProtTermsConfig;
         searchFieldConfig =
@@ -95,6 +101,24 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
     }
 
     @Override
+    public SolrRequest createSearchIdsSolrRequest(
+            SearchRequest request, List<String> idsList, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder =
+                createSearchIdsSolrRequestBuilder(request, idField);
+        requestBuilder.idsQuery(getUniProtKBIdsTermQuery(idsList, idField));
+        return requestBuilder.build();
+    }
+
+    @Override
+    public SolrRequest createStreamIdsSolrRequest(
+            StreamRequest request, List<String> idsList, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder =
+                createStreamIdsSolrRequestBuilder(request, idField);
+        requestBuilder.idsQuery(getUniProtKBIdsTermQuery(idsList, idField));
+        return requestBuilder.build();
+    }
+
+    @Override
     public int getDefaultPageSize() {
         return basicConverter.getDefaultPageSize();
     }
@@ -125,6 +149,29 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
     @Override
     public String getQueryFields(String query) {
         return basicConverter.getQueryFields(query);
+    }
+
+    protected SolrRequest.SolrRequestBuilder createSearchIdsSolrRequestBuilder(
+            SearchRequest request, String idField) {
+        return basicConverter.createIdsSolrRequest(request, idField);
+    }
+
+    protected SolrRequest.SolrRequestBuilder createStreamIdsSolrRequestBuilder(
+            StreamRequest request, String idField) {
+        return basicConverter.createIdsSolrRequest(request, idField);
+    }
+
+    protected String getUniProtKBIdsTermQuery(List<String> idsList, String idField) {
+        List<String> result = new ArrayList<>();
+        List<String> isoformList = idsList.stream().filter(id -> id.contains("-")).toList();
+        if (Utils.notNullNotEmpty(isoformList)) {
+            result.add(BasicRequestConverter.getIdsTermQuery(isoformList, ACCESSION));
+        }
+        List<String> accessionList = idsList.stream().filter(id -> !id.contains("-")).toList();
+        if (Utils.notNullNotEmpty(accessionList)) {
+            result.add(getIdsTermQuery(accessionList, idField));
+        }
+        return String.join(" OR ", result);
     }
 
     private void updateIsoformsFilterQuery(

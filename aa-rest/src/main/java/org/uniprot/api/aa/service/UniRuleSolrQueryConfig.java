@@ -1,11 +1,15 @@
 package org.uniprot.api.aa.service;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIRULE_ALL_ID_REGEX;
+
 import java.util.*;
+import java.util.regex.Pattern;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -23,6 +27,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @Configuration
 public class UniRuleSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/unirule-query.config";
+    private static final Pattern UNIRULE_REGEX_PATTERN = Pattern.compile(UNIRULE_ALL_ID_REGEX);
 
     @Bean
     public SolrQueryConfig uniRuleSolrQueryConf() {
@@ -54,12 +59,15 @@ public class UniRuleSolrQueryConfig {
             SolrQueryConfig uniRuleSolrQueryConf,
             UniRuleSortClause uniRuleSortClause,
             UniProtQueryProcessorConfig uniRuleQueryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig uniRuleFacetConfig) {
         return new RequestConverterImpl(
                 uniRuleSolrQueryConf,
                 uniRuleSortClause,
                 uniRuleQueryProcessorConfig,
-                requestConverterConfigProperties);
+                requestConverterConfigProperties,
+                uniRuleFacetConfig,
+                UNIRULE_REGEX_PATTERN);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

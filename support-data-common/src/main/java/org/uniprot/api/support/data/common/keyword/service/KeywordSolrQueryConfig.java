@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -60,12 +61,14 @@ public class KeywordSolrQueryConfig {
             SolrQueryConfig keywordSolrQueryConf,
             KeywordSortClause keywordSolrClause,
             UniProtQueryProcessorConfig keywordQueryProcessorConfig,
-            RequestConverterConfigProperties uniProtRequestConverterConfigProperties) {
+            RequestConverterConfigProperties uniProtRequestConverterConfigProperties,
+            FacetConfig keywordFacetConfig) {
         return new RequestConverterImpl(
                 keywordSolrQueryConf,
                 keywordSolrClause,
                 keywordQueryProcessorConfig,
                 uniProtRequestConverterConfigProperties,
+                keywordFacetConfig,
                 KEYWORD_ID_REGEX_PATTERN);
     }
 }

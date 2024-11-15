@@ -8,27 +8,22 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.ExtraOptions;
-import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.request.UniProtKBRequestUtil;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -46,8 +41,7 @@ public abstract class BasicIdService<T, U> {
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RdfStreamer rdfStreamer;
-    private final SolrQueryConfig queryConfig;
-    private final FacetConfig facetConfig;
+    private final RequestConverter requestConverter;
 
     @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
@@ -71,14 +65,13 @@ public abstract class BasicIdService<T, U> {
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
             RdfStreamer rdfStreamer,
-            SolrQueryConfig queryConfig) {
+            RequestConverter requestConverter) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
-        this.facetConfig = facetConfig;
         this.facetTupleStreamConverter =
                 new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
         this.rdfStreamer = rdfStreamer;
-        this.queryConfig = queryConfig;
+        this.requestConverter = requestConverter;
     }
 
     public QueryResult<U> getMappedEntries(
@@ -112,8 +105,10 @@ public abstract class BasicIdService<T, U> {
                                         this.maxIdMappingToIdsCountWithFacets)));
             }
 
-            SolrStreamFacetResponse solrStreamResponse =
-                    searchBySolrStream(toIds, searchRequest, includeIsoform);
+            SolrRequest solrRequest =
+                    requestConverter.createSearchIdsSolrRequest(
+                            searchRequest, toIds, getSolrIdField());
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(solrRequest);
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
@@ -184,10 +179,6 @@ public abstract class BasicIdService<T, U> {
 
     protected abstract String getSolrIdField();
 
-    protected String getTermsQueryField() {
-        return getSolrIdField();
-    }
-
     protected abstract UniProtDataType getUniProtDataType();
 
     protected abstract Stream<U> streamEntries(
@@ -215,9 +206,10 @@ public abstract class BasicIdService<T, U> {
 
             long start = System.currentTimeMillis();
 
-            SearchRequest searchRequest = SearchStreamRequest.from(streamRequest);
-            SolrStreamFacetResponse solrStreamResponse =
-                    searchBySolrStream(toIds, searchRequest, includeIsoform);
+            SolrRequest solrRequest =
+                    requestConverter.createStreamIdsSolrRequest(
+                            streamRequest, toIds, getSolrIdField());
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(solrRequest);
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
@@ -237,31 +229,11 @@ public abstract class BasicIdService<T, U> {
         return mappedIds;
     }
 
-    protected SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, SearchRequest searchRequest, boolean includeIsoform) {
-        String termsField = getSolrIdField();
-        // use accession field to get isoform also if asked for kb mapping
-        boolean filterIsoform =
-                UniProtKBRequestUtil.needsToFilterIsoform(
-                        UniProtKBIdService.ACCESSION,
-                        UniProtKBIdService.IS_ISOFORM,
-                        searchRequest.getQuery(),
-                        includeIsoform);
-        if (!filterIsoform) {
-            termsField = getTermsQueryField();
-        }
-        SolrStreamFacetRequest solrStreamRequest =
-                SolrStreamFacetRequest.createSolrStreamFacetRequest(
-                        queryConfig,
-                        getUniProtDataType(),
-                        getSolrIdField(),
-                        termsField,
-                        ids,
-                        searchRequest,
-                        includeIsoform);
-        TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest, facetConfig);
+    protected SolrStreamFacetResponse searchBySolrStream(SolrRequest solrRequest) {
+        TupleStream facetTupleStream = this.tupleStream.create(solrRequest);
         return this.facetTupleStreamConverter.convert(
-                facetTupleStream, searchRequest.getFacetList());
+                facetTupleStream,
+                solrRequest.getFacets().stream().map(SolrFacetRequest::getName).toList());
     }
 
     private Integer getPageSize(SearchRequest searchRequest) {

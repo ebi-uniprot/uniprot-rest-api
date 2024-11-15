@@ -1,138 +1,165 @@
 package org.uniprot.api.common.repository.solrstream;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.uniprot.api.common.repository.solrstream.FacetStreamExpression.DEFAULT_BUCKET_SIZE;
+import static org.uniprot.api.common.repository.solrstream.FacetStreamExpression.DEFAULT_BUCKET_SORTS;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
-import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
+import org.uniprot.api.common.repository.search.SolrFacetRequest;
+import org.uniprot.api.common.repository.search.SolrRequest;
 
 class FacetStreamExpressionTest {
 
     @Test
-    void testCreate() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
+    void testCreateFullFacetStreamExpression() {
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
+        String idsQuery = "P21802 OR P12345";
+        String idFields = "id_field";
+        String queryField = "field1 field2";
         String buckets = "reviewed";
-        String metrics = "count(reviewed)";
-        String bucketSorts = "count(reviewed)";
+        String bucketSorts = "count(*)";
         int bucketSizeLimit = 10;
         builder.query(query);
-        builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        FacetConfig facetConfig = new FakeFacetConfig();
+        builder.idField(idFields);
+        builder.idsQuery(idsQuery);
+        builder.queryField(queryField);
+        SolrFacetRequest facetRequest =
+                SolrFacetRequest.builder()
+                        .name(buckets)
+                        .limit(bucketSizeLimit)
+                        .minCount(1)
+                        .sort(bucketSorts)
+                        .build();
+        builder.facet(facetRequest);
         FacetStreamExpression facetExpression =
-                new FacetStreamExpression(collection, buckets, builder.build(), facetConfig);
+                new FacetStreamExpression(collection, builder.build(), facetRequest);
         Assertions.assertNotNull(facetExpression);
         Assertions.assertEquals("facet", facetExpression.getFunctionName());
-        Assertions.assertEquals(6, facetExpression.getParameters().size());
+        Assertions.assertEquals(10, facetExpression.getParameters().size());
 
-        List<StreamExpressionParameter> params = facetExpression.getParameters();
+        Map<String, String> params = getMappedParameters(facetExpression);
+        Assertions.assertEquals(8, params.size());
+        Assertions.assertEquals(query, params.get("q"));
+        Assertions.assertEquals(buckets, params.get("buckets"));
+        Assertions.assertEquals(bucketSorts, params.get("bucketSorts"));
+        Assertions.assertEquals(String.valueOf(bucketSizeLimit), params.get("bucketSizeLimit"));
+        Assertions.assertEquals("edismax", params.get("defType"));
+        Assertions.assertEquals(queryField, params.get("qf"));
+        Assertions.assertEquals(idsQuery, params.get("fq"));
+        Assertions.assertEquals("AND", params.get("q.op"));
 
-        for (StreamExpressionParameter param : params) {
-            if (param instanceof StreamExpressionNamedParameter) {
-                StreamExpressionNamedParameter namedParam = (StreamExpressionNamedParameter) param;
-                assertThat(
-                        namedParam.getName(),
-                        Matchers.isIn(
-                                Arrays.asList("q", "buckets", "bucketSorts", "bucketSizeLimit")));
-                assertThat(
-                        ((StreamExpressionValue) namedParam.getParameter()).getValue(),
-                        Matchers.isIn(
-                                Arrays.asList(
-                                        query,
-                                        buckets,
-                                        bucketSorts,
-                                        String.valueOf(bucketSizeLimit))));
-
-            } else if (param instanceof StreamExpressionValue) {
-                StreamExpressionValue valueParam = (StreamExpressionValue) param;
-                assertThat(
-                        valueParam.getValue(),
-                        Matchers.isIn(Arrays.asList(collection, "count(*)")));
-            }
-        }
+        List<String> expressionValue = getExpressionValues(facetExpression);
+        Assertions.assertEquals(List.of(collection), expressionValue);
     }
 
     @Test
-    void testCreateBucketSizeFailure() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
-        String collection = "sample collection";
-        String query = "q:*:*";
-        String buckets = "facet";
-        String metrics = "count(facet)";
-        String bucketSorts = "count(facet)";
-        int bucketSizeLimit = -1;
-        builder.query(query);
-        builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        FacetConfig facetConfig = new FakeFacetConfig();
-        IllegalArgumentException exception =
-                Assertions.assertThrows(
-                        IllegalArgumentException.class,
-                        () ->
-                                new FacetStreamExpression(
-                                        collection, buckets, builder.build(), facetConfig));
-        Assertions.assertEquals(
-                "bucketSizeLimit should be a positive integer", exception.getMessage());
+    void testCreateMinimunParameters() {
+        String idsQuery = "P21802 OR P12345";
+        String buckets = "reviewed";
+        String collection = "collection";
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
+        builder.idsQuery(idsQuery);
+        SolrFacetRequest facetRequest = SolrFacetRequest.builder().name(buckets).build();
+        builder.facet(facetRequest);
+
+        FacetStreamExpression facetExpression =
+                new FacetStreamExpression(collection, builder.build(), facetRequest);
+        Assertions.assertNotNull(facetExpression);
+        Assertions.assertEquals("facet", facetExpression.getFunctionName());
+        Assertions.assertEquals(6, facetExpression.getParameters().size());
+        Map<String, String> params = getMappedParameters(facetExpression);
+        Assertions.assertEquals(4, params.size());
+        Assertions.assertEquals(idsQuery, params.get("q"));
+        Assertions.assertEquals(buckets, params.get("buckets"));
+        Assertions.assertEquals(DEFAULT_BUCKET_SORTS, params.get("bucketSorts"));
+        Assertions.assertEquals(DEFAULT_BUCKET_SIZE, params.get("bucketSizeLimit"));
+
+        List<String> expressionValue = getExpressionValues(facetExpression);
+        Assertions.assertEquals(List.of(collection), expressionValue);
+    }
+
+    @Test
+    void testCreateWithIntervalReturnDefaultBucketSize() {
+        String idsQuery = "P21802 OR P12345";
+        String buckets = "reviewed";
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
+        builder.idsQuery(idsQuery);
+        SolrFacetRequest facetRequest =
+                SolrFacetRequest.builder()
+                        .name(buckets)
+                        .limit(10)
+                        .interval(Map.of("10", "20"))
+                        .build();
+        builder.facet(facetRequest);
+
+        FacetStreamExpression facetExpression =
+                new FacetStreamExpression("collection", builder.build(), facetRequest);
+        Assertions.assertNotNull(facetExpression);
+        Assertions.assertEquals("facet", facetExpression.getFunctionName());
+        Assertions.assertEquals(6, facetExpression.getParameters().size());
+        Map<String, String> params = getMappedParameters(facetExpression);
+        Assertions.assertEquals(4, params.size());
+        Assertions.assertEquals(idsQuery, params.get("q"));
+        Assertions.assertEquals(buckets, params.get("buckets"));
+        Assertions.assertEquals(DEFAULT_BUCKET_SORTS, params.get("bucketSorts"));
+        Assertions.assertEquals(DEFAULT_BUCKET_SIZE, params.get("bucketSizeLimit"));
     }
 
     @Test
     void testCreateFailureWithoutQuery() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
         String collection = "sample collection";
-        FacetConfig facetConfig = new FakeFacetConfig();
+        SolrFacetRequest facetRequest = SolrFacetRequest.builder().build();
+        builder.facet(facetRequest);
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () ->
-                                new FacetStreamExpression(
-                                        collection, "buckets", builder.build(), facetConfig));
-        Assertions.assertEquals("query is a mandatory param", exception.getMessage());
+                        () -> new FacetStreamExpression(collection, builder.build(), facetRequest));
+        Assertions.assertEquals("query or Ids is a mandatory param", exception.getMessage());
     }
 
     @Test
     void testCreateFailureWithoutCollection() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
-        FacetConfig facetConfig = new FakeFacetConfig();
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
+        SolrFacetRequest facetRequest = SolrFacetRequest.builder().build();
+        builder.facet(facetRequest);
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () ->
-                                new FacetStreamExpression(
-                                        null, "buckets", builder.build(), facetConfig));
+                        () -> new FacetStreamExpression(null, builder.build(), facetRequest));
         Assertions.assertEquals("collection is a mandatory param", exception.getMessage());
     }
 
-    @Test
-    void testCreateMetricFailure() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
-        String collection = "sample collection";
-        String query = "q:*:*";
-        String buckets = "reviewed";
-        String metrics = "median(reviewed)";
-        String bucketSorts = "count(reviewed)";
-        int bucketSizeLimit = 1;
-        builder.query(query);
-        builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        FacetConfig facetConfig = new FakeFacetConfig();
-        IllegalArgumentException exception =
-                Assertions.assertThrows(
-                        IllegalArgumentException.class,
-                        () ->
-                                new FacetStreamExpression(
-                                        collection, buckets, builder.build(), facetConfig));
-        Assertions.assertEquals("Unknown function median(reviewed)", exception.getMessage());
+    private static List<String> getExpressionValues(FacetStreamExpression facetExpression) {
+        return facetExpression.getParameters().stream()
+                .filter(p -> p instanceof StreamExpressionValue)
+                .map(p -> (StreamExpressionValue) p)
+                .map(StreamExpressionValue::getValue)
+                .toList();
+    }
+
+    private static Map<String, String> getMappedParameters(FacetStreamExpression facetExpression) {
+        return facetExpression.getParameters().stream()
+                .filter(p -> p instanceof StreamExpressionNamedParameter)
+                .map(p -> (StreamExpressionNamedParameter) p)
+                .collect(
+                        Collectors.groupingBy(
+                                StreamExpressionNamedParameter::getName,
+                                Collectors.mapping(
+                                        FacetStreamExpressionTest::getParameterValues,
+                                        Collectors.joining(","))));
+    }
+
+    private static String getParameterValues(StreamExpressionNamedParameter p) {
+        StreamExpressionValue ep = (StreamExpressionValue) p.getParameter();
+        return ep.getValue();
     }
 }

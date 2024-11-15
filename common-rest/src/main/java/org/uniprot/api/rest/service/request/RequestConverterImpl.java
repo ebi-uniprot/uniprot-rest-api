@@ -1,9 +1,13 @@
 package org.uniprot.api.rest.service.request;
 
+import static org.uniprot.api.rest.service.request.BasicRequestConverter.*;
+
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -17,12 +21,14 @@ public class RequestConverterImpl implements RequestConverter {
             SolrQueryConfig queryConfig,
             AbstractSolrSortClause solrSortClause,
             UniProtQueryProcessorConfig queryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig facetConfig) {
         this(
                 queryConfig,
                 solrSortClause,
                 queryProcessorConfig,
                 requestConverterConfigProperties,
+                facetConfig,
                 null);
     }
 
@@ -31,6 +37,7 @@ public class RequestConverterImpl implements RequestConverter {
             AbstractSolrSortClause solrSortClause,
             UniProtQueryProcessorConfig queryProcessorConfig,
             RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig facetConfig,
             Pattern idPattern) {
         basicConverter =
                 new BasicRequestConverter(
@@ -38,6 +45,7 @@ public class RequestConverterImpl implements RequestConverter {
                         solrSortClause,
                         queryProcessorConfig,
                         requestConverterConfigProperties,
+                        facetConfig,
                         idPattern);
     }
 
@@ -50,6 +58,24 @@ public class RequestConverterImpl implements RequestConverter {
     public SolrRequest createStreamSolrRequest(StreamRequest request) {
         SolrRequest.SolrRequestBuilder requestBuilder =
                 basicConverter.createStreamSolrRequest(request);
+        return requestBuilder.build();
+    }
+
+    @Override
+    public SolrRequest createSearchIdsSolrRequest(
+            SearchRequest request, List<String> idsList, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder =
+                basicConverter.createIdsSolrRequest(request, idField);
+        requestBuilder.idsQuery(getIdsTermQuery(idsList, idField));
+        return requestBuilder.build();
+    }
+
+    @Override
+    public SolrRequest createStreamIdsSolrRequest(
+            StreamRequest request, List<String> idsList, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder =
+                basicConverter.createIdsSolrRequest(request, idField);
+        requestBuilder.idsQuery(getIdsTermQuery(idsList, idField));
         return requestBuilder.build();
     }
 
