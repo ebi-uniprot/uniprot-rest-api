@@ -142,7 +142,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
             case "length":
                 value = "[* TO *]";
                 break;
-            case "accession":
+            case "uniprotkb":
             case "isoform":
                 value = "P10011";
                 break;

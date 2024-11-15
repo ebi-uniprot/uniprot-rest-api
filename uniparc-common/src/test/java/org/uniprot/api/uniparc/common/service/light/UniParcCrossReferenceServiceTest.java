@@ -75,6 +75,7 @@ class UniParcCrossReferenceServiceTest {
     void testStreamCrossReferences() {
         when(uniParcLightStoreClient.getEntry(any())).thenReturn(Optional.empty());
         assertThrows(
-                ResourceNotFoundException.class, () -> service.streamCrossReferences("upi", null));
+                ResourceNotFoundException.class,
+                () -> service.streamCrossReferences("UPI000000001", null));
     }
 }

@@ -72,6 +72,6 @@ public class UniRefSolrQueryConfig {
             SearchFieldConfig uniRefSearchFieldConfig) {
         return asList(
                 uniRefSearchFieldConfig.getSearchFieldItemByName("id"),
-                uniRefSearchFieldConfig.getSearchFieldItemByName("upi"));
+                uniRefSearchFieldConfig.getSearchFieldItemByName("uniparc"));
     }
 }
