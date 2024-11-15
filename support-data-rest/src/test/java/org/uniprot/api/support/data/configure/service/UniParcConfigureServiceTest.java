@@ -26,7 +26,7 @@ class UniParcConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(5, resultGroups.size());
 
-        assertEquals(7, resultGroups.get(0).getFields().size());
+        assertEquals(8, resultGroups.get(0).getFields().size());
         assertEquals(3, resultGroups.get(1).getFields().size());
         assertEquals(1, resultGroups.get(2).getFields().size());
         assertEquals(2, resultGroups.get(3).getFields().size());
