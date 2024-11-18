@@ -1,10 +1,8 @@
 package org.uniprot.api.async.download.model.request.mapto;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.store.search.SolrCollection.*;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
@@ -12,18 +10,20 @@ import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidTSVAndXLSFormatOnlyFields;
-import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
+import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 import org.uniprot.store.config.UniProtDataType;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.uniprot;
+import static org.uniprot.store.search.SolrCollection.uniref;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ValidDownloadRequest(groups = CustomConstraintGroup.class)
 @ParameterObject
-public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
+public class UniRefToUniProtKBDownloadRequest extends UniRefStreamRequest
         implements MapToDownloadRequest {
 
     @ValidAsyncDownloadFormats(
@@ -37,13 +37,13 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIREF_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     private String format;
 
     private boolean force;
 
-    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
-    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;
 
@@ -51,12 +51,12 @@ public class UniProtKBToUniRefDownloadRequest extends UniProtKBStreamRequest
     private String downloadJobId;
 
     @Override
-    public String getFrom() {
+    public String getTo() {
         return uniprot.name();
     }
 
     @Override
-    public String getTo() {
+    public String getFrom() {
         return uniref.name();
     }
 
