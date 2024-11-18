@@ -340,35 +340,4 @@ public abstract class BasicIdService<T, U> {
         return Utils.notNullNotEmpty(searchRequest.getFacets())
                 && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;
     }
-
-    @Builder
-    @Getter
-    private static class SearchStreamRequest implements SearchRequest {
-        private String facets;
-        private final String cursor;
-        private final String query;
-        private final String sort;
-        private final String fields;
-        private Integer size;
-        private String format;
-
-        @Override
-        public void setSize(Integer size) {
-            this.size = size;
-        }
-
-        static SearchRequest from(StreamRequest streamRequest) {
-            return SearchStreamRequest.builder()
-                    .fields(streamRequest.getFields())
-                    .query(streamRequest.getQuery())
-                    .sort(streamRequest.getSort())
-                    .format(streamRequest.getFormat())
-                    .build();
-        }
-
-        @Override
-        public void setFormat(String format) {
-            // do nothing
-        }
-    }
 }
