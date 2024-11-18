@@ -8,4 +8,6 @@ import lombok.Getter;
 public class StoreRequest {
 
     private final boolean addLineage;
+
+    private final String fields;
 }

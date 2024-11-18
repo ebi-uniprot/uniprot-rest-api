@@ -107,6 +107,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     protected Stream<UniProtKBEntry> getEntries(List<String> toIds, String fields) {
         StoreRequest storeRequest =
                 StoreRequest.builder()
+                        .fields(fields)
                         .addLineage(isLineageAllowed(fields, returnFieldConfig))
                         .build();
         return this.storeStreamer.streamEntries(toIds, storeRequest);

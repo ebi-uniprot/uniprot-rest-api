@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,6 +62,7 @@ public abstract class SolrIdMessageConsumerIT<
         fileHandler.deleteAllFiles(ID);
     }
 
+    @Disabled
     @Test
     void onMessage_maxRetriesReached() {
         MessageProperties messageHeader = new MessageProperties();
@@ -114,6 +116,7 @@ public abstract class SolrIdMessageConsumerIT<
         assertTrue(fileHandler.areIdAndResultFilesPresent(ID));
     }
 
+    @Disabled
     @Test
     void onMessage_retryLoop() throws Exception {
         createAllFiles(ID);

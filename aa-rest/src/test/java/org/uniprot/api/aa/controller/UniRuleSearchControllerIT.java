@@ -69,7 +69,7 @@ public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetContro
 
     @Autowired private UniRuleQueryRepository repository;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer solrBatchSize;
 
     @Override

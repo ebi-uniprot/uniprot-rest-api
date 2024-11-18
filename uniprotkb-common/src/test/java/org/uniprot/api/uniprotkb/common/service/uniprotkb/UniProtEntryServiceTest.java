@@ -1,11 +1,10 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 
-import static java.util.Collections.EMPTY_SET;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.FILTER_QUERY;
+import static org.uniprot.api.common.repository.search.SolrQueryConverterUtils.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverterUtils.FILTER_QUERY;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
@@ -29,7 +28,6 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -42,14 +40,13 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverter;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -72,6 +69,7 @@ class UniProtEntryServiceTest {
     @Mock private SearchFieldConfig uniProtKBSearchFieldConfig;
     @Mock private RdfStreamer uniProtRdfStreamer;
     @Mock private TupleStreamDocumentIdStream documentIdStream;
+    @Mock private UniProtKBRequestConverter uniProtKBRequestConverter;
     private UniProtEntryService entryService;
 
     @BeforeEach
@@ -80,8 +78,6 @@ class UniProtEntryServiceTest {
                 new UniProtEntryService(
                         repository,
                         uniprotKBFacetConfig,
-                        uniProtTermsConfig,
-                        uniProtSolrSortClause,
                         uniProtKBSolrQueryConf,
                         entryStore,
                         uniProtEntryStoreStreamer,
@@ -90,60 +86,12 @@ class UniProtEntryServiceTest {
                         uniProtKBQueryProcessorConfig,
                         uniProtKBSearchFieldConfig,
                         documentIdStream,
-                        uniProtRdfStreamer);
-    }
-
-    @Test
-    void changeLowercaseAccessionToUppercase() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
-        verifyValidSearchRequest.setQuery("p12345");
-        verifyValidSearchRequest.setSize(10);
-        SolrRequest verifyValidSolrRequest =
-                entryService.createSearchSolrRequest(verifyValidSearchRequest);
-        assertNotNull(verifyValidSolrRequest);
-        assertEquals("P12345", verifyValidSolrRequest.getQuery());
-    }
-
-    @Test
-    void changeQueryToUpperCaseOnlyIfItIsAccession() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
-        verifyFailingRequest.setQuery("hexdecimalString134");
-        verifyFailingRequest.setSize(10);
-        SolrRequest verifyFailingSolrRequestCase =
-                entryService.createSearchSolrRequest(verifyFailingRequest);
-        assertNotNull(verifyFailingSolrRequestCase);
-        assertEquals("hexdecimalString134", verifyFailingSolrRequestCase.getQuery());
-    }
-
-    @Test
-    void verifyQueryHasAccessionRegexAndHasDash() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
-        verifyValidSearchRequest.setQuery("p12345-1");
-        verifyValidSearchRequest.setSize(10);
-        SolrRequest verifyValidSolrRequest =
-                entryService.createSearchSolrRequest(verifyValidSearchRequest);
-        assertNotNull(verifyValidSolrRequest);
-        assertTrue(verifyValidSolrRequest.getFilterQueries().isEmpty());
-    }
-
-    @Test
-    void addIsoFormFalseFilterOnlyIfQueryHasNoAccessionValue() {
-        mockSolrRequest();
-        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
-        verifyFailingRequest.setQuery("accession:hexdecimalString134");
-        verifyFailingRequest.setSize(10);
-        SolrRequest verifyFailingSolrRequestCase =
-                entryService.createSearchSolrRequest(verifyFailingRequest);
-        assertNotNull(verifyFailingSolrRequestCase);
-        assertTrue(!verifyFailingSolrRequestCase.getFilterQueries().isEmpty());
+                        uniProtRdfStreamer,
+                        uniProtKBRequestConverter);
     }
 
     @Test
     void search_in_list_format_without_voldemort_being_called() {
-        mockSolrRequest();
         // when
         String acc1 = "P12345";
         String acc2 = "P54321";
@@ -175,7 +123,6 @@ class UniProtEntryServiceTest {
 
     @Test
     void search_in_non_list_format_with_voldemort_being_called() {
-        mockSolrRequest();
         // when
         String acc1 = "Q56789";
         String acc2 = "P56789";
@@ -208,7 +155,6 @@ class UniProtEntryServiceTest {
 
     @Test
     void stream_in_list_format_without_voldemort_being_called() {
-        mockSolrRequest();
         // when
         String acc1 = "Q12345";
         String acc2 = "Q54321";
@@ -271,7 +217,6 @@ class UniProtEntryServiceTest {
 
     @Test
     void stream_in_non_list_format_with_voldemort_store_streamer_being_called() {
-        mockSolrRequest();
         // when
         String acc1 = "P56789";
         UniProtKBEntry entry1 =
@@ -412,25 +357,5 @@ class UniProtEntryServiceTest {
         assertThrows(
                 ResourceNotFoundException.class,
                 () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
-    }
-
-    private void mockSolrRequest() {
-        SearchFieldConfig searchFieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
-        SearchFieldItem accessionIdSearchField =
-                searchFieldConfig.getSearchFieldItemByName("accession_id");
-        SearchFieldItem isoFormSearchField =
-                searchFieldConfig.getSearchFieldItemByName("is_isoform");
-        SearchFieldItem accessionSearchField =
-                searchFieldConfig.getSearchFieldItemByName("accession");
-
-        when(uniProtKBQueryProcessorConfig.getOptimisableFields())
-                .thenReturn(List.of(accessionSearchField));
-        when(uniProtKBQueryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
-        when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields()).thenReturn(EMPTY_SET);
-        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"))
-                .thenReturn(accessionIdSearchField);
-        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
-                .thenReturn(isoFormSearchField);
     }
 }

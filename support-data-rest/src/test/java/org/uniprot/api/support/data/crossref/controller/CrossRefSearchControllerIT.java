@@ -64,7 +64,7 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private CrossRefFacetConfig facetConfig;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer solrBatchSize;
 
     @Override

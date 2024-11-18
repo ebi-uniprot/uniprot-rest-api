@@ -27,6 +27,7 @@ public class UniParcRequestProcessor implements RequestProcessor<UniParcDownload
     @Override
     public void process(UniParcDownloadRequest request) {
         jobService.update(request.getDownloadJobId(), Map.of(STATUS.getName(), RUNNING));
+
         uniParcCompositeRequestProcessor.process(request);
         jobService.update(
                 request.getDownloadJobId(),

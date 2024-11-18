@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyLineage;
@@ -23,6 +25,7 @@ class TaxonomyLineageServiceImplTest {
     @Test
     void findByIdsFoundId() throws Exception {
         TaxonomyLineageRepository repository = Mockito.mock(TaxonomyLineageRepository.class);
+        RequestConverter requestConverter = Mockito.mock(RequestConverterImpl.class);
         TaxonomyLineage lineage = new TaxonomyLineageBuilder().taxonId(2).build();
         TaxonomyEntry entry = new TaxonomyEntryBuilder().taxonId(1L).lineagesAdd(lineage).build();
         TaxonomyDocument taxonomyDocument =
@@ -34,7 +37,10 @@ class TaxonomyLineageServiceImplTest {
                                         .getFullObjectMapper()
                                         .writeValueAsBytes(entry))
                         .build();
+        SolrRequest solrRequest = SolrRequest.builder().totalRows(10).build();
         Mockito.when(repository.getAll(Mockito.any())).thenReturn(Stream.of(taxonomyDocument));
+        Mockito.when(requestConverter.createStreamSolrRequest(Mockito.any()))
+                .thenReturn(solrRequest);
 
         TaxonomyLineageServiceImpl service = new TaxonomyLineageServiceImpl(repository);
         Map<Long, List<TaxonomyLineage>> result = service.findByIds(Set.of(1L));

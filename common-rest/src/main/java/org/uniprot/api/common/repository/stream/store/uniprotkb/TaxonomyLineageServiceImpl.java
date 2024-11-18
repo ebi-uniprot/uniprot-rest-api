@@ -15,6 +15,9 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
+import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyLineage;
@@ -40,12 +43,7 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
 
     @Autowired
     public TaxonomyLineageServiceImpl(TaxonomyLineageRepository taxRepo) {
-        super(
-                taxRepo,
-                new TaxonomyEntryConverter(),
-                new TaxonomySortClause(),
-                getQueryBoosts(),
-                null);
+        super(taxRepo, new TaxonomyEntryConverter(), getLineageRequestConverter());
         this.searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
     }
@@ -59,11 +57,6 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
     @Override
     protected SearchFieldItem getIdField() {
         return searchFieldConfig.getSearchFieldItemByName("id");
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return UniProtQueryProcessorConfig.builder().build();
     }
 
     @Override
@@ -84,8 +77,14 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
                 .collect(Collectors.toMap(TaxonomyEntry::getTaxonId, TaxonomyEntry::getLineages));
     }
 
-    private static SolrQueryConfig getQueryBoosts() {
-        return SolrQueryConfig.builder().queryFields("id").build();
+    private static RequestConverter getLineageRequestConverter() {
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.TAXONOMY);
+        return new RequestConverterImpl(
+                SolrQueryConfig.builder().queryFields("id").build(),
+                new TaxonomySortClause(),
+                UniProtQueryProcessorConfig.builder().searchFieldConfig(fieldConfig).build(),
+                new RequestConverterConfigProperties());
     }
 
     static class TaxonomyEntryConverter implements Function<TaxonomyDocument, TaxonomyEntry> {

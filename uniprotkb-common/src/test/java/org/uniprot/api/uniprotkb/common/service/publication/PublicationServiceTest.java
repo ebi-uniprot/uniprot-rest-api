@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -24,6 +25,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
+import org.uniprot.api.rest.service.query.sort.LiteratureSortClause;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.common.repository.search.LiteratureRepository;
 import org.uniprot.api.uniprotkb.common.repository.search.PublicationRepository;
@@ -47,7 +50,7 @@ import org.uniprot.store.search.document.publication.PublicationDocument;
 @TestPropertySource(
         locations = "/common-message.properties",
         properties = {
-            "search.default.page.size=25",
+            "search.request.converter.defaultRestPageSize=25",
         })
 class PublicationServiceTest {
     @MockBean private PublicationRepository publicationRepository;
@@ -56,6 +59,12 @@ class PublicationServiceTest {
     @MockBean private LiteratureEntryConverter literatureEntryConverter;
     @MockBean private UniProtKBPublicationsSolrSortClause solrSortClause;
     @MockBean private PublicationFacetConfig publicationFacetConfig;
+
+    @Qualifier("publicationRequestConverter")
+    @MockBean
+    private RequestConverter publicationRequestConverter;
+
+    @MockBean private LiteratureSortClause literatureSortClause;
 
     @Test
     void ensureHappyPathThroughServiceCallExists() {
@@ -100,13 +109,11 @@ class PublicationServiceTest {
                         publicationRepository,
                         literatureRepository,
                         new PublicationConverter(),
-                        solrSortClause,
                         new LiteratureEntryConverter(),
-                        publicationSolrQueryConfig.publicationSolrQueryConf(),
-                        publicationFacetConfig,
                         publicationSolrQueryConfig.publicationQueryProcessorConfig(
                                 publicationSolrQueryConfig.publicationSearchFieldConfig()),
-                        literatureSolrQueryConfig.literatureSolrQueryConf());
+                        literatureSolrQueryConfig.literatureSolrQueryConf(),
+                        publicationRequestConverter);
         PublicationRequest request = new PublicationRequest();
         request.setSize(25);
         QueryResult<PublicationEntry> result =

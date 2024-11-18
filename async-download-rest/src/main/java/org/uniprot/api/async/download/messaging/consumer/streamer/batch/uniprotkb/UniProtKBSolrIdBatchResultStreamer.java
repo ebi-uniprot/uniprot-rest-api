@@ -44,6 +44,6 @@ public class UniProtKBSolrIdBatchResultStreamer
                 storeStreamerConfig.getStoreFetchRetryPolicy(),
                 storeStreamerConfig.getStreamConfig().getStoreBatchSize(),
                 lineageService,
-                service.buildStoreRequest(request).isAddLineage());
+                service.getStoreRequest(request).isAddLineage());
     }
 }

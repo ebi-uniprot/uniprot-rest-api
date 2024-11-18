@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -377,7 +378,6 @@ class SolrQueryRepositoryIT {
                 .query(query)
                 .defaultQueryOperator(QueryOperator.AND)
                 .filterQuery("active:true")
-                .facetConfig(facetConfig)
                 .facets(facets)
                 .sort(SolrQuery.SortClause.asc("accession_id"))
                 .rows(size)
@@ -420,8 +420,8 @@ class SolrQueryRepositoryIT {
 
     private static class GeneralSolrRequestConverter extends SolrRequestConverter {
         @Override
-        public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
-            JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
+        public JsonQueryRequest toJsonQueryRequest(SolrRequest request, FacetConfig facetConfig) {
+            JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
 
             // required for tests, because EmbeddedSolrServer is not sharded
             ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");

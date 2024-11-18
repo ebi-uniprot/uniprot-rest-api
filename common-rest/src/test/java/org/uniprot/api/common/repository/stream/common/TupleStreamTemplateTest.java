@@ -93,7 +93,7 @@ class TupleStreamTemplateTest {
         SolrDocumentList results = mock(SolrDocumentList.class);
         JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
         SolrRequestConverter converter = mock(SolrRequestConverter.class);
-        when(converter.toJsonQueryRequest(any())).thenReturn(jsonQueryRequest);
+        when(converter.toJsonQueryRequest(any(), any())).thenReturn(jsonQueryRequest);
         when(jsonQueryRequest.process(any(), any())).thenReturn(response);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
@@ -158,7 +158,7 @@ class TupleStreamTemplateTest {
         SolrDocumentList results = mock(SolrDocumentList.class);
         JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
         SolrRequestConverter converter = mock(SolrRequestConverter.class);
-        when(converter.toJsonQueryRequest(any())).thenReturn(jsonQueryRequest);
+        when(converter.toJsonQueryRequest(any(), any())).thenReturn(jsonQueryRequest);
         when(jsonQueryRequest.process(any(), any())).thenReturn(response);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
