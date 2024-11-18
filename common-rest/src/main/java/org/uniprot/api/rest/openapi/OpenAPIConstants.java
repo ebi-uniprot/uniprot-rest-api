@@ -711,6 +711,13 @@ public class OpenAPIConstants {
                     + " <a href='https://rest.uniprot.org/configure/unirule/result-fields' target='_blank' rel='noopener noreferrer'>List of valid sort fields</a>";
     public static final String QUERY_UNIRULE_EXAMPLE = "Eukaryota";
     public static final String SORT_UNIRULE_EXAMPLE = "unirule_id asc";
+    public static final String TAG_MAP_TO_JOB = "map async download";
+    public static final String TAG_MAP_TO_JOB_DESC =
+            "Map asynchronous download jobs are different from synchronous downloads offered via stream API. "
+                    + "First, a job must be submitted for download. "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
 
     // UniRef
     public static final String TAG_UNIREF = "UniRef";

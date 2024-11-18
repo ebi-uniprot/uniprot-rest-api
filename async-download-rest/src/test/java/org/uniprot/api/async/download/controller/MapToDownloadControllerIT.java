@@ -106,4 +106,10 @@ public abstract class MapToDownloadControllerIT extends AbstractDownloadControll
     protected @NotNull String getJobHashForForceOnFailedJobBeforeMaxRetryWillReturnJobRunning() {
         return "39d24482eb412445796f112a0262b0c4e62feafc";
     }
+
+    protected String getDownloadAPIsBasePath() {
+        return MapToDownloadController.DOWNLOAD_RESOURCE;
+    }
+
+    protected abstract String getMapToDownloadAPIsBasePath();
 }

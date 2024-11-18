@@ -124,10 +124,6 @@ class UniProtKBToUniRefToDownloadControllerIT extends MapToDownloadControllerIT 
         return List.of(SolrCollection.uniprot, SolrCollection.taxonomy, SolrCollection.uniref);
     }
 
-    protected String getDownloadAPIsBasePath() {
-        return UniProtKBToUniRefDownloadController.DOWNLOAD_RESOURCE;
-    }
-
     @Override
     protected String submitJobWithQuery() {
         return "content:*";
@@ -179,6 +175,11 @@ class UniProtKBToUniRefToDownloadControllerIT extends MapToDownloadControllerIT 
     }
 
     @Override
+    protected String getMapToDownloadAPIsBasePath() {
+        return UniProtKBToUniRefDownloadController.DOWNLOAD_RESOURCE;
+    }
+
+    @Override
     protected ResultActions callPostJobStatus(
             String query,
             String fields,
@@ -188,7 +189,7 @@ class UniProtKBToUniRefToDownloadControllerIT extends MapToDownloadControllerIT 
             boolean force)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
-                post(getDownloadAPIsBasePath() + "/run")
+                post(getMapToDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", query)
                         .param("fields", fields)
