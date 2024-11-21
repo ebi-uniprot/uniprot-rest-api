@@ -58,24 +58,4 @@ public abstract class MapToProducerMessageServiceIT<T extends MapToDownloadReque
         "org.uniprot.api.async.download.messaging.producer.mapto"
     })
     static class MapProducerTestConfig {}
-
-    @Override
-    protected @NotNull String getJobHashForSuccess() {
-        return "e01159046a85cbd920622f34511d9e4c198c6ca4";
-    }
-
-    @Override
-    protected @NotNull String getJobHashForSuccessForceAndIdleJobAllowedAndCleanResources() {
-        return "7a5b14e8b59dd20dcbd27ba8cad1fb45c4806575";
-    }
-
-    @Override
-    protected @NotNull String getJobHashForWithoutFormatDefaultToJson() {
-        return "964a9c6154896d88132b6082d397dc6ca9d9f733";
-    }
-
-    @Override
-    protected @NotNull String getJobHashForAlreadyRunning() {
-        return "ab3f9709a8a59b7241901f13167686bf124fdd81";
-    }
 }

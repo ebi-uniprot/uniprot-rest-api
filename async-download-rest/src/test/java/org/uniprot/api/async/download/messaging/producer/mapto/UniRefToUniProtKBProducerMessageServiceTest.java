@@ -1,5 +1,13 @@
 package org.uniprot.api.async.download.messaging.producer.mapto;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
+import org.uniprot.api.async.download.model.request.mapto.UniRefToUniProtKBDownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -8,51 +16,43 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.download.model.JobStatus.NEW;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
-import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
-import org.uniprot.api.rest.request.HashGenerator;
-
 @ExtendWith(MockitoExtension.class)
-public class UniProtKBToUniRefProducerMessageServiceTest
-        extends MapToProducerMessageServiceTest<UniProtKBToUniRefDownloadRequest> {
-    public static final String UNIPROTKB_MAP_FIELDS = "uniProtKBMapFields";
-    public static final String UNIPROTKB_MAP_SORT = "uniProtKBMapSort";
-    public static final String UNIPROTKB_MAP_FORMAT = "uniProtKBMapFormat";
-    protected final String UNIPROTKB_MAP_QUERY = "uniProtKBMapQuery";
-    @Mock private UniProtKBToUniRefDownloadRequest mapDownloadRequest;
+public class UniRefToUniProtKBProducerMessageServiceTest
+        extends MapToProducerMessageServiceTest<UniRefToUniProtKBDownloadRequest> {
+    public static final String UNIREF_MAP_FIELDS = "uniRefMapFields";
+    public static final String UNIREF_MAP_SORT = "uniRefMapSort";
+    public static final String UNIREF_MAP_FORMAT = "uniRefMapFormat";
+    protected final String UNIREF_MAP_QUERY = "uniRefMapQuery";
+    @Mock private UniRefToUniProtKBDownloadRequest mapDownloadRequest;
 
     @Mock
-    private HashGenerator<UniProtKBToUniRefDownloadRequest>
+    private HashGenerator<UniRefToUniProtKBDownloadRequest>
             uniProtKBMapDownloadRequestHashGenerator;
 
     @Mock
-    private UniProtKBToUniRefJobSubmissionRules
-            uniProtKBMapDownloadRequestMapToJobSubmissionRules;
+    private UniRefToUniProtKBJobSubmissionRules
+            uniRefToUniProtKBJobSubmissionRules;
 
     @BeforeEach
     void setUp() {
         init();
         this.downloadRequest = mapDownloadRequest;
         this.hashGenerator = uniProtKBMapDownloadRequestHashGenerator;
-        this.jobSubmissionRules = uniProtKBMapDownloadRequestMapToJobSubmissionRules;
+        this.jobSubmissionRules = uniRefToUniProtKBJobSubmissionRules;
         this.producerMessageService =
-                new UniProtKBToUniRefProducerMessageService(
+                new UniRefToUniProtKBProducerMessageService(
                         mapToJobService,
                         mapMessageConverter,
                         mapToMessagingService,
                         hashGenerator,
                         mapDownloadFileHandler,
-                        uniProtKBMapDownloadRequestMapToJobSubmissionRules);
+                        uniRefToUniProtKBJobSubmissionRules);
     }
 
     @Override
     protected void mockDownloadRequest() {
         mockDownloadRequestWithoutFormat();
-        when(downloadRequest.getFormat()).thenReturn(UNIPROTKB_MAP_FORMAT);
+        when(downloadRequest.getFormat()).thenReturn(UNIREF_MAP_FORMAT);
     }
 
     @Override
@@ -61,13 +61,13 @@ public class UniProtKBToUniRefProducerMessageServiceTest
                         same(downloadRequest),
                         argThat(mh -> JOB_ID.equals(mh.getHeader(ProducerMessageService.JOB_ID)))))
                 .thenReturn(message);
-        when(downloadRequest.getQuery()).thenReturn(UNIPROTKB_MAP_QUERY);
-        when(downloadRequest.getFields()).thenReturn(UNIPROTKB_MAP_FIELDS);
-        when(downloadRequest.getSort()).thenReturn(UNIPROTKB_MAP_SORT);
+        when(downloadRequest.getQuery()).thenReturn(UNIREF_MAP_QUERY);
+        when(downloadRequest.getFields()).thenReturn(UNIREF_MAP_FIELDS);
+        when(downloadRequest.getSort()).thenReturn(UNIREF_MAP_SORT);
     }
 
     @Override
-    protected void verifyDownloadJob(UniProtKBToUniRefDownloadRequest request) {
+    protected void verifyDownloadJob(UniRefToUniProtKBDownloadRequest request) {
         verify(jobService)
                 .save(
                         argThat(

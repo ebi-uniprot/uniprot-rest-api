@@ -10,6 +10,7 @@ import org.uniprot.api.async.download.messaging.config.common.QueueConsumerConfi
 import org.uniprot.api.async.download.messaging.consumer.mapto.MapToMessageConsumer;
 import org.uniprot.api.async.download.model.request.MapToDownloadRequestToArrayConverter;
 import org.uniprot.api.async.download.model.request.mapto.UniProtKBToUniRefDownloadRequest;
+import org.uniprot.api.async.download.model.request.mapto.UniRefToUniProtKBDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 /**
@@ -93,7 +94,13 @@ public class MapToRabbitMQConfig {
     }
 
     @Bean
-    public HashGenerator<UniProtKBToUniRefDownloadRequest> mapDownloadHashGenerator(
+    public HashGenerator<UniProtKBToUniRefDownloadRequest> uniProtKbToUniRefMapDownloadHashGenerator(
+            @Value("${async.download.mapto.hash.salt}") String hashSalt) {
+        return new HashGenerator<>(new MapToDownloadRequestToArrayConverter<>(), hashSalt);
+    }
+
+    @Bean
+    public HashGenerator<UniRefToUniProtKBDownloadRequest> unirefToUniProtKBMapDownloadHashGenerator(
             @Value("${async.download.mapto.hash.salt}") String hashSalt) {
         return new HashGenerator<>(new MapToDownloadRequestToArrayConverter<>(), hashSalt);
     }
