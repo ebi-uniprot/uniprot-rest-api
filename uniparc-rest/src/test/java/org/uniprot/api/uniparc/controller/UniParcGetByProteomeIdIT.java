@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Disabled
 class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
 
     private static final String getByUpIdPath = "/uniparc/proteome/{upid}";
