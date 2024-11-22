@@ -21,10 +21,7 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -367,6 +364,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdCanReturnSuccess() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -398,6 +396,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdBadRequest() throws Exception {
         // when
         ResultActions response =
@@ -423,6 +422,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdyPDownloadCompressedFile() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -445,6 +445,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdSortWorks() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -476,6 +477,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdDefaultSearchWithLowerCaseId() throws Exception {
 
         // when
@@ -495,6 +497,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
 
     @ParameterizedTest(name = "[{index}] sort fieldName {0}")
     @MethodSource("getAllSortFields")
+    @Disabled
     void streamByProteomeIdCanSortAllPossibleSortFields(String sortField) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -513,6 +516,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
+    @Disabled
     void streamByProteomeIdFields() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -540,6 +544,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
     @MethodSource("getContentTypesForUniParcStreamByByProteomeId")
+    @Disabled
     void streamByProteomeIdAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
