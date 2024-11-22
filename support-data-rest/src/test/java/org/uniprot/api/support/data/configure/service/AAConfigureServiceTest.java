@@ -56,6 +56,6 @@ class AAConfigureServiceTest {
     void getArbaSearchItems() {
         List<AdvancedSearchTerm> result = SERVICE.getArbaSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(7, result.size());
+        assertEquals(6, result.size());
     }
 }

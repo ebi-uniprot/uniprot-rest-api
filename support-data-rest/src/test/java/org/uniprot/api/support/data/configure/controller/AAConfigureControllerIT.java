@@ -103,23 +103,16 @@ class AAConfigureControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.size()", is(7)))
+                .andExpect(jsonPath("$.size()", is(6)))
                 .andExpect(jsonPath("$.[0].label", is("Protein Name [DE]")))
-                .andExpect(jsonPath("$.[1].label", is("Organism [OS]")))
-                .andExpect(jsonPath("$.[2].label", is("Taxonomy [OC]")))
-                .andExpect(jsonPath("$.[3].label", is("Function")))
-                .andExpect(jsonPath("$.[3].itemType", is("group")))
-                .andExpect(jsonPath("$.[3].items.size()", is(5)))
-                .andExpect(jsonPath("$.[4].label", is("Subcellular location")))
+                .andExpect(jsonPath("$.[1].label", is("Taxonomy [OC]")))
+                .andExpect(jsonPath("$.[2].label", is("Function")))
+                .andExpect(jsonPath("$.[2].itemType", is("group")))
+                .andExpect(jsonPath("$.[2].items.size()", is(4)))
+                .andExpect(jsonPath("$.[3].label", is("Subcellular location [CC]")))
+                .andExpect(jsonPath("$.[4].label", is("Family and Domains")))
                 .andExpect(jsonPath("$.[4].itemType", is("group")))
-                .andExpect(jsonPath("$.[4].items.size()", is(1)))
-                .andExpect(jsonPath("$.[4].items[0].items.size()", is(2)))
-                .andExpect(
-                        jsonPath("$.[4].items[0].items[0].label", is("Subcellular location term")))
-                .andExpect(jsonPath("$.[4].items[0].items[1].label", is("Note")))
-                .andExpect(jsonPath("$.[5].label", is("Family and Domains")))
-                .andExpect(jsonPath("$.[5].itemType", is("group")))
-                .andExpect(jsonPath("$.[5].items.size()", is(3)))
-                .andExpect(jsonPath("$.[6].label", is("Keyword [KW]")));
+                .andExpect(jsonPath("$.[4].items.size()", is(2)))
+                .andExpect(jsonPath("$.[5].label", is("Keyword [KW]")));
     }
 }
