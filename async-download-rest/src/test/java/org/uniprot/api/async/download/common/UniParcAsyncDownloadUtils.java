@@ -77,8 +77,6 @@ public class UniParcAsyncDownloadUtils {
         UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, upi);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
-        UniParcEntryConverter uniParcEntryConverter = new UniParcEntryConverter();
-        UniParcEntry uniParcEntry = uniParcEntryConverter.fromXml(xmlEntry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
         UniParcEntryLight lightEntry = UniParcEntryMocker.convertToUniParcEntryLight(entry);

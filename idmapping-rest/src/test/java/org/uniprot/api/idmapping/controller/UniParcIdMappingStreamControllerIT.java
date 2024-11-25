@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
 
 import java.util.Collections;
 import java.util.List;
@@ -136,12 +136,12 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
                 performRequest(
                         get(getIdMappingResultPath(), job.getJobId())
                                 .param("query", "database:EnsemblMetazoa")
-                                .param("fields", "upi,accession")
+                                .param("fields", "upi,accession,organism")
                                 .param("sort", "length desc")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(6)))
@@ -163,7 +163,8 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
                                         "UPI0000283A03")))
                 .andExpect(jsonPath("$.results.*.to.uniProtKBAccessions").exists())
                 .andExpect(jsonPath("$.results.*.to.oldestCrossRefCreated").exists())
-                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists());
+                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists())
+                .andExpect(jsonPath("$.results.*.to.organisms").exists());
     }
 
     @Override

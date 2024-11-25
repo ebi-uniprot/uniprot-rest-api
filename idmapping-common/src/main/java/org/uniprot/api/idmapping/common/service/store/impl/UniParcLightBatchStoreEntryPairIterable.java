@@ -71,7 +71,7 @@ public class UniParcLightBatchStoreEntryPairIterable
 
     @Override
     protected void logTiming(int batchSize, long start, long end) {
-        log.info(
+        log.debug(
                 "Total {} UniParc entries fetched from voldemort in {} ms",
                 batchSize,
                 (end - start));

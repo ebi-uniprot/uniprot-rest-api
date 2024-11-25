@@ -2,8 +2,6 @@ package org.uniprot.api.uniparc.common.service.request;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
-import javax.validation.constraints.Pattern;
-
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -24,8 +22,6 @@ import lombok.Data;
 @ParameterObject
 @ValidUniParcBestGuessRequest
 public class UniParcBestGuessRequest {
-    @Parameter(hidden = true)
-    private static final String TAXONOMY_ID_LIST_REGEX = "^(\\d+)(,\\d+)*$";
 
     @Parameter(description = "Comma separated UniParc Ids")
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPARC)
@@ -46,7 +42,6 @@ public class UniParcBestGuessRequest {
     private String genes;
 
     @Parameter(description = IDS_TAX_DESCRIPTION, example = IDS_TAX_EXAMPLE)
-    @Pattern(regexp = TAXONOMY_ID_LIST_REGEX, message = "{search.taxonomy.invalid.list.id}")
     @ValidCommaSeparatedItemsLength(maxLength = 20)
     private String taxonIds;
 

@@ -16,12 +16,12 @@ import org.uniprot.api.idmapping.common.service.store.impl.UniParcLightBatchStor
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
-public class UniParcIdMappingBatchResultStreamer
+public class UniParcLightIdMappingBatchResultStreamer
         extends IdMappingBatchResultStreamer<UniParcEntryLight, UniParcEntryLightPair> {
     protected final StoreStreamerConfig<UniParcEntryLight> storeStreamerConfig;
     private final UniParcCrossReferenceLazyLoader lazyLoader;
 
-    protected UniParcIdMappingBatchResultStreamer(
+    protected UniParcLightIdMappingBatchResultStreamer(
             IdMappingHeartbeatProducer heartbeatProducer,
             IdMappingJobService jobService,
             StoreStreamerConfig<UniParcEntryLight> storeLightStreamerConfig,

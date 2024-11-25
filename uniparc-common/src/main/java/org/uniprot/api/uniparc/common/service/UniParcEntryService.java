@@ -18,20 +18,25 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
-import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcProteomeIdFilter;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcCrossReference;
@@ -57,7 +62,6 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String CHECKSUM_STR = "checksum";
     private static final String COMMA_STR = ",";
-    private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcQueryRepository repository;
     private final UniParcLightStoreClient uniParcLightStoreClient;
@@ -68,28 +72,23 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     public UniParcEntryService(
             UniParcQueryRepository repository,
             UniParcFacetConfig facetConfig,
-            UniParcSortClause solrSortClause,
-            UniParcQueryResultConverter uniParcQueryResultConverter,
-            StoreStreamer<UniParcEntry> storeStreamer,
             SolrQueryConfig uniParcSolrQueryConf,
-            UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
             RdfStreamer uniParcRdfStreamer,
             FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate,
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
             UniParcLightStoreClient uniParcLightStoreClient,
-            UniParcCrossReferenceService uniParcCrossReferenceService) {
+            UniParcCrossReferenceService uniParcCrossReferenceService,
+            RequestConverter uniParcRequestConverter) {
 
         super(
                 repository,
-                uniParcQueryResultConverter,
-                solrSortClause,
                 facetConfig,
-                storeStreamer,
+                null,
                 uniParcSolrQueryConf,
                 uniParcFacetTupleStreamTemplate,
-                uniParcTupleStreamDocumentIdStream);
-        this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
+                uniParcTupleStreamDocumentIdStream,
+                uniParcRequestConverter);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.repository = repository;
         this.uniParcLightStoreClient = uniParcLightStoreClient;
@@ -98,19 +97,18 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest uniParcIdRequest) {
-        return getUniParcEntry(uniParcIdRequest.getUpi(), uniParcIdRequest, null);
+        return getUniParcEntry(uniParcIdRequest.getUpi(), uniParcIdRequest);
     }
 
     public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
         String uniParcId = searchUniParcId(ACCESSION_FIELD, getByAccessionRequest.getAccession());
-        return getUniParcEntry(uniParcId, getByAccessionRequest, null);
+        return getUniParcEntry(uniParcId, getByAccessionRequest);
     }
 
     public UniParcEntry getBySequence(UniParcSequenceRequest sequenceRequest) {
-
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
         String uniParcId = searchUniParcId(CHECKSUM_STR, md5Value);
-        return getUniParcEntry(uniParcId, sequenceRequest, null);
+        return getUniParcEntry(uniParcId, sequenceRequest);
     }
 
     public QueryResult<UniParcEntry> searchByProteomeId(
@@ -149,11 +147,6 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return uniParcQueryProcessorConfig;
-    }
-
-    @Override
     public UniParcEntry findByUniqueId(String uniqueId, String filters) {
         return findByUniqueId(uniqueId);
     }
@@ -177,6 +170,17 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         return builder.build();
     }
 
+    @Override
+    public QueryResult<UniParcEntry> search(SearchRequest request) {
+        throw new UnsupportedOperationException("Operation not supported. Use light service");
+    }
+
+    @Override
+    public Stream<UniParcEntry> stream(StreamRequest request) {
+        throw new UnsupportedOperationException("Operation not supported. Use light service");
+    }
+
+    private UniParcEntry getUniParcEntry(String uniParcId, UniParcGetByIdRequest request) {
     private UniParcEntry getUniParcEntry(
             String uniParcId, UniParcGetByIdRequest request, String proteomeId) {
         Optional<UniParcEntryLight> optLightEntry =

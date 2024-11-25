@@ -25,6 +25,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.SearchResult;
+import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -33,7 +35,6 @@ import org.uniprot.api.uniparc.common.service.light.UniParcLightEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -80,6 +81,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
@@ -88,12 +90,16 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             })
     @Operation(
             summary = ID_UNIPARC_LIGHT_OPERATION,
+            description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniParcEntryLight.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
@@ -131,24 +137,27 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = SEARCH_UNIPARC_OPERATION,
+            description = SEARCH_OPERATION_DESC,
             responses = {
                 @ApiResponse(
+                        description = "UniParcEntry",
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntryLight
-                                                                                    .class))),
+                                    schema = @Schema(implementation = SearchResult.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation = Entry.class,
+                                                    name = "entries")),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -181,6 +190,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
@@ -190,18 +200,13 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             })
     @Operation(
             summary = STREAM_UNIPARC_OPERATION,
+            description = STREAM_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntryLight
-                                                                                    .class))),
+                                    schema = @Schema(implementation = StreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -252,6 +257,7 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
     @Operation(
             hidden = true,
             summary = DBID_UNIPARC_OPERATION,
+            description = DBID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -287,53 +293,57 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
 
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
+    /*
+        @SuppressWarnings("squid:S6856")
+        @GetMapping(
+                value = "/proteome/{upId}",
+                produces = {
+                    APPLICATION_JSON_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    TSV_MEDIA_TYPE_VALUE,
+                    XLS_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE
+                })
+        @Operation(
+                hidden = true,
+                summary = PROTEOME_UPID_UNIPARC_OPERATION,
+                description = PROTEOME_UPID_UNIPARC_OPERATION_DESC,
+                responses = {
+                    @ApiResponse(
+                            content = {
+                                @Content(
+                                        mediaType = APPLICATION_JSON_VALUE,
+                                        array =
+                                                @ArraySchema(
+                                                        schema =
+                                                                @Schema(
+                                                                        implementation =
+                                                                                UniParcEntryLight
+                                                                                        .class))),
+                                @Content(
+                                        mediaType = APPLICATION_XML_VALUE,
+                                        array =
+                                                @ArraySchema(
+                                                        schema =
+                                                                @Schema(
+                                                                        implementation = Entry.class,
+                                                                        name = "entries"))),
+                                @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                                @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                                @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                                @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                            })
+                })
+        public ResponseEntity<MessageConverterContext<UniParcEntryLight>> searchByProteomeId(
+                @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
+                HttpServletRequest request,
+                HttpServletResponse response) {
 
-    @SuppressWarnings("squid:S6856")
-    @GetMapping(
-            value = "/proteome/{upId}/light",
-            produces = {
-                APPLICATION_JSON_VALUE,
-                TSV_MEDIA_TYPE_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE
-            })
-    @Operation(
-            hidden = true,
-            summary = PROTEOME_UPID_UNIPARC_OPERATION,
-            responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcEntryLight
-                                                                                    .class))),
-                            @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation = Entry.class,
-                                                                    name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
-                        })
-            })
-    public ResponseEntity<MessageConverterContext<UniParcEntryLight>> searchByProteomeId(
-            @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            QueryResult<UniParcEntryLight> results = queryService.searchByFieldId(getByUpIdRequest);
 
-        QueryResult<UniParcEntryLight> results = queryService.searchByFieldId(getByUpIdRequest);
-
-        return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
-    }
+            return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
+        }
+    */
 
     @SuppressWarnings("squid:S3752")
     @RequestMapping(
@@ -344,11 +354,13 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
             summary = IDS_UNIPARC_OPERATION,
+            description = IDS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -385,6 +397,20 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         return getByUpis(idsSearchRequest, request, response);
     }
 
+    private ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpis(
+            IdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
+    }
+
     @SuppressWarnings("squid:S3752")
     @RequestMapping(
             value = "/upis",
@@ -394,11 +420,13 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
                 FASTA_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
             })
     @Operation(
             hidden = true,
             summary = IDS_UNIPARC_OPERATION,
+            description = IDS_POST_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -436,6 +464,55 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         return getByUpis(idsSearchRequest, request, response);
     }
 
+    /*
+       @SuppressWarnings("squid:S6856")
+       @GetMapping(
+               value = "/proteome/{upId}/stream",
+               produces = {
+                   TSV_MEDIA_TYPE_VALUE,
+                   FASTA_MEDIA_TYPE_VALUE,
+                   LIST_MEDIA_TYPE_VALUE,
+                   APPLICATION_XML_VALUE,
+                   APPLICATION_JSON_VALUE,
+                   XLS_MEDIA_TYPE_VALUE,
+               })
+       @Operation(
+               hidden = true,
+               summary = PROTEOME_UPID_STREAM_UNIPARC_OPERATION,
+               description = PROTEOME_UPID_STREAM_UNIPARC_OPERATION_DESC,
+               responses = {
+                   @ApiResponse(
+                           content = {
+                               @Content(
+                                       mediaType = APPLICATION_JSON_VALUE,
+                                       schema = @Schema(implementation = StreamResult.class)),
+                               @Content(
+                                       mediaType = APPLICATION_XML_VALUE,
+                                       array =
+                                               @ArraySchema(
+                                                       schema =
+                                                               @Schema(
+                                                                       implementation = Entry.class,
+                                                                       name = "entries"))),
+                               @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                               @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                               @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                               @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                           })
+               })
+       public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryLight>>>
+               streamByProteomeId(
+                       @Valid @ModelAttribute UniParcStreamByProteomeIdRequest streamRequest,
+                       @Parameter(hidden = true)
+                               @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
+                               MediaType contentType,
+                       HttpServletRequest request) {
+           setBasicRequestFormat(streamRequest, request);
+           return super.stream(
+                   () -> queryService.stream(streamRequest), streamRequest, contentType, request);
+       }
+    */
+
     @Override
     protected String getEntityId(UniParcEntryLight entity) {
         return entity.getUniParcId();
@@ -451,19 +528,5 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
-    }
-
-    private ResponseEntity<MessageConverterContext<UniParcEntryLight>> getByUpis(
-            IdsSearchRequest idsSearchRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
-
-        return super.getSearchResponse(
-                results,
-                idsSearchRequest.getFields(),
-                idsSearchRequest.isDownload(),
-                request,
-                response);
     }
 }

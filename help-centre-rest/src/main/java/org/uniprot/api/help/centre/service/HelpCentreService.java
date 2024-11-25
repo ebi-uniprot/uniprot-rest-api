@@ -10,16 +10,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
-import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -66,12 +64,10 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     public HelpCentreService(
             SolrQueryRepository<HelpDocument> repository,
             Function<HelpDocument, HelpCentreEntry> entryConverter,
-            AbstractSolrSortClause solrSortClause,
-            SolrQueryConfig helpCentreSolrQueryConf,
-            HelpCentreFacetConfig facetConfig,
             SearchFieldConfig helpCentreSearchFieldConfig,
-            UniProtQueryProcessorConfig helpCentreQueryProcessorConfig) {
-        super(repository, entryConverter, solrSortClause, helpCentreSolrQueryConf, facetConfig);
+            UniProtQueryProcessorConfig helpCentreQueryProcessorConfig,
+            RequestConverter helpCentreRequestConverter) {
+        super(repository, entryConverter, helpCentreRequestConverter);
         this.searchFieldConfig = helpCentreSearchFieldConfig;
         this.helpCentreQueryProcessorConfig = helpCentreQueryProcessorConfig;
     }
@@ -141,11 +137,6 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(HELP_CENTRE_ID_FIELD);
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return helpCentreQueryProcessorConfig;
     }
 
     private boolean isDefaultSearch(String query) {

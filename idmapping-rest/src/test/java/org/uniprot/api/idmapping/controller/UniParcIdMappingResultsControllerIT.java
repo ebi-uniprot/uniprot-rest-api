@@ -8,7 +8,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
 import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
@@ -158,13 +157,13 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 get(getIdMappingResultPath(), job.getJobId())
                                         .param("query", "database:EnsemblMetazoa")
                                         .param("facets", "organism_name,database_facet")
-                                        .param("fields", "upi,accession")
+                                        .param("fields", "upi,accession,gene")
                                         .param("sort", "length desc")
                                         .param("size", "10")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
@@ -183,7 +182,8 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 contains("UPI0000283A09", "UPI0000283A06", "UPI0000283A03")))
                 .andExpect(jsonPath("$.results.*.to.uniProtKBAccessions").exists())
                 .andExpect(jsonPath("$.results.*.to.oldestCrossRefCreated").exists())
-                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists());
+                .andExpect(jsonPath("$.results.*.to.mostRecentCrossRefUpdated").exists())
+                .andExpect(jsonPath("$.results.*.to.geneNames").exists());
     }
 
     @Test

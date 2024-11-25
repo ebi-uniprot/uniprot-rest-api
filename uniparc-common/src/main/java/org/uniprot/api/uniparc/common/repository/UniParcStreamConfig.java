@@ -20,7 +20,6 @@ import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossRefere
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
-import org.uniprot.api.uniparc.common.repository.store.entry.UniParcStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.stream.UniParcFastaStoreStreamer;
 import org.uniprot.core.uniparc.UniParcEntry;

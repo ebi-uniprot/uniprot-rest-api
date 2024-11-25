@@ -25,7 +25,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
-class UniParcIdMappingBatchResultStreamerTest
+class UniParcLightIdMappingBatchResultStreamerTest
         extends IdMappingBatchResultStreamerTest<UniParcEntryLight, UniParcEntryLightPair> {
     public static final int BATCH_SIZE = 2;
     @Mock private StoreStreamerConfig<UniParcEntryLight> storeStreamerConfig;
@@ -43,7 +43,7 @@ class UniParcIdMappingBatchResultStreamerTest
         heartbeatProducer = idMappingHeartbeatProducer;
         jobService = idMappingJobService;
         idMappingBatchResultStreamer =
-                new UniParcIdMappingBatchResultStreamer(
+                new UniParcLightIdMappingBatchResultStreamer(
                         idMappingHeartbeatProducer,
                         idMappingJobService,
                         storeStreamerConfig,

@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.query.sort.UniRefSortClause;
+import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
+import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -48,10 +52,23 @@ public class UniRefSolrQueryConfig {
                 .build();
     }
 
+    @Bean
+    public RequestConverter uniRefRequestConverter(
+            SolrQueryConfig uniRefSolrQueryConf,
+            UniRefSortClause uniRefSortClause,
+            UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
+            RequestConverterConfigProperties requestConverterConfigProperties) {
+        return new RequestConverterImpl(
+                uniRefSolrQueryConf,
+                uniRefSortClause,
+                uniRefQueryProcessorConfig,
+                requestConverterConfigProperties);
+    }
+
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
             SearchFieldConfig uniRefSearchFieldConfig) {
         return asList(
                 uniRefSearchFieldConfig.getSearchFieldItemByName("id"),
-                uniRefSearchFieldConfig.getSearchFieldItemByName("upi"));
+                uniRefSearchFieldConfig.getSearchFieldItemByName("uniparc"));
     }
 }

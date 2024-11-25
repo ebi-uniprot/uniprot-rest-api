@@ -1,6 +1,6 @@
 package org.uniprot.api.uniparc.common.service.light;
 
-import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.*;
+import static org.uniprot.api.uniparc.common.service.light.UniParcServiceUtils.csvToList;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
+import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
@@ -41,15 +43,17 @@ public class UniParcCrossReferenceService {
     private final UniParcCrossReferenceStoreClient crossReferenceStoreClient;
     private final RetryPolicy<Object> crossReferenceStoreRetryPolicy;
     private final UniParcCrossReferenceStoreConfigProperties storeConfigProperties;
+    private final UniParcCrossReferenceFacetConfig uniParcCrossReferenceFacetConfig;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     @Autowired
     public UniParcCrossReferenceService(
             UniParcLightStoreClient uniParcLightStoreClient,
             UniParcCrossReferenceStoreClient uniParcCrossReferenceStoreClient,
-            UniParcCrossReferenceStoreConfigProperties storeConfigProperties) {
+            UniParcCrossReferenceStoreConfigProperties storeConfigProperties,
+            UniParcCrossReferenceFacetConfig uniParcCrossReferenceFacetConfig) {
         this.uniParcLightStoreClient = uniParcLightStoreClient;
         this.crossReferenceStoreClient = uniParcCrossReferenceStoreClient;
         this.crossReferenceStoreRetryPolicy =
@@ -59,6 +63,7 @@ public class UniParcCrossReferenceService {
                                 Duration.ofMillis(storeConfigProperties.getFetchRetryDelayMillis()))
                         .withMaxRetries(storeConfigProperties.getFetchMaxRetries());
         this.storeConfigProperties = storeConfigProperties;
+        this.uniParcCrossReferenceFacetConfig = uniParcCrossReferenceFacetConfig;
     }
 
     public QueryResult<UniParcCrossReference> getCrossReferencesByUniParcId(
@@ -92,9 +97,20 @@ public class UniParcCrossReferenceService {
             paginatedResults =
                     requiredCrossReferenceBatches.subList(scaledOffset, scaledNextOffset);
         }
+        // populate facets if needed
+        List<Facet> facets = null;
+        if (facetNeeded(request)) {
+            Stream<UniParcCrossReference> allCrossReferences =
+                    getFilteredCrossReferences(uniParcEntryLight, request);
+            facets =
+                    this.uniParcCrossReferenceFacetConfig.getUniParcCrossReferenceFacets(
+                            allCrossReferences, request.getFacets());
+        }
+
         return QueryResult.<UniParcCrossReference>builder()
                 .content(paginatedResults.stream())
                 .page(page)
+                .facets(facets)
                 .build();
     }
 
@@ -107,6 +123,18 @@ public class UniParcCrossReferenceService {
         }
         UniParcEntryLight uniParcEntryLight = optUniParcLight.get();
         return getFilteredCrossReferences(uniParcEntryLight, streamRequest);
+    }
+
+    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight) {
+        BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
+                new BatchStoreIterable<>(
+                        generateUniParcCrossReferenceKeys(uniParcEntryLight),
+                        this.crossReferenceStoreClient,
+                        this.crossReferenceStoreRetryPolicy,
+                        1);
+        return StreamSupport.stream(batchIterable.spliterator(), false)
+                .flatMap(Collection::stream)
+                .flatMap(pair -> pair.getValue().stream());
     }
 
     private Stream<UniParcCrossReference> getFilteredCrossReferences(
@@ -164,18 +192,6 @@ public class UniParcCrossReferenceService {
         return xrefs.subList(offset, nextOffset);
     }
 
-    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight) {
-        BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
-                new BatchStoreIterable<>(
-                        generateUniParcCrossReferenceKeys(uniParcEntryLight),
-                        this.crossReferenceStoreClient,
-                        this.crossReferenceStoreRetryPolicy,
-                        1);
-        return StreamSupport.stream(batchIterable.spliterator(), false)
-                .flatMap(Collection::stream)
-                .flatMap(pair -> pair.getValue().stream());
-    }
-
     private boolean filterCrossReference(
             UniParcCrossReference xref, UniParcGetByIdRequest request) {
         List<String> databases =
@@ -203,5 +219,9 @@ public class UniParcCrossReferenceService {
             xrefKeys.add(uniParcId + "_" + batchId);
         }
         return xrefKeys;
+    }
+
+    private boolean facetNeeded(UniParcDatabasesRequest request) {
+        return !request.hasCursor() && Utils.notNullNotEmpty(request.getFacets());
     }
 }

@@ -11,7 +11,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 /**
  * @author lgonzales
  */
-public abstract class AbstractGetIdParameterResolver implements ParameterResolver {
+public abstract class AbstractGetByIdParameterResolver implements ParameterResolver {
 
     @Override
     public boolean supportsParameter(
@@ -31,7 +31,7 @@ public abstract class AbstractGetIdParameterResolver implements ParameterResolve
                         .orElseThrow(
                                 () ->
                                         new RuntimeException(
-                                                "AbstractGetIdParameterResolver: Unable to find tested method"));
+                                                "AbstractGetByIdParameterResolver: Unable to find tested method"));
         switch (method.getName()) {
             case "validIdReturnSuccess":
             case "idWithoutContentTypeMeansUseDefaultContentType":

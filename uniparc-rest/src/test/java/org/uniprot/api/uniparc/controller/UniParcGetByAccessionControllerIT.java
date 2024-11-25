@@ -14,8 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
+import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
-import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
@@ -38,7 +38,7 @@ import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniParcGetByAccessionControllerIT.UniParcGetByAccessionParameterResolver.class,
+            UniParcGetByAccessionControllerIT.UniParcGetByAccessionParameterResolverBy.class,
             UniParcGetByAccessionControllerIT.UniParcGetByAccessionContentTypeParamResolver.class
         })
 class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest {
@@ -53,7 +53,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
         return ACCESSION;
     }
 
-    static class UniParcGetByAccessionParameterResolver extends AbstractGetIdParameterResolver {
+    static class UniParcGetByAccessionParameterResolverBy extends AbstractGetByIdParameterResolver {
 
         @Override
         protected GetIdParameter validIdParameter() {

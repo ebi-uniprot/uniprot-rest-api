@@ -2,12 +2,10 @@ package org.uniprot.api.support.data.common.taxonomy.service;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -18,24 +16,19 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @Import(TaxonomySolrQueryConfig.class)
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     public static final String TAXONOMY_ID_FIELD = "id";
-    private final UniProtQueryProcessorConfig taxonomyQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RdfStreamer rdfStreamer;
     private final DefaultDocumentIdStream<TaxonomyDocument> documentIdStream;
 
     public TaxonomyService(
             TaxonomyRepository repository,
-            TaxonomyFacetConfig facetConfig,
             TaxonomyEntryConverter converter,
-            TaxonomySortClause taxonomySortClause,
-            SolrQueryConfig taxonomySolrQueryConf,
-            UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
             SearchFieldConfig taxonomySearchFieldConfig,
             RdfStreamer supportDataRdfStreamer,
-            DefaultDocumentIdStream<TaxonomyDocument> documentIdStream) {
+            DefaultDocumentIdStream<TaxonomyDocument> documentIdStream,
+            RequestConverter taxonomyRequestConverter) {
 
-        super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
-        this.taxonomyQueryProcessorConfig = taxonomyQueryProcessorConfig;
+        super(repository, converter, taxonomyRequestConverter);
         this.searchFieldConfig = taxonomySearchFieldConfig;
         this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
@@ -48,11 +41,6 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     @Override
     protected SearchFieldItem getIdField() {
         return this.searchFieldConfig.getSearchFieldItemByName(TAXONOMY_ID_FIELD);
-    }
-
-    @Override
-    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
-        return taxonomyQueryProcessorConfig;
     }
 
     @Override

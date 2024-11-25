@@ -1,15 +1,20 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniparc.controller.UniParcITUtils.*;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+import static org.uniprot.api.uniparc.controller.UniParcITUtils.getUniParcDocument;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createUniParcEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -71,14 +76,14 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniParcController.class)
+@WebMvcTest(UniParcEntryLightController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
-            UniParcSearchControllerIT.UniParcSearchParameterResolver.class
+            UniParcLightSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
+            UniParcLightSearchControllerIT.UniParcSearchParameterResolver.class
         })
-class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
+class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
@@ -87,7 +92,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
     @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
-    @Value("${search.default.page.size:#{null}}")
+    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
 
     private UniParcLightStoreClient storeClient;
@@ -141,7 +146,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
             case "isoform":
                 value = "P10011";
                 break;
-            case "upid":
+            case "proteome":
                 value = "UP000005640";
                 break;
             case "proteomecomponent":
@@ -468,7 +473,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                             "query",
                             List.of(
                                     "upi:INVALID OR taxonomy_id:INVALID "
-                                            + "OR length:INVALID OR upid:INVALID"))
+                                            + "OR length:INVALID OR proteome:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -477,7 +482,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                             "The 'upi' value has invalid format. It should be a valid UniParc UPI",
                                             "'length' filter type 'general' is invalid. Expected 'range' filter type",
                                             "The taxonomy id filter value should be a number",
-                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                            "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                     .build();
         }
 
@@ -604,13 +609,38 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                                             containsString(
                                                                     ">UPI0000083A11 status=active")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(content().contentType(MediaType.APPLICATION_XML))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<accession>UPI0000083A11</accession>")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sequence length=\"30\" checksum=\"F1F61B3F5B5121E3\">MLMPKRTKYRAAAAAAAAAAAAAAAAAAAA</sequence>")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<accession>UPI0000083A20</accession>\n"
+                                                                            + "  <signatureSequenceMatch database=\"CDD\" id=\"SIG000020\">\n"
+                                                                            + "    <ipr name=\"Inter Pro Name20\" id=\"IP000020\"/>\n"
+                                                                            + "    <lcn start=\"12\" end=\"23\" alignment=\"55M\"/>\n"
+                                                                            + "    <lcn start=\"45\" end=\"89\"/>\n"
+                                                                            + "  </signatureSequenceMatch>")))
+                                    .build())
                     .build();
         }
 
         @Override
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("upid:invalid")
+                    .query("proteome:invalid")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -619,7 +649,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                                            "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -627,7 +657,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -635,7 +665,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -649,7 +679,16 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                                     .resultMatcher(
                                             content()
                                                     .string(
-                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
+                                                            "Error messages\nThe 'proteome' value has invalid format. It should be a valid Proteome UPID"))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'proteome' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .build();
         }

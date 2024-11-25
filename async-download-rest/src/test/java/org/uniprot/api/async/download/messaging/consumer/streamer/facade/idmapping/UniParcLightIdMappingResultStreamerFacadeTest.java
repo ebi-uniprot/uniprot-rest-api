@@ -14,7 +14,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @ExtendWith(MockitoExtension.class)
-public class UniParcIdMappingResultStreamerFacadeTest
+public class UniParcLightIdMappingResultStreamerFacadeTest
         extends IdMappingResultStreamerFacadeTest<UniParcEntryLight, UniParcEntryLightPair> {
     @Mock private UniParcIdMappingRDFResultStreamer rdfResultStreamer;
     @Mock private IdMappingListResultStreamer listResultStreamer;
@@ -36,7 +36,7 @@ public class UniParcIdMappingResultStreamerFacadeTest
         converterContextFactory = uniParcConverterContextFactory;
         idMappingBatchResultStreamer = uniParcIdMappingBatchResultStreamer;
         idMappingResultStreamerFacade =
-                new UniParcIdMappingResultStreamerFacade(
+                new UniParcLightIdMappingResultStreamerFacade(
                         rdfResultStreamer,
                         listResultStreamer,
                         uniParcIdMappingBatchResultStreamer,

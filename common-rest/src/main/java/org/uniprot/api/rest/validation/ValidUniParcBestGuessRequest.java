@@ -16,8 +16,7 @@ import org.uniprot.core.util.Utils;
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUniParcBestGuessRequest {
-    String message() default
-            "Invalid request: at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds' must be provided. If 'dbids' is provided, one of the other parameters must also be provided.";
+    String message() default "{uniparc.best.guess.invalid}";
 
     String upis() default "upis";
 
@@ -85,9 +84,8 @@ public @interface ValidUniParcBestGuessRequest {
                 isValid = false;
             }
             if (!isValid) {
-                buildErrorMessage(
-                        context,
-                        "Provide at least one of 'upis', 'accessions', 'dbids', 'genes', or 'taxonIds'. 'dbids' alone is not allowed.");
+                String errorMessage = "{uniparc.best.guess.invalid}";
+                buildErrorMessage(context, errorMessage);
             }
             return isValid;
         }

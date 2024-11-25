@@ -13,10 +13,10 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 @Component
-public class UniParcIdMappingResultStreamerFacade
+public class UniParcLightIdMappingResultStreamerFacade
         extends IdMappingResultStreamerFacade<UniParcEntryLight, UniParcEntryLightPair> {
 
-    protected UniParcIdMappingResultStreamerFacade(
+    protected UniParcLightIdMappingResultStreamerFacade(
             UniParcIdMappingRDFResultStreamer idMappingRdfStreamer,
             IdMappingListResultStreamer listResultStreamer,
             IdMappingBatchResultStreamer<UniParcEntryLight, UniParcEntryLightPair>

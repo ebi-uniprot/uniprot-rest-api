@@ -142,6 +142,8 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
         List<Map<String, Integer>> sequences = JsonPath.read(resultsJson, "$.results.*.sequence");
         sequences.forEach(s -> assertTrue(s.containsKey("length")));
         assertEquals(12, sequences.size());
+        List<Map<String, Integer>> organisms = JsonPath.read(resultsJson, "$.results.*.organisms");
+        assertEquals(12, organisms.size());
         List<String> mostRecentCrossRefUpdated =
                 JsonPath.read(resultsJson, "$.results.*.mostRecentCrossRefUpdated");
         assertEquals(12, mostRecentCrossRefUpdated.size());
