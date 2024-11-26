@@ -110,7 +110,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         assertThrows(
                 IllegalDownloadJobSubmissionException.class,
                 () -> producerMessageService.sendMessage(downloadRequest));
-        verify(jobService, never()).save(any());
+        verify(jobService, never()).create(any());
         verify(messagingService, never()).send(any());
     }
 

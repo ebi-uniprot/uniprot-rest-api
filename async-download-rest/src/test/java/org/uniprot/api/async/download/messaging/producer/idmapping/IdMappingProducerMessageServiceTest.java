@@ -76,7 +76,7 @@ class IdMappingProducerMessageServiceTest
     @Override
     protected void verifyDownloadJob(IdMappingDownloadRequest request) {
         verify(jobService)
-                .save(
+                .create(
                         argThat(
                                 job -> {
                                     assertSame(JOB_ID, job.getId());

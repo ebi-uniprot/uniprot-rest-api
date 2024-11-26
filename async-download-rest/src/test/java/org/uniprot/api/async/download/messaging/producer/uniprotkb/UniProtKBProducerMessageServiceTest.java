@@ -82,7 +82,7 @@ class UniProtKBProducerMessageServiceTest
     @Override
     protected void verifyDownloadJob(UniProtKBDownloadRequest request) {
         verify(jobService)
-                .save(
+                .create(
                         argThat(
                                 job -> {
                                     assertSame(JOB_ID, job.getId());

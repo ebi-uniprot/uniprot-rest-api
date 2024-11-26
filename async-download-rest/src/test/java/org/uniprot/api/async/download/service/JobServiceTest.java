@@ -19,9 +19,17 @@ public abstract class JobServiceTest<R extends DownloadJob> {
 
     @Test
     void create() {
-        jobService.save(downloadJob);
+        jobService.create(downloadJob);
 
         verify(downloadJobRepository).save(downloadJob);
+    }
+
+    @Test
+    void create_whenAlreadyPresent() {
+        when(downloadJob.getId()).thenReturn(ID);
+        when(downloadJobRepository.findById(ID)).thenReturn(downloadJobOpt);
+
+        assertThrows(IllegalStateException.class, () -> jobService.create(downloadJob));
     }
 
     @Test

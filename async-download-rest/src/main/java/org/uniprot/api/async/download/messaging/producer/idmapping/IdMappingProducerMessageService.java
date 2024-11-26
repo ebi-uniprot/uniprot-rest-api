@@ -49,7 +49,7 @@ public class IdMappingProducerMessageService
                 .format(request.getFormat())
                 .created(now)
                 .updated(now);
-        this.jobService.save(jobBuilder.build());
+        jobService.create(jobBuilder.build());
         log.info("Job with jobId {} created in redis", jobId);
     }
 }

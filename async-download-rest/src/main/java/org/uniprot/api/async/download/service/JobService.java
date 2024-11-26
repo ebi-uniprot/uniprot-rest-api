@@ -13,7 +13,14 @@ public class JobService<R extends DownloadJob> {
         this.downloadJobRepository = downloadJobRepository;
     }
 
-    public R save(R downloadJob) {
+    public R create(R downloadJob) {
+        downloadJobRepository
+                .findById(downloadJob.getId())
+                .ifPresent(
+                        dj -> {
+                            throw new IllegalStateException(
+                                    "A job with id %s is already present.".formatted(dj.getId()));
+                        });
         return downloadJobRepository.save(downloadJob);
     }
 
