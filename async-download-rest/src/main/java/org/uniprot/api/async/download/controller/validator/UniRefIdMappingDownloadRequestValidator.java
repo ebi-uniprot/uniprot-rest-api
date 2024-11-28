@@ -2,6 +2,7 @@ package org.uniprot.api.async.download.controller.validator;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class UniRefIdMappingDownloadRequestValidator
 
     @Override
     protected String getType() {
-        return "UniRef";
+        return uniref.name();
     }
 
     @Override

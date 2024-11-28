@@ -12,7 +12,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
     void canGetType() {
         UniParcIdMappingDownloadRequestValidator validator =
                 new UniParcIdMappingDownloadRequestValidator();
-        assertEquals("UniParc", validator.getType());
+        assertEquals("uniparc", validator.getType());
     }
 
     @Test
@@ -75,7 +75,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid UniParc fields parameter values: [upid, identity].",
+                "Invalid uniparc fields parameter values: [upid, identity].",
                 exception.getMessage());
     }
 
@@ -90,7 +90,7 @@ class UniParcIdMappingDownloadRequestValidatorTest {
         InvalidRequestException exception =
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
-        assertEquals("Invalid UniParc fields parameter value: [invalid].", exception.getMessage());
+        assertEquals("Invalid uniparc fields parameter value: [invalid].", exception.getMessage());
     }
 
     @Test

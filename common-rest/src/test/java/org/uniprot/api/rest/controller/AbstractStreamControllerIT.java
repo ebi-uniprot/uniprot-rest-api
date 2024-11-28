@@ -100,6 +100,48 @@ public abstract class AbstractStreamControllerIT {
         }
     }
 
+    protected void startClusterForMapping(
+            TupleStreamTemplate secondaryTupleStreamTemplate,
+            FacetTupleStreamTemplate secondaryFacetTupleStreamTemplate)
+            throws Exception {
+        Properties solrProperties = loadSolrProperties();
+        String solrHome = solrProperties.getProperty("solr.home");
+        tempClusterDir = Files.createTempDirectory("MiniSolrCloudCluster");
+        System.setProperty(
+                "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
+
+        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
+        try {
+            cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
+            getTupleStreamTemplate()
+                    .getStreamConfig()
+                    .setZkHost(cluster.getZkServer().getZkAddress());
+            secondaryTupleStreamTemplate
+                    .getStreamConfig()
+                    .setZkHost(cluster.getZkServer().getZkAddress());
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamFactory", null);
+            ReflectionTestUtils.setField(secondaryTupleStreamTemplate, "streamFactory", null);
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamContext", null);
+            ReflectionTestUtils.setField(secondaryTupleStreamTemplate, "streamContext", null);
+            cloudSolrClient = cluster.getSolrClient();
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "solrClient", cloudSolrClient);
+            ReflectionTestUtils.setField(
+                    secondaryTupleStreamTemplate, "solrClient", cloudSolrClient);
+            updateFacetTupleStreamTemplateForMapping(secondaryFacetTupleStreamTemplate);
+
+            for (SolrCollection solrCollection : getSolrCollections()) {
+                String collection = solrCollection.name();
+                Path configPath = Paths.get(solrHome + File.separator + collection + "/conf");
+                cluster.uploadConfigSet(configPath, collection);
+                CollectionAdminRequest.createCollection(collection, collection, 1, 1)
+                        .process(cloudSolrClient);
+            }
+        } catch (Exception exc) {
+            log.error("Failed to initialize a MiniSolrCloudCluster due to: " + exc, exc);
+            throw exc;
+        }
+    }
+
     protected abstract List<SolrCollection> getSolrCollections();
 
     protected abstract TupleStreamTemplate getTupleStreamTemplate();
@@ -144,5 +186,17 @@ public abstract class AbstractStreamControllerIT {
                 cluster.getZkServer().getZkAddress());
         ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamFactory", null);
         ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamContext", null);
+    }
+
+    private void updateFacetTupleStreamTemplateForMapping(
+            FacetTupleStreamTemplate secondaryFacetTupleStreamTemplate) {
+        // update facet tuple for fields value for testing
+        updateFacetTupleStreamTemplate();
+        ReflectionTestUtils.setField(
+                secondaryFacetTupleStreamTemplate,
+                "zookeeperHost",
+                cluster.getZkServer().getZkAddress());
+        ReflectionTestUtils.setField(secondaryFacetTupleStreamTemplate, "streamFactory", null);
+        ReflectionTestUtils.setField(secondaryFacetTupleStreamTemplate, "streamContext", null);
     }
 }
