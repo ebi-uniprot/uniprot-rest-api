@@ -8,9 +8,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.MessageConsumerTest;
 import org.uniprot.api.async.download.messaging.consumer.processor.uniparc.UniParcRequestProcessor;
 import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandler;
+import org.uniprot.api.async.download.messaging.service.uniparc.UniParcMessagingService;
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
-import org.uniprot.api.async.download.mq.uniparc.UniParcMessagingService;
 import org.uniprot.api.async.download.service.uniparc.UniParcJobService;
 
 @ExtendWith(MockitoExtension.class)

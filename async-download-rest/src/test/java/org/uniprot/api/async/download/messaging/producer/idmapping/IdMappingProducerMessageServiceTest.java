@@ -16,9 +16,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
+import org.uniprot.api.async.download.messaging.service.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
 import org.uniprot.api.async.download.model.request.idmapping.IdMappingDownloadRequest;
-import org.uniprot.api.async.download.mq.idmapping.IdMappingRabbitMQMessagingService;
 import org.uniprot.api.async.download.service.idmapping.IdMappingJobService;
 import org.uniprot.api.rest.request.HashGenerator;
 

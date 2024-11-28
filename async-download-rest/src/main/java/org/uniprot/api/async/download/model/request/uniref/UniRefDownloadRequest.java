@@ -41,6 +41,7 @@ public class UniRefDownloadRequest extends UniRefStreamRequest
     @Parameter(hidden = true)
     private String downloadJobId;
 
+    @Override
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);
     }

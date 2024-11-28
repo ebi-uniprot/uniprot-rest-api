@@ -3,6 +3,7 @@ package org.uniprot.api.async.download.messaging.consumer;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.async.download.messaging.consumer.MessageConsumer.*;
+import static org.uniprot.api.async.download.messaging.repository.JobFields.*;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
 
@@ -19,9 +20,9 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.consumer.processor.RequestProcessor;
 import org.uniprot.api.async.download.messaging.result.common.FileHandler;
+import org.uniprot.api.async.download.messaging.service.MessagingService;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
-import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -60,7 +61,15 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
 
         verify(messagingService).sendToRejected(message);
         verify(jobService)
-                .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
+                .update(
+                        ID,
+                        Map.of(
+                                UPDATE_COUNT.getName(),
+                                0L,
+                                UPDATED.getName(),
+                                dateTime,
+                                PROCESSED_ENTRIES.getName(),
+                                0L));
         verify(fileHandler).deleteAllFiles(ID);
 
         localTimeMockedStatic.reset();
@@ -108,7 +117,8 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
 
         messageConsumer.onMessage(message);
 
-        verify(jobService).update(ID, Map.of(MessageConsumer.RETRIED, 8, STATUS, JobStatus.ERROR));
+        verify(jobService)
+                .update(ID, Map.of(RETRIED.getName(), 8, STATUS.getName(), JobStatus.ERROR));
         verify(messagingService)
                 .sendToRetry(
                         argThat(
@@ -148,7 +158,15 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
         InOrder inOrder = inOrder(jobService, fileHandler, downloadRequest, requestProcessor);
         inOrder.verify(jobService).find(ID);
         inOrder.verify(jobService)
-                .update(ID, Map.of(UPDATE_COUNT, 0L, UPDATED, dateTime, PROCESSED_ENTRIES, 0L));
+                .update(
+                        ID,
+                        Map.of(
+                                UPDATE_COUNT.getName(),
+                                0L,
+                                UPDATED.getName(),
+                                dateTime,
+                                PROCESSED_ENTRIES.getName(),
+                                0L));
         inOrder.verify(fileHandler).deleteAllFiles(ID);
         inOrder.verify(downloadRequest).setDownloadJobId(ID);
         inOrder.verify(requestProcessor).process(downloadRequest);
