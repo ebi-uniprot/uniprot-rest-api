@@ -3,10 +3,12 @@ package org.uniprot.api.async.download.service;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
+@Slf4j
 public class JobService<R extends DownloadJob> {
     private final DownloadJobRepository<R> downloadJobRepository;
 
@@ -21,6 +23,7 @@ public class JobService<R extends DownloadJob> {
                         dj -> {
                             throw new IllegalDownloadJobSubmissionException(downloadJob.getId());
                         });
+        log.info("A concurrent consumer has already picked up the job %s".formatted(downloadJob.getId()));
         return downloadJobRepository.save(downloadJob);
     }
 
