@@ -65,7 +65,7 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
                                 .find(jobId)
                                 .orElseThrow(() -> new MessageConsumerException(error));
 
-                if (isJobStillRunning(downloadJob)) {
+                if (isJobCurrentlyRunning(downloadJob)) {
                     log.warn("The job {} is being run by other thread", jobId);
                 } else if (downloadJob.getStatus() == FINISHED) {
                     log.warn("The job {} has already been processed successfully", jobId);
@@ -98,7 +98,7 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
         }
     }
 
-    private static <R extends DownloadJob> boolean isJobStillRunning(R downloadJob) {
+    private boolean isJobCurrentlyRunning(R downloadJob) {
         return downloadJob.getStatus() == RUNNING
                 || downloadJob.getStatus() == PROCESSING
                 || downloadJob.getStatus() == UNFINISHED;

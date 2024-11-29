@@ -11,4 +11,8 @@ public class IllegalDownloadJobSubmissionException extends RuntimeException {
         super(message);
         this.jobId = jobId;
     }
+
+    public IllegalDownloadJobSubmissionException(String jobId) {
+        this.jobId = jobId;
+    }
 }

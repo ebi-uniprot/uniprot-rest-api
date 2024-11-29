@@ -19,9 +19,7 @@ public class JobService<R extends DownloadJob> {
                 .findById(downloadJob.getId())
                 .ifPresent(
                         dj -> {
-                            throw new IllegalDownloadJobSubmissionException(
-                                    downloadJob.getId(),
-                                    "A job with id %s is already present.".formatted(dj.getId()));
+                            throw new IllegalDownloadJobSubmissionException(downloadJob.getId());
                         });
         return downloadJobRepository.save(downloadJob);
     }
