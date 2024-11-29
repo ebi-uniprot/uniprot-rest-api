@@ -51,7 +51,7 @@ public class UniProtKBProducerMessageService
                 .format(request.getFormat())
                 .created(now)
                 .updated(now);
-        jobService.save(jobBuilder.build());
+        jobService.create(jobBuilder.build());
         log.info("Job with jobId {} created in redis", jobId);
     }
 }
