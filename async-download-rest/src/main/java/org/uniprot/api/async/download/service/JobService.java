@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
 public class JobService<R extends DownloadJob> {
     private final DownloadJobRepository<R> downloadJobRepository;
@@ -18,7 +19,8 @@ public class JobService<R extends DownloadJob> {
                 .findById(downloadJob.getId())
                 .ifPresent(
                         dj -> {
-                            throw new IllegalStateException(
+                            throw new IllegalDownloadJobSubmissionException(
+                                    downloadJob.getId(),
                                     "A job with id %s is already present.".formatted(dj.getId()));
                         });
         return downloadJobRepository.save(downloadJob);

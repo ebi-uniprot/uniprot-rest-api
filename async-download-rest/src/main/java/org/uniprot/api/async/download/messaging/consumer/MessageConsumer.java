@@ -1,7 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer;
 
-import static org.uniprot.api.rest.download.model.JobStatus.ERROR;
-import static org.uniprot.api.rest.download.model.JobStatus.RUNNING;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -66,13 +65,12 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
                                 .find(jobId)
                                 .orElseThrow(() -> new MessageConsumerException(error));
 
-                // run the job only if it has errored out
-                if (isConsumedBefore(downloadJob)) {
-                    if (downloadJob.getStatus() == RUNNING) {
-                        log.warn("The job {} is running by other thread", jobId);
-                    } else {
-                        log.info("The job {} is already processed", jobId);
-                    }
+                if (isJobStillRunning(downloadJob)) {
+                    log.warn("The job {} is being run by other thread", jobId);
+                } else if (downloadJob.getStatus() == FINISHED) {
+                    log.warn("The job {} has already been processed successfully", jobId);
+                } else if (downloadJob.getStatus() == ABORTED) {
+                    log.warn("The job {} has already been aborted earlier", jobId);
                 } else {
                     cleanIfNecessary(downloadJob);
                     T request = (T) this.messageConverter.fromMessage(message);
@@ -100,9 +98,10 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
         }
     }
 
-    protected boolean isConsumedBefore(R downloadJob) {
-        return fileHandler.areAllFilesPresent(downloadJob.getId())
-                && ERROR != downloadJob.getStatus();
+    private static <R extends DownloadJob> boolean isJobStillRunning(R downloadJob) {
+        return downloadJob.getStatus() == RUNNING
+                || downloadJob.getStatus() == PROCESSING
+                || downloadJob.getStatus() == UNFINISHED;
     }
 
     private void cleanIfNecessary(DownloadJob downloadJob) {
