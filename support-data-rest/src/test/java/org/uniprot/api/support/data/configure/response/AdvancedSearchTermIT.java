@@ -27,6 +27,7 @@ class AdvancedSearchTermIT {
                     new String[] {
                         "UniProtKB AC",
                         "Entry Name [ID]",
+                        "Secondary Accession",
                         "Protein Name [DE]",
                         "Gene Name [GN]",
                         "Organism [OS]",
