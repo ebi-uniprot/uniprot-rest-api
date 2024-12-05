@@ -1,7 +1,5 @@
 package org.uniprot.api.async.download.messaging.consumer.idmapping;
 
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -43,10 +41,5 @@ class IdMappingMessageConsumerTest
                         idMappingJobService,
                         idMappingMessageConverter);
         mockCommon();
-    }
-
-    @Override
-    protected void mockFileExistence() {
-        when(fileHandler.isResultFilePresent(ID)).thenReturn(true);
     }
 }

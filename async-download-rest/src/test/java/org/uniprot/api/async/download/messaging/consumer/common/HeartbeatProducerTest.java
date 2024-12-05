@@ -114,7 +114,7 @@ class HeartbeatProducerTest {
         heartBeatProducer.generateForResults(downloadJob, 70);
         heartBeatProducer.generateForResults(downloadJob, 70);
 
-        verify(jobService, never()).save(any());
+        verify(jobService, never()).create(any());
         verify(jobService, never()).update(any(), any());
     }
 
@@ -167,7 +167,7 @@ class HeartbeatProducerTest {
         heartBeatProducer.generateForIds(downloadJob);
         heartBeatProducer.generateForIds(downloadJob);
 
-        verify(jobService, never()).save(any());
+        verify(jobService, never()).create(any());
         verify(jobService, never()).update(any(), any());
     }
 

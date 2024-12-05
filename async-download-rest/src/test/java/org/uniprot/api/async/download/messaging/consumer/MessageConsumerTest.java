@@ -72,8 +72,6 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
         when(messageProperties.getHeader(JOB_ID_HEADER)).thenReturn(ID);
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(RETRIES);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
-        when(downloadJob.getId()).thenReturn(ID);
-        mockFileExistence();
         when(downloadJob.getStatus()).thenReturn(RUNNING);
 
         messageConsumer.onMessage(message);
@@ -81,17 +79,11 @@ public abstract class MessageConsumerTest<T extends DownloadRequest, R extends D
         verifyNoInteractions(requestProcessor);
     }
 
-    protected void mockFileExistence() {
-        when(fileHandler.areAllFilesPresent(ID)).thenReturn(true);
-    }
-
     @Test
     void onMessage_CompletedJob() {
         when(messageProperties.getHeader(JOB_ID_HEADER)).thenReturn(ID);
         when(messageProperties.getHeader(CURRENT_RETRIED_COUNT_HEADER)).thenReturn(RETRIES);
         when(jobService.find(ID)).thenReturn(Optional.of(downloadJob));
-        when(downloadJob.getId()).thenReturn(ID);
-        mockFileExistence();
         when(downloadJob.getStatus()).thenReturn(FINISHED);
 
         messageConsumer.onMessage(message);

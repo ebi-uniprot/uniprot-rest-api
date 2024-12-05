@@ -2183,6 +2183,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             value =
                     switch (searchField) {
                         case "accession", "accession_id" -> "P21802";
+                        case "sec_acc" -> "B4DFC2";
                         case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
                         case "length", "mass" -> "[* TO *]";
                         case "proteome" -> "UP000000000";

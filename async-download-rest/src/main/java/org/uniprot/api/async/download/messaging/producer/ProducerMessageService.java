@@ -52,7 +52,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
         JobSubmitFeedback jobSubmitFeedback = jobSubmissionRules.submit(request);
 
         if (jobSubmitFeedback.isAllowed()) {
-            cleanIfNecessary(jobId, request.isForce());
+            cleanIfNecessary(jobId);
             createDownloadJob(jobId, request);
             sendMessage(jobId, request);
         } else {
@@ -69,12 +69,10 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
         }
     }
 
-    private void cleanIfNecessary(String jobId, boolean force) {
-        if (force) {
-            jobService.delete(jobId);
-            fileHandler.deleteAllFiles(jobId);
-            log.info("Message with jobId {} is ready to resubmit", jobId);
-        }
+    private void cleanIfNecessary(String jobId) {
+        jobService.delete(jobId);
+        fileHandler.deleteAllFiles(jobId);
+        log.info("Message with jobId {} is ready to resubmit", jobId);
     }
 
     protected abstract void createDownloadJob(String jobId, T request);

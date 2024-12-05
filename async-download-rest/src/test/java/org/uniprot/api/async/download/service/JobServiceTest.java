@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
 public abstract class JobServiceTest<R extends DownloadJob> {
     public static final String ID = "id";
@@ -19,9 +20,18 @@ public abstract class JobServiceTest<R extends DownloadJob> {
 
     @Test
     void create() {
-        jobService.save(downloadJob);
+        jobService.create(downloadJob);
 
         verify(downloadJobRepository).save(downloadJob);
+    }
+
+    @Test
+    void create_whenAlreadyPresent() {
+        when(downloadJob.getId()).thenReturn(ID);
+        when(downloadJobRepository.findById(ID)).thenReturn(downloadJobOpt);
+
+        assertThrows(
+                IllegalDownloadJobSubmissionException.class, () -> jobService.create(downloadJob));
     }
 
     @Test

@@ -5,9 +5,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +71,7 @@ class UniProtKBConfigureControllerIT {
                         .collect(Collectors.toList());
         // then
         validateResponse(response);
-        response.andExpect(jsonPath("$.[4].autoComplete", is("/suggester?dict=organism&query=?")))
+        response.andExpect(jsonPath("$.[5].autoComplete", is("/suggester?dict=organism&query=?")))
                 .andExpect(
                         jsonPath(
                                 "$.[?(@.id=='cross_references')].items.*.items.*.label",

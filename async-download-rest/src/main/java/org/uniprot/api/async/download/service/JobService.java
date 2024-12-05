@@ -5,7 +5,11 @@ import java.util.Optional;
 
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class JobService<R extends DownloadJob> {
     private final DownloadJobRepository<R> downloadJobRepository;
 
@@ -13,7 +17,16 @@ public class JobService<R extends DownloadJob> {
         this.downloadJobRepository = downloadJobRepository;
     }
 
-    public R save(R downloadJob) {
+    public R create(R downloadJob) {
+        downloadJobRepository
+                .findById(downloadJob.getId())
+                .ifPresent(
+                        dj -> {
+                            throw new IllegalDownloadJobSubmissionException(downloadJob.getId());
+                        });
+        log.info(
+                "A concurrent consumer has already picked up the job %s"
+                        .formatted(downloadJob.getId()));
         return downloadJobRepository.save(downloadJob);
     }
 

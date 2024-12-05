@@ -72,6 +72,7 @@ public class IdMappingUniProtKBITUtils {
             value =
                     switch (searchField) {
                         case "accession_id", "accession" -> "Q00011";
+                        case "sec_acc" -> "B4DFC2";
                         case "mass", "length" -> "[* TO *]";
                         case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
                         case "date_modified",
