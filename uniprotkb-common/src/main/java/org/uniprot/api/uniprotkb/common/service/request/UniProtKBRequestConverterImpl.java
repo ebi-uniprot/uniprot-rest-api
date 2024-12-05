@@ -153,12 +153,12 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
 
     protected SolrRequest.SolrRequestBuilder createSearchIdsSolrRequestBuilder(
             SearchRequest request, String idField) {
-        return basicConverter.createIdsSolrRequest(request, idField);
+        return basicConverter.createSearchIdsSolrRequest(request, idField);
     }
 
     protected SolrRequest.SolrRequestBuilder createStreamIdsSolrRequestBuilder(
             StreamRequest request, String idField) {
-        return basicConverter.createIdsSolrRequest(request, idField);
+        return basicConverter.createStreamIdsSolrRequest(request, idField);
     }
 
     protected String getUniProtKBIdsTermQuery(List<String> idsList, String idField) {

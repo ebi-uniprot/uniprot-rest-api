@@ -38,9 +38,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
         try {
             List<StreamExpression> expressions = new ArrayList<>();
             // add search function if needed
-            if (Utils.notNullNotEmpty(request.getQuery())
-                    || Utils.notNullNotEmpty(request.getSorts())
-                    || Utils.nullOrEmpty(request.getFacets())) {
+            if (shouldAddSearchExpression(request)) {
                 StreamExpression searchExpression =
                         new SearchStreamExpression(this.collection, request);
                 expressions.add(searchExpression);
@@ -66,5 +64,11 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
             log.error("Could not create TupleStream", e);
             throw new IllegalStateException();
         }
+    }
+
+    private static boolean shouldAddSearchExpression(SolrRequest request) {
+        return Utils.notNullNotEmpty(request.getQuery())
+                || Utils.notNullNotEmpty(request.getSorts())
+                || Utils.nullOrEmpty(request.getFacets());
     }
 }

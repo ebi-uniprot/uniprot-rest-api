@@ -1,10 +1,13 @@
 package org.uniprot.api.rest.service.request;
 
+import static org.uniprot.api.rest.search.AbstractSolrSortClause.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.common.repository.search.SolrFacetRequest;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -70,7 +73,7 @@ public class BasicRequestConverter {
         return requestBuilder;
     }
 
-    public SolrRequest.SolrRequestBuilder createIdsSolrRequest(
+    public SolrRequest.SolrRequestBuilder createSearchIdsSolrRequest(
             SearchRequest request, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder = createSearchSolrRequest(request);
         requestBuilder.idField(idField);
@@ -78,7 +81,7 @@ public class BasicRequestConverter {
         return requestBuilder;
     }
 
-    public SolrRequest.SolrRequestBuilder createIdsSolrRequest(
+    public SolrRequest.SolrRequestBuilder createStreamIdsSolrRequest(
             StreamRequest request, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder = createStreamSolrRequest(request);
         requestBuilder.idField(idField);
@@ -89,10 +92,11 @@ public class BasicRequestConverter {
     private void updateIdsSort(SolrRequest.SolrRequestBuilder requestBuilder, String requestSorts) {
         requestBuilder.clearSorts();
         if (Utils.notNullNotEmpty(requestSorts)) {
-            requestBuilder.sorts(
+            List<SolrQuery.SortClause> sorts =
                     solrSortClause.getSort(requestSorts).stream()
-                            .filter(clause -> !clause.getItem().equals("score"))
-                            .toList());
+                            .filter(clause -> !SCORE.equals(clause.getItem()))
+                            .toList();
+            requestBuilder.sorts(sorts);
         }
     }
 
@@ -138,6 +142,7 @@ public class BasicRequestConverter {
                 String cleanQuery =
                         CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
                 if (idRequestRegex.matcher(cleanQuery.toUpperCase()).matches()) {
+                    // This will allow default search p12345 works.
                     query = cleanQuery.toUpperCase();
                 }
             }

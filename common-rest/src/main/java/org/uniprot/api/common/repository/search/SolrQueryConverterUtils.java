@@ -65,7 +65,7 @@ public class SolrQueryConverterUtils {
                 rangeFacet.put("refine", "true");
                 List<Object> ranges = new ArrayList<>();
                 for (int i = 1; i <= facet.getInterval().size(); i++) {
-                    String rangeItem = facet.getInterval().get("" + i);
+                    String rangeItem = facet.getInterval().get(String.valueOf(i));
                     Map<String, Object> range = new HashMap<>();
                     range.put("range", rangeItem);
                     ranges.add(range);

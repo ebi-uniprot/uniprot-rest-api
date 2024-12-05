@@ -152,6 +152,12 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                         .build();
         saveEntry(uniProtKBEntry);
 
+        uniProtKBEntry =
+                UniProtKBEntryBuilder.from(
+                                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL))
+                        .build();
+        saveEntry(uniProtKBEntry);
+
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 
@@ -189,7 +195,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Test
-    void getByIdsIsoformEntriesSuccess() throws Exception {
+    void getByIdsMixedIdsWithIsoformAndNonIsoformEntriesSuccess() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -198,7 +204,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
-                                        .param(getRequestParamName(), "p21802-2,p00003")
+                                        .param(getRequestParamName(), "p21802-2,p00003,p21802")
                                         .param("size", "10"));
 
         // then
@@ -207,10 +213,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(3)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("P00003", "P21802-2")))
+                                "$.results.*.primaryAccession", contains("P00003", "P21802", "P21802-2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 

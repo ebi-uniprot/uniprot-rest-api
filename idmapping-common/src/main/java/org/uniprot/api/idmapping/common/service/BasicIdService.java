@@ -27,8 +27,6 @@ import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
-import lombok.Builder;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**

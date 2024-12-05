@@ -113,7 +113,7 @@ class SolrRequestConverterTest {
             assertThat(result.get("sort"), is(sortField1 + " asc," + sortField2 + " desc"));
 
             Map<String, Object> facets = (Map<String, Object>) result.get("facet");
-            // assertThat(facets.keySet(), containsInAnyOrder(facet1, facet2));
+            assertThat(facets.keySet(), containsInAnyOrder(facet1.getName(), facet2.getName()));
 
             Map<String, Object> fragment = (Map<String, Object>) facets.get("fragment");
             assertThat(fragment.get("type"), is("terms"));

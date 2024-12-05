@@ -333,7 +333,7 @@ class BasicRequestConverterTest {
         Mockito.when(request.getQuery()).thenReturn(query);
         Mockito.when(request.getSort()).thenReturn(sort.toString());
 
-        SolrRequest result = converter.createIdsSolrRequest(request, idField).build();
+        SolrRequest result = converter.createStreamIdsSolrRequest(request, idField).build();
         assertNotNull(result);
         assertEquals(query, result.getQuery());
         assertEquals(idField, result.getIdField());
@@ -364,10 +364,17 @@ class BasicRequestConverterTest {
         Mockito.when(request.getQuery()).thenReturn(query);
         Mockito.when(request.getSort()).thenReturn(sort.toString());
 
-        SolrRequest result = converter.createIdsSolrRequest(request, idField).build();
+        SolrRequest result = converter.createSearchIdsSolrRequest(request, idField).build();
         assertNotNull(result);
         assertEquals(query, result.getQuery());
         assertEquals(idField, result.getIdField());
         assertEquals(List.of(sort), result.getSorts());
+    }
+
+    @Test
+    void canGetIdsTermQuery() {
+        String idsFieldQuery =
+                BasicRequestConverter.getIdsTermQuery(List.of("id1", "id2"), "id_field");
+        assertEquals("({!terms f=id_field}id1,id2)", idsFieldQuery);
     }
 }

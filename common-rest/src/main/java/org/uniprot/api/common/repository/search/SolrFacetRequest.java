@@ -10,9 +10,19 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SolrFacetRequest {
+
+    /** Facet name. */
     private String name;
+    /** Define minimum items required to return the facet item. */
     private int minCount;
+
+    /**
+     * Define facet items limit for a specific facet. IMPORTANT: -1 means return all items without
+     * limit.
+     */
     private int limit;
+    /** Define facet sort, for example, index desc */
     private String sort;
+    /** used to define the intervals for an interval facet that will be sent to solr. */
     private Map<String, String> interval;
 }
