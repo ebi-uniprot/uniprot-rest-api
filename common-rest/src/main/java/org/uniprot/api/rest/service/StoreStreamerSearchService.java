@@ -18,7 +18,6 @@ import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -106,7 +105,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         boolean hasIsoformIds = hasIsoformIds(idsRequest.getIdList());
         SolrStreamFacetResponse solrStreamResponse =
                 solrStreamNeeded(idsRequest, hasIsoformIds)
-                        ? searchBySolrStream(idsRequest, hasIsoformIds)
+                        ? searchBySolrStream(idsRequest)
                         : new SolrStreamFacetResponse();
 
         // use the ids returned by solr stream if query filter is passed or sort field is passed
@@ -169,18 +168,12 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         return converted;
     }
 
-    private SolrStreamFacetResponse searchBySolrStream(
-            IdsSearchRequest idsRequest, boolean includeIsoform) {
-        SolrStreamFacetRequest solrStreamRequest =
-                SolrStreamFacetRequest.createSolrStreamFacetRequest(
-                        this.solrQueryConfig,
-                        getUniProtDataType(),
-                        getSolrIdField(),
-                        getTermsQueryField(),
-                        idsRequest.getIdList(),
-                        idsRequest,
-                        includeIsoform);
-        TupleStream tupleStream = this.tupleStreamTemplate.create(solrStreamRequest, facetConfig);
+    private SolrStreamFacetResponse searchBySolrStream(IdsSearchRequest idsRequest) {
+        SolrRequest solrRequest =
+                getRequestConverter()
+                        .createSearchIdsSolrRequest(
+                                idsRequest, idsRequest.getIdList(), getSolrIdField());
+        TupleStream tupleStream = this.tupleStreamTemplate.create(solrRequest);
         return this.tupleStreamConverter.convert(tupleStream, idsRequest.getFacetList());
     }
 

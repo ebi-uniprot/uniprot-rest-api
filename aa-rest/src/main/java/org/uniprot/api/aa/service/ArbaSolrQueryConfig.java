@@ -1,12 +1,16 @@
 package org.uniprot.api.aa.service;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.ARBA_ID_REGEX;
+
 import java.util.*;
+import java.util.regex.Pattern;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -25,6 +29,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @EnableConfigurationProperties(value = RequestConverterConfigProperties.class)
 public class ArbaSolrQueryConfig {
     private static final String RESOURCE_LOCATION = "/arba-query.config";
+    private static final Pattern ARBA_REGEX_PATTERN = Pattern.compile(ARBA_ID_REGEX);
 
     @Bean
     public SolrQueryConfig arbaSolrQueryConf() {
@@ -56,12 +61,15 @@ public class ArbaSolrQueryConfig {
             SolrQueryConfig arbaSolrQueryConf,
             ArbaSortClause arbaSortClause,
             UniProtQueryProcessorConfig arbaQueryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig arbaFacetConfig) {
         return new RequestConverterImpl(
                 arbaSolrQueryConf,
                 arbaSortClause,
                 arbaQueryProcessorConfig,
-                requestConverterConfigProperties);
+                requestConverterConfigProperties,
+                arbaFacetConfig,
+                ARBA_REGEX_PATTERN);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

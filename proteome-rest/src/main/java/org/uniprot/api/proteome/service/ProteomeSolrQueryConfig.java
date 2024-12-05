@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -57,12 +58,14 @@ public class ProteomeSolrQueryConfig {
             SolrQueryConfig proteomeSolrQueryConf,
             ProteomeSortClause proteomeSortClause,
             UniProtQueryProcessorConfig proteomeQueryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig proteomeFacetConfig) {
         return new RequestConverterImpl(
                 proteomeSolrQueryConf,
                 proteomeSortClause,
                 proteomeQueryProcessorConfig,
                 requestConverterConfigProperties,
+                proteomeFacetConfig,
                 PROTEOME_ID_REGEX_PATTERN);
     }
 

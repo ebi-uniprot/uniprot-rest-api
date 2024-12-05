@@ -84,7 +84,8 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
                 SolrQueryConfig.builder().queryFields("id").build(),
                 new TaxonomySortClause(),
                 UniProtQueryProcessorConfig.builder().searchFieldConfig(fieldConfig).build(),
-                new RequestConverterConfigProperties());
+                new RequestConverterConfigProperties(),
+                null);
     }
 
     static class TaxonomyEntryConverter implements Function<TaxonomyDocument, TaxonomyEntry> {

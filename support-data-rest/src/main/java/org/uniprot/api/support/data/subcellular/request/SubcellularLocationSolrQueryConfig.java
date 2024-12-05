@@ -63,6 +63,7 @@ public class SubcellularLocationSolrQueryConfig {
                 subcellSortClause,
                 subcellQueryProcessorConfig,
                 requestConverterConfigProperties,
+                null,
                 SUBCELLULAR_LOCATION_ID_REGEX_PATTERN);
     }
 

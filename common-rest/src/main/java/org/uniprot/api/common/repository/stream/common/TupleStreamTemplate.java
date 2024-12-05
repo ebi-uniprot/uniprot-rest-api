@@ -87,7 +87,7 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                         .build();
         try {
             JsonQueryRequest jsonQueryRequest =
-                    solrRequestConverter.toJsonQueryRequest(slimRequest, null);
+                    solrRequestConverter.toJsonQueryRequest(slimRequest);
             QueryResponse response =
                     jsonQueryRequest.process(solrClient, streamConfig.getCollection());
             return response.getResults().getNumFound();

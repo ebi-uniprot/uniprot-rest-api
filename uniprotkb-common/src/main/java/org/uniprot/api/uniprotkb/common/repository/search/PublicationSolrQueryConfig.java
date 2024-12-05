@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -47,11 +48,13 @@ public class PublicationSolrQueryConfig {
             @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
             UniProtKBPublicationsSolrSortClause publicationsSolrSortClause,
             UniProtQueryProcessorConfig publicationQueryProcessorConfig,
-            RequestConverterConfigProperties requestConverterConfigProperties) {
+            RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig publicationFacetConfig) {
         return new RequestConverterImpl(
                 publicationSolrQueryConf,
                 publicationsSolrSortClause,
                 publicationQueryProcessorConfig,
-                requestConverterConfigProperties);
+                requestConverterConfigProperties,
+                publicationFacetConfig);
     }
 }

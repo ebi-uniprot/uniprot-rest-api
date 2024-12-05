@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -291,7 +290,9 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("reviewed"), 2);
+        SolrRequest query =
+                queryWithFacets(
+                        accQuery, List.of(SolrFacetRequest.builder().name("reviewed").build()), 2);
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
@@ -319,7 +320,14 @@ class SolrQueryRepositoryIT {
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
         SolrRequest query =
-                queryWithFacets(accQuery, Collections.singletonList("proteins_with"), 2);
+                queryWithFacets(
+                        accQuery,
+                        List.of(
+                                SolrFacetRequest.builder()
+                                        .name("proteins_with")
+                                        .minCount(1)
+                                        .build()),
+                        2);
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
@@ -338,7 +346,11 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("length"), 2);
+        SolrRequest query =
+                queryWithFacets(
+                        accQuery,
+                        List.of(SolrFacetRequest.builder().name("length").minCount(1).build()),
+                        2);
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
@@ -354,7 +366,9 @@ class SolrQueryRepositoryIT {
 
         // when attempt to fetch results with facets
         String accQuery = "accession:*";
-        SolrRequest query = queryWithFacets(accQuery, asList("reviewed", "fragment"), 2);
+        SolrFacetRequest reviewed = SolrFacetRequest.builder().name("reviewed").build();
+        SolrFacetRequest fragment = SolrFacetRequest.builder().name("fragment").build();
+        SolrRequest query = queryWithFacets(accQuery, List.of(reviewed, fragment), 2);
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
@@ -369,11 +383,7 @@ class SolrQueryRepositoryIT {
                 .build();
     }
 
-    private SolrRequest queryWithFacets(String query, List<String> facets) {
-        return queryWithFacets(query, facets, defaultPageSize);
-    }
-
-    private SolrRequest queryWithFacets(String query, List<String> facets, int size) {
+    private SolrRequest queryWithFacets(String query, List<SolrFacetRequest> facets, int size) {
         return SolrRequest.builder()
                 .query(query)
                 .defaultQueryOperator(QueryOperator.AND)
@@ -420,8 +430,8 @@ class SolrQueryRepositoryIT {
 
     private static class GeneralSolrRequestConverter extends SolrRequestConverter {
         @Override
-        public JsonQueryRequest toJsonQueryRequest(SolrRequest request, FacetConfig facetConfig) {
-            JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
+        public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+            JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
 
             // required for tests, because EmbeddedSolrServer is not sharded
             ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");

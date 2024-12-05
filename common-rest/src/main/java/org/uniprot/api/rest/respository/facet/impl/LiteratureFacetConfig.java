@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.literature.repository;
+package org.uniprot.api.rest.respository.facet.impl;
 
 import java.util.Collection;
 import java.util.HashMap;

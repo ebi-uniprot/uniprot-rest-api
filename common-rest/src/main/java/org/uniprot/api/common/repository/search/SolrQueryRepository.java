@@ -72,7 +72,9 @@ public abstract class SolrQueryRepository<T extends Document> {
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
             FacetResponseConverter facetConverter = new FacetResponseConverter(facetConfig);
-            List<Facet> facets = facetConverter.convert(solrResponse, request.getFacets());
+            List<String> facetNames =
+                    request.getFacets().stream().map(SolrFacetRequest::getName).toList();
+            List<Facet> facets = facetConverter.convert(solrResponse, facetNames);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
             List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
 
@@ -98,8 +100,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
-            JsonQueryRequest solrQuery =
-                    requestConverter.toJsonQueryRequest(request, facetConfig, true);
+            JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request, true);
             QueryResponse response = solrQuery.process(solrClient, collection.toString());
             if (!response.getResults().isEmpty()) {
                 if (response.getResults().size() > 1) {
@@ -122,7 +123,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                 new SolrResultsIterator<>(
                         solrClient,
                         collection,
-                        requestConverter.toJsonQueryRequest(request, facetConfig),
+                        requestConverter.toJsonQueryRequest(request),
                         tClass);
         return StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
@@ -145,7 +146,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     private QueryResponse search(SolrRequest request, String cursor)
             throws IOException, SolrServerException {
-        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request, facetConfig);
+        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
         if (cursor != null && !cursor.isEmpty()) {
             ((ModifiableSolrParams) solrQuery.getParams())
                     .set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);

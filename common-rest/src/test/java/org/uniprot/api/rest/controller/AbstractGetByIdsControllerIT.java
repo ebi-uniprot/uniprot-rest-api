@@ -575,6 +575,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                 get(getGetByIdsPath())
                                         .param(getRequestParamName(), getCommaSeparatedIds())
                                         .param("sort", sortField + " asc")
+                                        .param("size", "10")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

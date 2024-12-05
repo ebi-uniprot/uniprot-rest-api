@@ -29,6 +29,8 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
+import org.uniprot.api.uniprotkb.common.repository.search.UniProtTermsConfig;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtSolrSortClause;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -44,7 +46,7 @@ import net.jodah.failsafe.RetryPolicy;
  * @created 18/02/2021
  */
 @Configuration
-@Import(RepositoryConfig.class)
+@Import({RepositoryConfig.class})
 @Slf4j
 public class UniProtKBIdMappingResultsConfig {
 
@@ -152,6 +154,16 @@ public class UniProtKBIdMappingResultsConfig {
                         storeConfigProperties.getStoreName(),
                         storeConfigProperties.getHost());
         return new UniProtStoreClient<>(client);
+    }
+
+    @Bean
+    public UniProtSolrSortClause uniProtSolrSortClause() {
+        return new UniProtSolrSortClause();
+    }
+
+    @Bean
+    public UniProtTermsConfig uniProtTermsConfig() {
+        return new UniProtTermsConfig();
     }
 
     private SolrClient buildSolrClient(

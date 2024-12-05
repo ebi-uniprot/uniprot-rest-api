@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -53,9 +54,6 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
 
     private static final int PREVIEW_SIZE = 10;
     private final UniRuleService uniRuleService;
-    public static final String UNIRULE_ALL_ID_REGEX =
-            "UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(\\-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}";
-    private static final String UNIRULE_ID_REGEX = "UR[0-9]{9}";
     private static final java.util.regex.Pattern UNIRULE_ID_PATTERN =
             java.util.regex.Pattern.compile(UNIRULE_ID_REGEX);
 

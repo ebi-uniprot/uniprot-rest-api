@@ -16,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,13 +46,16 @@ class SolrRequestConverterTest {
             // given
             String queryString = "query";
             int rows = 25;
-            String facet1 = "fragment";
-            String facet2 = "length";
-            FakeFacetConfig facetConfig = new FakeFacetConfig();
-            int facetLimit = 100;
-            int facetMinCount = 10;
-            facetConfig.setLimit(facetLimit);
-            facetConfig.setMincount(facetMinCount);
+            SolrFacetRequest facet1 =
+                    SolrFacetRequest.builder().name("fragment").minCount(10).limit(2).build();
+            Map<String, String> interval = new HashMap<>();
+            interval.put("1", "[1,200]");
+            interval.put("2", "[201,400]");
+            interval.put("3", "[401,600]");
+            interval.put("4", "[601,800]");
+            interval.put("5", "[801,*]");
+            SolrFacetRequest facet2 =
+                    SolrFacetRequest.builder().name("length").interval(interval).build();
 
             String termField1 = "term field 1";
             String termField2 = "term field 2";
@@ -79,7 +81,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, facetConfig);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
             // then
             SolrParams queryParams = solrQuery.getParams();
@@ -111,18 +113,18 @@ class SolrRequestConverterTest {
             assertThat(result.get("sort"), is(sortField1 + " asc," + sortField2 + " desc"));
 
             Map<String, Object> facets = (Map<String, Object>) result.get("facet");
-            assertThat(facets.keySet(), containsInAnyOrder(facet1, facet2));
+            assertThat(facets.keySet(), containsInAnyOrder(facet1.getName(), facet2.getName()));
 
-            Map<String, Object> fragment = (Map<String, Object>) facets.get(facet1);
+            Map<String, Object> fragment = (Map<String, Object>) facets.get("fragment");
             assertThat(fragment.get("type"), is("terms"));
-            assertThat(fragment.get("field"), is(facet1));
+            assertThat(fragment.get("field"), is("fragment"));
             assertThat(fragment.get("mincount"), is(10));
             assertThat(fragment.get("limit"), is(2));
             assertThat(fragment.get("refine"), is(true));
 
-            Map<String, Object> lengthFacet = (Map<String, Object>) facets.get(facet2);
+            Map<String, Object> lengthFacet = (Map<String, Object>) facets.get("length");
             assertThat(lengthFacet.get("type"), is("range"));
-            assertThat(lengthFacet.get("field"), is(facet2));
+            assertThat(lengthFacet.get("field"), is("length"));
             assertThat(lengthFacet.get("refine"), is("true"));
             List ranges = (List) lengthFacet.get("ranges");
             assertNotNull(ranges);
@@ -140,7 +142,7 @@ class SolrRequestConverterTest {
             SolrRequest request = SolrRequest.builder().query(queryString).build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null, true);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, true);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -155,8 +157,7 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder().query("too long").termField("field 1").build();
             assertThrows(
-                    InvalidRequestException.class,
-                    () -> converter.toJsonQueryRequest(request, null));
+                    InvalidRequestException.class, () -> converter.toJsonQueryRequest(request));
         }
 
         @Test
@@ -167,7 +168,7 @@ class SolrRequestConverterTest {
                             .termQuery("multi word")
                             .termField("field 1")
                             .build();
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             assertNotNull(solrQuery);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -195,7 +196,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -219,7 +220,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
             // then
@@ -242,7 +243,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -265,7 +266,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -287,7 +288,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -309,7 +310,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 
@@ -330,7 +331,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -354,7 +355,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
@@ -377,7 +378,7 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, null);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             SolrParams queryParams = solrQuery.getParams();
             assertNotNull(queryParams);
 

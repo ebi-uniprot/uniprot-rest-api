@@ -26,6 +26,9 @@ public class SolrRequest {
     private String queryField;
 
     private String defaultField;
+
+    private String idField;
+    private String idsQuery;
     // Batch size of rows in solr request. In case of search api request rows and totalRows will be
     // same.
     private int rows;
@@ -41,7 +44,7 @@ public class SolrRequest {
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();
-    @Singular private List<String> facets = new ArrayList<>();
+    @Singular private List<SolrFacetRequest> facets = new ArrayList<>();
     @Singular private List<SolrQuery.SortClause> sorts = new ArrayList<>();
 
     // setting default field values in a builder following instructions here:

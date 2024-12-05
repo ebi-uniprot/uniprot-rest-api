@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
@@ -82,9 +81,8 @@ public class IdMappingDataStoreTestConfig {
     public SolrRequestConverter idMappingSolrRequestConverter() {
         return new SolrRequestConverter() {
             @Override
-            public JsonQueryRequest toJsonQueryRequest(
-                    SolrRequest request, FacetConfig facetConfig) {
-                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request, facetConfig);
+            public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
 
                 // required for tests, because EmbeddedSolrServer is not sharded
                 ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.query.sort.LiteratureSortClause;
 import org.uniprot.api.rest.service.request.RequestConverter;
@@ -48,12 +49,14 @@ public class LiteratureSolrQueryConfig {
             SolrQueryConfig literatureSolrQueryConf,
             LiteratureSortClause literatureSortClause,
             UniProtQueryProcessorConfig literatureQueryProcessorConfig,
+            FacetConfig literatureFacetConfig,
             RequestConverterConfigProperties requestConverterConfigProperties) {
         return new RequestConverterImpl(
                 literatureSolrQueryConf,
                 literatureSortClause,
                 literatureQueryProcessorConfig,
-                requestConverterConfigProperties);
+                requestConverterConfigProperties,
+                literatureFacetConfig);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

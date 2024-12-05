@@ -7,8 +7,8 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.respository.facet.impl.LiteratureFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;

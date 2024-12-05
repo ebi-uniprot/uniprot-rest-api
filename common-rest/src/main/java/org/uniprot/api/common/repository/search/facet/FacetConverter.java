@@ -1,6 +1,6 @@
 package org.uniprot.api.common.repository.search.facet;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import org.uniprot.core.util.Utils;
 
 public abstract class FacetConverter<F, T> {
 
-    public abstract T convert(F queryResponse, List<String> facetList);
+    public abstract T convert(F queryResponse, Collection<String> facetList);
 
     protected abstract FacetConfig getFacetConfig();
 
