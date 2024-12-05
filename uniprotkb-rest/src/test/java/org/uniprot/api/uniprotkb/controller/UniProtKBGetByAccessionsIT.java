@@ -216,7 +216,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(3)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession", contains("P00003", "P21802", "P21802-2")))
+                                "$.results.*.primaryAccession",
+                                contains("P00003", "P21802", "P21802-2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
