@@ -679,6 +679,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                                             + "  <property type=\"proteome_id\" value=\"UP000005640\"/>\n"
                                                                             + "  <property type=\"component\" value=\"chromosome\"/>\n"
                                                                             + "  <property type=\"NCBI_taxonomy_id\" value=\"9606\"/>\n"
+                                                                            + "  <property type=\"sources\" value=\"WP_168893201:UP000005640:chromosome\"/>\n"
                                                                             + "</dbReference>\n"
                                                                             + "<dbReference type=\"RefSeq\" id=\"WP_168893201\" version_i=\"1\" active=\"Y\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\"/>\n"
                                                                             + "<dbReference type=\"EMBL\" id=\"embl1\" version_i=\"1\" active=\"Y\" version=\"7\" created=\"2017-02-12\" last=\"2017-04-23\" xmlns=\"http://uniprot.org/dbReference\">\n"

@@ -5,6 +5,7 @@ import static org.uniprot.core.uniparc.UniParcCrossReference.PROPERTY_SOURCES;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+import org.uniprot.core.Property;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.util.Utils;
 
@@ -21,10 +22,11 @@ public class UniParcProteomeIdFilter implements BiFunction<UniParcCrossReference
         return Utils.notNullNotEmpty(xref.getProperties())
                 && xref.getProperties().stream()
                         .filter(p -> p.getKey().equals(PROPERTY_SOURCES))
-                        .anyMatch(p -> p.getValue().contains(proteomeId));
+                        .map(Property::getValue)
+                        .anyMatch(v -> v.toLowerCase().contains(proteomeId.toLowerCase()));
     }
 
     private boolean hasProteomeId(UniParcCrossReference xref, String proteomeId) {
-        return proteomeId.equals(xref.getProteomeId());
+        return proteomeId.equalsIgnoreCase(xref.getProteomeId());
     }
 }

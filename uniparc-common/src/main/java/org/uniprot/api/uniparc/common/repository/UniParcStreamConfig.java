@@ -16,16 +16,14 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceLazyLoader;
-import org.uniprot.api.common.repository.stream.store.uniparc.UniParcCrossReferenceStoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.uniparc.UniParcLightStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.stream.UniParcFastaStoreStreamer;
+import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
-import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.extern.slf4j.Slf4j;
@@ -54,17 +52,15 @@ public class UniParcStreamConfig {
 
     @Bean
     public StoreStreamer<UniParcEntry> uniParcFastaStoreStreamer(
-            StoreStreamerConfig<UniParcEntry> config,
+            StoreStreamerConfig<UniParcEntry> uniParcFastaStoreStreamerConfig,
             StoreStreamerConfig<UniParcEntryLight> lightConfig,
-            UniProtStoreClient<UniParcCrossReferencePair> crossRefStoreClient,
-            UniParcCrossReferenceStoreConfigProperties storeConfigProperties) {
+            UniParcCrossReferenceService uniParcCrossReferenceService) {
         return new UniParcFastaStoreStreamer(
-                config, lightConfig, crossRefStoreClient, storeConfigProperties);
+                uniParcFastaStoreStreamerConfig, lightConfig, uniParcCrossReferenceService);
     }
 
     @Bean
-    public StoreStreamerConfig<UniParcEntry> storeStreamerConfig(
-            UniParcStoreClient uniParcClient,
+    public StoreStreamerConfig<UniParcEntry> uniParcFastaStoreStreamerConfig(
             TupleStreamTemplate uniParcTupleStreamTemplate,
             StreamerConfigProperties uniParcStreamerConfigProperties,
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream) {
@@ -77,7 +73,6 @@ public class UniParcStreamConfig {
                                                 .getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(uniParcStreamerConfigProperties.getStoreFetchMaxRetries());
         return StoreStreamerConfig.<UniParcEntry>builder()
-                .storeClient(uniParcClient)
                 .streamConfig(uniParcStreamerConfigProperties)
                 .tupleStreamTemplate(uniParcTupleStreamTemplate)
                 .storeFetchRetryPolicy(storeRetryPolicy)

@@ -7,7 +7,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
-import org.uniprot.core.parser.fasta.UniParcFastaParser;
+import org.uniprot.core.parser.fasta.uniparc.UniParcFastaParser;
 import org.uniprot.core.parser.fasta.uniparc.UniParcProteomeFastaParser;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;

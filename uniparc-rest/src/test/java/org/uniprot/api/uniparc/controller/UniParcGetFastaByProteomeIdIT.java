@@ -2,13 +2,22 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
+import static org.uniprot.api.uniparc.controller.UniParcITUtils.*;
 
+import java.util.stream.IntStream;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +26,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
+import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
+import org.uniprot.store.indexer.DataStoreManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,68 +47,76 @@ import lombok.extern.slf4j.Slf4j;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcGetFastaByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
-
+class UniParcGetFastaByProteomeIdIT {
     private static final String getByUpIdPath = "/uniparc/proteome/{upid}";
 
-    @Override
-    protected String getGetByIdEndpoint() {
-        return getByUpIdPath;
+    @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
+
+    @Autowired private MockMvc mockMvc;
+
+    @Autowired private UniParcQueryRepository repository;
+
+    @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
+    private Integer xrefGroupSize;
+
+    @BeforeAll
+    void initDataStore() {
+        initStoreManager(storeManager, repository);
+
+        // create 5 entries
+        IntStream.rangeClosed(1, 5).forEach(i -> saveEntry(storeManager, xrefGroupSize, i));
     }
 
-    @Override
-    protected String getSearchValue() {
-        return "UP123456701";
+    @AfterAll
+    void cleanUp() {
+        storeManager.cleanSolr(DataStoreManager.StoreType.UNIPARC);
+        storeManager.close();
     }
 
     @Test
     void testGetByUpIdSuccess() throws Exception {
         // when
-        String upid = "UP123456701";
+        String upid = "UP000005640";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
-                                .param("fields", "proteome,fullSequence,fullsequencefeatures"));
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", notNullValue()))
-                .andExpect(jsonPath("$.results", iterableWithSize(1)))
-                .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)))
-                .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.value", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.length", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.molWeight", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.crc64", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequence.md5", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(12)))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].databaseId", notNullValue()))
-                .andExpect(jsonPath("$.results[0].sequenceFeatures[*].locations", notNullValue()))
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A01 anotherProteinName01 OS=Name 9606 OX=9606 AC=P12301 SS=WP_168893201 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRA")))
                 .andExpect(
-                        jsonPath("$.results[0].sequenceFeatures[0].locations", iterableWithSize(2)))
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A02 anotherProteinName02 OS=Name 9606 OX=9606 AC=P12302 SS=WP_168893202 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAA")))
                 .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].locations[*].start",
-                                notNullValue()))
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A03 anotherProteinName03 OS=Name 9606 OX=9606 AC=P12303 SS=WP_168893203 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAA")))
                 .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].locations[*].end",
-                                notNullValue()))
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A04 anotherProteinName04 OS=Name 9606 OX=9606 AC=P12304 SS=WP_168893204 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAAA")))
                 .andExpect(
-                        jsonPath("$.results[0].sequenceFeatures[*].interproGroup", notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].interproGroup.id",
-                                notNullValue()))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].sequenceFeatures[*].interproGroup.name",
-                                notNullValue()));
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A05 anotherProteinName05 OS=Name 9606 OX=9606 AC=P12305 SS=WP_168893205 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAAAA")));
     }
 
     @Test
@@ -106,73 +126,86 @@ class UniParcGetFastaByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         int size = 2;
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
-                                .param("fields", "proteome")
-                                .param("size", String.valueOf(size)));
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
+                                .param("size", String.valueOf(size))
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(size)))
                 .andExpect(
-                        jsonPath(
-                                "$.results.*.uniParcId",
-                                contains("UPI0000083C01", "UPI0000083C02")))
-                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A01 anotherProteinName01 OS=Name 9606 OX=9606 AC=P12301 SS=WP_168893201 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRA")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A02 anotherProteinName02 OS=Name 9606 OX=9606 AC=P12302 SS=WP_168893202 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAA")));
 
-        String cursor1 = extractCursor(response);
+        String cursor1 = extractCursor(response, 0);
         // when get second page
         ResultActions responsePage2 =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
-                                .param("fields", "proteome")
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
                                 .param("size", String.valueOf(size))
-                                .param("cursor", cursor1));
+                                .param("cursor", cursor1)
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then verify second page
         responsePage2
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(size)))
                 .andExpect(
-                        jsonPath(
-                                "$.results.*.uniParcId",
-                                contains("UPI0000083C03", "UPI0000083C04")))
-                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A03 anotherProteinName03 OS=Name 9606 OX=9606 AC=P12303 SS=WP_168893203 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAA")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A04 anotherProteinName04 OS=Name 9606 OX=9606 AC=P12304 SS=WP_168893204 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAAA")));
 
-        String cursor2 = extractCursor(responsePage2);
+        String cursor2 = extractCursor(responsePage2, 0);
 
         // when get third page
         ResultActions responsePage3 =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
-                                .param("fields", "proteome")
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
                                 .param("size", String.valueOf(size))
-                                .param("cursor", cursor2));
+                                .param("cursor", cursor2)
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+        ;
 
         // then verify third page
         responsePage3
-                .andDo(log())
+                .andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))
-                .andExpect(jsonPath("$.results[0].proteomes[*].id", hasItem(upid)));
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A05 anotherProteinName05 OS=Name 9606 OX=9606 AC=P12305 SS=WP_168893205 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRAAAAA")));
     }
 
     @Test
@@ -180,30 +213,36 @@ class UniParcGetFastaByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
         // when
         String upid = "randomId";
         ResultActions response =
-                mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid));
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", empty()));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(""));
     }
 
     @Test
-    void testGetByProteomeIdSuccessInFastaFormat() throws Exception {
+    void testGetByProteomeJsonFormatIsNotSupported() throws Exception {
         // when
         String upid = "UP000005640";
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(getGetByIdEndpoint(), upid)
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
                                 .param("size", "2")
-                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string("LEO"));
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                containsString(
+                                        "Invalid request received. Requested media type/format not accepted: 'application/json'.")));
     }
 }

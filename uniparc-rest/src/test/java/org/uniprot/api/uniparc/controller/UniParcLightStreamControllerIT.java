@@ -11,9 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.uniparc.controller.UniParcITUtils.getUniParcDocument;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +37,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -49,20 +45,15 @@ import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
-import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
-import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
-import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,9 +71,7 @@ import lombok.extern.slf4j.Slf4j;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     private static final String UPI_PREF = "UPI0000283A";
-    private static final String UP_ID = "UP000005640";
     private static final String streamRequestPath = "/uniparc/stream";
-    private static final String streamByProteomeIdRequestPath = "/uniparc/proteome/{upId}/stream";
     private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
     @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
@@ -101,7 +90,8 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
-        saveEntries();
+        UniParcITUtils.saveStreamEntries(
+                xrefGroupSize, cloudSolrClient, storeClient, xRefStoreClient);
 
         // for the following tests, ensure the number of hits
         // for each query is less than the maximum number allowed
@@ -350,26 +340,6 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
     }
 
-    @Test
-    void testGetByProteomeIdSuccessInFastaFormatStream() throws Exception {
-        // when
-        String upid = "UP000005640";
-
-        MvcResult response =
-                mockMvc.perform(
-                                MockMvcRequestBuilders.get(
-                                                "/uniparc/proteome/UP000005640/stream", upid)
-                                        .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE))
-                        .andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                // .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string("LEO"));
-    }
-
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniparc);
@@ -385,228 +355,6 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
         return facetTupleStreamTemplate;
     }
 
-    @Test
-    @Disabled
-    void streamByProteomeIdCanReturnSuccess() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(10)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.uniParcId",
-                                containsInAnyOrder(
-                                        "UPI0000283A10",
-                                        "UPI0000283A09",
-                                        "UPI0000283A08",
-                                        "UPI0000283A07",
-                                        "UPI0000283A06",
-                                        "UPI0000283A05",
-                                        "UPI0000283A04",
-                                        "UPI0000283A03",
-                                        "UPI0000283A02",
-                                        "UPI0000283A01")));
-    }
-
-    @Test
-    @Disabled
-    void streamByProteomeIdBadRequest() throws Exception {
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(streamByProteomeIdRequestPath, UP_ID)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("fields", "invalid,invalid1")
-                                .param("sort", "invalid")
-                                .param("download", "invalid"));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(
-                                        "Invalid fields parameter value 'invalid'",
-                                        "Invalid fields parameter value 'invalid1'",
-                                        "Invalid sort parameter format. Expected format fieldName asc|desc.",
-                                        "The 'download' parameter has invalid format. It should be a boolean true or false.")));
-    }
-
-    @Test
-    @Disabled
-    void streamByProteomeIdyPDownloadCompressedFile() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("download", "true");
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(
-                                        "Content-Disposition",
-                                        startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniparc_")))
-                .andExpect(jsonPath("$.results.size()", is(10)));
-    }
-
-    @Test
-    @Disabled
-    void streamByProteomeIdSortWorks() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("sort", "upi desc");
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.uniParcId",
-                                contains(
-                                        "UPI0000283A10",
-                                        "UPI0000283A09",
-                                        "UPI0000283A08",
-                                        "UPI0000283A07",
-                                        "UPI0000283A06",
-                                        "UPI0000283A05",
-                                        "UPI0000283A04",
-                                        "UPI0000283A03",
-                                        "UPI0000283A02",
-                                        "UPI0000283A01")));
-    }
-
-    @Test
-    @Disabled
-    void streamByProteomeIdDefaultSearchWithLowerCaseId() throws Exception {
-
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID.toLowerCase())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)));
-    }
-
-    @ParameterizedTest(name = "[{index}] sort fieldName {0}")
-    @MethodSource("getAllSortFields")
-    @Disabled
-    void streamByProteomeIdCanSortAllPossibleSortFields(String sortField) throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("sort", sortField + " asc");
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)));
-    }
-
-    @Test
-    @Disabled
-    void streamByProteomeIdFields() throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("fields", "gene,organism_id");
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.uniParcId",
-                                hasItems("UPI0000283A01", "UPI0000283A02")))
-                .andExpect(jsonPath("$.results.*.uniParcCrossReferences.*.geneName", empty()))
-                .andExpect(
-                        jsonPath("$.results.*.uniParcCrossReferences.*.organism.taxonId", empty()))
-                .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
-                .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());
-    }
-
-    @ParameterizedTest(name = "[{index}] contentType {0}")
-    @MethodSource("getContentTypesForUniParcStreamByByProteomeId")
-    @Disabled
-    void streamByProteomeIdAllContentType(MediaType mediaType) throws Exception {
-        // when
-        MockHttpServletRequestBuilder requestBuilder =
-                get(streamByProteomeIdRequestPath, UP_ID).header(ACCEPT, mediaType);
-
-        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-        // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                .andExpect(content().contentTypeCompatibleWith(mediaType));
-    }
-
-    private void saveEntries() throws Exception {
-        for (int i = 1; i <= 10; i++) {
-            saveEntry(i);
-        }
-        cloudSolrClient.commit(SolrCollection.uniparc.name());
-    }
-
-    private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createUniParcEntry(i, UPI_PREF);
-        UniParcDocument.UniParcDocumentBuilder builder = getUniParcDocument(entry);
-        cloudSolrClient.addBean(SolrCollection.uniparc.name(), builder.build());
-
-        UniParcEntryLight entryLight = convertToUniParcEntryLight(entry);
-        storeClient.saveEntry(entryLight);
-
-        List<UniParcCrossReferencePair> xrefPairs =
-                UniParcCrossReferenceMocker.createCrossReferencePairsFromXRefs(
-                        entryLight.getUniParcId(),
-                        xrefGroupSize,
-                        entry.getUniParcCrossReferences());
-        for (UniParcCrossReferencePair xrefPair : xrefPairs) {
-            xRefStoreClient.saveEntry(xrefPair);
-        }
-    }
-
     private Stream<Arguments> getAllSortFields() {
         SearchFieldConfig fieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
@@ -618,9 +366,5 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
 
     private Stream<Arguments> getContentTypesForUniParcStream() {
         return super.getContentTypes(streamRequestPath);
-    }
-
-    private Stream<Arguments> getContentTypesForUniParcStreamByByProteomeId() {
-        return super.getContentTypes(streamByProteomeIdRequestPath);
     }
 }
