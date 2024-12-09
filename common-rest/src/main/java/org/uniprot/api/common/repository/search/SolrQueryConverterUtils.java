@@ -13,8 +13,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.common.repository.search.request.BoostApplier;
 import org.uniprot.core.util.Utils;
 
@@ -57,18 +55,17 @@ public class SolrQueryConverterUtils {
         return SINGLE_TERM_PATTERN.matcher(query).matches();
     }
 
-    static void setFacets(
-            JsonQueryRequest solrQuery, List<String> facets, FacetConfig facetConfig) {
-        for (String facetName : facets) {
-            FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
-            if (notNullNotEmpty(facetProperty.getInterval())) {
+    static void setFacets(JsonQueryRequest solrQuery, SolrRequest request) {
+        for (SolrFacetRequest facet : request.getFacets()) {
+            String facetName = facet.getName();
+            if (notNullNotEmpty(facet.getInterval())) {
                 Map<String, Object> rangeFacet = new HashMap<>();
                 rangeFacet.put("field", facetName);
                 rangeFacet.put("type", "range");
                 rangeFacet.put("refine", "true");
                 List<Object> ranges = new ArrayList<>();
-                for (int i = 1; i <= facetProperty.getInterval().size(); i++) {
-                    String rangeItem = facetProperty.getInterval().get("" + i);
+                for (int i = 1; i <= facet.getInterval().size(); i++) {
+                    String rangeItem = facet.getInterval().get(String.valueOf(i));
                     Map<String, Object> range = new HashMap<>();
                     range.put("range", rangeItem);
                     ranges.add(range);
@@ -76,20 +73,16 @@ public class SolrQueryConverterUtils {
                 rangeFacet.put("ranges", ranges);
                 solrQuery.withFacet(facetName, rangeFacet);
             } else {
-                final TermsFacetMap facet = new TermsFacetMap(facetName);
-                facet.setMinCount(facetConfig.getMincount());
+                final TermsFacetMap termFacet = new TermsFacetMap(facetName);
+                termFacet.setMinCount(facet.getMinCount());
 
-                if (facetProperty.getLimit() <= 0) {
-                    facet.setLimit(facetConfig.getLimit()); // default facet.limit property
-                } else {
-                    facet.setLimit(facetProperty.getLimit());
-                }
+                termFacet.setLimit(facet.getLimit());
 
-                if (facetProperty.getSort() != null) {
-                    facet.setSort(facetProperty.getSort());
+                if (facet.getSort() != null) {
+                    termFacet.setSort(facet.getSort());
                 }
-                facet.useDistributedFacetRefining(true);
-                solrQuery.withFacet(facetName, facet);
+                termFacet.useDistributedFacetRefining(true);
+                solrQuery.withFacet(facetName, termFacet);
             }
         }
     }

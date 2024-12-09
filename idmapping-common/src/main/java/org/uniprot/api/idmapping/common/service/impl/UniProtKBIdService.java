@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
@@ -25,6 +24,7 @@ import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingStre
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.common.service.BasicIdService;
+import org.uniprot.api.idmapping.common.service.request.UniProtKBIdMappingRequestConverter;
 import org.uniprot.api.idmapping.common.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -72,14 +72,14 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             UniProtKBFacetConfig facetConfig,
             RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
-            SolrQueryConfig uniProtKBSolrQueryConf,
-            TaxonomyLineageService lineageService) {
+            TaxonomyLineageService lineageService,
+            UniProtKBIdMappingRequestConverter uniProtKBIdMappingRequestConverter) {
         super(
                 storeStreamer,
                 tupleStream,
                 facetConfig,
                 idMappingRdfStreamer,
-                uniProtKBSolrQueryConf);
+                uniProtKBIdMappingRequestConverter);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
@@ -131,13 +131,6 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     protected String getSolrIdField() {
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName("accession_id")
-                .getFieldName();
-    }
-
-    @Override
-    protected String getTermsQueryField() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
-                .getSearchFieldItemByName("accession")
                 .getFieldName();
     }
 

@@ -8,7 +8,6 @@ import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -20,6 +19,7 @@ import org.uniprot.api.idmapping.common.service.BasicIdService;
 import org.uniprot.api.idmapping.common.service.store.impl.UniParcLightBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -51,9 +51,14 @@ public class UniParcLightIdService
             UniParcFacetConfig facetConfig,
             RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniParcEntryLight> storeClient,
-            SolrQueryConfig uniParcSolrQueryConf,
-            UniParcCrossReferenceLazyLoader lazyLoader) {
-        super(storeStreamer, tupleStream, facetConfig, idMappingRdfStreamer, uniParcSolrQueryConf);
+            UniParcCrossReferenceLazyLoader lazyLoader,
+            RequestConverter uniParcRequestConverter) {
+        super(
+                storeStreamer,
+                tupleStream,
+                facetConfig,
+                idMappingRdfStreamer,
+                uniParcRequestConverter);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;

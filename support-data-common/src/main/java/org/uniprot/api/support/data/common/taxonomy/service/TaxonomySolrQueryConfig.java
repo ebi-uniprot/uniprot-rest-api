@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
@@ -51,12 +52,14 @@ public class TaxonomySolrQueryConfig {
             SolrQueryConfig taxonomySolrQueryConf,
             TaxonomySortClause taxonomySolrClause,
             UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
-            RequestConverterConfigProperties uniProtRequestConverterConfigProperties) {
+            RequestConverterConfigProperties uniProtRequestConverterConfigProperties,
+            FacetConfig taxonomyFacetConfig) {
         return new RequestConverterImpl(
                 taxonomySolrQueryConf,
                 taxonomySolrClause,
                 taxonomyQueryProcessorConfig,
-                uniProtRequestConverterConfigProperties);
+                uniProtRequestConverterConfigProperties,
+                taxonomyFacetConfig);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

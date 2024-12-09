@@ -1,10 +1,18 @@
 package org.uniprot.api.rest.service.request;
 
+import static org.uniprot.api.rest.search.AbstractSolrSortClause.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.uniprot.api.common.repository.search.SolrFacetRequest;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -24,6 +32,7 @@ public class BasicRequestConverter {
     private final AbstractSolrSortClause solrSortClause;
     private final UniProtQueryProcessorConfig queryProcessorConfig;
     private final RequestConverterConfigProperties requestConverterConfigProperties;
+    private final FacetConfig facetConfig;
     private final Pattern idRequestRegex;
 
     public BasicRequestConverter(
@@ -31,11 +40,13 @@ public class BasicRequestConverter {
             AbstractSolrSortClause solrSortClause,
             UniProtQueryProcessorConfig queryProcessorConfig,
             RequestConverterConfigProperties requestConverterConfigProperties,
+            FacetConfig facetConfig,
             Pattern idPattern) {
         this.queryConfig = queryConfig;
         this.solrSortClause = solrSortClause;
         this.queryProcessorConfig = queryProcessorConfig;
         this.requestConverterConfigProperties = requestConverterConfigProperties;
+        this.facetConfig = facetConfig;
         this.idRequestRegex = idPattern;
     }
 
@@ -47,7 +58,7 @@ public class BasicRequestConverter {
         }
 
         if (request.hasFacets()) {
-            requestBuilder.facets(request.getFacetList());
+            requestBuilder.facets(getFacetRequests(request));
         }
         requestBuilder.rows(request.getSize());
         requestBuilder.totalRows(request.getSize());
@@ -60,6 +71,33 @@ public class BasicRequestConverter {
         requestBuilder.rows(getDefaultBatchSize());
         requestBuilder.totalRows(Integer.MAX_VALUE);
         return requestBuilder;
+    }
+
+    public SolrRequest.SolrRequestBuilder createSearchIdsSolrRequest(
+            SearchRequest request, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder = createSearchSolrRequest(request);
+        requestBuilder.idField(idField);
+        updateIdsSort(requestBuilder, request.getSort());
+        return requestBuilder;
+    }
+
+    public SolrRequest.SolrRequestBuilder createStreamIdsSolrRequest(
+            StreamRequest request, String idField) {
+        SolrRequest.SolrRequestBuilder requestBuilder = createStreamSolrRequest(request);
+        requestBuilder.idField(idField);
+        updateIdsSort(requestBuilder, request.getSort());
+        return requestBuilder;
+    }
+
+    private void updateIdsSort(SolrRequest.SolrRequestBuilder requestBuilder, String requestSorts) {
+        requestBuilder.clearSorts();
+        if (Utils.notNullNotEmpty(requestSorts)) {
+            List<SolrQuery.SortClause> sorts =
+                    solrSortClause.getSort(requestSorts).stream()
+                            .filter(clause -> !SCORE.equals(clause.getItem()))
+                            .toList();
+            requestBuilder.sorts(sorts);
+        }
     }
 
     public String getQueryFields(String query) {
@@ -76,24 +114,44 @@ public class BasicRequestConverter {
         return queryFields;
     }
 
+    private List<SolrFacetRequest> getFacetRequests(SearchRequest request) {
+        List<SolrFacetRequest> facets = new ArrayList<>();
+        for (String facet : request.getFacetList()) {
+            FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facet);
+            SolrFacetRequest.SolrFacetRequestBuilder facetBuilder =
+                    SolrFacetRequest.builder()
+                            .name(facet)
+                            .interval(facetProperty.getInterval())
+                            .sort(facetProperty.getSort());
+            if (facetProperty.getLimit() > 0) {
+                facetBuilder.limit(facetProperty.getLimit());
+            } else {
+                facetBuilder.limit(facetConfig.getLimit());
+            }
+            facetBuilder.minCount(facetConfig.getMincount());
+            facets.add(facetBuilder.build());
+        }
+        return facets;
+    }
+
     private SolrRequest.SolrRequestBuilder createBasicSolrRequestBuilder(BasicRequest request) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
-        String requestedQuery = request.getQuery();
-        if (idRequestRegex != null) {
-            String cleanQuery =
-                    CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
-            if (idRequestRegex.matcher(cleanQuery.toUpperCase()).matches()) {
-                requestedQuery = cleanQuery.toUpperCase();
+        String query = request.getQuery();
+        if (query != null) {
+            if (idRequestRegex != null) {
+                String cleanQuery =
+                        CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
+                if (idRequestRegex.matcher(cleanQuery.toUpperCase()).matches()) {
+                    // This will allow default search p12345 works.
+                    query = cleanQuery.toUpperCase();
+                }
             }
-        }
 
-        String query = requestedQuery;
-        if (queryProcessorConfig != null) {
-            query =
-                    UniProtQueryProcessor.newInstance(queryProcessorConfig)
-                            .processQuery(requestedQuery);
+            if (queryProcessorConfig != null) {
+                query = UniProtQueryProcessor.newInstance(queryProcessorConfig).processQuery(query);
+            }
+            requestBuilder.query(query);
         }
-        requestBuilder.query(query);
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
@@ -109,14 +167,17 @@ public class BasicRequestConverter {
     }
 
     private Optional<String> validateOptimisableField(String query) {
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
-        return queryProcessorConfig.getOptimisableFields().stream()
-                .filter(
-                        f ->
-                                Utils.notNullNotEmpty(f.getValidRegex())
-                                        && cleanQuery.matches(f.getValidRegex()))
-                .map(SearchFieldItem::getFieldName)
-                .findFirst();
+        if (query != null) {
+            String cleanQuery = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
+            return queryProcessorConfig.getOptimisableFields().stream()
+                    .filter(
+                            f ->
+                                    Utils.notNullNotEmpty(f.getValidRegex())
+                                            && cleanQuery.matches(f.getValidRegex()))
+                    .map(SearchFieldItem::getFieldName)
+                    .findFirst();
+        }
+        return Optional.empty();
     }
 
     public AbstractSolrSortClause getSolrSortClause() {
@@ -133,5 +194,16 @@ public class BasicRequestConverter {
         return requestConverterConfigProperties.getDefaultSolrPageSize() == null
                 ? DEFAULT_SOLR_BATCH_SIZE
                 : requestConverterConfigProperties.getDefaultSolrPageSize();
+    }
+
+    public static String getIdsTermQuery(List<String> ids, String idField) {
+        StringBuilder termsQuery = new StringBuilder();
+        termsQuery
+                .append("({!terms f=")
+                .append(idField)
+                .append("}")
+                .append(String.join(",", ids))
+                .append(")");
+        return termsQuery.toString();
     }
 }
