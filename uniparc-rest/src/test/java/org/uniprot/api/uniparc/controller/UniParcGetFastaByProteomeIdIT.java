@@ -2,7 +2,6 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
@@ -131,7 +130,7 @@ class UniParcGetFastaByProteomeIdIT {
                                 .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
@@ -162,7 +161,7 @@ class UniParcGetFastaByProteomeIdIT {
 
         // then verify second page
         responsePage2
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
@@ -195,7 +194,7 @@ class UniParcGetFastaByProteomeIdIT {
 
         // then verify third page
         responsePage3
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, "5"))
@@ -218,7 +217,7 @@ class UniParcGetFastaByProteomeIdIT {
                                 .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(""));
@@ -235,7 +234,7 @@ class UniParcGetFastaByProteomeIdIT {
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))

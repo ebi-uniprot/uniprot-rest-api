@@ -1,7 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
@@ -55,7 +55,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -103,7 +103,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -121,7 +121,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 mockMvc.perform(MockMvcRequestBuilders.get(getGetByIdEndpoint(), dbid));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -139,7 +139,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -162,7 +162,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -186,7 +186,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("taxonIds", taxonIds));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -209,7 +209,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -232,7 +232,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -255,7 +255,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                                 .param("size", String.valueOf(size)));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -280,7 +280,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
 
         // then verify second page
         responsePage2
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -306,7 +306,7 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
 
         // then verify third page
         responsePage3
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
