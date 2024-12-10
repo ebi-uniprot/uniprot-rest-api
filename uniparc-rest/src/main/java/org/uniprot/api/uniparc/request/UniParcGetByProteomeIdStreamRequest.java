@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode;
 public class UniParcGetByProteomeIdStreamRequest extends UniParcGetByIdStreamRequest
         implements StreamRequest {
     @Parameter(hidden = true)
-    private static final String PROTEOME_ID_STR = "upid";
+    private static final String PROTEOME_ID_STR = "proteome";
 
     @Parameter(
             description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
