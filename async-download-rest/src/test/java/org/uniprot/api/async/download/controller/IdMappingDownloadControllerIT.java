@@ -753,7 +753,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniProtKB/Swiss-Prot', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test
@@ -951,7 +951,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniProtKB/Swiss-Prot', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test
@@ -1175,7 +1175,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniProtKB/Swiss-Prot', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test

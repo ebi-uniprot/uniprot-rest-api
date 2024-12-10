@@ -8,7 +8,7 @@ public class IdMappingDownloadRequestValidatorFactory {
     public IdMappingDownloadRequestValidator create(String type) {
         IdMappingDownloadRequestValidator validator;
         switch (type) {
-            case IdMappingFieldConfig.UNIPROTKB_STR:
+            case IdMappingFieldConfig.UNIPROTKB_STR, IdMappingFieldConfig.UNIPROTKB_SWISS_STR:
                 validator = new UniProtKBIdMappingDownloadRequestValidator();
                 break;
             case IdMappingFieldConfig.UNIPARC_STR:
@@ -23,6 +23,8 @@ public class IdMappingDownloadRequestValidatorFactory {
                 throw new InvalidRequestException(
                         "The IdMapping 'to' parameter value is invalid. It should be '"
                                 + IdMappingFieldConfig.UNIPROTKB_STR
+                                + "', '"
+                                + IdMappingFieldConfig.UNIPROTKB_SWISS_STR
                                 + "', '"
                                 + IdMappingFieldConfig.UNIPARC_STR
                                 + "', '"
