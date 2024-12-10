@@ -15,7 +15,7 @@ class IdMappingDownloadRequestValidatorFactoryTest {
         IdMappingDownloadRequestValidator result =
                 factory.create(IdMappingFieldConfig.UNIPROTKB_STR);
         assertNotNull(result);
-        assertTrue(result instanceof UniProtKBIdMappingDownloadRequestValidator);
+        assertInstanceOf(UniProtKBIdMappingDownloadRequestValidator.class, result);
     }
 
     @Test
@@ -24,7 +24,7 @@ class IdMappingDownloadRequestValidatorFactoryTest {
                 new IdMappingDownloadRequestValidatorFactory();
         IdMappingDownloadRequestValidator result = factory.create(IdMappingFieldConfig.UNIPARC_STR);
         assertNotNull(result);
-        assertTrue(result instanceof UniParcIdMappingDownloadRequestValidator);
+        assertInstanceOf(UniParcIdMappingDownloadRequestValidator.class, result);
     }
 
     @Test
@@ -34,7 +34,17 @@ class IdMappingDownloadRequestValidatorFactoryTest {
         IdMappingDownloadRequestValidator result =
                 factory.create(IdMappingFieldConfig.UNIREF_50_STR);
         assertNotNull(result);
-        assertTrue(result instanceof UniRefIdMappingDownloadRequestValidator);
+        assertInstanceOf(UniRefIdMappingDownloadRequestValidator.class, result);
+    }
+
+    @Test
+    void canCreateUniProtKBSwissProt() {
+        IdMappingDownloadRequestValidatorFactory factory =
+                new IdMappingDownloadRequestValidatorFactory();
+        IdMappingDownloadRequestValidator result =
+                factory.create(IdMappingFieldConfig.UNIPROTKB_SWISS_STR);
+        assertNotNull(result);
+        assertInstanceOf(UniProtKBIdMappingDownloadRequestValidator.class, result);
     }
 
     @Test
@@ -45,7 +55,7 @@ class IdMappingDownloadRequestValidatorFactoryTest {
                 assertThrows(InvalidRequestException.class, () -> factory.create("gene"));
         assertNotNull(exception);
         assertEquals(
-                "The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.",
+                "The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniProtKB/Swiss-Prot', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.",
                 exception.getMessage());
     }
 }
