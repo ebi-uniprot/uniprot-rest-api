@@ -6,11 +6,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(indexes = @Index(columnList = "attributeName", unique = true))
+@Table(indexes = @Index(columnList = "attributeName, statistics_category_id", unique = true))
 public class AttributeQuery {
     @Id private Long id;
 
-    @Column(unique = true)
+    @ManyToOne
+    @JoinColumn(name = "statistics_category_id")
+    private StatisticsCategory statisticsCategory;
+
     private String attributeName;
 
     private String query;

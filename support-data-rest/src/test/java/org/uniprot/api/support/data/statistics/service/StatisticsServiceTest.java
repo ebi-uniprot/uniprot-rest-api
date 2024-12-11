@@ -128,13 +128,19 @@ class StatisticsServiceTest {
                 .when(releaseRepository.findById(VERSION))
                 .thenReturn(Optional.of(UNI_PROT_RELEASE));
         lenient()
-                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[0]))
+                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[1],ENTRY_NAMES[0]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
         lenient()
-                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[1]))
+                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0],ENTRY_NAMES[0]))
+                .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
+        lenient()
+                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0], ENTRY_NAMES[1]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
         lenient()
-                .when(attributeQueryRepository.findByAttributeNameIgnoreCase(ENTRY_NAMES[5]))
+                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[2], ENTRY_NAMES[1]))
+                .thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
+        lenient()
+                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0], ENTRY_NAMES[5]))
                 .thenReturn(Optional.empty());
         lenient()
                 .when(releaseRepository.findPreviousReleaseDate(REL_0))
