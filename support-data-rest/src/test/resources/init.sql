@@ -44,7 +44,8 @@ ALTER TABLE uniprotkb_statistics_entry
 CREATE TABLE attribute_query
 (
     id   SERIAL PRIMARY KEY,
-    attribute_name  varchar(64),
+    attribute_name  varchar(64) NOT NULL,
+    statistics_category_id int8 NOT NULL,
     query varchar(64)
 );
 
@@ -76,9 +77,9 @@ INSERT INTO uniprotkb_statistics_entry (id, attribute_name, statistics_category_
                                         description, release_name, entry_type)
 VALUES (47206, 'Salmonella paratyphi B (strain ATCC BAA-1250 / SPB7)', 52, 716, 716, null, '2021_03', 'SWISSPROT');
 
-INSERT INTO attribute_query (id, attribute_name, query)
-VALUES (1,'Fungi','(taxonomy_id:4751)');
-INSERT INTO attribute_query (id, attribute_name, query)
-VALUES (2,'Insecta','(fragment:true)');
-INSERT INTO attribute_query (id, attribute_name, query)
-VALUES (3,'AMINO_ACID_U','(previous_release_date:previous_release_date)');
+INSERT INTO attribute_query (id, attribute_name, query, statistics_category_id)
+VALUES (1,'Fungi','(taxonomy_id:4751)', 39);
+INSERT INTO attribute_query (id, attribute_name, query, statistics_category_id)
+VALUES (2,'Insecta','(fragment:true)', 39);
+INSERT INTO attribute_query (id, attribute_name, query, statistics_category_id)
+VALUES (3,'AMINO_ACID_U','(previous_release_date:previous_release_date)', 45);
