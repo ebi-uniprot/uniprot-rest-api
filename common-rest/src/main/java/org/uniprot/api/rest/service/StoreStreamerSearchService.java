@@ -102,6 +102,9 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     public QueryResult<R> getByIds(IdsSearchRequest idsRequest) {
+        if (idsRequest.getSize() == null) {
+            idsRequest.setSize(idsRequest.getIdList().size());
+        }
         boolean hasIsoformIds = hasIsoformIds(idsRequest.getIdList());
         SolrStreamFacetResponse solrStreamResponse =
                 solrStreamNeeded(idsRequest, hasIsoformIds)
