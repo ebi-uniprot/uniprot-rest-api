@@ -14,6 +14,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -54,7 +55,11 @@ public class BasicRequestConverter {
         SolrRequest.SolrRequestBuilder requestBuilder = createBasicSolrRequestBuilder(request);
 
         if (request.getSize() == null) { // set the default result size
-            request.setSize(getDefaultPageSize());
+            if (request instanceof IdsSearchRequest idsSearchRequest) {
+                request.setSize(idsSearchRequest.getIdList().size());
+            } else {
+                request.setSize(getDefaultPageSize());
+            }
         }
 
         if (request.hasFacets()) {
