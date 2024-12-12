@@ -14,6 +14,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.FakeSolrSortClause;
@@ -376,5 +377,38 @@ class BasicRequestConverterTest {
         String idsFieldQuery =
                 BasicRequestConverter.getIdsTermQuery(List.of("id1", "id2"), "id_field");
         assertEquals("({!terms f=id_field}id1,id2)", idsFieldQuery);
+    }
+
+    @Test
+    void createIdsSearchRequestWithDefaultSizeAsNumberOfIdsOnly() {
+        String query = "*:*";
+        String idField = "dummy";
+        Integer defaultPageSize = 5;
+        SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
+
+        UniProtQueryProcessorConfig queryProcessorConfig =
+                Mockito.mock(UniProtQueryProcessorConfig.class);
+        Mockito.when(queryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
+        RequestConverterConfigProperties convertProps =
+                Mockito.mock(RequestConverterConfigProperties.class);
+        Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
+        BasicRequestConverter converter =
+                new BasicRequestConverter(
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
+
+        IdsSearchRequest request = Mockito.mock(IdsSearchRequest.class);
+        List<String> listOfIds =
+                List.of("AC1", "AC2", "AC3", "AC4", "AC5", "AC6", "AC7", "AC8", "AC9", "AC10");
+        Mockito.when(request.getIdList()).thenReturn(listOfIds);
+        Mockito.when(request.getQuery()).thenReturn(query);
+        Mockito.when(request.getSize()).thenReturn(null).thenReturn(listOfIds.size());
+
+        SolrRequest result = converter.createSearchIdsSolrRequest(request, idField).build();
+        assertNotNull(result);
+        Mockito.verify(request, times(1)).setSize(listOfIds.size());
+        assertEquals(query, result.getQuery());
+        assertEquals(idField, result.getIdField());
+        assertEquals(listOfIds.size(), result.getRows());
+        assertEquals(listOfIds.size(), result.getTotalRows());
     }
 }
