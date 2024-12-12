@@ -116,9 +116,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         char prefix = 'z';
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 30; i++) {
             UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
             String acc = String.format("P%05d", i);
+            System.out.print(acc + ",");
             entryBuilder.primaryAccession(acc);
             if (i % 2 == 0) {
                 entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
@@ -336,6 +337,69 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         for (ResultMatcher matcher : matchers) {
             resultActions.andExpect(matcher);
         }
+    }
+
+    @Test
+    void getByIdsMixedIdsWithIsoformAndNonIsoformEntriesMoreThanPageSizeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(
+                                                getRequestParamName(),
+                                                "p21802-2,p21802,P00001,P00002,P00003,P00004,P00005,P00006,P00007,"
+                                                        + "P00008,P00009,P00010,P00011,P00012,P00013,P00014,P00015,P00016,P00017,"
+                                                        + "P00018,P00019,P00020,P00021,P00022,P00023,P00024,P00025,P00026,P00027,"
+                                                        + "P00028,P00029,P00030"));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(32)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "P00001",
+                                        "P00002",
+                                        "P00003",
+                                        "P00004",
+                                        "P00005",
+                                        "P00006",
+                                        "P00007",
+                                        "P00008",
+                                        "P00009",
+                                        "P00010",
+                                        "P00011",
+                                        "P00012",
+                                        "P00013",
+                                        "P00014",
+                                        "P00015",
+                                        "P00016",
+                                        "P00017",
+                                        "P00018",
+                                        "P00019",
+                                        "P00020",
+                                        "P00021",
+                                        "P00022",
+                                        "P00023",
+                                        "P00024",
+                                        "P00025",
+                                        "P00026",
+                                        "P00027",
+                                        "P00028",
+                                        "P00029",
+                                        "P00030",
+                                        "P21802",
+                                        "P21802-2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     private void verifyFastaResponse(String fastaResponse) {
