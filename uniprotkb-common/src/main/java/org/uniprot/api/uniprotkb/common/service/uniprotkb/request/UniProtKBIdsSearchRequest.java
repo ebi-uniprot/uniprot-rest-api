@@ -57,7 +57,7 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(description = SIZE_UNIPROTKB_ID_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = SearchRequest.MAX_RESULTS_SIZE, message = "{search.max.page.size}")
+    @Max(value = SearchRequest.MAX_IDS_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Parameter(description = SORT_UNIPROTKB_ID_DESCRIPTION, example = SORT_UNIPROTKB_EXAMPLE)
