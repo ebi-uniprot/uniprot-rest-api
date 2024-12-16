@@ -2159,6 +2159,31 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.messages.*", contains("'VGNC' is not a valid search field")));
     }
 
+    @Test
+    void testSearchByChebi() throws Exception {
+        saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                        .param("query", "chebi:search")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("P00001")));
+        // then
+
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -2297,7 +2322,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.commentMap.put("cc_bpcp_temp_dependence_exp", Collections.singleton("Search All"));
             doc.inchikey.add("Search All");
             doc.rheaIds.add("Search All");
-            doc.chebi.add("Search All");
+            doc.chebi.addAll(Set.of("Search All", "CHEBI:12345"));
             doc.cofactorChebi.add("Search All");
             doc.commentMap.put("cc_cofactor_chebi_exp", Collections.singleton("Search All"));
             doc.cofactorNote.add("Search All");
