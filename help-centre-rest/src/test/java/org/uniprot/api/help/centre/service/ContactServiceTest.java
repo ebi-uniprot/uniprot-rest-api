@@ -1,15 +1,18 @@
 package org.uniprot.api.help.centre.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ContactServiceTest {
 
@@ -89,31 +92,65 @@ class ContactServiceTest {
         String subject = "subjectValue";
         String host = "hostValue";
         String toEmail = "to@email.com";
+        String ccEmail = "cc@email.com";
+        String bccEmail = "bcc@email.com";
         String fromEmail = "from@email.com";
         String messageFormat = "messageFormatValue";
         String message = "messageValue";
 
-        ContactConfig config = new ContactConfig();
-        config.setHost(host);
-        config.setTo(toEmail);
-        config.setMessageFormat(messageFormat);
-
+        ContactConfig config = createContactConfig(host, toEmail, ccEmail, bccEmail, messageFormat);
         FakeContactService service = new FakeContactService(config);
-
-        ContactForm contactForm = new ContactForm();
-        contactForm.setEmail(fromEmail);
-        contactForm.setMessage(message);
-
-        contactForm.setSubject(subject);
+        ContactForm contactForm = createContactForm(fromEmail, message, subject);
         service.sendEmail(contactForm);
         MimeMessage sentMessage = (MimeMessage) service.getSentMessage();
-        assertNotNull(sentMessage);
-        assertEquals(subject, sentMessage.getSubject());
-        assertEquals(fromEmail, sentMessage.getFrom()[0].toString());
-        assertEquals(toEmail, sentMessage.getAllRecipients()[0].toString());
-        String sentContent =
-                ((MimeMultipart) sentMessage.getContent()).getBodyPart(0).getContent().toString();
-        assertEquals(message, sentContent);
+
+        validateMessage(sentMessage, subject, fromEmail, toEmail, message);
+        assertNull(sentMessage.getRecipients(Message.RecipientType.CC));
+        assertNull(sentMessage.getRecipients(Message.RecipientType.BCC));
+    }
+
+    @Test
+    void failedIdMappingJobCCedToPIR() throws Exception {
+        String subject = ContactService.ID_MAPPING_FAILURE_SUBJECT;
+        String host = "hostValue";
+        String toEmail = "to@email.com";
+        String ccEmail = "cc@email.com";
+        String bccEmail = "bcc@email.com";
+        String fromEmail = "from@email.com";
+        String messageFormat = "messageFormatValue";
+        String message = "messageValue";
+
+        ContactConfig config = createContactConfig(host, toEmail, ccEmail, bccEmail, messageFormat);
+        FakeContactService service = new FakeContactService(config);
+        ContactForm contactForm = createContactForm(fromEmail, message, subject);
+        service.sendEmail(contactForm);
+        MimeMessage sentMessage = (MimeMessage) service.getSentMessage();
+
+        validateMessage(sentMessage, subject, fromEmail, toEmail, message);
+        assertEquals(ccEmail, sentMessage.getRecipients(Message.RecipientType.CC)[0].toString());
+        assertNull(sentMessage.getRecipients(Message.RecipientType.BCC));
+    }
+
+    @Test
+    void failedPeptideSearchJobCCedToPIR() throws Exception {
+        String subject = ContactService.PEPTIDE_SEARCH_FAILURE_SUBJECT;
+        String host = "hostValue";
+        String toEmail = "to@email.com";
+        String ccEmail = "cc@email.com";
+        String bccEmail = "bcc@email.com";
+        String fromEmail = "from@email.com";
+        String messageFormat = "messageFormatValue";
+        String message = "messageValue";
+
+        ContactConfig config = createContactConfig(host, toEmail, ccEmail, bccEmail, messageFormat);
+        FakeContactService service = new FakeContactService(config);
+        ContactForm contactForm = createContactForm(fromEmail, message, subject);
+        service.sendEmail(contactForm);
+        MimeMessage sentMessage = (MimeMessage) service.getSentMessage();
+
+        validateMessage(sentMessage, subject, fromEmail, toEmail, message);
+        assertEquals(bccEmail, sentMessage.getRecipients(Message.RecipientType.CC)[0].toString());
+        assertNull(sentMessage.getRecipients(Message.RecipientType.BCC));
     }
 
     @Test
@@ -133,5 +170,35 @@ class ContactServiceTest {
         assertNotNull(serviceException);
         assertEquals("Unable to send Email", serviceException.getMessage());
         assertNotNull(serviceException.getCause());
+    }
+
+
+    private static ContactConfig createContactConfig(String host, String toEmail, String ccEmail, String bccEmail, String messageFormat) {
+        ContactConfig config = new ContactConfig();
+        config.setHost(host);
+        config.setTo(toEmail);
+        config.setCc(ccEmail);
+        config.setBcc(bccEmail);
+        config.setMessageFormat(messageFormat);
+        return config;
+    }
+
+    private static ContactForm createContactForm(String fromEmail, String message, String subject) {
+        ContactForm contactForm = new ContactForm();
+        contactForm.setEmail(fromEmail);
+        contactForm.setMessage(message);
+
+        contactForm.setSubject(subject);
+        return contactForm;
+    }
+
+    private static void validateMessage(MimeMessage sentMessage, String subject, String fromEmail, String toEmail, String message) throws MessagingException, IOException {
+        assertNotNull(sentMessage);
+        assertEquals(subject, sentMessage.getSubject());
+        assertEquals(fromEmail, sentMessage.getFrom()[0].toString());
+        assertEquals(toEmail, sentMessage.getAllRecipients()[0].toString());
+        String sentContent =
+                ((MimeMultipart) sentMessage.getContent()).getBodyPart(0).getContent().toString();
+        assertEquals(message, sentContent);
     }
 }

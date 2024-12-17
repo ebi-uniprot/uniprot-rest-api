@@ -28,6 +28,8 @@ public class ContactService {
     private static final int TOKEN_RADIX = 36;
     private final ContactConfig contactConfig;
     final Properties emailProperties;
+    static final String ID_MAPPING_FAILURE_SUBJECT = "Failed id mapping job";
+    static final String PEPTIDE_SEARCH_FAILURE_SUBJECT = "Failed peptide search job";
 
     public ContactService(ContactConfig contactConfig) {
         this.contactConfig = contactConfig;
@@ -76,6 +78,14 @@ public class ContactService {
                     Message.RecipientType.TO, InternetAddress.parse(contactConfig.getTo()));
             message.setSubject(contactForm.getSubject());
 
+            if(isIdMappingFailure(contactForm.getSubject())) {
+                message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(contactConfig.getCc()));
+            }
+
+            if(isPeptideFailure(contactForm.getSubject())) {
+                message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(contactConfig.getBcc()));
+            }
+
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent(contactForm.getMessage(), contactConfig.getMessageFormat());
 
@@ -90,7 +100,16 @@ public class ContactService {
         }
     }
 
+
     protected void sendMail(Message message) throws MessagingException {
         Transport.send(message);
+    }
+
+    private boolean isIdMappingFailure(String subject) {
+        return ID_MAPPING_FAILURE_SUBJECT.equalsIgnoreCase(subject);
+    }
+
+    private boolean isPeptideFailure(String subject) {
+        return PEPTIDE_SEARCH_FAILURE_SUBJECT.equalsIgnoreCase(subject);
     }
 }

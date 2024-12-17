@@ -16,7 +16,11 @@ public class ContactConfig {
 
     private String host;
 
-    private String to;
+    private String to; // main support mail group
+
+    private String cc;//idmapping support mail group
+
+    private String bcc; // peptide support mail group
 
     private String messageFormat;
 
