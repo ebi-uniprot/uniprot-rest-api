@@ -2,6 +2,7 @@ package org.uniprot.api.support.data.statistics.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.support.data.statistics.entity.AttributeQuery;
+import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -34,6 +36,7 @@ class AttributeQueryRepositoryTest {
     private static final String[] ATTRIBUTES = new String[] {"a0", "a1", "a2"};
     private static final String[] QUERIES = new String[] {"q0", "q1", "q2"};
     private static final AttributeQuery[] ATTRIBUTE_QUERIES = new AttributeQuery[3];
+    private static final StatisticsCategory STATISTICS_CATEGORY = STATISTICS_CATEGORIES[0];
 
     @BeforeEach
     void setUp() {
@@ -41,16 +44,18 @@ class AttributeQueryRepositoryTest {
             AttributeQuery attributeQuery = new AttributeQuery();
             attributeQuery.setId(IDS[i]);
             attributeQuery.setAttributeName(ATTRIBUTES[i]);
+            attributeQuery.setStatisticsCategory(STATISTICS_CATEGORY);
             attributeQuery.setQuery(QUERIES[i]);
             ATTRIBUTE_QUERIES[i] = attributeQuery;
         }
         Arrays.stream(ATTRIBUTE_QUERIES).forEach(entityManager::persist);
+        entityManager.persist(STATISTICS_CATEGORY);
     }
 
     @Test
     void findByAttributeName_whenExist() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByAttributeNameIgnoreCase(ATTRIBUTES[1]);
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, ATTRIBUTES[1]);
         AttributeQuery attributeQuery = result.get();
 
         assertEquals(IDS[1], attributeQuery.getId());
@@ -60,7 +65,7 @@ class AttributeQueryRepositoryTest {
     @Test
     void findByAttributeName_whenExistAndCaseDiff() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByAttributeNameIgnoreCase(ATTRIBUTES[1].toUpperCase());
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, ATTRIBUTES[1].toUpperCase());
         AttributeQuery attributeQuery = result.get();
 
         assertEquals(IDS[1], attributeQuery.getId());
@@ -70,7 +75,7 @@ class AttributeQueryRepositoryTest {
     @Test
     void findByAttributeName_whenAbsent() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByAttributeNameIgnoreCase("random");
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, "random");
 
         assertFalse(result.isPresent());
     }
