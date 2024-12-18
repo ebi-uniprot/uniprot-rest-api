@@ -110,7 +110,7 @@ public class TestEntityGeneratorUtil {
         uniprotkbStatisticsEntry.setValueCount(VALUE_COUNTS[index]);
         uniprotkbStatisticsEntry.setEntryCount(ENTRY_COUNTS[index]);
         uniprotkbStatisticsEntry.setDescription(DESCRIPTIONS[index]);
-        uniprotkbStatisticsEntry.setReleaseName(
+        uniprotkbStatisticsEntry.setUniProtRelease(
                 Set.of(0, 1, 3, 4, 5).contains(index) ? RELEASES[0] : RELEASES[1]);
         uniprotkbStatisticsEntry.setEntryType(ENTRY_TYPES[index]);
         return uniprotkbStatisticsEntry;

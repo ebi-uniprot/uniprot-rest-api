@@ -2,9 +2,7 @@ package org.uniprot.api.support.data.statistics.entity;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
 
@@ -12,6 +10,9 @@ import lombok.Data;
 @Entity
 @Table(name = "uniprot_release")
 public class UniProtRelease {
-    @Id private String id;
+    @Id private int id;
     private Date date;
+    @Enumerated(EnumType.STRING)
+    private EntryType entryType;
+    private String name;
 }

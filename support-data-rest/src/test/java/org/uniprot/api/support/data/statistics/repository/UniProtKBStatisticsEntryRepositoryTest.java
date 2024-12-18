@@ -48,7 +48,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryType() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryType(RELEASES[0], SWISSPROT);
+                entryRepository.findAllByUniprotReleaseAndEntryType(RELEASES[0], SWISSPROT);
 
         assertThat(
                 results,
@@ -61,7 +61,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseName() {
-        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByReleaseName(RELEASES[0]);
+        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByUniprotRelease(RELEASES[0]);
 
         assertThat(
                 results,
@@ -76,14 +76,14 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryType_whenNoMatch() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryType(RELEASES[2], TREMBL);
+                entryRepository.findAllByUniprotReleaseAndEntryType(RELEASES[2], TREMBL);
 
         assertThat(results, empty());
     }
 
     @Test
     void findAllByReleaseName_whenNoMatch() {
-        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByReleaseName(RELEASES[2]);
+        List<UniProtKBStatisticsEntry> results = entryRepository.findAllByUniprotRelease(RELEASES[2]);
 
         assertThat(results, empty());
     }
@@ -91,7 +91,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
                         RELEASES[0],
                         SWISSPROT,
                         List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
@@ -105,7 +105,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
 
         assertThat(
@@ -117,7 +117,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
                         RELEASES[0], SWISSPROT, List.of(STATISTICS_CATEGORIES[0]));
 
         assertThat(results, containsInAnyOrder(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
@@ -126,7 +126,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0]));
 
         assertThat(results, containsInAnyOrder(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
@@ -135,7 +135,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
                         RELEASES[0], SWISSPROT, Collections.emptyList());
 
         assertThat(results, empty());
@@ -144,7 +144,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
+                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
                         RELEASES[2], Collections.emptyList());
 
         assertThat(results, empty());
