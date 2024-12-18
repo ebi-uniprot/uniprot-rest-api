@@ -17,6 +17,7 @@ import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
+import org.uniprot.core.util.Utils;
 
 @Service
 @Profile("live")
@@ -28,8 +29,6 @@ public class ContactService {
     private static final int TOKEN_RADIX = 36;
     private final ContactConfig contactConfig;
     final Properties emailProperties;
-    static final String ID_MAPPING_FAILURE_SUBJECT = "Failed id mapping job";
-    static final String PEPTIDE_SEARCH_FAILURE_SUBJECT = "Failed peptide search job";
 
     public ContactService(ContactConfig contactConfig) {
         this.contactConfig = contactConfig;
@@ -78,12 +77,14 @@ public class ContactService {
                     Message.RecipientType.TO, InternetAddress.parse(contactConfig.getTo()));
             message.setSubject(contactForm.getSubject());
 
-            if(isIdMappingFailure(contactForm.getSubject())) {
-                message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(contactConfig.getCc()));
+            if (isIdMappingFailureEmail(contactForm, contactConfig)) {
+                message.setRecipients(
+                        Message.RecipientType.CC, InternetAddress.parse(contactConfig.getCc()));
             }
 
-            if(isPeptideFailure(contactForm.getSubject())) {
-                message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(contactConfig.getBcc()));
+            if (isPeptideFailureEmail(contactForm, contactConfig)) {
+                message.setRecipients(
+                        Message.RecipientType.CC, InternetAddress.parse(contactConfig.getBcc()));
             }
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
@@ -100,16 +101,23 @@ public class ContactService {
         }
     }
 
-
     protected void sendMail(Message message) throws MessagingException {
         Transport.send(message);
     }
 
-    private boolean isIdMappingFailure(String subject) {
-        return ID_MAPPING_FAILURE_SUBJECT.equalsIgnoreCase(subject);
+    private boolean isIdMappingFailureEmail(ContactForm contactForm, ContactConfig contactConfig) {
+        return Utils.notNullNotEmpty(contactConfig.getIdmappingFailedSubject())
+                && contactForm
+                        .getSubject()
+                        .toLowerCase()
+                        .contains(contactConfig.getIdmappingFailedSubject().toLowerCase());
     }
 
-    private boolean isPeptideFailure(String subject) {
-        return PEPTIDE_SEARCH_FAILURE_SUBJECT.equalsIgnoreCase(subject);
+    private boolean isPeptideFailureEmail(ContactForm contactForm, ContactConfig contactConfig) {
+        return Utils.notNullNotEmpty(contactConfig.getPeptideFailedSubject())
+                && contactForm
+                        .getSubject()
+                        .toLowerCase()
+                        .contains(contactConfig.getPeptideFailedSubject().toLowerCase());
     }
 }
