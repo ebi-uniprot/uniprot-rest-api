@@ -46,7 +46,8 @@ CREATE TABLE attribute_query
     id   SERIAL PRIMARY KEY,
     attribute_name  varchar(64) NOT NULL,
     statistics_category_id int8 NOT NULL,
-    query varchar(64)
+    query varchar(64),
+    CONSTRAINT attribute_query_un UNIQUE (attribute_name, statistics_category_id)
 );
 
 INSERT INTO statistics_category (id, category, db_type, label, search_field)
