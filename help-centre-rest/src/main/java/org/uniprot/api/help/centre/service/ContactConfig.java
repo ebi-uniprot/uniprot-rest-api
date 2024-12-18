@@ -18,11 +18,15 @@ public class ContactConfig {
 
     private String to; // main support mail group
 
-    private String cc;//idmapping support mail group
+    private String cc; // idmapping support mail group
 
     private String bcc; // peptide support mail group
 
     private String messageFormat;
 
     private Long tokenExpiresInSecs;
+
+    private String idmappingFailedSubject;
+
+    private String peptideFailedSubject;
 }

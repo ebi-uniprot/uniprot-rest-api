@@ -1,18 +1,19 @@
 package org.uniprot.api.help.centre.service;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.exception.ImportantMessageServiceException;
-import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.help.centre.model.ContactForm;
-import org.uniprot.api.help.centre.model.Token;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
+import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.help.centre.model.ContactForm;
+import org.uniprot.api.help.centre.model.Token;
 
 class ContactServiceTest {
 
@@ -111,7 +112,7 @@ class ContactServiceTest {
 
     @Test
     void failedIdMappingJobCCedToPIR() throws Exception {
-        String subject = ContactService.ID_MAPPING_FAILURE_SUBJECT;
+        String subject = "Failed id mapping job";
         String host = "hostValue";
         String toEmail = "to@email.com";
         String ccEmail = "cc@email.com";
@@ -121,6 +122,7 @@ class ContactServiceTest {
         String message = "messageValue";
 
         ContactConfig config = createContactConfig(host, toEmail, ccEmail, bccEmail, messageFormat);
+        config.setIdmappingFailedSubject(subject);
         FakeContactService service = new FakeContactService(config);
         ContactForm contactForm = createContactForm(fromEmail, message, subject);
         service.sendEmail(contactForm);
@@ -133,7 +135,7 @@ class ContactServiceTest {
 
     @Test
     void failedPeptideSearchJobCCedToPIR() throws Exception {
-        String subject = ContactService.PEPTIDE_SEARCH_FAILURE_SUBJECT;
+        String subject = "Failed peptide search job";
         String host = "hostValue";
         String toEmail = "to@email.com";
         String ccEmail = "cc@email.com";
@@ -143,6 +145,7 @@ class ContactServiceTest {
         String message = "messageValue";
 
         ContactConfig config = createContactConfig(host, toEmail, ccEmail, bccEmail, messageFormat);
+        config.setPeptideFailedSubject(subject);
         FakeContactService service = new FakeContactService(config);
         ContactForm contactForm = createContactForm(fromEmail, message, subject);
         service.sendEmail(contactForm);
@@ -172,8 +175,8 @@ class ContactServiceTest {
         assertNotNull(serviceException.getCause());
     }
 
-
-    private static ContactConfig createContactConfig(String host, String toEmail, String ccEmail, String bccEmail, String messageFormat) {
+    private static ContactConfig createContactConfig(
+            String host, String toEmail, String ccEmail, String bccEmail, String messageFormat) {
         ContactConfig config = new ContactConfig();
         config.setHost(host);
         config.setTo(toEmail);
@@ -192,7 +195,13 @@ class ContactServiceTest {
         return contactForm;
     }
 
-    private static void validateMessage(MimeMessage sentMessage, String subject, String fromEmail, String toEmail, String message) throws MessagingException, IOException {
+    private static void validateMessage(
+            MimeMessage sentMessage,
+            String subject,
+            String fromEmail,
+            String toEmail,
+            String message)
+            throws MessagingException, IOException {
         assertNotNull(sentMessage);
         assertEquals(subject, sentMessage.getSubject());
         assertEquals(fromEmail, sentMessage.getFrom()[0].toString());
