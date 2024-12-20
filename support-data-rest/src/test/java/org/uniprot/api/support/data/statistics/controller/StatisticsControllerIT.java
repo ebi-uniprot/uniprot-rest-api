@@ -39,7 +39,7 @@ class StatisticsControllerIT {
     @Test
     void getByReleaseAndType() throws Exception {
         this.mockMvc
-                .perform(get("/statistics/releases/2021_03/reviewed"))
+                .perform(get("/statistics/releases/2021_02/reviewed"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(3)))
@@ -52,7 +52,7 @@ class StatisticsControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results[0].items[0].query",
-                                is("(reviewed:true) AND (previous_release_date:2021-03-25)")))
+                                is("(reviewed:true) AND (previous_release_date:2021-01-25)")))
                 .andExpect(jsonPath("$.results[0].items[0].count", is(329)))
                 .andExpect(jsonPath("$.results[0].items[0].entryCount", is(254)))
                 .andExpect(jsonPath("$.results[1].categoryName", is("TOP_ORGANISM")))
@@ -91,7 +91,7 @@ class StatisticsControllerIT {
     @Test
     void getByRelease() throws Exception {
         this.mockMvc
-                .perform(get("/statistics/releases/2021_03"))
+                .perform(get("/statistics/releases/2021_02"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(3)))
@@ -104,7 +104,7 @@ class StatisticsControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results[0].items[0].query",
-                                is("(previous_release_date:2021-03-25)")))
+                                is("(previous_release_date:2021-01-25)")))
                 .andExpect(jsonPath("$.results[0].items[0].count", is(329)))
                 .andExpect(jsonPath("$.results[0].items[0].entryCount", is(254)))
                 .andExpect(jsonPath("$.results[1].categoryName", is("TOP_ORGANISM")))
@@ -137,7 +137,7 @@ class StatisticsControllerIT {
     @Test
     void getByReleaseAndTypeAndSingleCategory() throws Exception {
         this.mockMvc
-                .perform(get("/statistics/releases/2021_03/reviewed?categories=EUKARYOTA"))
+                .perform(get("/statistics/releases/2021_02/reviewed?categories=EUKARYOTA"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(1)))
@@ -165,7 +165,7 @@ class StatisticsControllerIT {
     @Test
     void getByReleaseAndSingleCategory() throws Exception {
         this.mockMvc
-                .perform(get("/statistics/releases/2021_03?categories=EUKARYOTA"))
+                .perform(get("/statistics/releases/2021_02?categories=EUKARYOTA"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(1)))
@@ -189,7 +189,7 @@ class StatisticsControllerIT {
         this.mockMvc
                 .perform(
                         get(
-                                "/statistics/releases/2021_03/reviewed?categories=EUKARYOTA,TOP_ORGANISM"))
+                                "/statistics/releases/2021_02/reviewed?categories=EUKARYOTA,TOP_ORGANISM"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(2)))
@@ -229,7 +229,7 @@ class StatisticsControllerIT {
     @Test
     void getByReleaseAndMultipleCategories() throws Exception {
         this.mockMvc
-                .perform(get("/statistics/releases/2021_03?categories=EUKARYOTA,TOP_ORGANISM"))
+                .perform(get("/statistics/releases/2021_02?categories=EUKARYOTA,TOP_ORGANISM"))
                 .andDo(log())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(2)))
@@ -268,8 +268,8 @@ class StatisticsControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
-                .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-25")))
+                .andExpect(jsonPath("$.results[0].releaseName", is("2021_02")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-03-25")))
                 .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
                 .andExpect(jsonPath("$.results[0].entryCount", is(35360)));
     }
@@ -311,13 +311,13 @@ class StatisticsControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results[0].statisticsType", is("REVIEWED")))
-                .andExpect(jsonPath("$.results[0].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-05-25")))
+                .andExpect(jsonPath("$.results[0].releaseName", is("2021_02")))
+                .andExpect(jsonPath("$.results[0].releaseDate", is("2021-03-25")))
                 .andExpect(jsonPath("$.results[0].valueCount", is(35360)))
                 .andExpect(jsonPath("$.results[0].entryCount", is(35360)))
                 .andExpect(jsonPath("$.results[1].statisticsType", is("UNREVIEWED")))
-                .andExpect(jsonPath("$.results[1].releaseName", is("2021_03")))
-                .andExpect(jsonPath("$.results[1].releaseDate", is("2021-05-25")))
+                .andExpect(jsonPath("$.results[1].releaseName", is("2021_02")))
+                .andExpect(jsonPath("$.results[1].releaseDate", is("2021-03-25")))
                 .andExpect(jsonPath("$.results[1].valueCount", is(12793422)))
                 .andExpect(jsonPath("$.results[1].entryCount", is(12793422)));
     }
