@@ -31,7 +31,8 @@ class UniProtReleaseRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 
     @Autowired private UniProtReleaseRepository uniProtReleaseRepository;
-    private static final String[] IDS = new String[] {"2023_05", "2023_06", "2024_01", "2024_02"};
+    private static final int[] IDS = new int[] {0, 1, 2, 3};
+    private static final String[] NAMES = new String[] {"2023_05", "2023_06", "2024_01", "2024_02"};
     private static final Date[] DATES =
             new Date[] {
                 Date.from(Instant.ofEpochMilli(100L)),
@@ -46,6 +47,7 @@ class UniProtReleaseRepositoryTest {
         for (int i = 0; i < 4; i++) {
             UniProtRelease uniProtRelease = new UniProtRelease();
             uniProtRelease.setId(IDS[i]);
+            uniProtRelease.setName(NAMES[i]);
             uniProtRelease.setDate(DATES[i]);
             UNIPROT_RELEASES[i] = uniProtRelease;
         }

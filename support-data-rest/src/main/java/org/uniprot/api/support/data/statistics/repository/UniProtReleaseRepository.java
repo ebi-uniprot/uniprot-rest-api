@@ -13,7 +13,7 @@ import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
 
 @Repository
 @Primary
-public interface UniProtReleaseRepository extends JpaRepository<UniProtRelease, String> {
+public interface UniProtReleaseRepository extends JpaRepository<UniProtRelease, Integer> {
     @Query("SELECT MAX (ur.date) from UniProtRelease ur where ur.name<?1")
     Optional<Date> findPreviousReleaseDate(String currentRelease);
     Optional<UniProtRelease> findByNameAndEntryType(String name, EntryType entryType);

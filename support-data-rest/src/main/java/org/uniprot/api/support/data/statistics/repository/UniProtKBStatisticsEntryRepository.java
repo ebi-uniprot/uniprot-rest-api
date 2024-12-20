@@ -15,14 +15,6 @@ import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
 @Primary
 public interface UniProtKBStatisticsEntryRepository
         extends JpaRepository<UniProtKBStatisticsEntry, Long> {
-    List<UniProtKBStatisticsEntry> findAllByUniprotReleaseAndEntryType(
-            UniProtRelease releaseName, EntryType entryType);
-
-    List<UniProtKBStatisticsEntry> findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
-            UniProtRelease uniProtRelease,
-            EntryType entryType,
-            Collection<StatisticsCategory> statisticsCategory);
-
     List<UniProtKBStatisticsEntry> findAllByAttributeNameIgnoreCaseAndEntryType(
             String attributeName, EntryType entryType);
 

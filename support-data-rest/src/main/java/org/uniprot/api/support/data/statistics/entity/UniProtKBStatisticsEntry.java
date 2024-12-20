@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "uniprotkb_statistics_entry")
+@Table(name = "uniprotkb_statistics_entry", indexes = @Index(columnList = "release_name"))
 public class UniProtKBStatisticsEntry {
     @Id private Long id;
     private String attributeName;

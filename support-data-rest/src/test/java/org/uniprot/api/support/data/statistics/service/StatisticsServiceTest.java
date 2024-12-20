@@ -4,10 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.*;
 import static org.uniprot.api.support.data.statistics.entity.EntryType.SWISSPROT;
+import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
+import static org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -34,7 +38,7 @@ class StatisticsServiceTest {
     private static final String STATISTIC_TYPE = "reviewed";
     private static final EntryType ENTRY_TYPE = EntryType.SWISSPROT;
     private static final StatisticsModuleStatisticsType STATISTIC_TYPE_ENUM =
-            StatisticsModuleStatisticsType.REVIEWED;
+            REVIEWED;
     private static final String VERSION = "version";
     private static final UniProtRelease UNI_PROT_RELEASE = new UniProtRelease();
     public static final String NAME_0 = "name0";
@@ -92,9 +96,16 @@ class StatisticsServiceTest {
                         .searchField(SEARCH_FIELDS[2])
                         .build();
         lenient().when(statisticsMapper.map(STATISTIC_TYPE_ENUM)).thenReturn(ENTRY_TYPE);
+        lenient().when(statisticsMapper.map(UNREVIEWED)).thenReturn(TREMBL);
         lenient()
                 .when(statisticsMapper.map(STATISTICS_ENTRIES[0], QUERIES[0]))
                 .thenReturn(statisticsModuleStatisticsAttribute0);
+       /* lenient()
+                .when(statisticsMapper.map(argThat(e->ENTRY_NAMES[0].equals(e.getAttributeName())), same(QUERIES_COMMON[0])))
+                .thenReturn(statisticsModuleStatisticsAttribute0);
+        lenient()
+                .when(statisticsMapper.map(argThat(e->ENTRY_NAMES[1].equals(e.getAttributeName())), same(QUERIES_COMMON[1])))
+                .thenReturn(statisticsModuleStatisticsAttribute0);*/
         lenient()
                 .when(statisticsMapper.map(STATISTICS_ENTRIES[1], QUERIES[1]))
                 .thenReturn(statisticsModuleStatisticsAttribute1);
@@ -125,8 +136,11 @@ class StatisticsServiceTest {
                                 getCommonEntry(STATISTICS_ENTRIES[3]), QUERIES_COMMON[3]))
                 .thenReturn(statisticsModuleStatisticsAttribute3);
         lenient()
-                .when(releaseRepository.findById(VERSION))
-                .thenReturn(Optional.of(UNI_PROT_RELEASE));
+                .when(releaseRepository.findByNameAndEntryType(VERSION, ENTRY_TYPE))
+                        .thenReturn(Optional.of(UNI_PROT_RELEASE));
+        lenient()
+                .when(releaseRepository.findByNameAndEntryType(VERSION, TREMBL))
+                        .thenReturn(Optional.of(UNI_PROT_RELEASE));
         lenient()
                 .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[1],ENTRY_NAMES[0]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
@@ -154,14 +168,13 @@ class StatisticsServiceTest {
         entry.setValueCount(statisticsEntry.getValueCount());
         entry.setEntryCount(statisticsEntry.getEntryCount());
         entry.setDescription(statisticsEntry.getDescription());
-        entry.setUniProtRelease(statisticsEntry.getUniProtRelease());
+        entry.setUniprotRelease(statisticsEntry.getUniprotRelease());
         return entry;
     }
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenEmptyListOfCategoriesPassed() {
-        when(statisticsEntryRepository.findAllByUniprotReleaseAndEntryType(
-                        UNI_PROT_RELEASE, ENTRY_TYPE))
+        when(statisticsEntryRepository.findAllByUniprotRelease(UNI_PROT_RELEASE))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -208,9 +221,8 @@ class StatisticsServiceTest {
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
-        when(statisticsEntryRepository.findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
+        when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
                         UNI_PROT_RELEASE,
-                        ENTRY_TYPE,
                         Set.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
@@ -256,8 +268,8 @@ class StatisticsServiceTest {
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenSingleCategoryIsPassed() {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
-        when(statisticsEntryRepository.findAllByUniprotReleaseAndEntryTypeAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE, ENTRY_TYPE, Set.of(statisticsCategory0)))
+        when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                        UNI_PROT_RELEASE, Set.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
 
         Collection<StatisticsModuleStatisticsCategory> results =
