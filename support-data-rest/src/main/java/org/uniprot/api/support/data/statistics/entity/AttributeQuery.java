@@ -6,7 +6,9 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "attribute_query", indexes = @Index(columnList = "attributeName, statistics_category_id", unique = true))
+@Table(
+        name = "attribute_query",
+        indexes = @Index(columnList = "attributeName, statistics_category_id", unique = true))
 public class AttributeQuery {
     @Id private Long id;
 

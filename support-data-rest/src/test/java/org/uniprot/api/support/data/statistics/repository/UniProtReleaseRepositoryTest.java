@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,10 +37,10 @@ class UniProtReleaseRepositoryTest {
     private static final String[] NAMES = new String[] {"2023_05", "2023_06", "2024_01", "2024_02"};
     private static final Date[] DATES =
             new Date[] {
-                Date.from(Instant.ofEpochMilli(100L)),
-                Date.from(Instant.ofEpochMilli(200L)),
-                Date.from(Instant.ofEpochMilli(300L)),
-                Date.from(Instant.ofEpochMilli(400L))
+                DateUtils.truncate(Date.from(Instant.ofEpochMilli(100L)), Calendar.DATE),
+                DateUtils.truncate(Date.from(Instant.ofEpochMilli(200L)), Calendar.DATE),
+                DateUtils.truncate(Date.from(Instant.ofEpochMilli(300L)), Calendar.DATE),
+                DateUtils.truncate(Date.from(Instant.ofEpochMilli(400L)), Calendar.DATE)
             };
     private static final UniProtRelease[] UNIPROT_RELEASES = new UniProtRelease[4];
 

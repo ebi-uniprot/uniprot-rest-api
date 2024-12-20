@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.*;
@@ -37,10 +35,24 @@ import org.uniprot.api.support.data.statistics.repository.UniProtReleaseReposito
 class StatisticsServiceTest {
     private static final String STATISTIC_TYPE = "reviewed";
     private static final EntryType ENTRY_TYPE = EntryType.SWISSPROT;
-    private static final StatisticsModuleStatisticsType STATISTIC_TYPE_ENUM =
-            REVIEWED;
+    private static final StatisticsModuleStatisticsType STATISTIC_TYPE_ENUM = REVIEWED;
     private static final String VERSION = "version";
-    private static final UniProtRelease UNI_PROT_RELEASE = new UniProtRelease();
+    private static final UniProtRelease UNI_PROT_RELEASE_SWISSPROT;
+
+    static {
+        UniProtRelease uniProtRelease = new UniProtRelease();
+        uniProtRelease.setEntryType(ENTRY_TYPE);
+        UNI_PROT_RELEASE_SWISSPROT = uniProtRelease;
+    }
+
+    private static final UniProtRelease UNI_PROT_RELEASE_TREMBL;
+
+    static {
+        UniProtRelease uniProtRelease = new UniProtRelease();
+        uniProtRelease.setEntryType(TREMBL);
+        UNI_PROT_RELEASE_TREMBL = uniProtRelease;
+    }
+
     public static final String NAME_0 = "name0";
     private static final Date PREVIOUS_RELEASE_DATE =
             Date.from(Instant.ofEpochMilli(1653476723000L));
@@ -100,12 +112,6 @@ class StatisticsServiceTest {
         lenient()
                 .when(statisticsMapper.map(STATISTICS_ENTRIES[0], QUERIES[0]))
                 .thenReturn(statisticsModuleStatisticsAttribute0);
-       /* lenient()
-                .when(statisticsMapper.map(argThat(e->ENTRY_NAMES[0].equals(e.getAttributeName())), same(QUERIES_COMMON[0])))
-                .thenReturn(statisticsModuleStatisticsAttribute0);
-        lenient()
-                .when(statisticsMapper.map(argThat(e->ENTRY_NAMES[1].equals(e.getAttributeName())), same(QUERIES_COMMON[1])))
-                .thenReturn(statisticsModuleStatisticsAttribute0);*/
         lenient()
                 .when(statisticsMapper.map(STATISTICS_ENTRIES[1], QUERIES[1]))
                 .thenReturn(statisticsModuleStatisticsAttribute1);
@@ -137,24 +143,34 @@ class StatisticsServiceTest {
                 .thenReturn(statisticsModuleStatisticsAttribute3);
         lenient()
                 .when(releaseRepository.findByNameAndEntryType(VERSION, ENTRY_TYPE))
-                        .thenReturn(Optional.of(UNI_PROT_RELEASE));
+                .thenReturn(Optional.of(UNI_PROT_RELEASE_SWISSPROT));
         lenient()
                 .when(releaseRepository.findByNameAndEntryType(VERSION, TREMBL))
-                        .thenReturn(Optional.of(UNI_PROT_RELEASE));
+                .thenReturn(Optional.of(UNI_PROT_RELEASE_TREMBL));
         lenient()
-                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[1],ENTRY_NAMES[0]))
+                .when(
+                        attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                                STATISTICS_CATEGORIES[1], ENTRY_NAMES[0]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
         lenient()
-                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0],ENTRY_NAMES[0]))
+                .when(
+                        attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                                STATISTICS_CATEGORIES[0], ENTRY_NAMES[0]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[0]));
         lenient()
-                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0], ENTRY_NAMES[1]))
+                .when(
+                        attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                                STATISTICS_CATEGORIES[0], ENTRY_NAMES[1]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
         lenient()
-                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[2], ENTRY_NAMES[1]))
+                .when(
+                        attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                                STATISTICS_CATEGORIES[2], ENTRY_NAMES[1]))
                 .thenReturn(Optional.of(ATTRIBUTE_QUERIES[1]));
         lenient()
-                .when(attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORIES[0], ENTRY_NAMES[5]))
+                .when(
+                        attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                                STATISTICS_CATEGORIES[0], ENTRY_NAMES[5]))
                 .thenReturn(Optional.empty());
         lenient()
                 .when(releaseRepository.findPreviousReleaseDate(REL_0))
@@ -174,7 +190,7 @@ class StatisticsServiceTest {
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenEmptyListOfCategoriesPassed() {
-        when(statisticsEntryRepository.findAllByUniprotRelease(UNI_PROT_RELEASE))
+        when(statisticsEntryRepository.findAllByUniprotRelease(UNI_PROT_RELEASE_SWISSPROT))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -196,7 +212,7 @@ class StatisticsServiceTest {
 
     @Test
     void findAllByVersionAndCategoryIn_whenEmptyListOfCategoriesPassed() {
-        when(statisticsEntryRepository.findAllByUniprotRelease(UNI_PROT_RELEASE))
+        when(statisticsEntryRepository.findAllByUniprotRelease(UNI_PROT_RELEASE_SWISSPROT))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -222,7 +238,7 @@ class StatisticsServiceTest {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
         when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE,
+                        UNI_PROT_RELEASE_SWISSPROT,
                         Set.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
@@ -247,7 +263,8 @@ class StatisticsServiceTest {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
         when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE, Set.of(statisticsCategory0, statisticsCategory1)))
+                        UNI_PROT_RELEASE_SWISSPROT,
+                        Set.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
@@ -269,7 +286,7 @@ class StatisticsServiceTest {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE, Set.of(statisticsCategory0)))
+                        UNI_PROT_RELEASE_SWISSPROT, Set.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
 
         Collection<StatisticsModuleStatisticsCategory> results =
@@ -284,7 +301,7 @@ class StatisticsServiceTest {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
-                        UNI_PROT_RELEASE, Set.of(statisticsCategory0)))
+                        UNI_PROT_RELEASE_SWISSPROT, Set.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
 
         Collection<StatisticsModuleStatisticsCategory> results =

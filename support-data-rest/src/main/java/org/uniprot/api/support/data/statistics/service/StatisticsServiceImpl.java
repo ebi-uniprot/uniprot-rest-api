@@ -1,5 +1,12 @@
 package org.uniprot.api.support.data.statistics.service;
 
+import static org.uniprot.api.support.data.statistics.entity.EntryType.SWISSPROT;
+import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.statistics.entity.*;
@@ -9,13 +16,6 @@ import org.uniprot.api.support.data.statistics.repository.AttributeQueryReposito
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtKBStatisticsEntryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniProtReleaseRepository;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.uniprot.api.support.data.statistics.entity.EntryType.SWISSPROT;
-import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -46,7 +46,9 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<StatisticsModuleStatisticsCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
             String version, String statisticType, Set<String> categories) {
-        List<UniProtKBStatisticsEntry> entries = getAllEntriesByVersionAndStatisticTypeAndCategoryIn(version, statisticType, categories);
+        List<UniProtKBStatisticsEntry> entries =
+                getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+                        version, statisticType, categories);
         return entries.stream()
                 .collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getStatisticsCategory))
                 .entrySet()
@@ -78,8 +80,11 @@ public class StatisticsServiceImpl implements StatisticsService {
             String version, Set<String> categories) {
         List<UniProtKBStatisticsEntry> entries = new LinkedList<>();
 
-        for (StatisticsModuleStatisticsType statisticsType : StatisticsModuleStatisticsType.values()) {
-            entries.addAll(getAllEntriesByVersionAndStatisticTypeAndCategoryIn(version, statisticsType.name(), categories));
+        for (StatisticsModuleStatisticsType statisticsType :
+                StatisticsModuleStatisticsType.values()) {
+            entries.addAll(
+                    getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+                            version, statisticsType.name(), categories));
         }
 
         return entries.stream()
@@ -91,20 +96,19 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .collect(Collectors.toList());
     }
 
-    private List<UniProtKBStatisticsEntry> getAllEntriesByVersionAndStatisticTypeAndCategoryIn(String version, String statisticType, Set<String> categories) {
+    private List<UniProtKBStatisticsEntry> getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+            String version, String statisticType, Set<String> categories) {
         List<UniProtKBStatisticsEntry> entries;
-        StatisticsModuleStatisticsType statisticsModuleStatisticsType = getStatisticType(statisticType);
+        StatisticsModuleStatisticsType statisticsModuleStatisticsType =
+                getStatisticType(statisticType);
         EntryType entryType = statisticsMapper.map(statisticsModuleStatisticsType);
         UniProtRelease release = getRelease(version, entryType);
         if (categories.isEmpty()) {
-            entries =
-                    statisticsEntryRepository.findAllByUniprotRelease(release);
+            entries = statisticsEntryRepository.findAllByUniprotRelease(release);
         } else {
             entries =
-                    statisticsEntryRepository
-                            .findAllByUniprotReleaseAndStatisticsCategoryIn(
-                                    release,
-                                    getCategories(categories));
+                    statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                            release, getCategories(categories));
         }
         return entries;
     }
@@ -115,7 +119,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .orElseThrow(
                         () ->
                                 new IllegalArgumentException(
-                                        String.format("Invalid Release Version: %s or entry type: %s", version, entryType)));
+                                        String.format(
+                                                "Invalid Release Version: %s or entry type: %s",
+                                                version, entryType)));
     }
 
     private Map.Entry<StatisticsCategory, List<UniProtKBStatisticsEntry>> groupEntries(
@@ -190,7 +196,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private String getAttributeQuery(UniProtKBStatisticsEntry entry) {
         Optional<AttributeQuery> attributeQuery =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(entry.getStatisticsCategory(),entry.getAttributeName());
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        entry.getStatisticsCategory(), entry.getAttributeName());
         return attributeQuery.map(query -> prepareQuery(query, entry)).orElse("");
     }
 
@@ -217,8 +224,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                 Objects.equals(entryType, SWISSPROT)
                         ? START_QUERY + REVIEWED + "true" + END_QUERY + " AND "
                         : Objects.equals(entryType, TREMBL)
-                        ? START_QUERY + REVIEWED + "false" + END_QUERY + " AND "
-                        : "";
+                                ? START_QUERY + REVIEWED + "false" + END_QUERY + " AND "
+                                : "";
         return prepend + result;
     }
 

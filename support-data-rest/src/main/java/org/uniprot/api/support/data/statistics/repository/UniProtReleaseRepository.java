@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.statistics.repository;
 
-import java.lang.annotation.ElementType;
 import java.util.Date;
 import java.util.Optional;
 
@@ -16,5 +15,6 @@ import org.uniprot.api.support.data.statistics.entity.UniProtRelease;
 public interface UniProtReleaseRepository extends JpaRepository<UniProtRelease, Integer> {
     @Query("SELECT MAX (ur.date) from UniProtRelease ur where ur.name<?1")
     Optional<Date> findPreviousReleaseDate(String currentRelease);
+
     Optional<UniProtRelease> findByNameAndEntryType(String name, EntryType entryType);
 }

@@ -68,7 +68,7 @@ public class TestEntityGeneratorUtil {
                 createRelease(2, REL_2, DATES[2])
             };
 
-    private static UniProtRelease createRelease(int id,String name, Date date) {
+    private static UniProtRelease createRelease(int id, String name, Date date) {
         UniProtRelease release = new UniProtRelease();
         release.setId(id);
         release.setName(name);

@@ -11,8 +11,12 @@ import lombok.Data;
 @Table(name = "uniprot_release")
 public class UniProtRelease {
     @Id private int id;
+
+    @Temporal(TemporalType.DATE)
     private Date date;
+
     @Enumerated(EnumType.STRING)
     private EntryType entryType;
+
     private String name;
 }
