@@ -46,35 +46,15 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<StatisticsModuleStatisticsCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
             String version, String statisticType, Set<String> categories) {
-        List<UniProtKBStatisticsEntry> entries;
-        if (categories.isEmpty()) {
-            entries =
-                    statisticsEntryRepository.findAllByReleaseNameAndEntryType(
-                            getRelease(version),
-                            statisticsMapper.map(getStatisticType(statisticType)));
-        } else {
-            entries =
-                    statisticsEntryRepository
-                            .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
-                                    getRelease(version),
-                                    statisticsMapper.map(getStatisticType(statisticType)),
-                                    getCategories(categories));
-        }
+        List<UniProtKBStatisticsEntry> entries =
+                getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+                        version, statisticType, categories);
         return entries.stream()
                 .collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getStatisticsCategory))
                 .entrySet()
                 .stream()
                 .map(this::buildStatisticsModuleStatisticsCategory)
                 .collect(Collectors.toList());
-    }
-
-    private UniProtRelease getRelease(String version) {
-        return releaseRepository
-                .findById(version)
-                .orElseThrow(
-                        () ->
-                                new IllegalArgumentException(
-                                        String.format("Invalid Release Version: %s", version)));
     }
 
     @Override
@@ -98,14 +78,15 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public Collection<StatisticsModuleStatisticsCategory> findAllByVersionAndCategoryIn(
             String version, Set<String> categories) {
-        List<UniProtKBStatisticsEntry> entries;
-        if (categories.isEmpty()) {
-            entries = statisticsEntryRepository.findAllByReleaseName(getRelease(version));
-        } else {
-            entries =
-                    statisticsEntryRepository.findAllByReleaseNameAndStatisticsCategoryIn(
-                            getRelease(version), getCategories(categories));
+        List<UniProtKBStatisticsEntry> entries = new LinkedList<>();
+
+        for (StatisticsModuleStatisticsType statisticsType :
+                StatisticsModuleStatisticsType.values()) {
+            entries.addAll(
+                    getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+                            version, statisticsType.name(), categories));
         }
+
         return entries.stream()
                 .collect(Collectors.groupingBy(UniProtKBStatisticsEntry::getStatisticsCategory))
                 .entrySet()
@@ -113,6 +94,34 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .map(this::groupEntries)
                 .map(this::buildStatisticsModuleStatisticsCategory)
                 .collect(Collectors.toList());
+    }
+
+    private List<UniProtKBStatisticsEntry> getAllEntriesByVersionAndStatisticTypeAndCategoryIn(
+            String version, String statisticType, Set<String> categories) {
+        List<UniProtKBStatisticsEntry> entries;
+        StatisticsModuleStatisticsType statisticsModuleStatisticsType =
+                getStatisticType(statisticType);
+        EntryType entryType = statisticsMapper.map(statisticsModuleStatisticsType);
+        UniProtRelease release = getRelease(version, entryType);
+        if (categories.isEmpty()) {
+            entries = statisticsEntryRepository.findAllByUniProtRelease(release);
+        } else {
+            entries =
+                    statisticsEntryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
+                            release, getCategories(categories));
+        }
+        return entries;
+    }
+
+    private UniProtRelease getRelease(String version, EntryType entryType) {
+        return releaseRepository
+                .findByNameAndEntryType(version, entryType)
+                .orElseThrow(
+                        () ->
+                                new IllegalArgumentException(
+                                        String.format(
+                                                "Invalid Release Version: %s or entry type: %s",
+                                                version, entryType)));
     }
 
     private Map.Entry<StatisticsCategory, List<UniProtKBStatisticsEntry>> groupEntries(
@@ -143,7 +152,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                         .mapToLong(UniProtKBStatisticsEntry::getEntryCount)
                         .sum());
         uniProtKBStatisticsEntry.setDescription(firstEntry.getDescription());
-        uniProtKBStatisticsEntry.setReleaseName(firstEntry.getReleaseName());
+        uniProtKBStatisticsEntry.setUniProtRelease(firstEntry.getUniProtRelease());
         return uniProtKBStatisticsEntry;
     }
 
@@ -187,7 +196,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private String getAttributeQuery(UniProtKBStatisticsEntry entry) {
         Optional<AttributeQuery> attributeQuery =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(entry.getStatisticsCategory(),entry.getAttributeName());
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        entry.getStatisticsCategory(), entry.getAttributeName());
         return attributeQuery.map(query -> prepareQuery(query, entry)).orElse("");
     }
 
@@ -195,7 +205,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         String result = query.getQuery();
         if (result.contains(PREVIOUS_RELEASE_DATE)) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String currentRelease = entry.getReleaseName().getId();
+            String currentRelease = entry.getUniProtRelease().getName();
             Date previousReleaseDate =
                     releaseRepository
                             .findPreviousReleaseDate(currentRelease)

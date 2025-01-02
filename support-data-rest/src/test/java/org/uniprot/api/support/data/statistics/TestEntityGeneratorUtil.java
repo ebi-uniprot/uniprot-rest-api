@@ -63,14 +63,15 @@ public class TestEntityGeneratorUtil {
             };
     public static final UniProtRelease[] RELEASES =
             new UniProtRelease[] {
-                createRelease(REL_0, DATES[0]),
-                createRelease(REL_1, DATES[1]),
-                createRelease(REL_2, DATES[2])
+                createRelease(0, REL_0, DATES[0]),
+                createRelease(1, REL_1, DATES[1]),
+                createRelease(2, REL_2, DATES[2])
             };
 
-    private static UniProtRelease createRelease(String name, Date date) {
+    private static UniProtRelease createRelease(int id, String name, Date date) {
         UniProtRelease release = new UniProtRelease();
-        release.setId(name);
+        release.setId(id);
+        release.setName(name);
         release.setDate(date);
         return release;
     }
@@ -110,7 +111,7 @@ public class TestEntityGeneratorUtil {
         uniprotkbStatisticsEntry.setValueCount(VALUE_COUNTS[index]);
         uniprotkbStatisticsEntry.setEntryCount(ENTRY_COUNTS[index]);
         uniprotkbStatisticsEntry.setDescription(DESCRIPTIONS[index]);
-        uniprotkbStatisticsEntry.setReleaseName(
+        uniprotkbStatisticsEntry.setUniProtRelease(
                 Set.of(0, 1, 3, 4, 5).contains(index) ? RELEASES[0] : RELEASES[1]);
         uniprotkbStatisticsEntry.setEntryType(ENTRY_TYPES[index]);
         return uniprotkbStatisticsEntry;
