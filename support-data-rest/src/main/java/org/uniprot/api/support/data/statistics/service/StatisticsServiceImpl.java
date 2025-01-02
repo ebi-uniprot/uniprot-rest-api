@@ -104,10 +104,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         EntryType entryType = statisticsMapper.map(statisticsModuleStatisticsType);
         UniProtRelease release = getRelease(version, entryType);
         if (categories.isEmpty()) {
-            entries = statisticsEntryRepository.findAllByUniprotRelease(release);
+            entries = statisticsEntryRepository.findAllByUniProtRelease(release);
         } else {
             entries =
-                    statisticsEntryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                    statisticsEntryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                             release, getCategories(categories));
         }
         return entries;
@@ -152,7 +152,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                         .mapToLong(UniProtKBStatisticsEntry::getEntryCount)
                         .sum());
         uniProtKBStatisticsEntry.setDescription(firstEntry.getDescription());
-        uniProtKBStatisticsEntry.setUniprotRelease(firstEntry.getUniprotRelease());
+        uniProtKBStatisticsEntry.setUniProtRelease(firstEntry.getUniProtRelease());
         return uniProtKBStatisticsEntry;
     }
 
@@ -205,7 +205,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         String result = query.getQuery();
         if (result.contains(PREVIOUS_RELEASE_DATE)) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String currentRelease = entry.getUniprotRelease().getName();
+            String currentRelease = entry.getUniProtRelease().getName();
             Date previousReleaseDate =
                     releaseRepository
                             .findPreviousReleaseDate(currentRelease)

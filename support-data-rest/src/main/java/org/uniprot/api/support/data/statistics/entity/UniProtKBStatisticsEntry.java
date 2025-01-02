@@ -21,7 +21,7 @@ public class UniProtKBStatisticsEntry {
 
     @ManyToOne
     @JoinColumn(name = "release_name")
-    private UniProtRelease uniprotRelease;
+    private UniProtRelease uniProtRelease;
 
     @Enumerated(EnumType.STRING)
     private EntryType entryType;

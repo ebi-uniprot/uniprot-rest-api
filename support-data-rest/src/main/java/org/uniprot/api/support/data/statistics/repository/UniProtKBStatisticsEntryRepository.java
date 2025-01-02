@@ -20,8 +20,8 @@ public interface UniProtKBStatisticsEntryRepository
 
     List<UniProtKBStatisticsEntry> findAllByAttributeNameIgnoreCase(String attributeName);
 
-    List<UniProtKBStatisticsEntry> findAllByUniprotRelease(UniProtRelease uniProtRelease);
+    List<UniProtKBStatisticsEntry> findAllByUniProtRelease(UniProtRelease uniProtRelease);
 
-    List<UniProtKBStatisticsEntry> findAllByUniprotReleaseAndStatisticsCategoryIn(
+    List<UniProtKBStatisticsEntry> findAllByUniProtReleaseAndStatisticsCategoryIn(
             UniProtRelease releaseName, Collection<StatisticsCategory> statisticsCategory);
 }

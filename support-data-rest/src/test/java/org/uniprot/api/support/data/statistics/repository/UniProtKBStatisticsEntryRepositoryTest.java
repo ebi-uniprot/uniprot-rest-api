@@ -48,7 +48,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseName() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotRelease(RELEASES[0]);
+                entryRepository.findAllByUniProtRelease(RELEASES[0]);
 
         assertThat(
                 results,
@@ -63,7 +63,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryType_whenNoMatch() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotRelease(RELEASES[2]);
+                entryRepository.findAllByUniProtRelease(RELEASES[2]);
 
         assertThat(results, empty());
     }
@@ -71,7 +71,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseName_whenNoMatch() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotRelease(RELEASES[2]);
+                entryRepository.findAllByUniProtRelease(RELEASES[2]);
 
         assertThat(results, empty());
     }
@@ -79,7 +79,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
 
         assertThat(
@@ -91,7 +91,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0], STATISTICS_CATEGORIES[1]));
 
         assertThat(
@@ -103,7 +103,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0]));
 
         assertThat(results, containsInAnyOrder(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
@@ -112,7 +112,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[0], List.of(STATISTICS_CATEGORIES[0]));
 
         assertThat(results, containsInAnyOrder(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
@@ -121,7 +121,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[0], Collections.emptyList());
 
         assertThat(results, empty());
@@ -130,7 +130,7 @@ class UniProtKBStatisticsEntryRepositoryTest {
     @Test
     void findAllByReleaseNameAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
         List<UniProtKBStatisticsEntry> results =
-                entryRepository.findAllByUniprotReleaseAndStatisticsCategoryIn(
+                entryRepository.findAllByUniProtReleaseAndStatisticsCategoryIn(
                         RELEASES[2], Collections.emptyList());
 
         assertThat(results, empty());
