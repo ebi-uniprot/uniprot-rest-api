@@ -187,7 +187,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private String getAttributeQuery(UniProtKBStatisticsEntry entry) {
         Optional<AttributeQuery> attributeQuery =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(entry.getStatisticsCategory(),entry.getAttributeName());
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        entry.getStatisticsCategory(), entry.getAttributeName());
         return attributeQuery.map(query -> prepareQuery(query, entry)).orElse("");
     }
 
