@@ -5,7 +5,10 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +41,7 @@ import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.util.Pair;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -402,11 +406,14 @@ public class UniParcEntryLightController extends BasicSearchController<UniParcEn
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniParcEntryLight> results = queryService.getByIds(idsSearchRequest);
-
+        Map<String, List<Pair<String, Boolean>>> idRangesMap =
+                getIdSequenceRangesMap(idsSearchRequest, UNIPARC_UPI_SEQUENCE_RANGE_REGEX);
         return super.getSearchResponse(
                 results,
                 idsSearchRequest.getFields(),
                 idsSearchRequest.isDownload(),
+                false,
+                idRangesMap,
                 request,
                 response);
     }

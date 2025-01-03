@@ -5,10 +5,9 @@ import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloa
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.isBrowserAsFarAsWeKnow;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,8 +30,10 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Pair;
+import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.util.Utils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -98,7 +99,7 @@ public abstract class BasicSearchController<T> {
         context.setFields(fields);
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setEntityOnly(true);
-        context.setAccessionSequenceRange(accessionSequenceMap);
+        context.setIdSequenceRanges(accessionSequenceMap);
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(Stream.of(getEntityId(entity)));
         } else {
@@ -163,7 +164,7 @@ public abstract class BasicSearchController<T> {
             String fields,
             boolean isDownload,
             boolean subSequence,
-            Map<String, List<Pair<String, Boolean>>> accessionSequenceStatus,
+            Map<String, List<Pair<String, Boolean>>> idSequenceRangesMap,
             HttpServletRequest request,
             HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
@@ -179,7 +180,7 @@ public abstract class BasicSearchController<T> {
             Stream<String> accList = result.getContent().map(this::getEntityId);
             context.setEntityIds(accList);
         } else {
-            context.setAccessionSequenceRange(accessionSequenceStatus);
+            context.setIdSequenceRanges(idSequenceRangesMap);
             context.setEntities(result.getContent());
             context.setExtraOptions(result.getExtraOptions());
             context.setWarnings(result.getWarnings());
@@ -384,5 +385,38 @@ public abstract class BasicSearchController<T> {
 
     private boolean isGatekeeperNeeded(String userAgent) {
         return Utils.notNull(downloadGatekeeper) && !isBrowserAsFarAsWeKnow(userAgent);
+    }
+
+    protected Map<String, List<Pair<String, Boolean>>> getIdSequenceRangesMap(
+            IdsSearchRequest idsSearchRequest, Pattern idSequencePattern) {
+        Map<String, List<Pair<String, Boolean>>> idRangesMap = new HashMap<>();
+        for (String passedId : idsSearchRequest.getCommaSeparatedIds().split(",")) {
+            String sanitisedId = passedId.strip().toUpperCase();
+            String sequenceRange = null;
+            if (idSequencePattern.matcher(sanitisedId).matches()) {
+                sequenceRange = getSequenceRange(sanitisedId);
+                sanitisedId = extractId(sanitisedId);
+            }
+            Pair<String, Boolean> rangeIsProcessedPair =
+                    new PairImpl<>(sequenceRange, Boolean.FALSE);
+            List<Pair<String, Boolean>> rangeIsProcessedPairs;
+            if (!idRangesMap.containsKey(sanitisedId)) {
+                rangeIsProcessedPairs = new ArrayList<>();
+                rangeIsProcessedPairs.add(rangeIsProcessedPair);
+                idRangesMap.put(sanitisedId, rangeIsProcessedPairs);
+            } else {
+                rangeIsProcessedPairs = idRangesMap.get(sanitisedId);
+                rangeIsProcessedPairs.add(rangeIsProcessedPair);
+            }
+        }
+        return idRangesMap;
+    }
+
+    protected String extractId(String id) {
+        return id.substring(0, id.indexOf('['));
+    }
+
+    protected String getSequenceRange(String id) {
+        return id.substring(id.indexOf('[') + 1, id.indexOf(']'));
     }
 }

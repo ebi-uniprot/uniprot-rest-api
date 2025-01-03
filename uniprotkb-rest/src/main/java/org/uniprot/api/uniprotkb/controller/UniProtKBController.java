@@ -220,7 +220,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
             if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(accessionOrId).matches()) {
                 accessionRangeMap = validateAndGetAccessionRangesMap(accessionOrId, request);
-                accessionOnly = extractAccession(accessionOrId);
+                accessionOnly = extractId(accessionOrId);
             }
 
             Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
@@ -411,7 +411,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             HttpServletResponse response) {
         QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);
         Map<String, List<Pair<String, Boolean>>> accessionRangesMap =
-                getAccessionSequenceRangesMap(accessionsRequest);
+                getIdSequenceRangesMap(accessionsRequest, UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX);
         return super.getSearchResponse(
                 result,
                 accessionsRequest.getFields(),
@@ -506,14 +506,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return responseBuilder.headers(HeaderFactory.createHttpSearchHeader(contentType)).build();
     }
 
-    private String extractAccession(String accessionOrId) {
-        return accessionOrId.substring(0, accessionOrId.indexOf('['));
-    }
-
-    private String getSequenceRange(String accessionOrId) {
-        return accessionOrId.substring(accessionOrId.indexOf('[') + 1, accessionOrId.indexOf(']'));
-    }
-
     private void validateSubsequence(String sequenceRange, HttpServletRequest request) {
         MediaType format = getAcceptHeader(request);
         if (!FASTA_MEDIA_TYPE.equals(format)) {
@@ -547,7 +539,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             // values between square brackets e.g. 10-20
             String range = getSequenceRange(accessionOrId);
             validateSubsequence(range, request);
-            String accessionOnly = extractAccession(accessionOrId);
+            String accessionOnly = extractId(accessionOrId);
             Pair<String, Boolean> rangeIsProcessedPair = new PairImpl<>(range, Boolean.FALSE);
             accessionRange = new HashMap<>();
             List<Pair<String, Boolean>> rangeIsProcessedPairs = new ArrayList<>();
@@ -555,30 +547,5 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             accessionRange.put(accessionOnly, rangeIsProcessedPairs);
         }
         return accessionRange;
-    }
-
-    private Map<String, List<Pair<String, Boolean>>> getAccessionSequenceRangesMap(
-            IdsSearchRequest accessionsRequest) {
-        Map<String, List<Pair<String, Boolean>>> accessionRangesMap = new HashMap<>();
-        for (String passedId : accessionsRequest.getCommaSeparatedIds().split(",")) {
-            String sanitisedId = passedId.strip().toUpperCase();
-            String sequenceRange = null;
-            if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(sanitisedId).matches()) {
-                sequenceRange = getSequenceRange(sanitisedId);
-                sanitisedId = extractAccession(sanitisedId);
-            }
-            Pair<String, Boolean> rangeIsProcessedPair =
-                    new PairImpl<>(sequenceRange, Boolean.FALSE);
-            List<Pair<String, Boolean>> rangeIsProcessedPairs;
-            if (!accessionRangesMap.containsKey(sanitisedId)) {
-                rangeIsProcessedPairs = new ArrayList<>();
-                rangeIsProcessedPairs.add(rangeIsProcessedPair);
-                accessionRangesMap.put(sanitisedId, rangeIsProcessedPairs);
-            } else {
-                rangeIsProcessedPairs = accessionRangesMap.get(sanitisedId);
-                rangeIsProcessedPairs.add(rangeIsProcessedPair);
-            }
-        }
-        return accessionRangesMap;
     }
 }

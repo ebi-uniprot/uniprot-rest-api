@@ -41,14 +41,14 @@ public class MessageConverterContext<T> {
     private boolean isLargeDownload;
     private boolean subsequence;
     /**
-     * A map to store accessions along with their associated sequence ranges and a flag indicating
-     * if they have been processed. Accessions can be repeated, allowing multiple sequence ranges
-     * for the same accession. For example, "P12345[20-30], P12345[0-10]". The isProcessed flag is
-     * set to true once a sequence range is handled.
+     * A map to store accessions/UniParc Ids along with their associated sequence ranges and a flag
+     * indicating if they have been processed. Accessions can be repeated, allowing multiple
+     * sequence ranges for the same accession. For example, "P12345[20-30], P12345[0-10]" or
+     * UPI0000000001[5-10]. The isProcessed flag is set to true once a sequence range is handled.
      *
      * @see org.uniprot.api.uniprotkb.output.converter.UniProtKBFastaMessageConverter
      */
-    private Map<String, List<Pair<String, Boolean>>> accessionSequenceRange;
+    private Map<String, List<Pair<String, Boolean>>> idSequenceRanges;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -67,7 +67,7 @@ public class MessageConverterContext<T> {
                 .warnings(this.warnings)
                 .isLargeDownload(this.isLargeDownload)
                 .subsequence(subsequence)
-                .accessionSequenceRange(this.accessionSequenceRange)
+                .idSequenceRanges(this.idSequenceRanges)
                 .build();
     }
 }

@@ -141,18 +141,38 @@ class ValidUniqueIdListTest {
 
     @ParameterizedTest
     @MethodSource("provideInvalidSequenceRange")
-    void testInValidIds(String accessionWithRange) {
+    void testInValidIds(UniProtDataType dataType, String accessionWithRange) {
         ValidUniqueIdListTest.FakeValidAccessionListValidator validator =
-                new ValidUniqueIdListTest.FakeValidAccessionListValidator(
-                        UniProtDataType.UNIPROTKB);
+                new ValidUniqueIdListTest.FakeValidAccessionListValidator(dataType);
         boolean result = validator.isValidSequenceRange(accessionWithRange, validator.dataType);
+        assertFalse(result);
+    }
+
+    @Test
+    void testIsValidUniParcSequenceRangeSuccess() {
+        ValidUniqueIdListTest.FakeValidAccessionListValidator validator =
+                new ValidUniqueIdListTest.FakeValidAccessionListValidator(UniProtDataType.UNIPARC);
+        assertTrue(validator.isValidSequenceRange("UPI0000000001[10-20]", validator.dataType));
+    }
+
+    @Test
+    void testInvalidFormatForUniParcSubsequenceFailure() {
+        ValidUniqueIdListTest.FakeValidAccessionListValidator validator =
+                new ValidUniqueIdListTest.FakeValidAccessionListValidator(UniProtDataType.UNIPARC);
+        boolean result =
+                validator.isValidFormatForSubsequence(
+                        "UPI0000000001[10-20]",
+                        MediaType.APPLICATION_JSON_VALUE,
+                        validator.dataType);
         assertFalse(result);
     }
 
     private static Stream<Arguments> provideDataTypeAndValidValues() {
         return Stream.of(
                 Arguments.of(UniProtDataType.UNIPROTKB, "P12345,P54321,P32542,P12345[10-20]"),
-                Arguments.of(UniProtDataType.UNIPARC, "UPI0000000001,UPI0000000002,UPI0000000003"),
+                Arguments.of(
+                        UniProtDataType.UNIPARC,
+                        "UPI0000000001,UPI0000000002[10-20],UPI0000000003"),
                 Arguments.of(
                         UniProtDataType.UNIREF,
                         "UniRef50_P12345,UniRef90_P12345,UniRef100_P12345"));
@@ -165,7 +185,7 @@ class ValidUniqueIdListTest {
                         "P12345[0-,P12345[0-10],P1234,UniRef90_P12345,UPI0000000001"),
                 Arguments.of(
                         UniProtDataType.UNIPARC,
-                        "P12345,UniRef100_P12345,UPI000000000,UPI000000010,UPI000000010[10-20]"),
+                        "P12345,UniRef100_P12345,UPI000000000,UPI000000010,UPI0000000001[20-10]"),
                 Arguments.of(
                         UniProtDataType.UNIREF,
                         "P12345,UPI0000000001,UniRef100P1234,P12345[10-20],UniRef100P1234[20-30]"));
@@ -173,11 +193,13 @@ class ValidUniqueIdListTest {
 
     private static Stream<Arguments> provideInvalidSequenceRange() {
         return Stream.of(
-                Arguments.of("P12345[0-10]"),
-                Arguments.of("P12345[1-4147483647]"),
-                Arguments.of("P12345[4147483647-40]"),
-                Arguments.of("P12345[4147483647-5147483647]"),
-                Arguments.of("P12345[20-10]"));
+                Arguments.of(UniProtDataType.UNIPROTKB, "P12345[0-10]"),
+                Arguments.of(UniProtDataType.UNIPROTKB, "P12345[1-4147483647]"),
+                Arguments.of(UniProtDataType.UNIPROTKB, "P12345[4147483647-40]"),
+                Arguments.of(UniProtDataType.UNIPROTKB, "P12345[4147483647-5147483647]"),
+                Arguments.of(UniProtDataType.UNIPROTKB, "P12345[20-10]"),
+                Arguments.of(UniProtDataType.UNIPARC, "UPI0000000001[20-10]"),
+                Arguments.of(UniProtDataType.UNIPARC, "UPI0000000001[0-10]"));
     }
 
     static class FakeValidAccessionListValidator extends ValidUniqueIdList.AccessionListValidator {
