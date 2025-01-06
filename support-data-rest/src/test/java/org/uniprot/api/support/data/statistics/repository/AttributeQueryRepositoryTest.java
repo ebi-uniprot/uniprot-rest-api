@@ -55,7 +55,8 @@ class AttributeQueryRepositoryTest {
     @Test
     void findByAttributeName_whenExist() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, ATTRIBUTES[1]);
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        STATISTICS_CATEGORY, ATTRIBUTES[1]);
         AttributeQuery attributeQuery = result.get();
 
         assertEquals(IDS[1], attributeQuery.getId());
@@ -65,7 +66,8 @@ class AttributeQueryRepositoryTest {
     @Test
     void findByAttributeName_whenExistAndCaseDiff() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, ATTRIBUTES[1].toUpperCase());
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        STATISTICS_CATEGORY, ATTRIBUTES[1].toUpperCase());
         AttributeQuery attributeQuery = result.get();
 
         assertEquals(IDS[1], attributeQuery.getId());
@@ -75,7 +77,8 @@ class AttributeQueryRepositoryTest {
     @Test
     void findByAttributeName_whenAbsent() {
         Optional<AttributeQuery> result =
-                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(STATISTICS_CATEGORY, "random");
+                attributeQueryRepository.findByStatisticsCategoryAndAttributeNameIgnoreCase(
+                        STATISTICS_CATEGORY, "random");
 
         assertFalse(result.isPresent());
     }

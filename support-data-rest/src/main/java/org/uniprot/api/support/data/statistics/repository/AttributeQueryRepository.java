@@ -11,5 +11,6 @@ import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 @Repository
 @Primary
 public interface AttributeQueryRepository extends JpaRepository<AttributeQuery, Long> {
-    Optional<AttributeQuery> findByStatisticsCategoryAndAttributeNameIgnoreCase(StatisticsCategory statisticsCategory, String attributeName);
+    Optional<AttributeQuery> findByStatisticsCategoryAndAttributeNameIgnoreCase(
+            StatisticsCategory statisticsCategory, String attributeName);
 }
