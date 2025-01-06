@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.search.facet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -37,7 +38,7 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
      * @return List of Facet converted and configured.
      */
     @Override
-    public List<Facet> convert(QueryResponse queryResponse, List<String> facetList) {
+    public List<Facet> convert(QueryResponse queryResponse, Collection<String> facetList) {
         List<Facet> facetResult = new ArrayList<>();
 
         if (Utils.notNull(queryResponse.getJsonFacetingResponse())) {

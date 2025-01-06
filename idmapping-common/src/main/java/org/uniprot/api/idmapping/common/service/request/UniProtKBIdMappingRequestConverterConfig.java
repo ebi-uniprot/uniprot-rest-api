@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.common.service.request;
+package org.uniprot.api.idmapping.common.service.request;
 
 import java.util.regex.Pattern;
 
@@ -13,20 +13,20 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtSolrSortClause;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Configuration
-public class UniProtKBRequestConverterConfig {
+public class UniProtKBIdMappingRequestConverterConfig {
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
 
     @Bean
-    public UniProtKBRequestConverter uniProtKBRequestConverter(
+    public UniProtKBIdMappingRequestConverter uniProtKBIdMappingRequestConverter(
             SolrQueryConfig uniProtKBSolrQueryConf,
             UniProtSolrSortClause uniProtSolrSortClause,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             RequestConverterConfigProperties uniProtRequestConverterConfigProperties,
             UniProtTermsConfig uniProtTermsConfig,
             FacetConfig uniProtKBFacetConfig) {
-        return new UniProtKBRequestConverterImpl(
+        return new UniProtKBIdMappingRequestConverter(
                 uniProtKBSolrQueryConf,
                 uniProtSolrSortClause,
                 uniProtKBQueryProcessorConfig,

@@ -63,7 +63,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(description = SIZE_IDS_UNIPARC_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
+    @Max(value = MAX_IDS_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Parameter(description = SORT_UNIPARC_DESCRIPTION, example = SORT_UNIPARC_EXAMPLE)

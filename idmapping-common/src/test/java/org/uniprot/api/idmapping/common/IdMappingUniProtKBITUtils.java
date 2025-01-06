@@ -72,6 +72,7 @@ public class IdMappingUniProtKBITUtils {
             value =
                     switch (searchField) {
                         case "accession_id", "accession" -> "Q00011";
+                        case "sec_acc" -> "B4DFC2";
                         case "mass", "length" -> "[* TO *]";
                         case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
                         case "date_modified",
@@ -204,19 +205,15 @@ public class IdMappingUniProtKBITUtils {
         doc.proteomes.add("UP000000000");
         doc.apApu.add("Search All");
         doc.commentMap.put("cc_ap_apu_exp", Collections.singleton("Search All"));
-        doc.apApuEv.add("Search All");
-        doc.apAsEv.add("Search All");
         doc.commentMap.put("cc_ap_as_exp", Collections.singleton("Search All"));
         doc.apRf.add("Search All");
         doc.commentMap.put("cc_ap_rf_exp", Collections.singleton("Search All"));
-        doc.apRfEv.add("Search All");
         doc.commentMap.put("cc_sequence_caution_exp", Collections.singleton("Search All"));
         doc.commentMap.put("cc_sc_misc_exp", Collections.singleton("Search All"));
         doc.seqCautionFrameshift.add("Search All");
         doc.seqCautionErTerm.add("Search All");
         doc.seqCautionErTran.add("Search All");
         doc.seqCautionMisc.add("Search All");
-        doc.seqCautionMiscEv.add("Search All");
         doc.rcPlasmid.add("Search All");
         doc.rcTransposon.add("Search All");
         doc.rcStrain.add("Search All");

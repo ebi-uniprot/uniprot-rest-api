@@ -82,7 +82,7 @@ class UniRefProducerMessageServiceTest
     @Override
     protected void verifyDownloadJob(UniRefDownloadRequest request) {
         verify(jobService)
-                .save(
+                .create(
                         argThat(
                                 job -> {
                                     assertSame(JOB_ID, job.getId());

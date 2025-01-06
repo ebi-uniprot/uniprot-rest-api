@@ -91,7 +91,7 @@ public abstract class FileHandler {
                     "Unable to delete file {} during IOException failure for job id {}",
                     file.toFile().getName(),
                     jobId);
-            throw new FileHandelerException(e);
+            throw new FileHandlerException(e);
         }
     }
 }

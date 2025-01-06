@@ -7,7 +7,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +23,11 @@ public class SolrRequestConverter {
      * @param request the request that specifies the query
      * @return the solr query
      */
-    public JsonQueryRequest toJsonQueryRequest(SolrRequest request, FacetConfig facetConfig) {
-        return toJsonQueryRequest(request, facetConfig, false);
+    public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+        return toJsonQueryRequest(request, false);
     }
 
-    public JsonQueryRequest toJsonQueryRequest(
-            SolrRequest request, FacetConfig facetConfig, boolean isEntry) {
+    public JsonQueryRequest toJsonQueryRequest(SolrRequest request, boolean isEntry) {
         final ModifiableSolrParams solrQuery = new ModifiableSolrParams();
         solrQuery.add("q", request.getQuery());
 
@@ -56,7 +54,7 @@ public class SolrRequestConverter {
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
-            setFacets(result, request.getFacets(), facetConfig);
+            setFacets(result, request);
         }
 
         log.debug("Solr Query without facet and sort details: " + solrQuery);

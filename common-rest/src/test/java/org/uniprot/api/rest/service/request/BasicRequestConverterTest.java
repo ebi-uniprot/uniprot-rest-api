@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.FakeSolrSortClause;
@@ -39,7 +43,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(RequestConverterConfigProperties.class);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -60,7 +64,12 @@ class BasicRequestConverterTest {
         Pattern diseaseIdPattern = Pattern.compile(FieldRegexConstants.DISEASE_REGEX);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, diseaseIdPattern);
+                        queryConfig,
+                        null,
+                        queryProcessorConfig,
+                        convertProps,
+                        null,
+                        diseaseIdPattern);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn("(di-12345)");
@@ -88,7 +97,12 @@ class BasicRequestConverterTest {
         Pattern diseaseIdPattern = Pattern.compile(FieldRegexConstants.DISEASE_REGEX);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, diseaseIdPattern);
+                        queryConfig,
+                        null,
+                        queryProcessorConfig,
+                        convertProps,
+                        null,
+                        diseaseIdPattern);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -113,7 +127,7 @@ class BasicRequestConverterTest {
         Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -141,7 +155,7 @@ class BasicRequestConverterTest {
         Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -171,7 +185,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(RequestConverterConfigProperties.class);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -197,7 +211,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(RequestConverterConfigProperties.class);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -211,7 +225,14 @@ class BasicRequestConverterTest {
     @Test
     void createSolrRequestWithFacets() {
         String query = "query:value";
-        List<String> facets = List.of("facet1", "facet2");
+        String facetName1 = "facet1";
+        String facetName2 = "facet2";
+        List<String> facets = List.of(facetName1, facetName2);
+        FacetConfig facetConfig = Mockito.mock(FacetConfig.class);
+        FacetProperty facet1 = Mockito.mock(FacetProperty.class);
+        FacetProperty facet2 = Mockito.mock(FacetProperty.class);
+        Mockito.when(facetConfig.getFacetPropertyMap())
+                .thenReturn(Map.of(facetName1, facet1, facetName2, facet2));
 
         SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
         UniProtQueryProcessorConfig queryProcessorConfig =
@@ -221,7 +242,7 @@ class BasicRequestConverterTest {
                 Mockito.mock(RequestConverterConfigProperties.class);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, facetConfig, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -231,7 +252,10 @@ class BasicRequestConverterTest {
         SolrRequest result = converter.createSearchSolrRequest(request).build();
         assertNotNull(result);
         assertEquals(query, result.getQuery());
-        assertEquals(facets, result.getFacets());
+        assertFalse(result.getFacets().isEmpty());
+        assertEquals(2, result.getFacets().size());
+        assertTrue(result.getFacets().stream().anyMatch(f -> f.getName().equals(facetName1)));
+        assertTrue(result.getFacets().stream().anyMatch(f -> f.getName().equals(facetName2)));
     }
 
     @Test
@@ -249,7 +273,7 @@ class BasicRequestConverterTest {
 
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, solrClause, queryProcessorConfig, convertProps, null);
+                        queryConfig, solrClause, queryProcessorConfig, convertProps, null, null);
 
         SearchRequest request = Mockito.mock(SearchRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -274,7 +298,7 @@ class BasicRequestConverterTest {
         Mockito.when(convertProps.getDefaultSolrPageSize()).thenReturn(defaultSolrBatchSize);
         BasicRequestConverter converter =
                 new BasicRequestConverter(
-                        queryConfig, null, queryProcessorConfig, convertProps, null);
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
 
         StreamRequest request = Mockito.mock(StreamRequest.class);
         Mockito.when(request.getQuery()).thenReturn(query);
@@ -284,5 +308,107 @@ class BasicRequestConverterTest {
         assertEquals(query, result.getQuery());
         assertEquals(defaultSolrBatchSize, result.getRows());
         assertEquals(Integer.MAX_VALUE, result.getTotalRows());
+    }
+
+    @Test
+    void createIdsStreamBasicSolrRequest() {
+        String idField = "idField";
+        String query = "query";
+        SolrQuery.SortClause sort = new SolrQuery.SortClause("sort", SolrQuery.ORDER.asc);
+        Integer defaultSolrBatchSize = 45;
+        SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
+
+        UniProtQueryProcessorConfig queryProcessorConfig =
+                Mockito.mock(UniProtQueryProcessorConfig.class);
+        Mockito.when(queryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
+        RequestConverterConfigProperties convertProps =
+                Mockito.mock(RequestConverterConfigProperties.class);
+        Mockito.when(convertProps.getDefaultSolrPageSize()).thenReturn(defaultSolrBatchSize);
+        FakeSolrSortClause solrClause = Mockito.mock(FakeSolrSortClause.class);
+        Mockito.when(solrClause.getSort(Mockito.anyString())).thenReturn(List.of(sort));
+        BasicRequestConverter converter =
+                new BasicRequestConverter(
+                        queryConfig, solrClause, queryProcessorConfig, convertProps, null, null);
+
+        StreamRequest request = Mockito.mock(StreamRequest.class);
+        Mockito.when(request.getQuery()).thenReturn(query);
+        Mockito.when(request.getSort()).thenReturn(sort.toString());
+
+        SolrRequest result = converter.createStreamIdsSolrRequest(request, idField).build();
+        assertNotNull(result);
+        assertEquals(query, result.getQuery());
+        assertEquals(idField, result.getIdField());
+        assertEquals(List.of(sort), result.getSorts());
+    }
+
+    @Test
+    void createIdsSearchBasicSolrRequest() {
+        String idField = "idField";
+        String query = "query";
+        SolrQuery.SortClause sort = new SolrQuery.SortClause("sort", SolrQuery.ORDER.asc);
+        Integer defaultSolrBatchSize = 45;
+        SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
+
+        UniProtQueryProcessorConfig queryProcessorConfig =
+                Mockito.mock(UniProtQueryProcessorConfig.class);
+        Mockito.when(queryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
+        RequestConverterConfigProperties convertProps =
+                Mockito.mock(RequestConverterConfigProperties.class);
+        Mockito.when(convertProps.getDefaultSolrPageSize()).thenReturn(defaultSolrBatchSize);
+        FakeSolrSortClause solrClause = Mockito.mock(FakeSolrSortClause.class);
+        Mockito.when(solrClause.getSort(Mockito.anyString())).thenReturn(List.of(sort));
+        BasicRequestConverter converter =
+                new BasicRequestConverter(
+                        queryConfig, solrClause, queryProcessorConfig, convertProps, null, null);
+
+        SearchRequest request = Mockito.mock(SearchRequest.class);
+        Mockito.when(request.getQuery()).thenReturn(query);
+        Mockito.when(request.getSort()).thenReturn(sort.toString());
+
+        SolrRequest result = converter.createSearchIdsSolrRequest(request, idField).build();
+        assertNotNull(result);
+        assertEquals(query, result.getQuery());
+        assertEquals(idField, result.getIdField());
+        assertEquals(List.of(sort), result.getSorts());
+    }
+
+    @Test
+    void canGetIdsTermQuery() {
+        String idsFieldQuery =
+                BasicRequestConverter.getIdsTermQuery(List.of("id1", "id2"), "id_field");
+        assertEquals("({!terms f=id_field}id1,id2)", idsFieldQuery);
+    }
+
+    @Test
+    void createIdsSearchRequestWithDefaultSizeAsNumberOfIdsOnly() {
+        String query = "*:*";
+        String idField = "dummy";
+        Integer defaultPageSize = 5;
+        SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
+
+        UniProtQueryProcessorConfig queryProcessorConfig =
+                Mockito.mock(UniProtQueryProcessorConfig.class);
+        Mockito.when(queryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
+        RequestConverterConfigProperties convertProps =
+                Mockito.mock(RequestConverterConfigProperties.class);
+        Mockito.when(convertProps.getDefaultRestPageSize()).thenReturn(defaultPageSize);
+        BasicRequestConverter converter =
+                new BasicRequestConverter(
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
+
+        IdsSearchRequest request = Mockito.mock(IdsSearchRequest.class);
+        List<String> listOfIds =
+                List.of("AC1", "AC2", "AC3", "AC4", "AC5", "AC6", "AC7", "AC8", "AC9", "AC10");
+        Mockito.when(request.getIdList()).thenReturn(listOfIds);
+        Mockito.when(request.getQuery()).thenReturn(query);
+        Mockito.when(request.getSize()).thenReturn(null).thenReturn(listOfIds.size());
+
+        SolrRequest result = converter.createSearchIdsSolrRequest(request, idField).build();
+        assertNotNull(result);
+        Mockito.verify(request, times(1)).setSize(listOfIds.size());
+        assertEquals(query, result.getQuery());
+        assertEquals(idField, result.getIdField());
+        assertEquals(listOfIds.size(), result.getRows());
+        assertEquals(listOfIds.size(), result.getTotalRows());
     }
 }

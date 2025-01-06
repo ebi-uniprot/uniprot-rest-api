@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.query.sort.UniRefSortClause;
 import org.uniprot.api.rest.service.request.RequestConverter;
@@ -57,12 +58,14 @@ public class UniRefSolrQueryConfig {
             SolrQueryConfig uniRefSolrQueryConf,
             UniRefSortClause uniRefSortClause,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
+            FacetConfig uniRefFacetConfig,
             RequestConverterConfigProperties requestConverterConfigProperties) {
         return new RequestConverterImpl(
                 uniRefSolrQueryConf,
                 uniRefSortClause,
                 uniRefQueryProcessorConfig,
-                requestConverterConfigProperties);
+                requestConverterConfigProperties,
+                uniRefFacetConfig);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

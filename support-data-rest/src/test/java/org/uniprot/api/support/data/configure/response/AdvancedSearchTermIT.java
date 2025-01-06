@@ -27,6 +27,7 @@ class AdvancedSearchTermIT {
                     new String[] {
                         "UniProtKB AC",
                         "Entry Name [ID]",
+                        "Secondary Accession",
                         "Protein Name [DE]",
                         "Gene Name [GN]",
                         "Organism [OS]",
@@ -86,7 +87,7 @@ class AdvancedSearchTermIT {
                 SEARCH_TERMS.size(),
                 "Top level fields count does not match");
         Assertions.assertNotNull(SEARCH_TERMS.get(index));
-        Assertions.assertEquals(Integer.valueOf(index), SEARCH_TERMS.get(index).getSeqNumber());
+        Assertions.assertEquals(index, SEARCH_TERMS.get(index).getSeqNumber());
         Assertions.assertEquals(label, SEARCH_TERMS.get(index).getLabel());
     }
 

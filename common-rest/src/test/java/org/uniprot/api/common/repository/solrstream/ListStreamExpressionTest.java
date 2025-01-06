@@ -7,8 +7,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
+import org.uniprot.api.common.repository.search.SolrFacetRequest;
+import org.uniprot.api.common.repository.search.SolrRequest;
 
 class ListStreamExpressionTest {
 
@@ -24,19 +24,19 @@ class ListStreamExpressionTest {
     }
 
     private FacetStreamExpression createExpression() {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
-                SolrStreamFacetRequest.builder();
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
         String buckets = "reviewed";
-        String metrics = "count(reviewed)";
         String bucketSorts = "count(reviewed)";
         int bucketSizeLimit = ThreadLocalRandom.current().nextInt(10, Integer.MAX_VALUE);
-        FacetConfig facetConfig = new FakeFacetConfig();
-        builder.query(query)
-                .metrics(metrics)
-                .bucketSorts(bucketSorts)
-                .bucketSizeLimit(bucketSizeLimit);
-        return new FacetStreamExpression(collection, buckets, builder.build(), facetConfig);
+        SolrFacetRequest solrFacetRequest =
+                SolrFacetRequest.builder()
+                        .name(buckets)
+                        .sort(bucketSorts)
+                        .limit(bucketSizeLimit)
+                        .build();
+        builder.query(query);
+        return new FacetStreamExpression(collection, builder.build(), solrFacetRequest);
     }
 }

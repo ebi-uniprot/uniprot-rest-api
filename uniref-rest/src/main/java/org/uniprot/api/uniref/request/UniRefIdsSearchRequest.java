@@ -59,7 +59,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(description = SIZE_UNIREF_ID_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
+    @Max(value = MAX_IDS_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Parameter(description = SORT_UNIREF_DESCRIPTION, example = SORT_UNIREF_EXAMPLE)

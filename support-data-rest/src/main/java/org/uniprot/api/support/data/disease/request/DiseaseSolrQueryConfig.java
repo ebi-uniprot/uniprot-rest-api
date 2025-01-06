@@ -63,6 +63,7 @@ public class DiseaseSolrQueryConfig {
                 diseaseSortClause,
                 diseaseQueryProcessorConfig,
                 requestConverterConfigProperties,
+                null,
                 DISEASE_REGEX_PATTERN);
     }
 

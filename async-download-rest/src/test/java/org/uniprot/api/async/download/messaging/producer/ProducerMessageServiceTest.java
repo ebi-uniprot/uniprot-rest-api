@@ -36,7 +36,6 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_withForceAndAllowed() {
         mockDownloadRequest();
         when(feedback.isAllowed()).thenReturn(true);
-        when(downloadRequest.isForce()).thenReturn(true);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
@@ -53,7 +52,6 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_withoutForceAndAllowed() {
         mockDownloadRequest();
         when(feedback.isAllowed()).thenReturn(true);
-        when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
@@ -69,7 +67,6 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_whenFormatIsEmptyAndAllowed() {
         mockDownloadRequestWithoutFormat();
         when(feedback.isAllowed()).thenReturn(true);
-        when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
 
@@ -86,7 +83,6 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
     void sendMessage_whenMessageSendingNotSuccessful() {
         mockDownloadRequestWithoutFormat();
         when(feedback.isAllowed()).thenReturn(true);
-        when(downloadRequest.isForce()).thenReturn(false);
         when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
         when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
         doThrow(AmqpException.class).when(messagingService).send(message);
@@ -98,7 +94,7 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         verifyPreprocess(downloadRequest);
         verifyDownloadJob(downloadRequest);
         verifyMessageSent();
-        verify(jobService).delete(JOB_ID);
+        verify(jobService, atLeastOnce()).delete(JOB_ID);
     }
 
     @Test
@@ -110,7 +106,21 @@ public abstract class ProducerMessageServiceTest<T extends DownloadRequest, R ex
         assertThrows(
                 IllegalDownloadJobSubmissionException.class,
                 () -> producerMessageService.sendMessage(downloadRequest));
-        verify(jobService, never()).save(any());
+        verify(jobService, never()).create(any());
+        verify(messagingService, never()).send(any());
+    }
+
+    @Test
+    void sendMessage_whenJobCreationThrowsError() {
+        when(hashGenerator.generateHash(downloadRequest)).thenReturn(JOB_ID);
+        when(feedback.isAllowed()).thenReturn(true);
+        when(jobService.create(argThat(dj -> dj.getId().equals(JOB_ID))))
+                .thenThrow(IllegalDownloadJobSubmissionException.class);
+        when(jobSubmissionRules.submit(downloadRequest)).thenReturn(feedback);
+
+        assertThrows(
+                IllegalDownloadJobSubmissionException.class,
+                () -> producerMessageService.sendMessage(downloadRequest));
         verify(messagingService, never()).send(any());
     }
 

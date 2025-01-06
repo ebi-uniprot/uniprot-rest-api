@@ -17,6 +17,7 @@ import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
+import org.uniprot.core.util.Utils;
 
 @Service
 @Profile("live")
@@ -76,6 +77,16 @@ public class ContactService {
                     Message.RecipientType.TO, InternetAddress.parse(contactConfig.getTo()));
             message.setSubject(contactForm.getSubject());
 
+            if (isIdMappingFailureEmail(contactForm, contactConfig)) {
+                message.setRecipients(
+                        Message.RecipientType.CC, InternetAddress.parse(contactConfig.getCc()));
+            }
+
+            if (isPeptideFailureEmail(contactForm, contactConfig)) {
+                message.setRecipients(
+                        Message.RecipientType.CC, InternetAddress.parse(contactConfig.getBcc()));
+            }
+
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent(contactForm.getMessage(), contactConfig.getMessageFormat());
 
@@ -92,5 +103,21 @@ public class ContactService {
 
     protected void sendMail(Message message) throws MessagingException {
         Transport.send(message);
+    }
+
+    private boolean isIdMappingFailureEmail(ContactForm contactForm, ContactConfig contactConfig) {
+        return Utils.notNullNotEmpty(contactConfig.getIdmappingFailedSubject())
+                && contactForm
+                        .getSubject()
+                        .toLowerCase()
+                        .contains(contactConfig.getIdmappingFailedSubject().toLowerCase());
+    }
+
+    private boolean isPeptideFailureEmail(ContactForm contactForm, ContactConfig contactConfig) {
+        return Utils.notNullNotEmpty(contactConfig.getPeptideFailedSubject())
+                && contactForm
+                        .getSubject()
+                        .toLowerCase()
+                        .contains(contactConfig.getPeptideFailedSubject().toLowerCase());
     }
 }

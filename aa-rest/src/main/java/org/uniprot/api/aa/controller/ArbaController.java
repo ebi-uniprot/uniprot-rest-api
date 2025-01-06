@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 
 import java.util.Optional;
 
@@ -56,7 +57,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ArbaController extends BasicSearchController<UniRuleEntry> {
     private static final int PREVIEW_SIZE = 10;
     private final ArbaService arbaService;
-    public static final String ARBA_ID_REGEX = "ARBA(\\d{8})";
 
     @Autowired
     public ArbaController(

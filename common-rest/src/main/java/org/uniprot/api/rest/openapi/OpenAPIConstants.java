@@ -262,7 +262,7 @@ public class OpenAPIConstants {
     public static final String FIELDS_GENECENTRIC_EXAMPLE = "accession,gene_name,proteome_id";
 
     // Proteome
-    public static final String TAG_PROTEOME = "Proteome";
+    public static final String TAG_PROTEOME = "Proteomes";
     public static final String TAG_PROTEOME_DESC =
             "The proteomes service offers access to UniProtKB proteomes, allowing users to search for proteomes (including reference or redundant proteomes) using UniProt proteome identifiers, species names, or taxonomy identifiers";
     public static final String SEARCH_PROTEOME_OPERATION =

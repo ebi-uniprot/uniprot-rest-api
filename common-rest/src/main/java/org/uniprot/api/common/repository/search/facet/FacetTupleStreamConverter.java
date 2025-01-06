@@ -41,7 +41,7 @@ public class FacetTupleStreamConverter
     }
 
     @Override
-    public SolrStreamFacetResponse convert(TupleStream tupleStream, List<String> facetList) {
+    public SolrStreamFacetResponse convert(TupleStream tupleStream, Collection<String> facetList) {
         Map<String, List<Pair<String, Long>>> facetNameValuesMap =
                 computeFacetValuesMap(tupleStream);
         List<String> accessions =
