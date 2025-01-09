@@ -25,7 +25,7 @@ class UniParcProteomeIdFilterTest {
                         .propertiesAdd(PROPERTY_SOURCES, "TEST:" + proteomeId)
                         .build();
         // filter by proteome id
-        boolean result = uniParcProteomeFilter.apply(xref, proteomeId);
+        boolean result = uniParcProteomeFilter.test(xref, proteomeId);
         Assertions.assertTrue(result);
     }
 
@@ -34,7 +34,7 @@ class UniParcProteomeIdFilterTest {
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder().proteomeId("ANY_VALUE").build();
         // filter by proteome id
-        boolean result = uniParcProteomeFilter.apply(xref, null);
+        boolean result = uniParcProteomeFilter.test(xref, null);
         Assertions.assertTrue(result);
     }
 
@@ -44,7 +44,7 @@ class UniParcProteomeIdFilterTest {
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder().proteomeId(proteomeId).build();
         // filter by proteome id
-        boolean result = uniParcProteomeFilter.apply(xref, proteomeId);
+        boolean result = uniParcProteomeFilter.test(xref, proteomeId);
         Assertions.assertTrue(result);
     }
 
@@ -57,7 +57,7 @@ class UniParcProteomeIdFilterTest {
                         .propertiesAdd(PROPERTY_SOURCES, "TEST:" + proteomeId)
                         .build();
         // filter by proteome id
-        boolean result = uniParcProteomeFilter.apply(xref, "UP000002");
+        boolean result = uniParcProteomeFilter.test(xref, "UP000002");
         Assertions.assertFalse(result);
     }
 }

@@ -216,7 +216,7 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
                 .filter(xref -> dbFilter.apply(xref, databases))
                 .filter(xref -> taxonFilter.apply(xref, taxonomyIds))
                 .filter(xref -> statusFilter.apply(xref, request.getActive()))
-                .filter(xref -> proteomeIdFilter.apply(xref, proteomeId));
+                .filter(xref -> proteomeIdFilter.test(xref, proteomeId));
     }
 
     private List<String> csvToList(String csv) {

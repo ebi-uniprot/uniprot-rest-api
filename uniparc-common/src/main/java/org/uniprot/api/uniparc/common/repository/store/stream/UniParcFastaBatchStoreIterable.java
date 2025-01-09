@@ -51,17 +51,17 @@ public class UniParcFastaBatchStoreIterable extends BatchStoreIterable<UniParcEn
                                                         "Batch call to voldemort server failed. Failure #{}. Retrying...",
                                                         e.getAttemptCount())))
                         .get(() -> storeClient.getEntries(batch));
-        return entries.stream().map(this::maptoUniParcEntry).toList();
+        return entries.stream().map(this::mapToUniParcEntry).toList();
     }
 
-    private UniParcEntry maptoUniParcEntry(UniParcEntryLight light) {
+    private UniParcEntry mapToUniParcEntry(UniParcEntryLight light) {
         UniParcEntryBuilder builder = new UniParcEntryBuilder();
         builder.uniParcId(light.getUniParcId()).sequence(light.getSequence());
         // populate cross-references from its own store
         Stream<UniParcCrossReference> crossReferences =
                 uniParcCrossReferenceService.getCrossReferences(light);
         UniParcProteomeIdFilter proteomeIdFilter = new UniParcProteomeIdFilter();
-        crossReferences = crossReferences.filter(xRef -> proteomeIdFilter.apply(xRef, proteomeId));
+        crossReferences = crossReferences.filter(xRef -> proteomeIdFilter.test(xRef, proteomeId));
         builder.uniParcCrossReferencesSet(crossReferences.toList());
         return builder.build();
     }

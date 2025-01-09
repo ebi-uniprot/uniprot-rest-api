@@ -4,10 +4,12 @@ import static org.uniprot.api.rest.openapi.OpenAPIConstants.PROTEOME_UPID_UNIPAR
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.PROTEOME_UPID_UNIPARC_EXAMPLE;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdStreamRequest;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
@@ -25,6 +27,9 @@ public class UniParcGetByProteomeIdStreamRequest extends UniParcGetByIdStreamReq
             description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
             example = PROTEOME_UPID_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
+    @Pattern(
+            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+            message = "{search.invalid.upid.value}")
     private String upId;
 
     @Override

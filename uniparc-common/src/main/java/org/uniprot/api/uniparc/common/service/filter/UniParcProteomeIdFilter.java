@@ -3,16 +3,16 @@ package org.uniprot.api.uniparc.common.service.filter;
 import static org.uniprot.core.uniparc.UniParcCrossReference.PROPERTY_SOURCES;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 import org.uniprot.core.Property;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.util.Utils;
 
-public class UniParcProteomeIdFilter implements BiFunction<UniParcCrossReference, String, Boolean> {
+public class UniParcProteomeIdFilter implements BiPredicate<UniParcCrossReference, String> {
 
     @Override
-    public Boolean apply(UniParcCrossReference xref, String proteomeId) {
+    public boolean test(UniParcCrossReference xref, String proteomeId) {
         return Objects.isNull(proteomeId)
                 || hasSourceProteome(xref, proteomeId)
                 || hasProteomeId(xref, proteomeId);

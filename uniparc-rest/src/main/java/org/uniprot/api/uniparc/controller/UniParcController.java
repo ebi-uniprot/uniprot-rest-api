@@ -238,6 +238,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/proteome/{upId}",
             produces = {FASTA_MEDIA_TYPE_VALUE})
     @Operation(
+            // We can not remove this hidden=true, before we fix this JIRA:TRM-32296
             hidden = true,
             summary = PROTEOME_UPID_FASTA_UNIPARC_OPERATION,
             responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
@@ -257,6 +258,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/proteome/{upId}/stream",
             produces = {FASTA_MEDIA_TYPE_VALUE})
     @Operation(
+            // We can not remove this hidden=true, before we fix this JIRA:TRM-32296
             hidden = true,
             summary = PROTEOME_UPID_UNIPARC_STREAM_OPERATION,
             responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})

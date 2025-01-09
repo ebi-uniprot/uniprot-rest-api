@@ -3,10 +3,12 @@ package org.uniprot.api.uniparc.request;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
@@ -28,6 +30,9 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
             description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
             example = PROTEOME_UPID_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
+    @Pattern(
+            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+            message = "{search.invalid.upid.value}")
     private String upId;
 
     @Override

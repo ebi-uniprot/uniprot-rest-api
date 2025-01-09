@@ -190,7 +190,6 @@ class UniParcGetFastaByProteomeIdIT {
                                 .param("size", String.valueOf(size))
                                 .param("cursor", cursor2)
                                 .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
-        ;
 
         // then verify third page
         responsePage3
@@ -243,5 +242,31 @@ class UniParcGetFastaByProteomeIdIT {
                                 "$.messages[0]",
                                 containsString(
                                         "Invalid request received. Requested media type/format not accepted: 'application/json'.")));
+    }
+
+    @Test
+    void testGetByProteomeInvalidRequest() throws Exception {
+        // when
+        String upid = "INVALID";
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
+                                .param("size", "-1")
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "'size' must be greater than or equal to 0")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "The 'upid' value has invalid format. It should be a valid Proteome UPID")));
     }
 }

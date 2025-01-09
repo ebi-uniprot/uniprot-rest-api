@@ -133,7 +133,7 @@ public class UniParcGetFastaByProteomeIdStreamIT extends AbstractStreamControlle
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(streamByProteomeIdRequestPath, UP_ID)
+                        get(streamByProteomeIdRequestPath, "INVALID")
                                 .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
                                 .param("download", "invalid"));
 
@@ -146,7 +146,12 @@ public class UniParcGetFastaByProteomeIdStreamIT extends AbstractStreamControlle
                         content()
                                 .string(
                                         containsString(
-                                                "The 'download' parameter has invalid format. It should be a boolean true or false.")));
+                                                "The 'download' parameter has invalid format. It should be a boolean true or false.")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "The 'upid' value has invalid format. It should be a valid Proteome UPID")));
     }
 
     @Test
