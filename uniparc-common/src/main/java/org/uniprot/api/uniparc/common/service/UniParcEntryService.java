@@ -18,6 +18,8 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -29,11 +31,9 @@ import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreCl
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcProteomeIdFilter;
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -74,12 +74,13 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
             TupleStreamDocumentIdStream uniParcTupleStreamDocumentIdStream,
             UniParcLightStoreClient uniParcLightStoreClient,
             UniParcCrossReferenceService uniParcCrossReferenceService,
-            RequestConverter uniParcRequestConverter) {
+            RequestConverter uniParcRequestConverter,
+            StoreStreamer<UniParcEntry> uniParcFastaStoreStreamer) {
 
         super(
                 repository,
                 facetConfig,
-                null,
+                uniParcFastaStoreStreamer,
                 uniParcSolrQueryConf,
                 uniParcFacetTupleStreamTemplate,
                 uniParcTupleStreamDocumentIdStream,
@@ -104,6 +105,31 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         String md5Value = MessageDigestUtil.getMD5(sequenceRequest.getSequence());
         String uniParcId = searchUniParcId(CHECKSUM_STR, md5Value);
         return getUniParcEntry(uniParcId, sequenceRequest);
+    }
+
+    public QueryResult<UniParcEntry> searchByProteomeId(
+            UniParcGetByIdPageSearchRequest searchRequest, String proteomeId) {
+        // search uniparc entries from solr
+        SolrRequest solrRequest = getRequestConverter().createSearchSolrRequest(searchRequest);
+        QueryResult<UniParcDocument> results =
+                repository.searchPage(solrRequest, searchRequest.getCursor());
+
+        // convert solr docs to entries
+        Stream<UniParcEntry> entries =
+                results.getContent()
+                        .map(d -> getUniParcEntry(d.getDocumentId(), searchRequest, proteomeId));
+        return QueryResult.<UniParcEntry>builder()
+                .content(entries)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .build();
+    }
+
+    public Stream<UniParcEntry> streamByProteomeId(
+            UniParcGetByIdStreamRequest streamRequest, String proteomeId) {
+        SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
+        StoreRequest storeRequest = StoreRequest.builder().proteomeId(proteomeId).build();
+        return this.storeStreamer.idsToStoreStream(solrRequest, storeRequest);
     }
 
     @Override
@@ -151,6 +177,11 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     private UniParcEntry getUniParcEntry(String uniParcId, UniParcGetByIdRequest request) {
+        return getUniParcEntry(uniParcId, request, null);
+    }
+
+    private UniParcEntry getUniParcEntry(
+            String uniParcId, UniParcGetByIdRequest request, String proteomeId) {
         Optional<UniParcEntryLight> optLightEntry =
                 this.uniParcLightStoreClient.getEntry(uniParcId);
         if (optLightEntry.isEmpty()) {
@@ -162,14 +193,15 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         // populate cross-references from its own store
         Stream<UniParcCrossReference> crossReferences =
                 this.uniParcCrossReferenceService.getCrossReferences(optLightEntry.get());
-        crossReferences = filterUniParcCrossReferenceStream(crossReferences, request);
+        crossReferences = filterUniParcCrossReferenceStream(crossReferences, request, proteomeId);
         builder.uniParcCrossReferencesSet(crossReferences.toList());
         return builder.build();
     }
 
     private Stream<UniParcCrossReference> filterUniParcCrossReferenceStream(
             Stream<UniParcCrossReference> uniParcCrossReferenceStream,
-            UniParcGetByIdRequest request) {
+            UniParcGetByIdRequest request,
+            String proteomeId) {
         // convert comma separated values to list
         List<String> databases = csvToList(request.getDbTypes());
         List<String> taxonomyIds = csvToList(request.getTaxonIds());
@@ -177,12 +209,14 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         UniParcDatabaseFilter dbFilter = new UniParcDatabaseFilter();
         UniParcCrossReferenceTaxonomyFilter taxonFilter = new UniParcCrossReferenceTaxonomyFilter();
         UniParcDatabaseStatusFilter statusFilter = new UniParcDatabaseStatusFilter();
+        UniParcProteomeIdFilter proteomeIdFilter = new UniParcProteomeIdFilter();
 
         // filter the results
         return uniParcCrossReferenceStream
                 .filter(xref -> dbFilter.apply(xref, databases))
                 .filter(xref -> taxonFilter.apply(xref, taxonomyIds))
-                .filter(xref -> statusFilter.apply(xref, request.getActive()));
+                .filter(xref -> statusFilter.apply(xref, request.getActive()))
+                .filter(xref -> proteomeIdFilter.test(xref, proteomeId));
     }
 
     private List<String> csvToList(String csv) {

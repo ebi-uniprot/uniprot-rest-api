@@ -608,6 +608,11 @@ public class OpenAPIConstants {
     public static final String DBID_UNIPARC_OPERATION_DESC = "";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION =
             "Get UniParc entries by Proteome UPID";
+
+    public static final String PROTEOME_UPID_FASTA_UNIPARC_OPERATION =
+            "Get UniParc fasta by Proteome UPID";
+    public static final String PROTEOME_UPID_UNIPARC_STREAM_OPERATION =
+            "Download UniParc entries by Proteome UPID";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION_DESC =
             "Search UniParc entries by proteome id(upid) to return all data associated with these entries. "
                     + FIELDS_OPERATION_DESC;
