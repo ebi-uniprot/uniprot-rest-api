@@ -32,6 +32,7 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
     @NotNull(message = "{search.required}")
     @Pattern(
             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.invalid.upid.value}")
     private String upId;
 

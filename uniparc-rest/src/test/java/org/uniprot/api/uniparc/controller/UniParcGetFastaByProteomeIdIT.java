@@ -119,6 +119,28 @@ class UniParcGetFastaByProteomeIdIT {
     }
 
     @Test
+    void testGetByUpIdLowerCase() throws Exception {
+        // when
+        String upid = "up000005640";
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getByUpIdPath, upid)
+                                .param("size", "1")
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">UPI0000283A01 anotherProteinName01 OS=Name 9606 OX=9606 AC=P12301 SS=WP_168893201 PC=UP000005640:chromosome\n"
+                                                        + "MLMPKRTKYRA")));
+    }
+
+    @Test
     void testGetByProteomeIdWithPagination() throws Exception {
         // when
         String upid = "UP000005640";
@@ -209,7 +231,7 @@ class UniParcGetFastaByProteomeIdIT {
     @Test
     void testGetByNonExistingProteomeIdSuccess() throws Exception {
         // when
-        String upid = "randomId";
+        String upid = "UP000000000";
         ResultActions response =
                 mockMvc.perform(
                         MockMvcRequestBuilders.get(getByUpIdPath, upid)
