@@ -8,7 +8,6 @@ import java.util.function.Function;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import org.apache.commons.codec.binary.Hex;
 import org.uniprot.api.common.exception.ServiceException;
 
 /**
@@ -20,6 +19,8 @@ public class HashGenerator<T> {
     private static final int ITERATION_COUNT = 16;
     private static final int KEY_LENGTH = 160;
     private final byte[] saltBytes;
+
+    private final int HASH_LENGTH = 10;
 
     private final Function<T, char[]> requestToArrayConverter;
 
@@ -37,7 +38,7 @@ public class HashGenerator<T> {
                     new PBEKeySpec(requestArray, this.saltBytes, ITERATION_COUNT, KEY_LENGTH);
             SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM_NAME);
             byte[] hash = skf.generateSecret(keySpec).getEncoded();
-            return Hex.encodeHexString(hash);
+            return HashUtils.toBase62(hash).substring(0, HASH_LENGTH);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new ServiceException("Problem during hash creation", e);
         }
