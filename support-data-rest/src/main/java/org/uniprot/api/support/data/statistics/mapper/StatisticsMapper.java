@@ -54,8 +54,8 @@ public class StatisticsMapper {
     public StatisticsModuleStatisticsHistory mapHistory(UniProtKBStatisticsEntry entry) {
         return StatisticsModuleStatisticsHistoryImpl.builder()
                 .statisticsType(map(entry.getEntryType()))
-                .releaseName(entry.getReleaseName().getId())
-                .releaseDate(entry.getReleaseName().getDate())
+                .releaseName(entry.getUniProtRelease().getName())
+                .releaseDate(entry.getUniProtRelease().getDate())
                 .valueCount(entry.getValueCount())
                 .entryCount(entry.getEntryCount())
                 .build();
