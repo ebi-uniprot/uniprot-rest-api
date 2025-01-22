@@ -5,7 +5,6 @@ import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPR
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sahmad
