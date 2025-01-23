@@ -1,2 +1,0 @@
-download_sp_url#download_sp_format
-/uniprot/api/uniprotkb/download?query=reviewed:true#text/flatfile

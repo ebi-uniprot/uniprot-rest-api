@@ -77,7 +77,6 @@
 		<module>unisave-rest</module>
 		<module>aa-rest</module>
 		<module>help-centre-rest</module>
-		<module>benchmark-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 
