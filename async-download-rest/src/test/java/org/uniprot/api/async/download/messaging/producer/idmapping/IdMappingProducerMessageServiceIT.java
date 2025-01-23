@@ -83,7 +83,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
 
         String jobId = service.sendMessage(request);
 
-        assertEquals("69f040f9379647d61adb703c357466fef6f07804", jobId);
+        assertEquals("f7aSiyBORu", jobId);
         Mockito.verify(idMappingMessageConsumer, Mockito.timeout(1000).times(1))
                 .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
@@ -102,7 +102,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         request.setFormat("json");
         request.setFields("accession,gene");
         request.setForce(true);
-        String jobId = "054de54c6e8ef8697b7863cfedb5afac75e156b0";
+        String jobId = "KVhf4sLgFV";
         createIDMappingJob(JobStatus.FINISHED);
         // Reproduce Idle Job in Running Status in and files created
         createJobFiles(jobId);
@@ -150,7 +150,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         IdMappingDownloadRequest request = new IdMappingDownloadRequest();
         request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         request.setFormat("json");
-        String jobId = "6ce47574dc980c6c4d49e62483eaee999fb51f60";
+        String jobId = "fxj2knPyPL";
         createIDMappingJob(JobStatus.FINISHED);
         IdMappingDownloadJob runningJob =
                 new IdMappingDownloadJob(
@@ -218,7 +218,7 @@ class IdMappingProducerMessageServiceIT extends BasicProducerMessageServiceIT {
         request.setIdMappingJobId(ID_MAPPING_JOB_ID_VALUE);
         createIDMappingJob(JobStatus.FINISHED);
 
-        String jobId = "6ce47574dc980c6c4d49e62483eaee999fb51f60";
+        String jobId = "fxj2knPyPL";
         String resultJobId = service.sendMessage(request);
         assertEquals(jobId, resultJobId);
         request.setFormat("json");

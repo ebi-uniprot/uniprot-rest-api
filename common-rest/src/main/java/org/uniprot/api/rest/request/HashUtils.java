@@ -2,6 +2,7 @@ package org.uniprot.api.rest.request;
 
 import java.math.BigInteger;
 
+/** A class to convert byte[] to Base62 */
 public class HashUtils {
     private static final String BASE62_CHARS =
             "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
