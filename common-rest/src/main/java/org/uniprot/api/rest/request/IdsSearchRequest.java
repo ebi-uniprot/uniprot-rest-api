@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.request;
 
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPARC_UPI_SEQUENCE_RANGE_REGEX;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sahmad
@@ -32,10 +32,13 @@ public interface IdsSearchRequest extends SearchRequest {
                 .map(
                         sanitisedId ->
                                 UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
-                                                .matcher(sanitisedId)
-                                                .matches()
+                                                        .matcher(sanitisedId)
+                                                        .matches()
+                                                || UNIPARC_UPI_SEQUENCE_RANGE_REGEX
+                                                        .matcher(sanitisedId)
+                                                        .matches()
                                         ? sanitisedId.substring(0, sanitisedId.indexOf("["))
                                         : sanitisedId)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
