@@ -5,6 +5,7 @@ import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPR
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author sahmad
@@ -39,6 +40,6 @@ public interface IdsSearchRequest extends SearchRequest {
                                                         .matches()
                                         ? sanitisedId.substring(0, sanitisedId.indexOf("["))
                                         : sanitisedId)
-                .toList();
+                .collect(Collectors.toList());
     }
 }
