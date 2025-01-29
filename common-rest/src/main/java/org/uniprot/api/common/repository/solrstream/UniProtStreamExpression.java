@@ -20,7 +20,7 @@ public class UniProtStreamExpression extends StreamExpression {
     }
 
     protected void addFQRelatedParams(SolrRequest request) {
-        // qf if there is a user query else no need for qf
+        // qf if there is a user query else no need for qf, we use fq for better performance
         if (Utils.notNullNotEmpty(request.getQuery()) && !"*:*".equals(request.getQuery())) {
             this.addParameter(new StreamExpressionNamedParameter("defType", "edismax"));
             this.addParameter(new StreamExpressionNamedParameter("qf", request.getQueryField()));

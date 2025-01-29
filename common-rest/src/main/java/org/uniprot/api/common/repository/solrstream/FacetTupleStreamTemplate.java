@@ -66,8 +66,9 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
     }
 
     private static boolean shouldAddSearchExpression(SolrRequest request) {
-        return Utils.notNullNotEmpty(request.getQuery())
-                || Utils.notNullNotEmpty(request.getSorts())
-                || Utils.nullOrEmpty(request.getFacets());
+        return (Utils.notNullNotEmpty(request.getQuery())
+                        || Utils.notNullNotEmpty(request.getSorts())
+                        || Utils.nullOrEmpty(request.getFacets()))
+                && request.getRows() > 0;
     }
 }
