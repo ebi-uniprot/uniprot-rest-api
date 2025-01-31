@@ -230,9 +230,11 @@ public abstract class BasicIdService<T, U> {
 
     protected SolrStreamFacetResponse searchBySolrStream(SolrRequest solrRequest) {
         // batch facets..
-        if(!solrRequest.getFacets().isEmpty() && facetBatchingEnabled){
+        if (!solrRequest.getFacets().isEmpty() && facetBatchingEnabled) {
             List<SolrStreamFacetResponse> responses = batchProcess(solrRequest, 5000, 3);
-            List<Facet> mergedFacets = FacetMerger.mergeCollectedFacets(responses.stream().map(SolrStreamFacetResponse::getFacets).toList());
+            List<Facet> mergedFacets =
+                    FacetMerger.mergeCollectedFacets(
+                            responses.stream().map(SolrStreamFacetResponse::getFacets).toList());
             return new SolrStreamFacetResponse(mergedFacets, List.of());
         } else { // TODO think about batching search
             TupleStream facetTupleStream = this.tupleStream.create(solrRequest);
@@ -242,8 +244,13 @@ public abstract class BasicIdService<T, U> {
         }
     }
 
-    public  List<SolrStreamFacetResponse> batchProcess(SolrRequest originalRequest, int idBatchSize, int facetBatchSize) {
-        String idsPart = originalRequest.getIdsQuery().replace("({!terms f="+originalRequest.getIdField()+"}", "").replace(")", "");
+    public List<SolrStreamFacetResponse> batchProcess(
+            SolrRequest originalRequest, int idBatchSize, int facetBatchSize) {
+        String idsPart =
+                originalRequest
+                        .getIdsQuery()
+                        .replace("({!terms f=" + originalRequest.getIdField() + "}", "")
+                        .replace(")", "");
         List<String> ids = Arrays.asList(idsPart.split(","));
         List<SolrFacetRequest> facets = originalRequest.getFacets();
         List<List<String>> idBatches = batch(ids, idBatchSize);
@@ -256,19 +263,22 @@ public abstract class BasicIdService<T, U> {
                 solrRequestBuilder.facets(facetBatch);
                 SolrRequest solrRequest = solrRequestBuilder.build();
                 TupleStream facetTupleStream = this.tupleStream.create(solrRequest);
-                SolrStreamFacetResponse response = this.facetTupleStreamConverter.convert(
-                        facetTupleStream,
-                        solrRequest.getFacets().stream().map(SolrFacetRequest::getName).toList());
+                SolrStreamFacetResponse response =
+                        this.facetTupleStreamConverter.convert(
+                                facetTupleStream,
+                                solrRequest.getFacets().stream()
+                                        .map(SolrFacetRequest::getName)
+                                        .toList());
                 responses.add(response);
             }
         }
         return responses;
     }
 
-
     public static String createIdsQuery(List<String> idBatch, String idField) {
-        return "({!terms f="+idField+"}" + String.join(",", idBatch) + ")";
+        return "({!terms f=" + idField + "}" + String.join(",", idBatch) + ")";
     }
+
     public static <T> List<List<T>> batch(List<T> list, int batchSize) {
         List<List<T>> batches = new ArrayList<>();
         for (int i = 0; i < list.size(); i += batchSize) {
@@ -276,8 +286,6 @@ public abstract class BasicIdService<T, U> {
         }
         return batches;
     }
-
-
 
     private Integer getPageSize(SearchRequest searchRequest) {
         Integer pageSize = this.defaultPageSize;

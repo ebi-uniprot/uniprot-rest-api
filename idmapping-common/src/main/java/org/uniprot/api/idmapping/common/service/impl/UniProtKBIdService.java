@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -63,9 +62,6 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     private final TaxonomyLineageService lineageService;
 
     private final ReturnFieldConfig returnFieldConfig;
-
-
-
 
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,

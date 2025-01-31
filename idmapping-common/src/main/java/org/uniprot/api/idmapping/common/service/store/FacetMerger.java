@@ -1,9 +1,9 @@
 package org.uniprot.api.idmapping.common.service.store;
 
+import java.util.*;
+
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
-
-import java.util.*;
 
 public class FacetMerger {
 
@@ -20,10 +20,12 @@ public class FacetMerger {
                     mergeFacetItems(existingBuilder, incomingFacet);
                 } else {
                     // Otherwise, add it to the mergedFacetsMap
-                    Facet.FacetBuilder newBuilder = Facet.builder()
-                            .label(incomingFacet.getLabel())
-                            .name(incomingFacet.getName())
-                            .allowMultipleSelection(incomingFacet.isAllowMultipleSelection());
+                    Facet.FacetBuilder newBuilder =
+                            Facet.builder()
+                                    .label(incomingFacet.getLabel())
+                                    .name(incomingFacet.getName())
+                                    .allowMultipleSelection(
+                                            incomingFacet.isAllowMultipleSelection());
                     mergeFacetItems(newBuilder, incomingFacet);
                     mergedFacetsMap.put(facetLabel, newBuilder);
                 }
@@ -47,15 +49,17 @@ public class FacetMerger {
         if (existingValues != null) {
             for (FacetItem existingItem : existingValues) {
                 String key = existingItem.getLabel() + "|" + existingItem.getValue();
-                FacetItem.FacetItemBuilder itemBuilder = FacetItem.builder()
-                        .label(existingItem.getLabel())
-                        .value(existingItem.getValue())
-                        .count(existingItem.getCount());
+                FacetItem.FacetItemBuilder itemBuilder =
+                        FacetItem.builder()
+                                .label(existingItem.getLabel())
+                                .value(existingItem.getValue())
+                                .count(existingItem.getCount());
                 itemMap.put(key, itemBuilder);
             }
         }
 
-        // Merge FacetItems from the sourceFacet (handling potential null in sourceFacet.getValues())
+        // Merge FacetItems from the sourceFacet (handling potential null in
+        // sourceFacet.getValues())
         List<FacetItem> sourceValues = sourceFacet.getValues();
         if (sourceValues != null) {
             for (FacetItem incomingItem : sourceValues) {
@@ -63,24 +67,26 @@ public class FacetMerger {
                 if (itemMap.containsKey(key)) {
                     // Add counts if the item already exists
                     FacetItem.FacetItemBuilder existingBuilder = itemMap.get(key);
-                    existingBuilder.count(existingBuilder.build().getCount() + incomingItem.getCount());
+                    existingBuilder.count(
+                            existingBuilder.build().getCount() + incomingItem.getCount());
                 } else {
                     // Otherwise, add the new item
-                    FacetItem.FacetItemBuilder newItemBuilder = FacetItem.builder()
-                            .label(incomingItem.getLabel())
-                            .value(incomingItem.getValue())
-                            .count(incomingItem.getCount());
+                    FacetItem.FacetItemBuilder newItemBuilder =
+                            FacetItem.builder()
+                                    .label(incomingItem.getLabel())
+                                    .value(incomingItem.getValue())
+                                    .count(incomingItem.getCount());
                     itemMap.put(key, newItemBuilder);
                 }
             }
         }
 
         // Update the builder's values with the merged items
-        List<FacetItem> facetItems = new ArrayList<>(); // Ensure the builder is initialized with a new list
+        List<FacetItem> facetItems =
+                new ArrayList<>(); // Ensure the builder is initialized with a new list
         for (FacetItem.FacetItemBuilder itemBuilder : itemMap.values()) {
             facetItems.add(itemBuilder.build());
         }
         builder.values(facetItems);
     }
 }
-
