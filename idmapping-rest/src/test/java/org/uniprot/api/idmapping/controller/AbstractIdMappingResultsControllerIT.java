@@ -316,7 +316,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
                                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("facets", "reviewed,model_organism,proteins_with,existence,annotation_score,length")
+                                        .param("facets", facetName)
                                         .param("size", "0"));
 
         // then

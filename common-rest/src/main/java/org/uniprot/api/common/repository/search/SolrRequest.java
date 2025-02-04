@@ -56,4 +56,40 @@ public class SolrRequest {
             return query;
         }
     }
+
+    @Override
+    public String toString() {
+        return "SolrRequest{"
+                + "query='"
+                + query
+                + '\''
+                + ", termQuery='"
+                + termQuery
+                + '\''
+                + ", queryField='"
+                + queryField
+                + '\''
+                + ", defaultField='"
+                + defaultField
+                + '\''
+                + ", idField='"
+                + idField
+                + '\''
+                + ", idsQuery='"
+                + idsQuery
+                + '\''
+                + ", rows="
+                + rows
+                + ", totalRows="
+                + totalRows
+                + ", termFields="
+                + termFields
+                + ", filterQueries="
+                + filterQueries
+                + ", facets="
+                + facets
+                + ", sorts="
+                + sorts
+                + '}';
+    }
 }

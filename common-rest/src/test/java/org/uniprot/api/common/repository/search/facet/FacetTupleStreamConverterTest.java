@@ -53,7 +53,8 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
+        SolrStreamFacetResponse response =
+                facetConverter.convert(tupleStream, List.of("reviewed", "model_organism"));
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());
@@ -114,7 +115,7 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, List.of("length"));
 
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());
@@ -163,7 +164,8 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
+        SolrStreamFacetResponse response =
+                facetConverter.convert(tupleStream, List.of("reviewed", "model_organism"));
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());

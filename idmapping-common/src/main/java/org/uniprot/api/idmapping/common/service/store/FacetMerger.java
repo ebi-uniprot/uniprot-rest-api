@@ -4,29 +4,29 @@ import java.util.*;
 
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
+import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 
 public class FacetMerger {
 
-    public static List<Facet> mergeCollectedFacets(List<List<Facet>> collectedFacets) {
-        Map<String, Facet.FacetBuilder> mergedFacetsMap = new HashMap<>();
-
-        for (List<Facet> facetList : collectedFacets) {
-            for (Facet incomingFacet : facetList) {
-                String facetLabel = incomingFacet.getLabel();
-
+    public static List<Facet> mergeBatchFacets(List<SolrStreamFacetResponse> facetsInBatches) {
+        List<List<Facet>> facetsLists =
+                facetsInBatches.stream().map(SolrStreamFacetResponse::getFacets).toList();
+        Map<String, Facet.FacetBuilder> mergedFacetsMap = new LinkedHashMap<>();
+        for (List<Facet> facets : facetsLists) {
+            for (Facet facet : facets) {
+                String facetLabel = facet.getLabel();
                 // If a Facet with the same label already exists, merge its FacetItems
                 if (mergedFacetsMap.containsKey(facetLabel)) {
                     Facet.FacetBuilder existingBuilder = mergedFacetsMap.get(facetLabel);
-                    mergeFacetItems(existingBuilder, incomingFacet);
+                    mergeFacetItems(existingBuilder, facet);
                 } else {
                     // Otherwise, add it to the mergedFacetsMap
                     Facet.FacetBuilder newBuilder =
                             Facet.builder()
-                                    .label(incomingFacet.getLabel())
-                                    .name(incomingFacet.getName())
-                                    .allowMultipleSelection(
-                                            incomingFacet.isAllowMultipleSelection());
-                    mergeFacetItems(newBuilder, incomingFacet);
+                                    .label(facet.getLabel())
+                                    .name(facet.getName())
+                                    .allowMultipleSelection(facet.isAllowMultipleSelection());
+                    mergeFacetItems(newBuilder, facet);
                     mergedFacetsMap.put(facetLabel, newBuilder);
                 }
             }
@@ -42,7 +42,7 @@ public class FacetMerger {
 
     private static void mergeFacetItems(Facet.FacetBuilder builder, Facet sourceFacet) {
         // Initialize itemMap to store merged FacetItems
-        Map<String, FacetItem.FacetItemBuilder> itemMap = new HashMap<>();
+        Map<String, FacetItem.FacetItemBuilder> itemMap = new LinkedHashMap<>();
 
         // Collect existing FacetItems from the builder (handling potential null)
         List<FacetItem> existingValues = builder.build().getValues();
@@ -62,20 +62,20 @@ public class FacetMerger {
         // sourceFacet.getValues())
         List<FacetItem> sourceValues = sourceFacet.getValues();
         if (sourceValues != null) {
-            for (FacetItem incomingItem : sourceValues) {
-                String key = incomingItem.getLabel() + "|" + incomingItem.getValue();
+            for (FacetItem facetItem : sourceValues) {
+                String key = facetItem.getLabel() + "|" + facetItem.getValue();
                 if (itemMap.containsKey(key)) {
                     // Add counts if the item already exists
                     FacetItem.FacetItemBuilder existingBuilder = itemMap.get(key);
                     existingBuilder.count(
-                            existingBuilder.build().getCount() + incomingItem.getCount());
+                            existingBuilder.build().getCount() + facetItem.getCount());
                 } else {
                     // Otherwise, add the new item
                     FacetItem.FacetItemBuilder newItemBuilder =
                             FacetItem.builder()
-                                    .label(incomingItem.getLabel())
-                                    .value(incomingItem.getValue())
-                                    .count(incomingItem.getCount());
+                                    .label(facetItem.getLabel())
+                                    .value(facetItem.getValue())
+                                    .count(facetItem.getCount());
                     itemMap.put(key, newItemBuilder);
                 }
             }
