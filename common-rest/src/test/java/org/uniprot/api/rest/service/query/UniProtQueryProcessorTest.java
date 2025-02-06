@@ -237,6 +237,14 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
+    void handleGreekSymbolValueSearch() {
+        String query = "field:other_value"+"\u03B1";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("field:other_valuealpha"));
+    }
+
+    @Test
     void handleUnderscoreDefaultSearch() {
         String query = "VAR_99999";
         String processedQuery = processor.processQuery(query);
