@@ -256,11 +256,13 @@ public abstract class BasicIdService<T, U> {
             // get facets
             List<SolrStreamFacetResponse> facetsInBatches =
                     getFacetsInBatches(solrRequest, this.idBatchSize, this.facetBatchSize);
-            List<Facet> mergedFacets = FacetMerger.mergeBatchFacets(facetsInBatches);
+            List<Facet> mergedFacets = FacetMerger.mergeBatchFacets(solrRequest, facetsInBatches);
             mergedResponse = new SolrStreamFacetResponse(mergedFacets, idsResponse.getIds());
             if (!FacetComparator.areFacetListsEqual(
                     mergedResponse.getFacets(), singleResponse.getFacets())) {
                 log.error("Facets did not match {}", solrRequest);
+                log.error("Batch Response {}", mergedResponse.getFacets());
+                log.error("Single Batch Response {}", singleResponse.getFacets());
             }
         }
 
@@ -382,28 +384,36 @@ public abstract class BasicIdService<T, U> {
                         .replace(")", "");
 
         List<String> ids = Arrays.asList(idsPart.split(","));
-        List<SolrFacetRequest> facets = solrRequest.getFacets();
+        List<SolrFacetRequest> batchFacets = createBatchFacets(solrRequest.getFacets());
         List<SolrStreamFacetResponse> facetResponses = new ArrayList<>();
         for (int i = 0; i < ids.size(); i += idBatchSize) {
             List<String> idBatch = ids.subList(i, Math.min(i + idBatchSize, ids.size()));
-            for (int j = 0; j < facets.size(); j += facetBatchSize) {
-                List<SolrFacetRequest> facetBatch =
-                        facets.subList(j, Math.min(j + facetBatchSize, facets.size()));
-                SolrRequest.SolrRequestBuilder solrFacetRequestBuilder = solrRequest.toBuilder();
-                solrFacetRequestBuilder.idsQuery(createIdsQuery(idBatch, solrRequest.getIdField()));
-                solrFacetRequestBuilder.clearFacets().facets(facetBatch);
-                SolrRequest solrFacetRequest = solrFacetRequestBuilder.build();
-                TupleStream facetTupleStream = this.tupleStream.create(solrFacetRequest);
-                SolrStreamFacetResponse response =
-                        this.facetTupleStreamConverter.convert(
-                                facetTupleStream,
-                                solrFacetRequest.getFacets().stream()
-                                        .map(SolrFacetRequest::getName)
-                                        .toList());
-                facetResponses.add(response);
-            }
+            SolrRequest.SolrRequestBuilder solrFacetRequestBuilder = solrRequest.toBuilder();
+            solrFacetRequestBuilder.idsQuery(createIdsQuery(idBatch, solrRequest.getIdField()));
+            SolrRequest solrFacetRequest = solrFacetRequestBuilder.clearFacets().facets(batchFacets).build();
+            TupleStream facetTupleStream = this.tupleStream.create(solrFacetRequest);
+            SolrStreamFacetResponse response =
+                    this.facetTupleStreamConverter.convert(
+                            facetTupleStream,
+                            solrFacetRequest.getFacets().stream()
+                                    .map(SolrFacetRequest::getName)
+                                    .toList());
+            facetResponses.add(response);
         }
         return facetResponses;
+    }
+
+    private List<SolrFacetRequest> createBatchFacets(List<SolrFacetRequest> facets) {
+        List<SolrFacetRequest> batchFacets = new ArrayList<>();
+        for(SolrFacetRequest facet : facets){
+            SolrFacetRequest.SolrFacetRequestBuilder builder = SolrFacetRequest.builder();
+            builder.name(facet.getName()).minCount(facet.getMinCount()).sort(null);
+            if(Utils.nullOrEmpty(facet.getInterval())) {
+                builder.limit(-1);
+            }
+            batchFacets.add(builder.build());
+        }
+        return batchFacets;
     }
 
     private String createIdsQuery(List<String> idBatch, String idField) {

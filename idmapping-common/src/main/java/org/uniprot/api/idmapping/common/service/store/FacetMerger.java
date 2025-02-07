@@ -2,13 +2,16 @@ package org.uniprot.api.idmapping.common.service.store;
 
 import java.util.*;
 
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
+import org.uniprot.api.common.repository.solrstream.FacetStreamExpression;
 
 public class FacetMerger {
 
-    public static List<Facet> mergeBatchFacets(List<SolrStreamFacetResponse> facetsInBatches) {
+    public static List<Facet> mergeBatchFacets(SolrRequest solrRequest, List<SolrStreamFacetResponse> facetsInBatches) {
+        Map<String, Map.Entry<Integer, Comparator<FacetItem>>> map = FacetStreamExpression.getFacetNameComparatorAndLimitMap(solrRequest.getFacets());
         List<List<Facet>> facetsLists =
                 facetsInBatches.stream().map(SolrStreamFacetResponse::getFacets).toList();
         Map<String, Facet.FacetBuilder> mergedFacetsMap = new LinkedHashMap<>();
@@ -35,6 +38,12 @@ public class FacetMerger {
         // Build the final list of Facets from the builders
         List<Facet> mergedFacets = new ArrayList<>();
         for (Facet.FacetBuilder builder : mergedFacetsMap.values()) {
+            Facet mergedFacet = builder.build();
+            Map.Entry<Integer, Comparator<FacetItem>> limitComparator = map.get(mergedFacet.getName());
+            List<FacetItem> facetItems = mergedFacet.getValues();
+            facetItems.sort(limitComparator.getValue());
+            Integer limit = limitComparator.getKey();
+            builder.values(facetItems.subList(0, Math.min(facetItems.size(), limit)));
             mergedFacets.add(builder.build());
         }
         return mergedFacets;

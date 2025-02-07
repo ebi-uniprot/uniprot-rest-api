@@ -36,7 +36,7 @@ public class FacetTupleStreamConverter
     }
 
     @Override
-    protected FacetConfig getFacetConfig() {
+    public FacetConfig getFacetConfig() {
         return this.facetConfig;
     }
 

@@ -24,6 +24,7 @@ public class FacetComparator {
     }
 
     private static boolean areFacetsEqual(Facet f1, Facet f2) {
+        if (f1 == null && f2 == null) return true;
         if (f1 == null || f2 == null) return false;
         if (!Objects.equals(f1.getLabel(), f2.getLabel())) return false;
         if (!Objects.equals(f1.getName(), f2.getName())) return false;
@@ -33,7 +34,8 @@ public class FacetComparator {
     }
 
     private static boolean areFacetItemsEqual(List<FacetItem> list1, List<FacetItem> list2) {
-        if (list1 == null || list2 == null) return list1 == list2;
+        if (list1 == null && list2 == null) return true;
+        if (list1 == null || list2 == null) return false;
         if (list1.size() != list2.size()) return false;
 
         for (int i = 0; i < list1.size(); i++) {
