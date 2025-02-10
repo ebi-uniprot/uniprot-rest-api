@@ -83,7 +83,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = ID_UNIPARC_OPERATION_DESC,
+            summary = ID_UNIPARC_OPERATION,
             description = ID_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
