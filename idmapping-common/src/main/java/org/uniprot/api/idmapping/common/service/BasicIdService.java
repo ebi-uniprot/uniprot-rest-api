@@ -255,7 +255,7 @@ public abstract class BasicIdService<T, U> {
                     this.facetTupleStreamConverter.convert(tupleStream, List.of());
             // get facets
             List<SolrStreamFacetResponse> facetsInBatches =
-                    getFacetsInBatches(solrRequest, this.idBatchSize, this.facetBatchSize);
+                    getFacetsInBatches(solrRequest, this.idBatchSize);
             List<Facet> mergedFacets = FacetMerger.mergeBatchFacets(solrRequest, facetsInBatches);
             mergedResponse = new SolrStreamFacetResponse(mergedFacets, idsResponse.getIds());
             if (!FacetComparator.areFacetListsEqual(
@@ -374,8 +374,7 @@ public abstract class BasicIdService<T, U> {
                 && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;
     }
 
-    private List<SolrStreamFacetResponse> getFacetsInBatches(
-            SolrRequest solrRequest, int idBatchSize, int facetBatchSize) {
+    private List<SolrStreamFacetResponse> getFacetsInBatches(SolrRequest solrRequest, int idBatchSize) {
         // get the ids from the terms query
         String idsPart =
                 solrRequest

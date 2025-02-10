@@ -18,4 +18,6 @@ import lombok.NoArgsConstructor;
 public class SolrStreamFacetResponse {
     private List<Facet> facets;
     private List<String> ids;
+    // TODO create a builder with list a facets
+    // add a static merge method to return single SolrStreamFacetResponse
 }

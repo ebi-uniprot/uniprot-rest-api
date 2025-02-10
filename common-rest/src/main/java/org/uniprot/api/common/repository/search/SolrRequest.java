@@ -57,6 +57,9 @@ public class SolrRequest {
         }
     }
 
+    // TODO add a method to create solrRequest with batch of ids and other info like facet, length, sort etc
+    // createBatchFacetSolrRequest
+
     @Override
     public String toString() {
         return "SolrRequest{"
