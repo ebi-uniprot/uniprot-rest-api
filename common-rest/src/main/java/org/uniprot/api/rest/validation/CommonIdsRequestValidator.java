@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.validation;
 
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_OPTIONAL_SEQ_RANGE;
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidatorContext;
@@ -82,7 +81,7 @@ public abstract class CommonIdsRequestValidator {
                         .matcher(id.strip().toUpperCase())
                         .matches();
             case UNIPARC:
-                return id.strip().toUpperCase().matches(FieldRegexConstants.UNIPARC_UPI_REGEX);
+                return UNIPARC_UPI_OPTIONAL_SEQ_RANGE.matcher(id.strip().toUpperCase()).matches();
             case UNIREF:
                 return id.strip().matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX);
             default:
@@ -124,10 +123,15 @@ public abstract class CommonIdsRequestValidator {
 
     boolean isValidFormatForSubsequence(String id, String passedFormat, UniProtDataType dataType) {
         boolean isValid = true;
-        if (UniProtDataType.UNIPROTKB == dataType
-                && UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
-                        .matcher(id.strip().toUpperCase())
-                        .matches()
+        if ((UniProtDataType.UNIPROTKB == dataType
+                        && UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
+                                .matcher(id.strip().toUpperCase())
+                                .matches())
+                && !UniProtMediaType.FASTA_MEDIA_TYPE_VALUE.equals(passedFormat)) {
+            isValid = false;
+        }
+        if (UniProtDataType.UNIPARC == dataType
+                && UNIPARC_UPI_SEQUENCE_RANGE_REGEX.matcher(id.strip().toUpperCase()).matches()
                 && !UniProtMediaType.FASTA_MEDIA_TYPE_VALUE.equals(passedFormat)) {
             isValid = false;
         }
@@ -136,10 +140,14 @@ public abstract class CommonIdsRequestValidator {
 
     boolean isValidSequenceRange(String id, UniProtDataType dataType) {
         boolean isValid = true;
-        if (UniProtDataType.UNIPROTKB == dataType
-                && UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
-                        .matcher(id.strip().toUpperCase())
-                        .matches()) {
+        if ((UniProtDataType.UNIPROTKB == dataType
+                        && UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
+                                .matcher(id.strip().toUpperCase())
+                                .matches())
+                || (UniProtDataType.UNIPARC == dataType
+                        && UNIPARC_UPI_SEQUENCE_RANGE_REGEX
+                                .matcher(id.strip().toUpperCase())
+                                .matches())) {
             String range = id.substring(id.indexOf('[') + 1, id.indexOf(']'));
             String[] rangeTokens = range.split("-");
 
@@ -161,7 +169,7 @@ public abstract class CommonIdsRequestValidator {
     }
 
     void invalidSequeceRangeMessage(String id, ConstraintValidatorContextImpl contextImpl) {
-        String errMsg = "Invalid sequence range '{0}' in the accession.";
+        String errMsg = "{ids.invalid.sequence.range}";
         contextImpl.addMessageParameter("0", id);
         contextImpl.buildConstraintViolationWithTemplate(errMsg).addConstraintViolation();
     }

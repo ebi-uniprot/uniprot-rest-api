@@ -6,6 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -157,6 +158,117 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
                                         "The 'upi' value has invalid format. It should be a valid UniParc UPI",
                                         "'invalid' is not a valid search field")))
                 .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByUPIdFastaWithSeqRangeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("upis", "UPI0000000004[5-10]"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content().string(is(">UPI0000000004|5-10 status=active\n" + "KRTKYR\n")));
+    }
+
+    @Test
+    void getByUPIdsFastaWithSeqRangesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("upis", "UPI0000000004[5-10],UPI0000000001[1-5]"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">UPI0000000004|5-10 status=active\n"
+                                                        + "KRTKYR\n"
+                                                        + ">UPI0000000001|1-5 status=active\n"
+                                                        + "MLMPK\n")));
+    }
+
+    @Test
+    void getByUPIdsFastaWithOrWithoutSeqRangesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param(
+                                        "upis",
+                                        "UPI0000000002,UPI0000000004[5-10],UPI0000000001[1-5],UPI0000000001"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">UPI0000000002 status=active\n"
+                                                        + "MLMPKRTKYRAA\n"
+                                                        + ">UPI0000000004|5-10 status=active\n"
+                                                        + "KRTKYR\n"
+                                                        + ">UPI0000000001|1-5 status=active\n"
+                                                        + "MLMPK\n"
+                                                        + ">UPI0000000001 status=active\n"
+                                                        + "MLMPKRTKYRA\n")));
+    }
+
+    @Test
+    void getByUPIdFastaWithSeqRangeInvalidFormat() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("upis", "UPI0000000004[5-10]"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains(
+                                        "Invalid content type received, 'application/json'. Expected one of [text/plain;format=fasta].")));
+    }
+
+    @Test
+    void getByUPIdFastaWithInvalidSeqRange() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("upis", "UPI0000000004[50-10]"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid sequence range 'UPI0000000004[50-10]' in the UniParc Id.")));
     }
 
     @Override

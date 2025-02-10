@@ -134,6 +134,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
         String value = "";
         switch (searchField) {
             case "upi":
+            case "uniparc":
                 value = UPI_PREF + 11;
                 break;
             case "taxonomy_id":
@@ -144,9 +145,11 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                 break;
             case "uniprotkb":
             case "isoform":
+            case "accession":
                 value = "P10011";
                 break;
             case "proteome":
+            case "upid":
                 value = "UP000005640";
                 break;
             case "proteomecomponent":
@@ -232,27 +235,6 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                         .perform(
                                 get(getSearchRequestPath())
                                         .param("query", "WP_168893211")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083A11")));
-    }
-
-    @Test
-    void searchWithAlias_returnsSuccess() throws Exception {
-        // given
-        saveEntry(SaveScenario.SEARCH_SUCCESS);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getSearchRequestPath())
-                                        .param("query", "uniparc:UPI0000083A11")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

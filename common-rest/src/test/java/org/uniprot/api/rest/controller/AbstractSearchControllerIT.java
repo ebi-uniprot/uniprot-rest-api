@@ -896,9 +896,16 @@ public abstract class AbstractSearchControllerIT {
     }
 
     private Stream<Arguments> getAllSearchFields() {
-        return getSearchFieldConfig().getSearchFieldItems().stream()
-                .map(SearchFieldItem::getFieldName)
-                .map(Arguments::of);
+        Stream<Arguments> fields =
+                getSearchFieldConfig().getSearchFieldItems().stream()
+                        .map(SearchFieldItem::getFieldName)
+                        .map(Arguments::of);
+        Stream<Arguments> aliases =
+                getSearchFieldConfig().getSearchFieldItems().stream()
+                        .map(SearchFieldItem::getAliases)
+                        .flatMap(List::stream)
+                        .map(Arguments::of);
+        return Stream.concat(fields, aliases);
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
