@@ -5,8 +5,8 @@ import java.io.OutputStream;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.core.parser.fasta.uniparc.UniParcFastaParser;
 import org.uniprot.api.rest.output.converter.AbstractFastaMessageConverter;
+import org.uniprot.core.parser.fasta.uniparc.UniParcFastaParser;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 
 public class UniParcLightFastaMessageConverter
