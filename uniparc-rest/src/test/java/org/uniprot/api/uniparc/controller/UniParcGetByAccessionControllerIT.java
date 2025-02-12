@@ -43,6 +43,8 @@ import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
         })
 class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest {
 
+    public static final String SOURCES = "sources";
+
     @Override
     protected String getIdRequestPath() {
         return "/uniparc/accession/{accession}";
@@ -180,6 +182,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

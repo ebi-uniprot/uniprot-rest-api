@@ -2,8 +2,6 @@ package org.uniprot.api.uniparc.common.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +12,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
@@ -22,6 +21,7 @@ import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreCl
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 
 /**
@@ -41,6 +41,7 @@ class UniParcEntryServiceTest {
     @Mock private UniParcCrossReferenceService uniParcCrossReferenceService;
 
     @Mock private RequestConverter uniParcRequestConverter;
+    @Mock private StoreStreamer<UniParcEntry> uniParcFastaStoreStreamer;
     private UniParcEntryService service;
 
     @BeforeEach
@@ -56,7 +57,8 @@ class UniParcEntryServiceTest {
                         solrIdStreamer,
                         uniParcLightStoreClient,
                         uniParcCrossReferenceService,
-                        uniParcRequestConverter);
+                        uniParcRequestConverter,
+                        uniParcFastaStoreStreamer);
     }
 
     @Test
@@ -73,13 +75,6 @@ class UniParcEntryServiceTest {
     @Test
     void streamThrowsUnsupportedOperationException() {
         UniParcStreamRequest request = new UniParcStreamRequest();
-        List<String> upis =
-                List.of(
-                        "UPI0000000001",
-                        "UPI0000000002",
-                        "UPI0000000003",
-                        "UPI0000000004",
-                        "UPI0000000005");
         request.setQuery("field:value");
         request.setFormat(UniProtMediaType.LIST_MEDIA_TYPE_VALUE);
         assertThrows(UnsupportedOperationException.class, () -> service.stream(request));
