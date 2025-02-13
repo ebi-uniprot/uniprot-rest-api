@@ -67,8 +67,6 @@ public class SolrRequest {
         return builder.build();
     }
 
-    // TODO add a method to create solrRequest with batch of ids and other info like facet, length,
-    // sort etc
     public SolrRequest createBatchFacetSolrRequest(List<String> ids) {
         SolrRequestBuilder builder = this.toBuilder();
         List<SolrFacetRequest> batchFacets = createBatchFacets(this.facets);
