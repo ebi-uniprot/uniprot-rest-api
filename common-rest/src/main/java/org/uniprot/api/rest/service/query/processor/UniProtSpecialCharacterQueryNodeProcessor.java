@@ -10,9 +10,117 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcessorImpl {
+    private static final Map<Character, String> SPECIAL_CHAR_MAP = createCharMap();
+
+    private static Map<Character, String> createCharMap() {
+        Map<Character, String> map = new HashMap<>();
+        map.put('\u00C0', "A"); // À
+        map.put('\u00C1', "A"); // Á
+        map.put('\u00C2', "A"); // Â
+        map.put('\u00C3', "A"); // Ã
+
+        map.put('\u00C5', "AA"); // Å
+
+        map.put('\u00C4', "AE"); // Ä
+        map.put('\u00C6', "AE"); // Æ
+
+        map.put('\u00C7', "C"); // Ç
+
+        map.put('\u00C8', "E"); // È
+        map.put('\u00C9', "E"); // É
+        map.put('\u00CA', "E"); // Ê
+        map.put('\u00CB', "E"); // Ë
+
+        map.put('\u00CC', "I"); // Ì
+        map.put('\u00CD', "I"); // Í
+        map.put('\u00CE', "I"); // Î
+        map.put('\u00CF', "I"); // Ï
+
+        map.put('\u00D0', "D"); // Ð
+        map.put('\u00D1', "N"); // Ñ
+        map.put('\u00D2', "O"); // Ò
+        map.put('\u00D3', "O"); // Ó
+        map.put('\u00D4', "O"); // Ô
+        map.put('\u00D5', "O"); // Õ
+        map.put('\u00D8', "OE"); // Ø
+        map.put('\u00D6', "OE"); // Ö
+        map.put('\u0152', "OE"); // Œ
+        map.put('\u00DE', "P"); // Þ
+        map.put('\u00D9', "U"); // Ù
+        map.put('\u00DA', "U"); // Ú
+        map.put('\u00DB', "U"); // Û
+        map.put('\u00DC', "UE"); // Ü
+        map.put('\u00DD', "Y"); // Ý
+        map.put('\u0178', "Y"); // Ÿ
+        map.put('\u00E0', "a"); // à
+        map.put('\u00E1', "a"); // á
+        map.put('\u00E2', "a"); // â
+        map.put('\u00E3', "a"); // ã
+        map.put('\u00E5', "aa"); // å
+        map.put('\u00E4', "ae"); // ä
+        map.put('\u00E6', "ae"); // æ
+        map.put('\u00E7', "c"); // ç
+        map.put('\u00E8', "e"); // è
+        map.put('\u00E9', "e"); // é
+        map.put('\u00EA', "e"); // ê
+        map.put('\u00EB', "e"); // ë
+        map.put('\u00EC', "i"); // ì
+        map.put('\u00ED', "i"); // í
+        map.put('\u00EE', "i"); // î
+        map.put('\u00EF', "i"); // ï
+        map.put('\u00F0', "d"); // ð
+        map.put('\u00F1', "n"); // ñ
+        map.put('\u00F2', "o"); // ò
+        map.put('\u00F3', "o"); // ó
+        map.put('\u00F4', "o"); // ô
+        map.put('\u00F5', "o"); // õ
+        map.put('\u00F8', "oe"); // ø
+        map.put('\u00F6', "oe"); // ö
+        map.put('\u0153', "oe"); // œ
+        map.put('\u00DF', "ss"); // ß
+        map.put('\u00FE', "th"); // þ
+        map.put('\u00F9', "u"); // ù
+        map.put('\u00FA', "u"); // ú
+        map.put('\u00FB', "u"); // û
+        map.put('\u00FC', "ue"); // ü
+        map.put('\u00FD', "y"); // ý
+        map.put('\u00FF', "y"); // ÿ
+        /* Greek */
+        map.put('\u03B1', "alpha"); // alpha
+        map.put('\u03B2', "beta"); // beta
+        map.put('\u03D0', "beta"); // beta symbol
+        map.put('\u03B3', "gamma"); // gamma
+        map.put('\u03B4', "delta"); // delta
+        map.put('\u03B5', "epsilon"); // epsilon
+        map.put('\u03B6', "zeta"); // zeta
+        map.put('\u03B7', "eta"); // eta
+        map.put('\u03B8', "theta"); // theta
+        map.put('\u03B9', "iota"); // iota
+        map.put('\u03BA', "kappa"); // kappa
+        map.put('\u03BB', "lamda"); // lambda
+        map.put('\u03BC', "u"); // mu
+        map.put('\u03BD', "nu"); // nu
+        map.put('\u03BE', "xi"); // xi
+        map.put('\u03BF', "omicron"); // omicron
+        map.put('\u03C0', "pi"); // pi
+        map.put('\u03C1', "rho"); // rho
+        map.put('\u03C2', "sigma"); // final sigma
+        map.put('\u03C3', "sigma"); // sigma
+        map.put('\u03C4', "tau"); // tau
+        map.put('\u03C5', "upsilon"); // upsilon
+        map.put('\u03C6', "phi"); // phi
+        map.put('\u03C7', "chi"); // chi
+        map.put('\u03C8', "psi"); // psi
+        map.put('\u03C9', "omega"); // omega
+        map.put('\u2122', "(tm)"); // trademark
+        return map;
+    }
+
     @Override
     protected QueryNode preProcessNode(QueryNode node) {
         return node;
@@ -21,13 +129,16 @@ public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcesso
     @Override
     protected QueryNode postProcessNode(QueryNode node) throws QueryNodeException {
         if (node.isLeaf() && node instanceof FieldQueryNode fieldQueryNode) {
-            try (UniProtSpecialCharacterFilter uniProtSpecialCharacterFilter =
-                         new UniProtSpecialCharacterFilter(new CharSequenceReader(fieldQueryNode.getText()))) {
-                uniProtSpecialCharacterFilter.read();
-                uniProtSpecialCharacterFilter.reset();
-                fieldQueryNode.setText(IOUtils.toString(uniProtSpecialCharacterFilter));
-            } catch (Exception e) {
-                throw new QueryNodeException(e);
+            CharSequence text = fieldQueryNode.getText();
+            if (text.chars().anyMatch(i -> SPECIAL_CHAR_MAP.containsKey((char) i))) {
+                try (UniProtSpecialCharacterFilter uniProtSpecialCharacterFilter =
+                             new UniProtSpecialCharacterFilter(new CharSequenceReader(text), SPECIAL_CHAR_MAP)) {
+                    uniProtSpecialCharacterFilter.read();
+                    uniProtSpecialCharacterFilter.reset();
+                    fieldQueryNode.setText(IOUtils.toString(uniProtSpecialCharacterFilter));
+                } catch (Exception e) {
+                    throw new QueryNodeException(e);
+                }
             }
         }
         return node;
@@ -39,118 +150,20 @@ public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcesso
     }
 
     private static class UniProtSpecialCharacterFilter extends MappingCharFilter {
-        private static final NormalizeCharMap CHARMAP = normMap();
-
         /**
          * Default constructor that takes a {@link Reader}.
          *
          * @param in
          */
-        public UniProtSpecialCharacterFilter(Reader in) {
-            super(CHARMAP, in);
+        public UniProtSpecialCharacterFilter(Reader in, Map<Character, String> map) {
+            super(normMap(map), in);
         }
 
-        private static NormalizeCharMap normMap() {
+        private static NormalizeCharMap normMap(Map<Character, String> map) {
             NormalizeCharMap.Builder b = new NormalizeCharMap.Builder();
-            b.add("\u00C0", "A"); // À
-            b.add("\u00C1", "A"); // Á
-            b.add("\u00C2", "A"); // Â
-            b.add("\u00C3", "A"); // Ã
-
-            b.add("\u00C5", "AA"); // Å
-
-            b.add("\u00C4", "AE"); // Ä
-            b.add("\u00C6", "AE"); // Æ
-
-            b.add("\u00C7", "C"); // Ç
-
-            b.add("\u00C8", "E"); // È
-            b.add("\u00C9", "E"); // É
-            b.add("\u00CA", "E"); // Ê
-            b.add("\u00CB", "E"); // Ë
-
-            b.add("\u00CC", "I"); // Ì
-            b.add("\u00CD", "I"); // Í
-            b.add("\u00CE", "I"); // Î
-            b.add("\u00CF", "I"); // Ï
-
-            b.add("\u00D0", "D"); // Ð
-            b.add("\u00D1", "N"); // Ñ
-            b.add("\u00D2", "O"); // Ò
-            b.add("\u00D3", "O"); // Ó
-            b.add("\u00D4", "O"); // Ô
-            b.add("\u00D5", "O"); // Õ
-            b.add("\u00D8", "OE"); // Ø
-            b.add("\u00D6", "OE"); // Ö
-            b.add("\u0152", "OE"); // Œ
-            b.add("\u00DE", "P"); // Þ
-            b.add("\u00D9", "U"); // Ù
-            b.add("\u00DA", "U"); // Ú
-            b.add("\u00DB", "U"); // Û
-            b.add("\u00DC", "UE"); // Ü
-            b.add("\u00DD", "Y"); // Ý
-            b.add("\u0178", "Y"); // Ÿ
-            b.add("\u00E0", "a"); // à
-            b.add("\u00E1", "a"); // á
-            b.add("\u00E2", "a"); // â
-            b.add("\u00E3", "a"); // ã
-            b.add("\u00E5", "aa"); // å
-            b.add("\u00E4", "ae"); // ä
-            b.add("\u00E6", "ae"); // æ
-            b.add("\u00E7", "c"); // ç
-            b.add("\u00E8", "e"); // è
-            b.add("\u00E9", "e"); // é
-            b.add("\u00EA", "e"); // ê
-            b.add("\u00EB", "e"); // ë
-            b.add("\u00EC", "i"); // ì
-            b.add("\u00ED", "i"); // í
-            b.add("\u00EE", "i"); // î
-            b.add("\u00EF", "i"); // ï
-            b.add("\u00F0", "d"); // ð
-            b.add("\u00F1", "n"); // ñ
-            b.add("\u00F2", "o"); // ò
-            b.add("\u00F3", "o"); // ó
-            b.add("\u00F4", "o"); // ô
-            b.add("\u00F5", "o"); // õ
-            b.add("\u00F8", "oe"); // ø
-            b.add("\u00F6", "oe"); // ö
-            b.add("\u0153", "oe"); // œ
-            b.add("\u00DF", "ss"); // ß
-            b.add("\u00FE", "th"); // þ
-            b.add("\u00F9", "u"); // ù
-            b.add("\u00FA", "u"); // ú
-            b.add("\u00FB", "u"); // û
-            b.add("\u00FC", "ue"); // ü
-            b.add("\u00FD", "y"); // ý
-            b.add("\u00FF", "y"); // ÿ
-            /* Greek */
-            b.add("\u03B1", "alpha"); // alpha
-            b.add("\u03B2", "beta"); // beta
-            b.add("\u03D0", "beta"); // beta symbol
-            b.add("\u03B3", "gamma"); // gamma
-            b.add("\u03B4", "delta"); // delta
-            b.add("\u03B5", "epsilon"); // epsilon
-            b.add("\u03B6", "zeta"); // zeta
-            b.add("\u03B7", "eta"); // eta
-            b.add("\u03B8", "theta"); // theta
-            b.add("\u03B9", "iota"); // iota
-            b.add("\u03BA", "kappa"); // kappa
-            b.add("\u03BB", "lamda"); // lambda
-            b.add("\u03BC", "u"); // mu
-            b.add("\u03BD", "nu"); // nu
-            b.add("\u03BE", "xi"); // xi
-            b.add("\u03BF", "omicron"); // omicron
-            b.add("\u03C0", "pi"); // pi
-            b.add("\u03C1", "rho"); // rho
-            b.add("\u03C2", "sigma"); // final sigma
-            b.add("\u03C3", "sigma"); // sigma
-            b.add("\u03C4", "tau"); // tau
-            b.add("\u03C5", "upsilon"); // upsilon
-            b.add("\u03C6", "phi"); // phi
-            b.add("\u03C7", "chi"); // chi
-            b.add("\u03C8", "psi"); // psi
-            b.add("\u03C9", "omega"); // omega
-            b.add("\u2122", "(tm)"); // trademark
+            for (Map.Entry<Character, String> entry : map.entrySet()) {
+                b.add("" + entry.getKey(), entry.getValue());
+            }
             return b.build();
         }
     }
