@@ -1,5 +1,7 @@
 package org.uniprot.api.common.repository.solrstream;
 
+import java.util.*;
+
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
@@ -9,8 +11,6 @@ import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.core.util.Utils;
 
 import lombok.Getter;
-
-import java.util.*;
 
 /**
  * This class creates expression to make solr streaming facet function call.
@@ -81,27 +81,31 @@ public class FacetStreamExpression extends UniProtStreamExpression {
             throw new IllegalArgumentException("buckets is a mandatory param");
         }
     }
-    public static Map<String, Map.Entry<Integer, Comparator<FacetItem>>> getFacetNameComparatorAndLimitMap
-            (List<SolrFacetRequest> facetRequests){
-        Map<String, Map.Entry<Integer, Comparator<FacetItem>>> nameComparatorLimitMap = new HashMap<>();
-        for(SolrFacetRequest request : facetRequests){
+
+    public static Map<String, Map.Entry<Integer, Comparator<FacetItem>>>
+            getFacetNameComparatorAndLimitMap(List<SolrFacetRequest> facetRequests) {
+        Map<String, Map.Entry<Integer, Comparator<FacetItem>>> nameComparatorLimitMap =
+                new HashMap<>();
+        for (SolrFacetRequest request : facetRequests) {
             Integer limit = Integer.parseInt(getBucketSizeLimit(request));
             Comparator<FacetItem> comparator = getFacetItemComparator(request);
-            Map.Entry<Integer, Comparator<FacetItem>> limitComparator = new AbstractMap.SimpleEntry<>(limit, comparator);
+            Map.Entry<Integer, Comparator<FacetItem>> limitComparator =
+                    new AbstractMap.SimpleEntry<>(limit, comparator);
             nameComparatorLimitMap.put(request.getName(), limitComparator);
         }
         return nameComparatorLimitMap;
     }
 
     private static Comparator<FacetItem> getFacetItemComparator(SolrFacetRequest request) {
-        if("index asc".equals(getBucketSorts(request))){
-            if("proteins_with".equals(request.getName()) || "database_facet".equals(request.getName())){
+        if ("index asc".equals(getBucketSorts(request))) {
+            if ("proteins_with".equals(request.getName())
+                    || "database_facet".equals(request.getName())) {
                 return Comparator.comparingInt(f -> Integer.parseInt(f.getValue()));
             }
             return Comparator.comparing(FacetItem::getLabel);
-        } else if("index desc".equals(getBucketSorts(request))){
+        } else if ("index desc".equals(getBucketSorts(request))) {
             return Comparator.comparing(FacetItem::getValue, Comparator.reverseOrder());
-        } else if("count(*) desc".equals(getBucketSorts(request))){
+        } else if ("count(*) desc".equals(getBucketSorts(request))) {
             return Comparator.comparing(FacetItem::getCount, Comparator.reverseOrder());
         }
         throw new IllegalArgumentException("Illegal sort " + getBucketSorts(request));

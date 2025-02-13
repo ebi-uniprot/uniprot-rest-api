@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
+// TODO delete this file after testing
 
 public class FacetComparator {
     public static boolean areFacetListsEqual(List<Facet> list1, List<Facet> list2) {
