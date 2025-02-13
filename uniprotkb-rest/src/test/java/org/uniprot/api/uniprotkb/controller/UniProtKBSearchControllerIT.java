@@ -64,6 +64,8 @@ import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
+import org.uniprot.core.uniprotkb.impl.GeneBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
@@ -183,6 +185,36 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
      * stopword filter factory and removeduplicatesfilterfactory)
      *
      */
+
+    @Test
+    void searchInGreekChars() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345"))
+                .genesAdd(new GeneBuilder().geneName(new GeneNameBuilder().value("genealpha").build()).build()).build();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=gene:gene"+"\u03B1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P12345")));
+    }
 
     @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
