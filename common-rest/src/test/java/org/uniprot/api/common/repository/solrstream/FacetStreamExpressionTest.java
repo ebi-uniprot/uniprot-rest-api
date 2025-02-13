@@ -74,13 +74,17 @@ class FacetStreamExpressionTest {
                 new FacetStreamExpression(collection, builder.build(), facetRequest);
         Assertions.assertNotNull(facetExpression);
         Assertions.assertEquals("facet", facetExpression.getFunctionName());
-        Assertions.assertEquals(6, facetExpression.getParameters().size());
+        Assertions.assertEquals(7, facetExpression.getParameters().size());
         Map<String, String> params = getMappedParameters(facetExpression);
-        Assertions.assertEquals(4, params.size());
-        Assertions.assertEquals(idsQuery, params.get("q"));
+        Assertions.assertEquals(5, params.size());
+        Assertions.assertEquals("*:*", params.get("q"));
+        Assertions.assertEquals(idsQuery, params.get("fq"));
         Assertions.assertEquals(buckets, params.get("buckets"));
         Assertions.assertEquals(DEFAULT_BUCKET_SORTS, params.get("bucketSorts"));
         Assertions.assertEquals(DEFAULT_BUCKET_SIZE, params.get("bucketSizeLimit"));
+        Assertions.assertNull(params.get("q.op"));
+        Assertions.assertNull(params.get("defType"));
+        Assertions.assertNull(params.get("qf"));
 
         List<String> expressionValue = getExpressionValues(facetExpression);
         Assertions.assertEquals(List.of(collection), expressionValue);
@@ -104,10 +108,11 @@ class FacetStreamExpressionTest {
                 new FacetStreamExpression("collection", builder.build(), facetRequest);
         Assertions.assertNotNull(facetExpression);
         Assertions.assertEquals("facet", facetExpression.getFunctionName());
-        Assertions.assertEquals(6, facetExpression.getParameters().size());
+        Assertions.assertEquals(7, facetExpression.getParameters().size());
         Map<String, String> params = getMappedParameters(facetExpression);
-        Assertions.assertEquals(4, params.size());
-        Assertions.assertEquals(idsQuery, params.get("q"));
+        Assertions.assertEquals(5, params.size());
+        Assertions.assertEquals("*:*", params.get("q"));
+        Assertions.assertEquals(idsQuery, params.get("fq"));
         Assertions.assertEquals(buckets, params.get("buckets"));
         Assertions.assertEquals(DEFAULT_BUCKET_SORTS, params.get("bucketSorts"));
         Assertions.assertEquals(DEFAULT_BUCKET_SIZE, params.get("bucketSizeLimit"));
@@ -136,6 +141,42 @@ class FacetStreamExpressionTest {
                         IllegalArgumentException.class,
                         () -> new FacetStreamExpression(null, builder.build(), facetRequest));
         Assertions.assertEquals("collection is a mandatory param", exception.getMessage());
+    }
+
+    @Test
+    void testCreateFullFacetStreamExpressionWithQuery() {
+        SolrRequest.SolrRequestBuilder builder = SolrRequest.builder();
+        String collection = "sample collection";
+        String query = "p53";
+        String idsQuery = "P21802 OR P12345";
+        String idFields = "id_field";
+        String queryField = "field1 field2";
+        String buckets = "reviewed";
+        String bucketSorts = "count(*)";
+        int bucketSizeLimit = 10;
+        builder.query(query);
+        builder.idField(idFields);
+        builder.idsQuery(idsQuery);
+        builder.queryField(queryField);
+        SolrFacetRequest facetRequest =
+                SolrFacetRequest.builder()
+                        .name(buckets)
+                        .limit(bucketSizeLimit)
+                        .minCount(1)
+                        .sort(bucketSorts)
+                        .build();
+        builder.facet(facetRequest);
+        FacetStreamExpression facetExpression =
+                new FacetStreamExpression(collection, builder.build(), facetRequest);
+        Assertions.assertNotNull(facetExpression);
+        Assertions.assertEquals("facet", facetExpression.getFunctionName());
+        Assertions.assertEquals(10, facetExpression.getParameters().size());
+        Map<String, String> params = getMappedParameters(facetExpression);
+        Assertions.assertEquals("p53", params.get("q"));
+        Assertions.assertEquals("AND", params.get("q.op"));
+        Assertions.assertEquals("edismax", params.get("defType"));
+        Assertions.assertEquals(queryField, params.get("qf"));
+        Assertions.assertEquals(idsQuery, params.get("fq"));
     }
 
     private static List<String> getExpressionValues(FacetStreamExpression facetExpression) {

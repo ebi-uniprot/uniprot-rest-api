@@ -19,7 +19,7 @@ class ListStreamExpressionTest {
         streamExpressions.add(createExpression());
         ListStreamExpression listStreamExpression = new ListStreamExpression(streamExpressions);
         Assertions.assertNotNull(listStreamExpression);
-        Assertions.assertEquals("list", listStreamExpression.getFunctionName());
+        Assertions.assertEquals("plist", listStreamExpression.getFunctionName());
         Assertions.assertEquals(2, listStreamExpression.getParameters().size());
     }
 

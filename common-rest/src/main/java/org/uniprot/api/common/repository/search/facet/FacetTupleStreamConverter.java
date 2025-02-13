@@ -36,7 +36,7 @@ public class FacetTupleStreamConverter
     }
 
     @Override
-    protected FacetConfig getFacetConfig() {
+    public FacetConfig getFacetConfig() {
         return this.facetConfig;
     }
 
@@ -50,7 +50,10 @@ public class FacetTupleStreamConverter
                         .collect(Collectors.toList());
         List<Facet> facets =
                 facetNameValuesMap.entrySet().stream()
-                        .filter(entry -> !idFieldName.equals(entry.getKey()))
+                        .filter(
+                                entry ->
+                                        !idFieldName.equals(entry.getKey())
+                                                && facetList.contains(entry.getKey()))
                         .map(this::convertSolrStreamFacet)
                         .collect(Collectors.toList());
         return new SolrStreamFacetResponse(facets, accessions);

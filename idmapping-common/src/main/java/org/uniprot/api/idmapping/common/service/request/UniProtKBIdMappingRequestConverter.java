@@ -67,6 +67,7 @@ public class UniProtKBIdMappingRequestConverter extends UniProtKBRequestConverte
         if (Utils.notNullNotEmpty(uniProtKbRequest.getQuery())) {
             hasIsIsoForm = SolrQueryUtil.hasFieldTerms(uniProtKbRequest.getQuery(), IS_ISOFORM);
         }
+        builder.ids(idsList);
         if (uniProtKbRequest.isIncludeIsoform() || hasIsIsoForm) {
             builder.idsQuery(getIdsTermQuery(idsList, ACCESSION));
         } else {
