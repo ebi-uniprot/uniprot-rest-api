@@ -23,6 +23,7 @@ import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossRefe
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseIdFilter;
 import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesStreamRequest;
@@ -79,7 +80,9 @@ public class UniParcCrossReferenceService {
         CursorPage page;
         if (hasRequestFilters(request)) {
             List<UniParcCrossReference> filteredCrossReferences =
-                    getFilteredCrossReferences(uniParcEntryLight, request).toList();
+                    getFilteredCrossReferences(uniParcEntryLight, request)
+                            .filter(xref -> new UniParcDatabaseIdFilter().apply(xref, request.getId()))
+                            .toList();
             page = CursorPage.of(request.getCursor(), pageSize, filteredCrossReferences.size());
             paginatedResults = paginateCrossReferences(page, filteredCrossReferences);
         } else {
