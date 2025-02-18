@@ -1,5 +1,10 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.lucene.analysis.charfilter.MappingCharFilter;
@@ -8,11 +13,6 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
-
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcessorImpl {
     private static final Map<Character, String> SPECIAL_CHAR_MAP = createCharMap();
@@ -132,7 +132,8 @@ public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcesso
             CharSequence text = fieldQueryNode.getText();
             if (text.chars().anyMatch(i -> SPECIAL_CHAR_MAP.containsKey((char) i))) {
                 try (UniProtSpecialCharacterFilter uniProtSpecialCharacterFilter =
-                             new UniProtSpecialCharacterFilter(new CharSequenceReader(text), SPECIAL_CHAR_MAP)) {
+                        new UniProtSpecialCharacterFilter(
+                                new CharSequenceReader(text), SPECIAL_CHAR_MAP)) {
                     uniProtSpecialCharacterFilter.read();
                     uniProtSpecialCharacterFilter.reset();
                     fieldQueryNode.setText(IOUtils.toString(uniProtSpecialCharacterFilter));
