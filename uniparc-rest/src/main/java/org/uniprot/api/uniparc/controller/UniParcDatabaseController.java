@@ -75,7 +75,6 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
                 APPLICATION_XML_VALUE
             })
     @Operation(
-            hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
             description = DATABASES_UNIPARC_OPERATION_DESC,
             responses = {
@@ -109,9 +108,8 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             value = "/{upi}/databases/stream",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @Operation(
-            hidden = true,
-            summary = DATABASES_UNIPARC_OPERATION,
-            description = DATABASES_UNIPARC_OPERATION_DESC,
+            summary = STREAM_DATABASES_UNIPARC_OPERATION,
+            description = STREAM_DATABASES_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
