@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -253,6 +254,24 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup.id", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup.name", notNullValue()));
+    }
+
+    @Test
+    void testGetBySequenceSuccessXml_doesntIncludePropertySources() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(getBySequencePath)
+                                .header(ACCEPT, MediaType.APPLICATION_XML_VALUE)
+                                .param("sequence", SEQUENCE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
+                .andDo(log())
+                .andExpect(content().string(not(containsString(("<property type=\"sources\"")))));
     }
 
     @Test

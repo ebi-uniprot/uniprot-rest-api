@@ -218,7 +218,6 @@ public abstract class BasicSearchController<T> {
                     MessageConverterContext<T> context =
                             createStreamContext(streamRequest, contentType, request);
                     context.setFields(streamRequest.getFields());
-
                     Stream<T> results = resultSupplier.get();
                     if (contentType.equals(LIST_MEDIA_TYPE)) {
                         context.setEntityIds(results.map(this::getEntityId));

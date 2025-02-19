@@ -218,6 +218,12 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .resultMatcher(
                                             content()
                                                     .string(
+                                                            not(
+                                                                    containsString(
+                                                                            ("<property type=\"sources\"")))))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
                                                             endsWith(
                                                                     COPYRIGHT_TAG
                                                                             + UNIPARC_XML_CLOSE_TAG)))
