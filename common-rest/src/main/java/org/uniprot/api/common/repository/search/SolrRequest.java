@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.rest.service.request.BasicRequestConverter;
-import org.uniprot.core.util.Utils;
 
 import lombok.*;
 
@@ -80,9 +79,7 @@ public class SolrRequest {
         for (SolrFacetRequest facet : facets) {
             SolrFacetRequest.SolrFacetRequestBuilder builder = SolrFacetRequest.builder();
             builder.name(facet.getName()).minCount(facet.getMinCount()).sort(null);
-            if (Utils.nullOrEmpty(facet.getInterval())) {
-                builder.limit(-1);
-            }
+            builder.limit(-1);
             batchFacets.add(builder.build());
         }
         return batchFacets;
