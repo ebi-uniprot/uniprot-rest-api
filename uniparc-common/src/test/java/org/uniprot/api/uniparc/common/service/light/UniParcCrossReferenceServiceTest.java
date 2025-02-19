@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +19,13 @@ import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossRefe
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreClient;
 import org.uniprot.api.uniparc.common.service.request.UniParcDatabasesRequest;
+import org.uniprot.core.Property;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
+import static org.uniprot.core.xml.CrossReferenceConverterUtils.SOURCES;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcCrossReferenceServiceTest {
@@ -68,6 +71,68 @@ class UniParcCrossReferenceServiceTest {
         // then
         assertNotNull(result);
         assertEquals(10, result.getContent().count());
+        assertNotNull(result.getPage());
+    }
+
+    @Test
+    void testGetCrossReferencesByUniParcId_filterWithDatabaseId_Success() {
+        // given
+        String uniParcId = "UPI000000001";
+        UniParcDatabasesRequest request = new UniParcDatabasesRequest();
+        request.setSize(10);
+        String xRefId = "P10001";
+        request.setId(xRefId);
+
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
+        // when
+        when(uniParcLightStoreClient.getEntry(uniParcId))
+                .thenReturn(Optional.of(uniParcEntryLight));
+        when(storeConfigProperties.getGroupSize()).thenReturn(1);
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
+        when(uniParcCrossReferenceStoreClient.getEntry(any())).thenReturn(Optional.of(pair));
+        // when
+        QueryResult<UniParcCrossReference> result =
+                service.getCrossReferencesByUniParcId(uniParcId, request);
+
+        // then
+        assertNotNull(result);
+        List<UniParcCrossReference> content = result.getContent().toList();
+        assertTrue(content.stream().map(UniParcCrossReference::getId).allMatch(xRefId::equals));
+        assertEquals(10, content.size());
+        assertNotNull(result.getPage());
+    }
+
+    @Test
+    void testGetCrossReferencesByUniParcId_includeSources_Success() {
+        // given
+        String uniParcId = "UPI000000001";
+        UniParcDatabasesRequest request = new UniParcDatabasesRequest();
+        request.setSize(10);
+        request.setIncludeSources(true);
+
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
+        // when
+        when(uniParcLightStoreClient.getEntry(uniParcId))
+                .thenReturn(Optional.of(uniParcEntryLight));
+        when(storeConfigProperties.getGroupSize()).thenReturn(1);
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
+        when(uniParcCrossReferenceStoreClient.getEntry(any())).thenReturn(Optional.of(pair));
+        // when
+        QueryResult<UniParcCrossReference> result =
+                service.getCrossReferencesByUniParcId(uniParcId, request);
+
+        // then
+        assertNotNull(result);
+        List<UniParcCrossReference> content = result.getContent().toList();
+        assertTrue(content.stream().map(UniParcCrossReference::getProperties).flatMap(List::stream)
+                .map(Property::getKey).anyMatch(SOURCES::equals));
+        assertEquals(10, content.size());
         assertNotNull(result.getPage());
     }
 

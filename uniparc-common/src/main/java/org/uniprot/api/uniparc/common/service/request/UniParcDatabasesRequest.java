@@ -28,11 +28,9 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
     private String fields;
 
     @Parameter(description = XREF_ID_UNIPARC_DESCRIPTION, example = XREF_ID_UNIPARC_EXAMPLE)
-    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
     private String id;
 
     @Parameter(description = XREF_INCLUDE_SOURCES_UNIPARC_DESCRIPTION, example = XREF_INCLUDE_SOURCES_UNIPARC_EXAMPLE)
-    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
     private boolean includeSources;
 
     @Parameter(hidden = true)
