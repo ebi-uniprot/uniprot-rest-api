@@ -59,6 +59,12 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
         return facetResult;
     }
 
+    @Override
+    public List<Facet> convert(
+            QueryResponse queryResponse, Collection<String> facetList, boolean ignoreLimit) {
+        throw new UnsupportedOperationException("This method is not supported");
+    }
+
     /**
      * This method is responsible to convert Solr Interval facet to a Facet response model, adding
      * configured labels and properties

@@ -42,6 +42,12 @@ public class FacetTupleStreamConverter
 
     @Override
     public SolrStreamFacetResponse convert(TupleStream tupleStream, Collection<String> facetList) {
+        return convert(tupleStream, facetList, false);
+    }
+
+    @Override
+    public SolrStreamFacetResponse convert(
+            TupleStream tupleStream, Collection<String> facetList, boolean ignoreLimit) {
         Map<String, List<Pair<String, Long>>> facetNameValuesMap =
                 computeFacetValuesMap(tupleStream);
         List<String> accessions =
@@ -54,7 +60,7 @@ public class FacetTupleStreamConverter
                                 entry ->
                                         !idFieldName.equals(entry.getKey())
                                                 && facetList.contains(entry.getKey()))
-                        .map(this::convertSolrStreamFacet)
+                        .map(facetValues -> convertSolrStreamFacet(facetValues, ignoreLimit))
                         .collect(Collectors.toList());
         return new SolrStreamFacetResponse(facets, accessions);
     }
@@ -101,7 +107,8 @@ public class FacetTupleStreamConverter
         }
     }
 
-    private Facet convertSolrStreamFacet(Map.Entry<String, List<Pair<String, Long>>> facetValues) {
+    private Facet convertSolrStreamFacet(
+            Map.Entry<String, List<Pair<String, Long>>> facetValues, boolean ignoreLimit) {
         if (!LENGTH_STR.equals(facetValues.getKey())) {
             List<FacetItem> values =
                     facetValues.getValue().stream()
@@ -109,7 +116,7 @@ public class FacetTupleStreamConverter
                             .collect(Collectors.toList());
 
             int limit = getFacetLimit(facetValues.getKey());
-            if (values.size() > limit) {
+            if (!ignoreLimit && values.size() > limit) {
                 values = values.subList(0, limit);
             }
 

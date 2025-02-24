@@ -382,7 +382,8 @@ public abstract class BasicIdService<T, U> {
                             facetTupleStream,
                             solrFacetRequest.getFacets().stream()
                                     .map(SolrFacetRequest::getName)
-                                    .toList());
+                                    .toList(),
+                            true);
             facetResponses.add(response);
         }
         return facetResponses;
