@@ -7,7 +7,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
@@ -106,7 +105,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -133,7 +132,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                                         .param("size", String.valueOf(size)));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
@@ -156,7 +155,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("cursor", cursor));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
@@ -176,7 +175,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("cursor", cursor));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
@@ -196,7 +195,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("cursor", cursor));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(total)))
@@ -216,7 +215,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -238,7 +237,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("taxonIds", taxonIds));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -261,7 +260,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -280,6 +279,47 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     }
 
     @Test
+    void testGetByAccessionWithCrossRefIdFilterSuccess() throws Exception {
+        // when
+        saveEntry();
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
+                                        .param("id", "embl1"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", iterableWithSize(4)))
+                .andExpect(jsonPath("$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
+                .andExpect(jsonPath("$.results[*].organism", notNullValue()));
+    }
+
+    @Test
+    void testGetByAccessionWithIncludeSourcesSuccess() throws Exception {
+        // when
+        saveEntry();
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
+                                        .param("includeSources", "true"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", iterableWithSize(5)))
+                .andExpect(content().string(containsString("\"key\":\"sources\"")));
+    }
+
+    @Test
     void testGetByAccessionWithActiveCrossRefFilterSuccess() throws Exception {
         // when
         String active = "true";
@@ -290,7 +330,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -315,7 +355,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         // then
         getMockMvc()
                 .perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(resultMatcher);
@@ -350,7 +390,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         // then
         getMockMvc()
                 .perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(jsonPath("$.results.size()", is(21)))
@@ -382,7 +422,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         ResultActions resultActions =
                 getMockMvc()
                         .perform(asyncDispatch(response))
-                        .andDo(print())
+                        .andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -409,7 +449,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("facets", facets)
                                         .param("size", "0"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results").isEmpty())
@@ -499,7 +539,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                                         .param("dbTypes", "UniProtKB/Swiss-Prot"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(5)))
@@ -523,7 +563,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("facets", facets)
                                         .param("size", "0"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages").exists())
@@ -536,7 +576,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
     }
 
     private void verifyResponse(ResultActions response) throws Exception {
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(5)))

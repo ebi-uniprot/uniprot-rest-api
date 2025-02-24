@@ -28,19 +28,20 @@ public interface IdsSearchRequest extends SearchRequest {
     }
 
     default List<String> getIdList() {
-        return new LinkedList<>(Arrays.stream(getCommaSeparatedIds().split(","))
-                .map(String::strip)
-                .map(String::toUpperCase)
-                .map(
-                        sanitisedId ->
-                                UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
-                                                        .matcher(sanitisedId)
-                                                        .matches()
-                                                || UNIPARC_UPI_SEQUENCE_RANGE_REGEX
-                                                        .matcher(sanitisedId)
-                                                        .matches()
-                                        ? sanitisedId.substring(0, sanitisedId.indexOf("["))
-                                        : sanitisedId)
-                .collect(Collectors.toList()));
+        return new LinkedList<>(
+                Arrays.stream(getCommaSeparatedIds().split(","))
+                        .map(String::strip)
+                        .map(String::toUpperCase)
+                        .map(
+                                sanitisedId ->
+                                        UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
+                                                                .matcher(sanitisedId)
+                                                                .matches()
+                                                        || UNIPARC_UPI_SEQUENCE_RANGE_REGEX
+                                                                .matcher(sanitisedId)
+                                                                .matches()
+                                                ? sanitisedId.substring(0, sanitisedId.indexOf("["))
+                                                : sanitisedId)
+                        .collect(Collectors.toList()));
     }
 }
