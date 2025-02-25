@@ -9,7 +9,10 @@ import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.*;
-import org.uniprot.api.common.repository.search.facet.*;
+import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
+import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
@@ -17,7 +20,6 @@ import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.service.store.FacetComparator;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -230,14 +232,6 @@ public abstract class BasicIdService<T, U> {
     }
 
     protected SolrStreamFacetResponse searchBySolrStream(SolrRequest solrRequest) {
-        // TODO delete this code block after testing
-        TupleStream facetTupleStream1 = this.tupleStream.create(solrRequest);
-        SolrStreamFacetResponse singleResponse1 =
-                this.facetTupleStreamConverter.convert(
-                        facetTupleStream1,
-                        solrRequest.getFacets().stream().map(SolrFacetRequest::getName).toList());
-        // code block to be deleted ended
-
         if (!solrRequest.getFacets().isEmpty()) {
             // request without facets. Normally search and facets requests are mutually exclusive.
             SolrRequest searchRequest = solrRequest.createSearchRequest();
@@ -249,13 +243,6 @@ public abstract class BasicIdService<T, U> {
             // merge them
             SolrStreamFacetResponse mergedResponse =
                     SolrStreamFacetResponse.merge(solrRequest, facetsInBatches, idsResponse);
-            // TODO delete this if block after testing
-            if (!FacetComparator.areFacetListsEqual(
-                    mergedResponse.getFacets(), singleResponse1.getFacets())) {
-                log.error("Facets did not match {}", solrRequest);
-                log.error("Batch Response {}", mergedResponse.getFacets());
-                log.error("Single Batch Response {}", singleResponse1.getFacets());
-            }
             return mergedResponse;
         } else { // request without facets
             TupleStream facetTupleStream = this.tupleStream.create(solrRequest);
@@ -373,6 +360,9 @@ public abstract class BasicIdService<T, U> {
     private List<SolrStreamFacetResponse> getFacetsInBatches(SolrRequest solrRequest) {
         List<String> ids = solrRequest.getIds();
         List<SolrStreamFacetResponse> facetResponses = new ArrayList<>();
+        boolean ignoreLimit =
+                true; // for batch faceting, get all facets and return "limit" number of facets
+        // during merge
         for (int i = 0; i < ids.size(); i += this.idBatchSize) {
             List<String> idsBatch = ids.subList(i, Math.min(i + this.idBatchSize, ids.size()));
             SolrRequest solrFacetRequest = solrRequest.createBatchFacetSolrRequest(idsBatch);
@@ -383,7 +373,7 @@ public abstract class BasicIdService<T, U> {
                             solrFacetRequest.getFacets().stream()
                                     .map(SolrFacetRequest::getName)
                                     .toList(),
-                            true);
+                            ignoreLimit);
             facetResponses.add(response);
         }
         return facetResponses;
