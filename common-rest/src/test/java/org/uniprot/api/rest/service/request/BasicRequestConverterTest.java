@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mockito;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -410,5 +413,31 @@ class BasicRequestConverterTest {
         assertEquals(idField, result.getIdField());
         assertEquals(listOfIds.size(), result.getRows());
         assertEquals(listOfIds.size(), result.getTotalRows());
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void createBasicSolrRequestWithEmptyOrNullQueryButFields(String query) {
+        String queryField = "queryField1,queryField2";
+
+        SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
+        Mockito.when(queryConfig.getQueryFields()).thenReturn(queryField);
+
+        UniProtQueryProcessorConfig queryProcessorConfig =
+                Mockito.mock(UniProtQueryProcessorConfig.class);
+        RequestConverterConfigProperties convertProps =
+                Mockito.mock(RequestConverterConfigProperties.class);
+        BasicRequestConverter converter =
+                new BasicRequestConverter(
+                        queryConfig, null, queryProcessorConfig, convertProps, null, null);
+
+        SearchRequest request = Mockito.mock(SearchRequest.class);
+        Mockito.when(request.getQuery()).thenReturn(query);
+
+        SolrRequest result = converter.createSearchSolrRequest(request).build();
+        assertNotNull(result);
+        assertEquals(query, result.getQuery());
+        assertEquals(queryField, result.getQueryField());
     }
 }
