@@ -108,6 +108,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     jsonPath("$.sequenceFeatures[*].interproGroup.name", notNullValue()));
             idParam.resultMatcher(jsonPath("$.oldestCrossRefCreated", notNullValue()));
             idParam.resultMatcher(jsonPath("$.mostRecentCrossRefUpdated", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.sequenceFeatures[*].properties[*].key", not("sources")));
             return idParam.build();
         }
 
@@ -177,6 +178,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                                             jsonPath(
                                                     "$.uniParcCrossReferences[*].id",
                                                     hasItem(ACCESSION)))
+                                    .resultMatcher(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -189,16 +191,19 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().string(Matchers.containsString(UNIPARC_ID)))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().string(Matchers.containsString(UNIPARC_ID)))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -215,6 +220,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .build();
         }
