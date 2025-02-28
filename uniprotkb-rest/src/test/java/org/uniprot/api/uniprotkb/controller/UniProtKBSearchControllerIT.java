@@ -189,8 +189,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     @Test
     void searchInGreekChars() throws Exception {
         // given
-        UniProtKBEntry entry = UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345"))
-                .genesAdd(new GeneBuilder().geneName(new GeneNameBuilder().value("genealpha").build()).build()).build();
+        UniProtKBEntry entry =
+                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345"))
+                        .genesAdd(
+                                new GeneBuilder()
+                                        .geneName(new GeneNameBuilder().value("genealpha").build())
+                                        .build())
+                        .build();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
@@ -198,8 +203,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE
-                                                        + "?query=gene:gene"+"\u03B1")
+                                                SEARCH_RESOURCE + "?query=gene:gene" + "\u03B1")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));

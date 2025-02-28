@@ -142,7 +142,8 @@ public class BasicRequestConverter {
     private SolrRequest.SolrRequestBuilder createBasicSolrRequestBuilder(BasicRequest request) {
         SolrRequest.SolrRequestBuilder requestBuilder = SolrRequest.builder();
         String query = request.getQuery();
-        if (query != null) {
+        requestBuilder.query(query);
+        if (Utils.notNullNotEmpty(query)) {
             if (idRequestRegex != null) {
                 String cleanQuery =
                         CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
