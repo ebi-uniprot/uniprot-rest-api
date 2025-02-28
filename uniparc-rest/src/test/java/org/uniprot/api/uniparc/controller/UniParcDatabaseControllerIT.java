@@ -321,7 +321,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", iterableWithSize(5)))
-                .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")));
+                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")));
     }
 
     @Test
