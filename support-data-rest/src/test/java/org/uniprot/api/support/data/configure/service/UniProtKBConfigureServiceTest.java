@@ -92,7 +92,7 @@ class UniProtKBConfigureServiceTest {
                         .collect(Collectors.toList());
         assertNotNull(multiValuesXrefs);
 
-        assertEquals(79, multiValuesXrefs.size());
+        assertEquals(81, multiValuesXrefs.size());
         for (UniProtReturnField xref : multiValuesXrefs) {
             assertTrue(xref.getName().startsWith("xref_"));
         }

@@ -249,7 +249,7 @@ class UniProtQueryProcessorTest {
 
     @Test
     void handleGreekSymbolValueSearch() {
-        String query = "field:other_value"+"\u03B1";
+        String query = "field:other_value" + "\u03B1";
         when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:other_valuealpha"));
@@ -257,19 +257,23 @@ class UniProtQueryProcessorTest {
 
     @Test
     void handleGreekSymbolValueSearch_freeText() {
-        String query = "other_value"+"\u03B1";
+        String query = "other_value" + "\u03B1";
         when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("other_valuealpha"));
     }
 
     @Test
-    void processQuery_whenSpecialCharFilter_throwsAnException(){
-        try (MockedConstruction<UniProtSpecialCharacterQueryNodeProcessor> mockConstruction = Mockito.mockConstruction(UniProtSpecialCharacterQueryNodeProcessor.class, (mock, context) -> {
-            when(mock.process(any())).thenThrow(RuntimeException.class);
-            assertThrows(QueryNodeException.class, () -> processor.processQuery("anyString"));
-        })) {
-        }
+    void processQuery_whenSpecialCharFilter_throwsAnException() {
+        try (MockedConstruction<UniProtSpecialCharacterQueryNodeProcessor> mockConstruction =
+                Mockito.mockConstruction(
+                        UniProtSpecialCharacterQueryNodeProcessor.class,
+                        (mock, context) -> {
+                            when(mock.process(any())).thenThrow(RuntimeException.class);
+                            assertThrows(
+                                    QueryNodeException.class,
+                                    () -> processor.processQuery("anyString"));
+                        })) {}
     }
 
     @Test
