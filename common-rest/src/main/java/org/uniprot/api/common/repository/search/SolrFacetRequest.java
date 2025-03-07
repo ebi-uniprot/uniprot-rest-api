@@ -25,22 +25,4 @@ public class SolrFacetRequest {
     private String sort;
     /** used to define the intervals for an interval facet that will be sent to solr. */
     private Map<String, String> interval;
-
-    @Override
-    public String toString() {
-        return "SolrFacetRequest{"
-                + "name='"
-                + name
-                + '\''
-                + ", minCount="
-                + minCount
-                + ", limit="
-                + limit
-                + ", sort='"
-                + sort
-                + '\''
-                + ", interval="
-                + interval
-                + '}';
-    }
 }

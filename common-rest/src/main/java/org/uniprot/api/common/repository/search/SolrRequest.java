@@ -6,7 +6,10 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.rest.service.request.BasicRequestConverter;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.
@@ -83,41 +86,5 @@ public class SolrRequest {
             batchFacets.add(builder.build());
         }
         return batchFacets;
-    }
-
-    @Override
-    public String toString() {
-        return "SolrRequest{"
-                + "query='"
-                + query
-                + '\''
-                + ", termQuery='"
-                + termQuery
-                + '\''
-                + ", queryField='"
-                + queryField
-                + '\''
-                + ", defaultField='"
-                + defaultField
-                + '\''
-                + ", idField='"
-                + idField
-                + '\''
-                + ", idsQuery='"
-                + idsQuery
-                + '\''
-                + ", rows="
-                + rows
-                + ", totalRows="
-                + totalRows
-                + ", termFields="
-                + termFields
-                + ", filterQueries="
-                + filterQueries
-                + ", facets="
-                + facets
-                + ", sorts="
-                + sorts
-                + '}';
     }
 }
