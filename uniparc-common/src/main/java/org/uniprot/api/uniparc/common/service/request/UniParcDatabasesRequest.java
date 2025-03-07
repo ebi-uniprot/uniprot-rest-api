@@ -30,7 +30,10 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
     @Parameter(description = XREF_ID_UNIPARC_DESCRIPTION, example = XREF_ID_UNIPARC_EXAMPLE)
     private String id;
 
-    @Parameter(description = XREF_INCLUDE_SOURCES_UNIPARC_DESCRIPTION, example = XREF_INCLUDE_SOURCES_UNIPARC_EXAMPLE, hidden = true)
+    @Parameter(
+            description = XREF_INCLUDE_SOURCES_UNIPARC_DESCRIPTION,
+            example = XREF_INCLUDE_SOURCES_UNIPARC_EXAMPLE,
+            hidden = true)
     private boolean includeSources;
 
     @Parameter(hidden = true)

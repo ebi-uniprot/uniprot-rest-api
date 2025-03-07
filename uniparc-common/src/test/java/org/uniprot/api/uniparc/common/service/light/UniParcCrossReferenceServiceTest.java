@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.uniprot.core.xml.CrossReferenceConverterUtils.PROPERTY_SOURCES;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,6 @@ import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcCrossReferenceMocker;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
-import static org.uniprot.core.xml.CrossReferenceConverterUtils.PROPERTY_SOURCES;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcCrossReferenceServiceTest {
@@ -134,11 +134,20 @@ class UniParcCrossReferenceServiceTest {
         // then
         assertNotNull(result);
         List<UniParcCrossReference> content = result.getContent().toList();
-        List<Property> propertyList = content.stream().map(UniParcCrossReference::getProperties).flatMap(List::stream).toList();
+        List<Property> propertyList =
+                content.stream()
+                        .map(UniParcCrossReference::getProperties)
+                        .flatMap(List::stream)
+                        .toList();
         List<String> keys = propertyList.stream().map(Property::getKey).toList();
         assertThat(keys, contains(PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES));
         List<String> values = propertyList.stream().map(Property::getValue).toList();
-        assertThat(values, contains("WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome"));
+        assertThat(
+                values,
+                contains(
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome"));
         assertEquals(10, content.size());
         assertNotNull(result.getPage());
     }
@@ -154,15 +163,19 @@ class UniParcCrossReferenceServiceTest {
     @Test
     void testStreamCrossReferences_success() {
         String uniParcId = "UPI000000001";
-        UniParcEntryLight uniParcEntryLight = UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
-        when(uniParcLightStoreClient.getEntry(uniParcId)).thenReturn(Optional.of(uniParcEntryLight));
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
+        when(uniParcLightStoreClient.getEntry(uniParcId))
+                .thenReturn(Optional.of(uniParcEntryLight));
         when(storeConfigProperties.getGroupSize()).thenReturn(1);
-        UniParcCrossReferencePair pair = new UniParcCrossReferencePair(
-                "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
         when(uniParcCrossReferenceStoreClient.getEntry(any())).thenReturn(Optional.of(pair));
         UniParcDatabasesStreamRequest request = new UniParcDatabasesStreamRequest();
 
-        Stream<UniParcCrossReference> response = service.streamCrossReferencesByUniParcId("UPI000000001", request);
+        Stream<UniParcCrossReference> response =
+                service.streamCrossReferencesByUniParcId("UPI000000001", request);
 
         assertEquals(30, response.toList().size());
     }
@@ -170,17 +183,21 @@ class UniParcCrossReferenceServiceTest {
     @Test
     void testStreamCrossReferences_filterWithDatabaseId_success() {
         String uniParcId = "UPI000000001";
-        UniParcEntryLight uniParcEntryLight = UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
-        when(uniParcLightStoreClient.getEntry(uniParcId)).thenReturn(Optional.of(uniParcEntryLight));
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
+        when(uniParcLightStoreClient.getEntry(uniParcId))
+                .thenReturn(Optional.of(uniParcEntryLight));
         when(storeConfigProperties.getGroupSize()).thenReturn(1);
-        UniParcCrossReferencePair pair = new UniParcCrossReferencePair(
-                "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
         when(uniParcCrossReferenceStoreClient.getEntry(any())).thenReturn(Optional.of(pair));
         UniParcDatabasesStreamRequest request = new UniParcDatabasesStreamRequest();
         String xRefId = "P10001";
         request.setId(xRefId);
 
-        Stream<UniParcCrossReference> response = service.streamCrossReferencesByUniParcId("UPI000000001", request);
+        Stream<UniParcCrossReference> response =
+                service.streamCrossReferencesByUniParcId("UPI000000001", request);
 
         assertTrue(response.map(UniParcCrossReference::getId).allMatch(xRefId::equals));
     }
@@ -188,26 +205,50 @@ class UniParcCrossReferenceServiceTest {
     @Test
     void testStreamCrossReferences_includeSources_success() {
         String uniParcId = "UPI000000001";
-        UniParcEntryLight uniParcEntryLight = UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
-        when(uniParcLightStoreClient.getEntry(uniParcId)).thenReturn(Optional.of(uniParcEntryLight));
+        UniParcEntryLight uniParcEntryLight =
+                UniParcEntryMocker.createUniParcEntryLight(1, "UPI", 10);
+        when(uniParcLightStoreClient.getEntry(uniParcId))
+                .thenReturn(Optional.of(uniParcEntryLight));
         when(storeConfigProperties.getGroupSize()).thenReturn(1);
-        UniParcCrossReferencePair pair = new UniParcCrossReferencePair(
-                "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
+        UniParcCrossReferencePair pair =
+                new UniParcCrossReferencePair(
+                        "key", UniParcCrossReferenceMocker.createCrossReferences(1, 3));
         when(uniParcCrossReferenceStoreClient.getEntry(any())).thenReturn(Optional.of(pair));
         UniParcDatabasesStreamRequest request = new UniParcDatabasesStreamRequest();
         request.setIncludeSources(true);
 
-        Stream<UniParcCrossReference> response = service.streamCrossReferencesByUniParcId("UPI000000001", request);
+        Stream<UniParcCrossReference> response =
+                service.streamCrossReferencesByUniParcId("UPI000000001", request);
 
-        List<Property> propertyList = response.map(UniParcCrossReference::getProperties).flatMap(List::stream).toList();
+        List<Property> propertyList =
+                response.map(UniParcCrossReference::getProperties).flatMap(List::stream).toList();
         List<String> keys = propertyList.stream().map(Property::getKey).toList();
-        assertThat(keys, contains(PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES,
-                PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES, PROPERTY_SOURCES));
+        assertThat(
+                keys,
+                contains(
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES,
+                        PROPERTY_SOURCES));
         List<String> values = propertyList.stream().map(Property::getValue).toList();
-        assertThat(values, contains("WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome",
-                "WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome",
-                "WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome",
-                "WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome",
-                "WP_168893201:UP000005640:chromosome", "WP_168893201:UP000005640:chromosome"));
+        assertThat(
+                values,
+                contains(
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome",
+                        "WP_168893201:UP000005640:chromosome"));
     }
 }

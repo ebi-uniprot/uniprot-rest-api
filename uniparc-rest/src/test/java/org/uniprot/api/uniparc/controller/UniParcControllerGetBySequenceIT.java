@@ -254,7 +254,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup.id", notNullValue()))
                 .andExpect(jsonPath("sequenceFeatures[*].interproGroup.name", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")));
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")));
     }
 
     @Test
@@ -291,7 +292,8 @@ class UniParcControllerGetBySequenceIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].proteomeId").doesNotExist())
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].proteinName").doesNotExist())
@@ -318,7 +320,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].database",
@@ -379,7 +382,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
@@ -409,7 +413,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].active", everyItem(is(true))))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
@@ -436,7 +441,8 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].active", everyItem(is(false))))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].taxonomy", notNullValue()))
-                .andExpect(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                .andExpect(
+                        jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }

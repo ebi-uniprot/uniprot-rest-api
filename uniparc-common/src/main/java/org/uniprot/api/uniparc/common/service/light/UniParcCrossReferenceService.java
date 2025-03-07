@@ -123,13 +123,16 @@ public class UniParcCrossReferenceService {
     }
 
     private UniParcCrossReference hideSources(UniParcCrossReference uniParcCrossReference) {
-        List<Property> filtered = uniParcCrossReference.getProperties().stream()
-                .filter(prop -> !PROPERTY_SOURCES.equals(prop.getKey())).toList();
+        List<Property> filtered =
+                uniParcCrossReference.getProperties().stream()
+                        .filter(prop -> !PROPERTY_SOURCES.equals(prop.getKey()))
+                        .toList();
         if (filtered.size() == uniParcCrossReference.getProperties().size()) {
             return uniParcCrossReference;
         }
-        return UniParcCrossReferenceBuilder
-                .from(uniParcCrossReference).propertiesSet(filtered).build();
+        return UniParcCrossReferenceBuilder.from(uniParcCrossReference)
+                .propertiesSet(filtered)
+                .build();
     }
 
     public Stream<UniParcCrossReference> streamCrossReferencesByUniParcId(
@@ -140,8 +143,11 @@ public class UniParcCrossReferenceService {
             throw new ResourceNotFoundException("Unable to find UniParc id " + uniParcId);
         }
         UniParcEntryLight uniParcEntryLight = optUniParcLight.get();
-        Stream<UniParcCrossReference> filteredDatabaseCrossReferences = getFilteredDatabaseCrossReferences(uniParcEntryLight, streamRequest);
-        return streamRequest.isIncludeSources() ? filteredDatabaseCrossReferences : filteredDatabaseCrossReferences.map(this::hideSources);
+        Stream<UniParcCrossReference> filteredDatabaseCrossReferences =
+                getFilteredDatabaseCrossReferences(uniParcEntryLight, streamRequest);
+        return streamRequest.isIncludeSources()
+                ? filteredDatabaseCrossReferences
+                : filteredDatabaseCrossReferences.map(this::hideSources);
     }
 
     private Stream<UniParcCrossReference> getFilteredDatabaseCrossReferences(

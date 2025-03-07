@@ -172,7 +172,10 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
-                    .resultMatcher(jsonPath("$.uniParcCrossReferences[*].properties[*].key", not("sources")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.uniParcCrossReferences[*].properties[*].key",
+                                    not("sources")))
                     .build();
         }
 
@@ -201,7 +204,10 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
-                                    .resultMatcher(jsonPath("$.sequenceFeatures[*].properties[*].key", not("sources")))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.sequenceFeatures[*].properties[*].key",
+                                                    not("sources")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
