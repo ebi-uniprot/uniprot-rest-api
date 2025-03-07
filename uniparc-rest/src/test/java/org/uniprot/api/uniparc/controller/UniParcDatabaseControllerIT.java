@@ -299,7 +299,9 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", iterableWithSize(4)))
-                .andExpect(jsonPath("$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")));
     }
@@ -409,6 +411,59 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
+    }
+
+    @Test
+    void StreamByAccessionWithCrossRefIdFilterSuccess() throws Exception {
+        // when
+        saveEntry();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamRequestPath(), getIdPathValue())
+                        .param("id", "embl1")
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
+
+        // then
+        getMockMvc()
+                .perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(4)))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", iterableWithSize(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
+                .andExpect(jsonPath("$.results[*].database", notNullValue()))
+                .andExpect(jsonPath("$.results[*].organism", notNullValue()));
+    }
+
+    @Test
+    void StreamByAccessionWithIncludeSourcesFilterSuccess() throws Exception {
+        // when
+        saveEntry();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamRequestPath(), getIdPathValue())
+                        .param("includeSources", "true")
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
+
+        // then
+        getMockMvc()
+                .perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(25)))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")))
+                .andExpect(jsonPath("$.results[*].database", notNullValue()))
+                .andExpect(jsonPath("$.results[*].organism", notNullValue()));
     }
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
