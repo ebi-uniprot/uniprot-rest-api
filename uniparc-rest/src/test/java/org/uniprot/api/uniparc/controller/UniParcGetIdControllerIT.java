@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
 
 import java.util.List;
 
@@ -171,6 +172,10 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.uniParcCrossReferences[*].properties[*].key",
+                                    not("sources")))
                     .build();
         }
 
@@ -199,11 +204,16 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.sequenceFeatures[*].properties[*].key",
+                                                    not("sources")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -231,6 +241,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(
                                             content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
                                     .resultMatcher(
@@ -246,6 +257,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -264,6 +276,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -279,15 +292,18 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                                                 <anotherSample>text2</anotherSample>
                                                                                 <someMore>text3</someMore>
                                                                             </rdf:RDF>""")))
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())

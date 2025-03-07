@@ -137,7 +137,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
         MediaType contentType = getAcceptHeader(request);
         setBasicRequestFormat(streamRequest, request);
         return super.stream(
-                () -> crossReferenceService.streamCrossReferences(upi, streamRequest),
+                () -> crossReferenceService.streamCrossReferencesByUniParcId(upi, streamRequest),
                 streamRequest,
                 contentType,
                 request);
