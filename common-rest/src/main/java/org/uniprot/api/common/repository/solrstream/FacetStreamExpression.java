@@ -55,10 +55,14 @@ public class FacetStreamExpression extends UniProtStreamExpression {
 
     private static String getBucketSizeLimit(SolrFacetRequest facetRequest) {
         String bucketSize = DEFAULT_BUCKET_SIZE;
-        if (facetRequest.getLimit() != 0 && Utils.nullOrEmpty(facetRequest.getInterval())) {
+        if (shouldApplyFacetingLimit(facetRequest)) {
             bucketSize = String.valueOf(facetRequest.getLimit());
         }
         return bucketSize;
+    }
+
+    private static boolean shouldApplyFacetingLimit(SolrFacetRequest facetRequest) {
+        return facetRequest.getLimit() != 0 && Utils.nullOrEmpty(facetRequest.getInterval());
     }
 
     private static String getBucketSorts(SolrFacetRequest facetRequest) {

@@ -63,6 +63,13 @@ public class SolrStreamFacetResponse {
                 FacetStreamExpression.getFacetNameComparatorAndLimitMap(solrRequest.getFacets());
         List<List<Facet>> facetsLists =
                 facetsInBatches.stream().map(SolrStreamFacetResponse::getFacets).toList();
+        Map<String, Facet.FacetBuilder> mergedFacetsMap = getFacetBuilderMap(facetsLists);
+        List<Facet> mergedFacets = getMergedFacets(mergedFacetsMap, map);
+        return mergedFacets;
+    }
+
+    private static Map<String, Facet.FacetBuilder> getFacetBuilderMap(
+            List<List<Facet>> facetsLists) {
         Map<String, Facet.FacetBuilder> mergedFacetsMap = new LinkedHashMap<>();
         for (List<Facet> facets : facetsLists) {
             for (Facet facet : facets) {
@@ -83,7 +90,12 @@ public class SolrStreamFacetResponse {
                 }
             }
         }
+        return mergedFacetsMap;
+    }
 
+    private static List<Facet> getMergedFacets(
+            Map<String, Facet.FacetBuilder> mergedFacetsMap,
+            Map<String, Map.Entry<Integer, Comparator<FacetItem>>> map) {
         // Build the final list of Facets from the builders
         List<Facet> mergedFacets = new ArrayList<>();
         for (Facet.FacetBuilder builder : mergedFacetsMap.values()) {
@@ -108,11 +120,7 @@ public class SolrStreamFacetResponse {
         if (existingValues != null) {
             for (FacetItem existingItem : existingValues) {
                 String key = existingItem.getLabel() + "|" + existingItem.getValue();
-                FacetItem.FacetItemBuilder itemBuilder =
-                        FacetItem.builder()
-                                .label(existingItem.getLabel())
-                                .value(existingItem.getValue())
-                                .count(existingItem.getCount());
+                FacetItem.FacetItemBuilder itemBuilder = getFacetItemBuilder(existingItem);
                 itemMap.put(key, itemBuilder);
             }
         }
@@ -130,11 +138,7 @@ public class SolrStreamFacetResponse {
                             existingBuilder.build().getCount() + facetItem.getCount());
                 } else {
                     // Otherwise, add the new item
-                    FacetItem.FacetItemBuilder newItemBuilder =
-                            FacetItem.builder()
-                                    .label(facetItem.getLabel())
-                                    .value(facetItem.getValue())
-                                    .count(facetItem.getCount());
+                    FacetItem.FacetItemBuilder newItemBuilder = getFacetItemBuilder(facetItem);
                     itemMap.put(key, newItemBuilder);
                 }
             }
@@ -147,5 +151,14 @@ public class SolrStreamFacetResponse {
             facetItems.add(itemBuilder.build());
         }
         builder.values(facetItems);
+    }
+
+    private static FacetItem.FacetItemBuilder getFacetItemBuilder(FacetItem existingItem) {
+        FacetItem.FacetItemBuilder itemBuilder =
+                FacetItem.builder()
+                        .label(existingItem.getLabel())
+                        .value(existingItem.getValue())
+                        .count(existingItem.getCount());
+        return itemBuilder;
     }
 }

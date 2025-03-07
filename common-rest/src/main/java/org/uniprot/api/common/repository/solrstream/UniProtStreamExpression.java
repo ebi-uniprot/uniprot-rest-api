@@ -21,13 +21,17 @@ public class UniProtStreamExpression extends StreamExpression {
 
     protected void addFQRelatedParams(SolrRequest request) {
         // qf if there is a user query else no need for qf, we use fq for better performance
-        if (Utils.notNullNotEmpty(request.getQuery()) && !"*:*".equals(request.getQuery())) {
+        if (shouldUseQueryFields(request)) {
             this.addParameter(new StreamExpressionNamedParameter("defType", "edismax"));
             this.addParameter(new StreamExpressionNamedParameter("qf", request.getQueryField()));
             this.addParameter(new StreamExpressionNamedParameter("q.op", QueryOperator.AND.name()));
         }
         this.addParameter(
                 new StreamExpressionNamedParameter("fq", String.join(",", request.getIdsQuery())));
+    }
+
+    private static boolean shouldUseQueryFields(SolrRequest request) {
+        return Utils.notNullNotEmpty(request.getQuery()) && !"*:*".equals(request.getQuery());
     }
 
     protected boolean queryFilteredQuerySet(SolrRequest request) {
