@@ -234,6 +234,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {FASTA_MEDIA_TYPE_VALUE})
@@ -254,6 +255,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 results, getByUpIdRequest.getFields(), false, false, null, request, response);
     }
 
+    @SuppressWarnings("squid:S6856")
     @GetMapping(
             value = "/proteome/{upId}/stream",
             produces = {FASTA_MEDIA_TYPE_VALUE})
