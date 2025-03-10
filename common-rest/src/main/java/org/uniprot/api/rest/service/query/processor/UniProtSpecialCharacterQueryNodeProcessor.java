@@ -134,7 +134,7 @@ public class UniProtSpecialCharacterQueryNodeProcessor extends QueryNodeProcesso
                 try (UniProtSpecialCharacterFilter uniProtSpecialCharacterFilter =
                         new UniProtSpecialCharacterFilter(
                                 new CharSequenceReader(text), SPECIAL_CHAR_MAP)) {
-                    int status = uniProtSpecialCharacterFilter.read();
+                    uniProtSpecialCharacterFilter.read();
                     uniProtSpecialCharacterFilter.reset();
                     fieldQueryNode.setText(IOUtils.toString(uniProtSpecialCharacterFilter));
                 } catch (Exception e) {
