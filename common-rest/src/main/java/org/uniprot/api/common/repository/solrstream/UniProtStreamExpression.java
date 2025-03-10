@@ -20,22 +20,28 @@ public class UniProtStreamExpression extends StreamExpression {
     }
 
     protected void addFQRelatedParams(SolrRequest request) {
-        this.addParameter(new StreamExpressionNamedParameter("defType", "edismax"));
-        this.addParameter(new StreamExpressionNamedParameter("qf", request.getQueryField()));
+        // qf if there is a user query else no need for qf, we use fq for better performance
+        if (shouldUseQueryFields(request)) {
+            this.addParameter(new StreamExpressionNamedParameter("defType", "edismax"));
+            this.addParameter(new StreamExpressionNamedParameter("qf", request.getQueryField()));
+            this.addParameter(new StreamExpressionNamedParameter("q.op", QueryOperator.AND.name()));
+        }
         this.addParameter(
                 new StreamExpressionNamedParameter("fq", String.join(",", request.getIdsQuery())));
-        this.addParameter(new StreamExpressionNamedParameter("q.op", QueryOperator.AND.name()));
+    }
+
+    private static boolean shouldUseQueryFields(SolrRequest request) {
+        return Utils.notNullNotEmpty(request.getQuery()) && !"*:*".equals(request.getQuery());
     }
 
     protected boolean queryFilteredQuerySet(SolrRequest request) {
-        return Utils.notNullNotEmpty(request.getIdsQuery())
-                && Utils.notNullNotEmpty(request.getQuery());
+        return Utils.notNullNotEmpty(request.getIdsQuery());
     }
 
     protected String constructQuery(SolrRequest request) {
         String query = request.getQuery();
         if (Utils.nullOrEmpty(query)) {
-            query = request.getIdsQuery();
+            query = "*:*";
         }
         return query;
     }

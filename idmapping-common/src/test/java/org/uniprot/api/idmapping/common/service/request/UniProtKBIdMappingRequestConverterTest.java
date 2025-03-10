@@ -47,6 +47,7 @@ class UniProtKBIdMappingRequestConverterTest {
         assertEquals(query, result.getQuery());
         assertEquals("({!terms f=accession_id}P21802,P12345,P05067)", result.getIdsQuery());
         assertEquals(ACCESSION_ID, result.getIdField());
+        assertEquals(ids, result.getIds());
     }
 
     @Test
@@ -76,6 +77,7 @@ class UniProtKBIdMappingRequestConverterTest {
         assertEquals(query, result.getQuery());
         assertEquals("({!terms f=accession_id}P21802,P12345,P05067)", result.getIdsQuery());
         assertEquals(ACCESSION_ID, result.getIdField());
+        assertEquals(ids, result.getIds());
     }
 
     @Test
@@ -101,6 +103,7 @@ class UniProtKBIdMappingRequestConverterTest {
         assertEquals(query, result.getQuery());
         assertEquals("({!terms f=accession}P21802,P12345,P05067)", result.getIdsQuery());
         assertEquals(ACCESSION_ID, result.getIdField());
+        assertEquals(ids, result.getIds());
     }
 
     @Test
@@ -127,6 +130,7 @@ class UniProtKBIdMappingRequestConverterTest {
                 "({!terms f=accession}P05067-3,P21802-2) OR ({!terms f=accession_id}P21802,P12345,P05067)",
                 result.getIdsQuery());
         assertEquals(ACCESSION_ID, result.getIdField());
+        assertEquals(ids, result.getIds());
     }
 
     @Test

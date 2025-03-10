@@ -10,4 +10,6 @@ public class StoreRequest {
     private final boolean addLineage;
 
     private final String fields;
+
+    private final String proteomeId;
 }

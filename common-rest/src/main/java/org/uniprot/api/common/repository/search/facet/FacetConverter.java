@@ -10,6 +10,8 @@ public abstract class FacetConverter<F, T> {
 
     public abstract T convert(F queryResponse, Collection<String> facetList);
 
+    public abstract T convert(F queryResponse, Collection<String> facetList, boolean ignoreLimit);
+
     protected abstract FacetConfig getFacetConfig();
 
     /**
