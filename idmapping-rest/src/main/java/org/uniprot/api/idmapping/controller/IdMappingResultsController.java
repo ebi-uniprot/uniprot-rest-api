@@ -30,11 +30,11 @@ import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.common.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.common.response.model.SimpleIdMappingSearchResult;
+import org.uniprot.api.idmapping.common.response.model.SimpleStreamResult;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.IdMappingSearchResult;
-import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.util.Utils;
@@ -97,7 +97,10 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = IdMappingSearchResult.class)),
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            SimpleIdMappingSearchResult.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
@@ -141,7 +144,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = StreamResult.class)),
+                                    schema = @Schema(implementation = SimpleStreamResult.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE)

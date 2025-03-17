@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class StreamResult<T> {
-    StreamResult() {}
+    public StreamResult() {}
 
     Collection<T> results;
     String error;

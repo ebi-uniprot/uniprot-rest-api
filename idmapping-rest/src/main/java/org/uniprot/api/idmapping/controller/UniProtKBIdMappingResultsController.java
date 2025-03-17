@@ -30,11 +30,11 @@ import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingStreamRequest;
 import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
+import org.uniprot.api.idmapping.common.response.model.UniProtKBIdMappingSearchResult;
+import org.uniprot.api.idmapping.common.response.model.UniProtKBStreamResult;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.IdMappingSearchResult;
-import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -101,7 +101,10 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = IdMappingSearchResult.class)),
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            UniProtKBIdMappingSearchResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =
@@ -162,7 +165,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = StreamResult.class)),
+                                    schema = @Schema(implementation = UniProtKBStreamResult.class)),
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     array =

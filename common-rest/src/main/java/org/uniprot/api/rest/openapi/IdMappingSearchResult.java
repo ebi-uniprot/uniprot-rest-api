@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class IdMappingSearchResult<T> extends SearchResult<T> {
-    IdMappingSearchResult() {
+    public IdMappingSearchResult() {
         super();
     }
 
