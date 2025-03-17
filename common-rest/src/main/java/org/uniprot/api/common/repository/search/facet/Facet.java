@@ -21,4 +21,20 @@ public class Facet {
     private boolean allowMultipleSelection;
 
     private List<FacetItem> values;
+
+    @Override
+    public String toString() {
+        return "Facet{"
+                + "label='"
+                + label
+                + '\''
+                + ", name='"
+                + name
+                + '\''
+                + ", allowMultipleSelection="
+                + allowMultipleSelection
+                + ", values="
+                + values
+                + '}';
+    }
 }

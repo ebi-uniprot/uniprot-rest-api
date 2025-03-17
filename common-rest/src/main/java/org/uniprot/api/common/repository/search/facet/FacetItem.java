@@ -17,4 +17,18 @@ public class FacetItem {
     private String value;
 
     private Long count;
+
+    @Override
+    public String toString() {
+        return "FacetItem{"
+                + "label='"
+                + label
+                + '\''
+                + ", value='"
+                + value
+                + '\''
+                + ", count="
+                + count
+                + '}';
+    }
 }

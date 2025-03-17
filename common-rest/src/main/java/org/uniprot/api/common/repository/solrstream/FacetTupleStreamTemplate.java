@@ -53,7 +53,6 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .collect(Collectors.toList());
 
             expressions.addAll(facetExpressions);
-            // we can replace list with plist function when solr >= 7.5
             ListStreamExpression listStreamExpression = new ListStreamExpression(expressions);
             StreamFactory streamFactory = getStreamFactory(this.zookeeperHost, this.collection);
             TupleStream tupleStream = streamFactory.constructStream(listStreamExpression);
@@ -67,8 +66,9 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
     }
 
     private static boolean shouldAddSearchExpression(SolrRequest request) {
-        return Utils.notNullNotEmpty(request.getQuery())
-                || Utils.notNullNotEmpty(request.getSorts())
-                || Utils.nullOrEmpty(request.getFacets());
+        return (Utils.notNullNotEmpty(request.getQuery())
+                        || Utils.notNullNotEmpty(request.getSorts())
+                        || Utils.nullOrEmpty(request.getFacets()))
+                && request.getRows() > 0;
     }
 }

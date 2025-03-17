@@ -66,6 +66,7 @@ public class RequestConverterImpl implements RequestConverter {
             SearchRequest request, List<String> idsList, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder =
                 basicConverter.createSearchIdsSolrRequest(request, idField);
+        requestBuilder.ids(idsList);
         requestBuilder.idsQuery(getIdsTermQuery(idsList, idField));
         return requestBuilder.build();
     }
@@ -75,6 +76,7 @@ public class RequestConverterImpl implements RequestConverter {
             StreamRequest request, List<String> idsList, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder =
                 basicConverter.createStreamIdsSolrRequest(request, idField);
+        requestBuilder.ids(idsList);
         requestBuilder.idsQuery(getIdsTermQuery(idsList, idField));
         return requestBuilder.build();
     }

@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,9 +29,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtSpecialCharacterQueryNodeProcessor;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
@@ -234,6 +238,42 @@ class UniProtQueryProcessorTest {
         when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is("field:thing_value"));
+    }
+
+    @Test
+    void handleEmptyString() {
+        String query = "";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is(""));
+    }
+
+    @Test
+    void handleGreekSymbolValueSearch() {
+        String query = "field:other_value" + "\u03B1";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("field:other_valuealpha"));
+    }
+
+    @Test
+    void handleGreekSymbolValueSearch_freeText() {
+        String query = "other_value" + "\u03B1";
+        when(searchFieldConfig.getSearchFieldNames()).thenReturn(Set.of("field"));
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("other_valuealpha"));
+    }
+
+    @Test
+    void processQuery_whenSpecialCharFilter_throwsAnException() {
+        try (MockedConstruction<UniProtSpecialCharacterQueryNodeProcessor> mockConstruction =
+                Mockito.mockConstruction(
+                        UniProtSpecialCharacterQueryNodeProcessor.class,
+                        (mock, context) -> {
+                            when(mock.process(any())).thenThrow(RuntimeException.class);
+                            assertThrows(
+                                    QueryNodeException.class,
+                                    () -> processor.processQuery("anyString"));
+                        })) {}
     }
 
     @Test

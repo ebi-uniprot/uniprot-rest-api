@@ -32,7 +32,7 @@ public abstract class SolrProducerMessageServiceIT<
 
         String jobId = getService().sendMessage(request);
 
-        assertEquals("e0457b3cf8130f3d374bf4e889ef01586caf6a51", jobId);
+        assertEquals("vZZOCYCQUM", jobId);
         Mockito.verify(getConsumer(), Mockito.timeout(1000).times(1))
                 .onMessage(messageCaptor.capture());
         Message message = messageCaptor.getValue();
@@ -47,7 +47,7 @@ public abstract class SolrProducerMessageServiceIT<
     @Test
     void sendMessage_withSuccessForceAndIdleJobAllowedAndCleanResources() throws Exception {
         T request = getSuccessDownloadRequestWithForce();
-        String jobId = "f98973831cfe2ba1a41cfb08151047f0c1a0d4f9";
+        String jobId = "zBvnr71Q5V";
 
         // Reproduce Idle Job in Running Status in and files created
         createJobFiles(jobId);
@@ -78,7 +78,7 @@ public abstract class SolrProducerMessageServiceIT<
     void sendMessage_jobAlreadyRunningAndNotAllowed() {
         T request = getAlreadyRunningRequest();
 
-        String jobId = "bca57aa8e6ae2c6ab771633215666a23d725c738";
+        String jobId = "qUQiIna2Vx";
         R runningJob = getDownloadJob(jobId, LocalDateTime.now(), request);
         getJobRepository().save(runningJob);
 
@@ -95,7 +95,7 @@ public abstract class SolrProducerMessageServiceIT<
     void sendMessage_WithoutFormatDefaultToJson() {
         T request = getWithoutFormatRequest();
 
-        String jobId = "d93243dd48e4a179052fd42f8478a3e2b9902327";
+        String jobId = "uZpiOSeviA";
         String resultJobId = getService().sendMessage(request);
         assertEquals(jobId, resultJobId);
         request.setFormat("json");

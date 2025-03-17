@@ -440,7 +440,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void downloadCanGetJobDetails() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS";
-        String asynchJobId = "0ec030e6ab2ee90d179cb5f9268e9daa98eaa67a";
+        String asynchJobId = "26us1hCFLb";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
@@ -480,7 +480,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void downloadCanGetJobDetailsWithError() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String asyncJobId = "jzDe7R1age";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         IdMappingDownloadJob downloadJob =
@@ -521,7 +521,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void resubmit_withForceOnAlreadyFinishedJob() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String asyncJobId = "jzDe7R1age";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         IdMappingDownloadJob downloadJob =
@@ -547,7 +547,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void resubmit_withForceOnAlreadyFinishedJobWithAcceptAll() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String asyncJobId = "jzDe7R1age";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         IdMappingDownloadJob downloadJob =
@@ -573,7 +573,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void resubmit_withForceOnAlreadyFinishedJobWithoutAccept() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String asyncJobId = "jzDe7R1age";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         IdMappingDownloadJob downloadJob =
@@ -598,7 +598,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void resubmit_withForceOnAlreadyFailedJobAfterMaxRetry() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_RETRY";
-        String asyncJobId = "1ae9841545d7e36f7106ae4e4f0965e4cb8d125d";
+        String asyncJobId = "3Q4ID5wQxK";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
@@ -643,7 +643,7 @@ public class IdMappingDownloadControllerIT {
     @Test
     void resubmit_withForceOnAlreadyFailedJobBeforeMaxRetry() throws Exception {
         String idMappingJobId = "JOB_ID_DETAILS_ERROR";
-        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+        String asyncJobId = "jzDe7R1age";
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         IdMappingDownloadJob downloadJob =
@@ -809,7 +809,7 @@ public class IdMappingDownloadControllerIT {
     void uniParcDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPARC_JOB_SUCCESS";
-        String asyncJobId = "aac4dca9f543088cce4b400aed297ed115b64af1";
+        String asyncJobId = "omGWzNTCvM";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
@@ -1007,7 +1007,7 @@ public class IdMappingDownloadControllerIT {
     void unirefDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIREF_JOB_SUCCESS";
-        String asyncJobId = "441c3ff4b48904378071ce766b0973c94f17d8fd";
+        String asyncJobId = "9IwZyXSe7G";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UniRef90_P03901"));
@@ -1231,7 +1231,7 @@ public class IdMappingDownloadControllerIT {
     void uniProtKBDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPROTKB_JOB_SUCCESS";
-        String asyncJobId = "608f212e45a8054809bd179b803029494d72418c";
+        String asyncJobId = "dMcurbvIQ8";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));

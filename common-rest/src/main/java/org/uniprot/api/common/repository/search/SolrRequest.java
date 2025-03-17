@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.uniprot.api.rest.service.request.BasicRequestConverter;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.
@@ -28,6 +32,7 @@ public class SolrRequest {
     private String defaultField;
 
     private String idField;
+    private List<String> ids;
     private String idsQuery;
     // Batch size of rows in solr request. In case of search api request rows and totalRows will be
     // same.
@@ -55,5 +60,31 @@ public class SolrRequest {
         public String getQuery() {
             return query;
         }
+    }
+
+    // get only search request without facets
+    public SolrRequest createSearchRequest() {
+        SolrRequestBuilder builder = this.toBuilder();
+        builder.clearFacets();
+        return builder.build();
+    }
+
+    public SolrRequest createBatchFacetSolrRequest(List<String> ids) {
+        SolrRequestBuilder builder = this.toBuilder();
+        List<SolrFacetRequest> batchFacets = createBatchFacets(this.facets);
+        builder.clearFacets().facets(batchFacets);
+        builder.idsQuery(BasicRequestConverter.getIdsTermQuery(ids, this.idField));
+        return builder.build();
+    }
+
+    private List<SolrFacetRequest> createBatchFacets(List<SolrFacetRequest> facets) {
+        List<SolrFacetRequest> batchFacets = new ArrayList<>();
+        for (SolrFacetRequest facet : facets) {
+            SolrFacetRequest.SolrFacetRequestBuilder builder = SolrFacetRequest.builder();
+            builder.name(facet.getName()).minCount(facet.getMinCount()).sort(null);
+            builder.limit(-1);
+            batchFacets.add(builder.build());
+        }
+        return batchFacets;
     }
 }

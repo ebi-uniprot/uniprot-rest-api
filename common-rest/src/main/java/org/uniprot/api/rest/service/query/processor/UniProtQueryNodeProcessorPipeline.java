@@ -27,5 +27,6 @@ public class UniProtQueryNodeProcessorPipeline extends QueryNodeProcessorPipelin
         add(new UniProtPointRangeQueryNodeProcessor());
         add(new UniProtTermRangeQueryNodeProcessor());
         add(new UniProtDefaultFieldQueryNodeProcessor());
+        add(new UniProtSpecialCharacterQueryNodeProcessor());
     }
 }

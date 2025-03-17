@@ -105,6 +105,7 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
             SearchRequest request, List<String> idsList, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder =
                 createSearchIdsSolrRequestBuilder(request, idField);
+        requestBuilder.ids(idsList);
         requestBuilder.idsQuery(getUniProtKBIdsTermQuery(idsList, idField));
         return requestBuilder.build();
     }
@@ -114,6 +115,7 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
             StreamRequest request, List<String> idsList, String idField) {
         SolrRequest.SolrRequestBuilder requestBuilder =
                 createStreamIdsSolrRequestBuilder(request, idField);
+        requestBuilder.ids(idsList);
         requestBuilder.idsQuery(getUniProtKBIdsTermQuery(idsList, idField));
         return requestBuilder.build();
     }
