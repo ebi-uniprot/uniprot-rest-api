@@ -77,6 +77,8 @@
 		<module>unisave-rest</module>
 		<module>aa-rest</module>
 		<module>help-centre-rest</module>
+		<module>mapto-common</module>
+		<module>mapto-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 
