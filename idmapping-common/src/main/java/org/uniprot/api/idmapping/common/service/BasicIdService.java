@@ -5,10 +5,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.*;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
@@ -36,10 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class BasicIdService<T, U> {
     protected final StoreStreamer<T> storeStreamer;
-    private final FacetTupleStreamTemplate tupleStream;
-    private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RdfStreamer rdfStreamer;
     private final RequestConverter requestConverter;
+    private final SolrStreamService solrStreamService;
 
     @Value("${search.request.converter.defaultRestPageSize:#{null}}")
     private Integer defaultPageSize;
@@ -69,9 +70,9 @@ public abstract class BasicIdService<T, U> {
             RdfStreamer rdfStreamer,
             RequestConverter requestConverter) {
         this.storeStreamer = storeStreamer;
-        this.tupleStream = tupleStream;
-        this.facetTupleStreamConverter =
-                new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
+        this.solrStreamService =
+                new SolrStreamService(
+                        tupleStream, new FacetTupleStreamConverter(getSolrIdField(), facetConfig));
         this.rdfStreamer = rdfStreamer;
         this.requestConverter = requestConverter;
     }
@@ -110,7 +111,8 @@ public abstract class BasicIdService<T, U> {
             SolrRequest solrRequest =
                     requestConverter.createSearchIdsSolrRequest(
                             searchRequest, toIds, getSolrIdField());
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(solrRequest);
+            SolrStreamFacetResponse solrStreamResponse =
+                    this.solrStreamService.searchBySolrStream(solrRequest, this.idBatchSize);
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
@@ -211,7 +213,8 @@ public abstract class BasicIdService<T, U> {
             SolrRequest solrRequest =
                     requestConverter.createStreamIdsSolrRequest(
                             streamRequest, toIds, getSolrIdField());
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(solrRequest);
+            SolrStreamFacetResponse solrStreamResponse =
+                    this.solrStreamService.searchBySolrStream(solrRequest, this.idBatchSize);
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
@@ -229,20 +232,6 @@ public abstract class BasicIdService<T, U> {
             }
         }
         return mappedIds;
-    }
-
-    protected SolrStreamFacetResponse searchBySolrStream(SolrRequest solrRequest) {
-        // request without facets. Normally search and facets requests are mutually exclusive.
-        SolrRequest searchRequest = solrRequest.createSearchRequest();
-        TupleStream tupleStream = this.tupleStream.create(searchRequest);
-        SolrStreamFacetResponse idsResponse =
-                this.facetTupleStreamConverter.convert(tupleStream, List.of());
-        // get facets in batches
-        List<SolrStreamFacetResponse> facetsInBatches = getFacetsInBatches(solrRequest);
-        // merge them
-        SolrStreamFacetResponse mergedResponse =
-                SolrStreamFacetResponse.merge(solrRequest, facetsInBatches, idsResponse);
-        return mergedResponse;
     }
 
     private Integer getPageSize(SearchRequest searchRequest) {
@@ -348,30 +337,5 @@ public abstract class BasicIdService<T, U> {
             SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
         return Utils.notNullNotEmpty(searchRequest.getFacets())
                 && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;
-    }
-
-    private List<SolrStreamFacetResponse> getFacetsInBatches(SolrRequest solrRequest) {
-        List<String> ids = solrRequest.getIds();
-        List<SolrStreamFacetResponse> facetResponses =
-                new ArrayList<>(ids.size() / this.idBatchSize + 1);
-        boolean ignoreLimit =
-                true; // for batch faceting, get all facets and return "limit" number of facets
-        // during merge
-        for (int i = 0;
-                solrRequest.getFacets().size() > 0 && i < ids.size();
-                i += this.idBatchSize) {
-            List<String> idsBatch = ids.subList(i, Math.min(i + this.idBatchSize, ids.size()));
-            SolrRequest solrFacetRequest = solrRequest.createBatchFacetSolrRequest(idsBatch);
-            TupleStream facetTupleStream = this.tupleStream.create(solrFacetRequest);
-            SolrStreamFacetResponse response =
-                    this.facetTupleStreamConverter.convert(
-                            facetTupleStream,
-                            solrFacetRequest.getFacets().stream()
-                                    .map(SolrFacetRequest::getName)
-                                    .toList(),
-                            ignoreLimit);
-            facetResponses.add(response);
-        }
-        return facetResponses;
     }
 }
