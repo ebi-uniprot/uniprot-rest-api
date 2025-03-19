@@ -277,7 +277,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "The 'length' filter value '[0 TO 50]' is invalid. The min value for the lower is 1.")));
+                                        "The 'length' filter value '[0 TO 1000]' is invalid. The min value for the lower is 1.")));
     }
 
     @Test

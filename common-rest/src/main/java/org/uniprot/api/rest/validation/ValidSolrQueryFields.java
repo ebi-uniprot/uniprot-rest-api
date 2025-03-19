@@ -31,7 +31,6 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.impl.SearchFieldConfigImpl;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 
@@ -67,12 +66,13 @@ public @interface ValidSolrQueryFields {
         @Autowired private ApplicationContext applicationContext;
 
         private Map<String, String> whiteListFields;
+        private UniProtDataType uniProtDataType;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
-                UniProtDataType uniProtDataType = constraintAnnotation.uniProtDataType();
+                this.uniProtDataType = constraintAnnotation.uniProtDataType();
                 this.searchFieldConfig =
                         SearchFieldConfigFactory.getSearchFieldConfig(uniProtDataType);
                 this.messagePrefix = constraintAnnotation.messagePrefix();
@@ -197,7 +197,7 @@ public @interface ValidSolrQueryFields {
         private boolean isValidField(ConstraintValidatorContext context, TermRangeQuery rangeQuery) {
             String fieldName = rangeQuery.getField();
             String fieldValue = rangeQuery.toString(fieldName);
-            if (UNIPROTKB.equals(((SearchFieldConfigImpl)searchFieldConfig).getDataType()) && "length".equals(fieldName)) {
+            if (UNIPROTKB.equals(uniProtDataType) && "length".equals(fieldName)) {
                 int lower = Integer.parseInt(new String(rangeQuery.getLowerTerm().bytes, StandardCharsets.UTF_8));
                 if (lower <= 0) {
                     addFieldValueErrorMessage(fieldName, fieldValue, (ConstraintValidatorContextImpl) context);
