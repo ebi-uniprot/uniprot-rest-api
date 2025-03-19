@@ -250,6 +250,62 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         "Invalid includeIsoform parameter value. Expected true or false")));
     }
 
+    @Test
+    void searchInvalidZeroLength() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=(length:[0 TO 1000])")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "The 'length' filter value '[0 TO 1000]' is invalid. The min value for the lower is 1.")));
+    }
+
+    @Test
+    void searchLengthMinOne_success() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=(length:[1 TO 1000])")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"\"HGNC:3689\"", "FGFR2", "3689", "\"hgnc-HGNC:3689\"", "hgnc-3689"})
     void searchWithHGNCIdAndProperties(String xref) throws Exception {
