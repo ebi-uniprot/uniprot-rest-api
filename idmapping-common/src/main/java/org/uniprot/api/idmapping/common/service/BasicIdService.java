@@ -5,24 +5,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.request.RequestConverter;
@@ -36,32 +30,8 @@ import lombok.extern.slf4j.Slf4j;
  * @created 16/02/2021
  */
 @Slf4j
-public abstract class BasicIdService<T, U> {
-    protected final StoreStreamer<T> storeStreamer;
+public abstract class BasicIdService<T, U> extends AbstractIdService<T> {
     private final RdfStreamer rdfStreamer;
-    private final RequestConverter requestConverter;
-    private final SolrStreamService solrStreamService;
-
-    @Value("${search.request.converter.defaultRestPageSize:#{null}}")
-    private Integer defaultPageSize;
-
-    // the maximum number of ids allowed in `to` field after mapped by `from` fields
-    @Value("${id.mapping.max.to.ids.count:#{null}}") // value to 500k
-    private Integer maxIdMappingToIdsCount;
-
-    // Maximum number of `to` ids supported to enrich result with uniprot data
-    // Greater than maxIdMappingToIdsCountEnriched and less than maxIdMappingToIdsCount, the API
-    // should return only `to` ids
-    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
-    private Integer maxIdMappingToIdsCountEnriched;
-
-    // Maximum number of `to` ids supported with faceting query
-    @Value("${id.mapping.max.to.ids.with.facets.count:#{null}}") // value to 10k
-    private Integer maxIdMappingToIdsCountWithFacets;
-
-    // config related to faceting
-    @Value("${id.mapping.facet.ids.batch.size:5000}")
-    private int idBatchSize;
 
     protected BasicIdService(
             StoreStreamer<T> storeStreamer,
@@ -69,12 +39,8 @@ public abstract class BasicIdService<T, U> {
             FacetConfig facetConfig,
             RdfStreamer rdfStreamer,
             RequestConverter requestConverter) {
-        this.storeStreamer = storeStreamer;
-        this.solrStreamService =
-                new SolrStreamService(
-                        tupleStream, new FacetTupleStreamConverter(getSolrIdField(), facetConfig));
+        super(storeStreamer, tupleStream, facetConfig, requestConverter);
         this.rdfStreamer = rdfStreamer;
-        this.requestConverter = requestConverter;
     }
 
     public QueryResult<U> getMappedEntries(
@@ -93,26 +59,19 @@ public abstract class BasicIdService<T, U> {
         validateMappedIdsEnrichmentLimit(mappedIds);
 
         List<ProblemPair> warnings = new ArrayList<>();
-        if (needSearchInSolr(searchRequest, includeIsoform)) {
+        if (solrSearchNeededBySearchRequest(searchRequest, includeIsoform)) {
             List<String> toIds = getMappedToIds(mappedIds);
 
             long start = System.currentTimeMillis();
 
             // unset facets if mapped to ids exceeds the allowed limit and set the warning
-            if (facetingDisallowed(searchRequest, mappedIds)) {
-                searchRequest.removeFacets();
-                warnings.add(
-                        new ProblemPair(
-                                PredefinedAPIStatus.FACET_WARNING.getCode(),
-                                PredefinedAPIStatus.FACET_WARNING.getErrorMessage(
-                                        this.maxIdMappingToIdsCountWithFacets)));
+            if (facetingDisallowed(searchRequest, toIds)) {
+                warnings.add(removeFacetsAndGetFacetWarning(searchRequest));
             }
 
-            SolrRequest solrRequest =
-                    requestConverter.createSearchIdsSolrRequest(
-                            searchRequest, toIds, getSolrIdField());
             SolrStreamFacetResponse solrStreamResponse =
-                    this.solrStreamService.searchBySolrStream(solrRequest, this.idBatchSize);
+                    searchMappedIdsFacetsBySearchRequest(searchRequest, toIds);
+
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
@@ -181,17 +140,10 @@ public abstract class BasicIdService<T, U> {
 
     protected abstract String getEntryId(T entry);
 
-    protected abstract String getSolrIdField();
-
     protected abstract UniProtDataType getUniProtDataType();
 
     protected abstract Stream<U> streamEntries(
             List<IdMappingStringPair> mappedIds, StreamRequest streamRequest);
-
-    protected Stream<T> getEntries(List<String> toIds, String fields) {
-        StoreRequest storeRequest = StoreRequest.builder().fields(fields).build();
-        return this.storeStreamer.streamEntries(toIds, storeRequest);
-    }
 
     protected List<IdMappingStringPair> streamFilterAndSortEntries(
             StreamRequest streamRequest, List<IdMappingStringPair> mappedIds, String jobId) {
@@ -203,18 +155,14 @@ public abstract class BasicIdService<T, U> {
             List<IdMappingStringPair> mappedIds,
             boolean includeIsoform,
             String jobId) {
-        if (Utils.notNull(streamRequest.getQuery())
-                || Utils.notNull(streamRequest.getSort())
-                || includeIsoform) {
+        if (solrSearchNeededByStreamRequest(streamRequest, includeIsoform)) {
             List<String> toIds = getMappedToIds(mappedIds);
 
             long start = System.currentTimeMillis();
 
-            SolrRequest solrRequest =
-                    requestConverter.createStreamIdsSolrRequest(
-                            streamRequest, toIds, getSolrIdField());
             SolrStreamFacetResponse solrStreamResponse =
-                    this.solrStreamService.searchBySolrStream(solrRequest, this.idBatchSize);
+                    searchMappedIdsFacetsByStreamRequest(streamRequest, toIds);
+
             long end = System.currentTimeMillis();
             log.debug(
                     "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
@@ -232,14 +180,6 @@ public abstract class BasicIdService<T, U> {
             }
         }
         return mappedIds;
-    }
-
-    private Integer getPageSize(SearchRequest searchRequest) {
-        Integer pageSize = this.defaultPageSize;
-        if (Utils.notNull(searchRequest.getSize())) {
-            pageSize = searchRequest.getSize();
-        }
-        return pageSize;
     }
 
     protected Stream<U> getPagedEntries(
@@ -316,26 +256,5 @@ public abstract class BasicIdService<T, U> {
 
     private Map<String, T> constructIdEntryMap(Stream<T> entries) {
         return entries.collect(Collectors.toMap(this::getEntryId, Function.identity()));
-    }
-
-    private boolean needSearchInSolr(SearchRequest searchRequest, boolean includeIsoform) {
-        return Utils.notNullNotEmpty(searchRequest.getQuery())
-                || Utils.notNullNotEmpty(searchRequest.getFacets())
-                || Utils.notNullNotEmpty(searchRequest.getSort())
-                || includeIsoform;
-    }
-
-    public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
-        if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
-            throw new InvalidRequestException(
-                    PredefinedAPIStatus.ENRICHMENT_WARNING.getErrorMessage(
-                            this.maxIdMappingToIdsCountEnriched));
-        }
-    }
-
-    private boolean facetingDisallowed(
-            SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
-        return Utils.notNullNotEmpty(searchRequest.getFacets())
-                && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;
     }
 }
