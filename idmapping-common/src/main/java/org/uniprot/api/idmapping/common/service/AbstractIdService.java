@@ -16,7 +16,6 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -63,8 +62,8 @@ public abstract class AbstractIdService<T> {
         this.requestConverter = requestConverter;
     }
 
-    public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
-        if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
+    public void validateMappedIdsEnrichmentLimit(int mappedIdsSize) {
+        if (mappedIdsSize > this.maxIdMappingToIdsCountEnriched) {
             throw new InvalidRequestException(
                     PredefinedAPIStatus.ENRICHMENT_WARNING.getErrorMessage(
                             this.maxIdMappingToIdsCountEnriched));

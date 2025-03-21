@@ -55,15 +55,11 @@ public abstract class BasicIdService<T, U> extends AbstractIdService<T> {
             String jobId) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
-
-        validateMappedIdsEnrichmentLimit(mappedIds);
-
+        validateMappedIdsEnrichmentLimit(mappedIds.size());
         List<ProblemPair> warnings = new ArrayList<>();
         if (solrSearchNeededBySearchRequest(searchRequest, includeIsoform)) {
             List<String> toIds = getMappedToIds(mappedIds);
-
             long start = System.currentTimeMillis();
-
             // unset facets if mapped to ids exceeds the allowed limit and set the warning
             if (facetingDisallowed(searchRequest, toIds)) {
                 warnings.add(removeFacetsAndGetFacetWarning(searchRequest));

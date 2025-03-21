@@ -159,7 +159,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
         MediaType contentType = getAcceptHeader(request);
 
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
-        this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
+        this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds().size());
 
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
