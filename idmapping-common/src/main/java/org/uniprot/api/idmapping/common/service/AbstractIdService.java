@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractIdService<T> {
     protected final StoreStreamer<T> storeStreamer;
-    private final FacetTupleStreamTemplate tupleStream;
+    private final FacetTupleStreamTemplate tupleStreamTemplate;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RequestConverter requestConverter;
 
@@ -52,11 +52,11 @@ public abstract class AbstractIdService<T> {
 
     public AbstractIdService(
             StoreStreamer<T> storeStreamer,
-            FacetTupleStreamTemplate tupleStream,
+            FacetTupleStreamTemplate tupleStreamTemplate,
             FacetConfig facetConfig,
             RequestConverter requestConverter) {
         this.storeStreamer = storeStreamer;
-        this.tupleStream = tupleStream;
+        this.tupleStreamTemplate = tupleStreamTemplate;
         this.facetTupleStreamConverter =
                 new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
         this.requestConverter = requestConverter;
@@ -97,7 +97,7 @@ public abstract class AbstractIdService<T> {
     protected SolrStreamFacetResponse searchBySolrStream(SolrRequest solrRequest, int batchSize) {
         // request without facets. Normally search and facets requests are mutually exclusive.
         SolrRequest searchRequest = solrRequest.createSearchRequest();
-        TupleStream tupleStream = this.tupleStream.create(searchRequest);
+        TupleStream tupleStream = this.tupleStreamTemplate.create(searchRequest);
         SolrStreamFacetResponse idsResponse =
                 this.facetTupleStreamConverter.convert(tupleStream, List.of());
         // get facets in batches
@@ -157,7 +157,7 @@ public abstract class AbstractIdService<T> {
         for (int i = 0; solrRequest.getFacets().size() > 0 && i < ids.size(); i += idBatchSize) {
             List<String> idsBatch = ids.subList(i, Math.min(i + idBatchSize, ids.size()));
             SolrRequest solrFacetRequest = solrRequest.createBatchFacetSolrRequest(idsBatch);
-            TupleStream facetTupleStream = this.tupleStream.create(solrFacetRequest);
+            TupleStream facetTupleStream = this.tupleStreamTemplate.create(solrFacetRequest);
             SolrStreamFacetResponse response =
                     this.facetTupleStreamConverter.convert(
                             facetTupleStream,

@@ -18,10 +18,10 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.request.RequestConverter;
 
-public abstract class MapToService<T> extends AbstractIdService<T> {
+public abstract class MapToTargetService<T> extends AbstractIdService<T> {
     private final StoreStreamer<T> storeStreamer;
 
-    protected MapToService(
+    protected MapToTargetService(
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
@@ -75,7 +75,6 @@ public abstract class MapToService<T> extends AbstractIdService<T> {
         if (solrSearchNeededByStreamRequest(streamRequest, false)) {
             SolrStreamFacetResponse solrStreamResponse =
                     searchMappedIdsFacetsByStreamRequest(streamRequest, toIds);
-
             return solrStreamResponse.getIds();
         }
         return toIds;

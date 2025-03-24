@@ -9,9 +9,9 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
-public class UniRefTargetMapToService extends MapToService<UniRefEntryLight> {
+public class UniRefMapToTargetService extends MapToTargetService<UniRefEntryLight> {
 
-    protected UniRefTargetMapToService(
+    protected UniRefMapToTargetService(
             @Qualifier("uniRefEntryStoreStreamer") StoreStreamer<UniRefEntryLight> storeStreamer,
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
