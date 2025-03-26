@@ -31,6 +31,7 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
     }
 
     public QueryResult<T> getMappedEntries(SearchRequest searchRequest, List<String> ids) {
+        // move logic of getting target ids form controller to here. TODO
         List<Facet> facets = null;
         validateMappedIdsEnrichmentLimit(ids.size());
         List<ProblemPair> warnings = new ArrayList<>();
