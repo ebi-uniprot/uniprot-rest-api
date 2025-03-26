@@ -1,9 +1,12 @@
 package org.uniprot.api.mapto.common.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -15,23 +18,24 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.uniprot.store.config.UniProtDataType;
 
 @Data
 @AllArgsConstructor
 @RedisHash("mapto")
+@RequiredArgsConstructor
 public class MapToJob implements Serializable {
+    @Serial
     private static final long serialVersionUID = -3919276929568870010L;
-    @Id private String id;
-    private String query; // query to run against the source collection
-    private String sourceDB;
-    private String targetDB;
-    private List<String> targetIds;
+    @Id private final String id;
+    private final UniProtDataType sourceDB;
+    private final UniProtDataType targetDB;
+    private final String query; // query to run against the source collection
     private JobStatus status;
-
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime created;
-
+    private final LocalDateTime created;
+    private List<String> targetIds;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updated;

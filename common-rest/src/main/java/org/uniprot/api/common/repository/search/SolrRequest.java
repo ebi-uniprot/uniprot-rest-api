@@ -42,6 +42,7 @@ public class SolrRequest {
 
     private boolean largeSolrStreamRestricted = true;
     private String highlightFields;
+    private String fields;
 
     private String boostFunctions;
     @Singular private List<String> fieldBoosts = new ArrayList<>();

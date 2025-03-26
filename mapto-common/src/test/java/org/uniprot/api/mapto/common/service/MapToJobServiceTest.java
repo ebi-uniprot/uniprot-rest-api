@@ -1,10 +1,5 @@
 package org.uniprot.api.mapto.common.service;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,13 +8,28 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
+import org.uniprot.api.rest.download.model.JobStatus;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MapToJobServiceTest {
 
-    @Mock private MapToJobRepository jobRepository;
+    public static final JobStatus JOB_STATUS = JobStatus.RUNNING;
+    public static final String ID = "id";
+    private static final List<String> TARGET_IDS = List.of();
+    @Mock
+    private MapToJobRepository jobRepository;
 
-    @Mock private MapToJob mapToJob;
+    @Mock
+    private MapToJob mapToJob;
 
     private MapToJobService jobService;
 
@@ -40,7 +50,7 @@ public class MapToJobServiceTest {
         String id = "ID";
         when(this.mapToJob.getId()).thenReturn(id);
         when(this.jobRepository.findById(id)).thenReturn(Optional.of(mapToJob));
-        Assertions.assertThrows(
+        assertThrows(
                 RuntimeException.class, () -> this.jobService.createMapToJob(mapToJob));
     }
 
@@ -64,5 +74,41 @@ public class MapToJobServiceTest {
         Boolean answer = true;
         when(this.jobRepository.existsById(id)).thenReturn(answer);
         Assertions.assertEquals(answer, jobService.mapToJobExists(id));
+    }
+
+    @Test
+    void updateStatus() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+
+        jobService.updateStatus(ID, JOB_STATUS);
+
+        verify(mapToJob).setStatus(JOB_STATUS);
+        verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(mapToJob);
+    }
+
+    @Test
+    void updateStatus_whenJobNotExist() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> jobService.updateStatus(ID, JOB_STATUS));
+    }
+
+    @Test
+    void setTargetIds() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+
+        jobService.setTargetIds(ID, TARGET_IDS);
+
+        verify(mapToJob).setTargetIds(TARGET_IDS);
+        verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(mapToJob);
+    }
+
+    @Test
+    void setTargetIds_whenJobNotExist() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> jobService.setTargetIds(ID, TARGET_IDS));
     }
 }
