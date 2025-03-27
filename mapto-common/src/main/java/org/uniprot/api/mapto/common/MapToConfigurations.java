@@ -11,11 +11,14 @@ public class MapToConfigurations {
 
     @Bean
     public MapToHashGenerator mapToHashGenerator() {
-        return new MapToHashGenerator(request -> {
-            String builder = request.getSource().name().toLowerCase() +
-                    request.getTarget().name().toLowerCase() +
-                    request.getQuery().strip().toLowerCase();
-            return builder.toCharArray();
-        }, SALT_STR);
+        return new MapToHashGenerator(
+                request -> {
+                    String builder =
+                            request.getSource().name().toLowerCase()
+                                    + request.getTarget().name().toLowerCase()
+                                    + request.getQuery().strip().toLowerCase();
+                    return builder.toCharArray();
+                },
+                SALT_STR);
     }
 }

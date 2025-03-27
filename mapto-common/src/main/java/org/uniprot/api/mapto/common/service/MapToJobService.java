@@ -42,16 +42,24 @@ public class MapToJobService {
     }
 
     public void updateStatus(String id, JobStatus jobStatus) {
-        MapToJob mapToJob = findMapToJob(id)
-                .orElseThrow(() -> new IllegalArgumentException("Mapto job does not exist with id + " + id));
+        MapToJob mapToJob =
+                findMapToJob(id)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Mapto job does not exist with id + " + id));
         mapToJob.setStatus(jobStatus);
         mapToJob.setUpdated(LocalDateTime.now());
         jobRepository.save(mapToJob);
     }
 
     public void setTargetIds(String id, List<String> allMappedIds) {
-        MapToJob mapToJob = findMapToJob(id)
-                .orElseThrow(() -> new IllegalArgumentException("Mapto job does not exist with id + " + id));
+        MapToJob mapToJob =
+                findMapToJob(id)
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Mapto job does not exist with id + " + id));
         mapToJob.setTargetIds(allMappedIds);
         mapToJob.setUpdated(LocalDateTime.now());
         mapToJob.setStatus(JobStatus.FINISHED);
@@ -60,7 +68,13 @@ public class MapToJobService {
 
     public MapToJob createMapToJob(String jobId, MapToJobRequest mapToJobRequest) {
         LocalDateTime now = LocalDateTime.now();
-        MapToJob mapToJob = new MapToJob(jobId, mapToJobRequest.getSource(), mapToJobRequest.getTarget(), mapToJobRequest.getQuery(), now);
+        MapToJob mapToJob =
+                new MapToJob(
+                        jobId,
+                        mapToJobRequest.getSource(),
+                        mapToJobRequest.getTarget(),
+                        mapToJobRequest.getQuery(),
+                        now);
         mapToJob.setUpdated(now);
         mapToJob.setStatus(JobStatus.NEW);
         return createMapToJob(mapToJob);

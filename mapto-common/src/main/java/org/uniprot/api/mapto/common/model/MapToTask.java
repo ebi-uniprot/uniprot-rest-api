@@ -1,19 +1,20 @@
 package org.uniprot.api.mapto.common.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import static org.uniprot.api.mapto.common.search.MapToSearchService.checkTheResultLimits;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.mapto.common.search.MapToSearchService;
 import org.uniprot.api.mapto.common.service.MapToJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.config.UniProtDataType;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-
-import static org.uniprot.api.mapto.common.search.MapToSearchService.checkTheResultLimits;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 @EqualsAndHashCode
 @Slf4j
@@ -23,7 +24,11 @@ public class MapToTask implements Runnable {
     private final MapToJob mapToJob;
     private final RetryPolicy<Object> retryPolicy;
 
-    public MapToTask(MapToSearchService mapToSearchService, MapToJobService mapToJobService, MapToJob mapToJob, RetryPolicy<Object> retryPolicy) {
+    public MapToTask(
+            MapToSearchService mapToSearchService,
+            MapToJobService mapToJobService,
+            MapToJob mapToJob,
+            RetryPolicy<Object> retryPolicy) {
         this.mapToSearchService = mapToSearchService;
         this.mapToJobService = mapToJobService;
         this.mapToJob = mapToJob;
@@ -34,7 +39,8 @@ public class MapToTask implements Runnable {
     public void run() {
         mapToJobService.updateStatus(mapToJob.getId(), JobStatus.RUNNING);
 
-        MapToSearchResult targetIdPage = getTargetIdPage(mapToJob.getQuery(), mapToJob.getTargetDB(), null);
+        MapToSearchResult targetIdPage =
+                getTargetIdPage(mapToJob.getQuery(), mapToJob.getTargetDB(), null);
         CursorPage page = targetIdPage.getPage();
         checkTheResultLimits(page.getTotalElements());
         List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
@@ -46,7 +52,11 @@ public class MapToTask implements Runnable {
         LinkedHashSet<String> allTargetIds = new LinkedHashSet<>(targetIdPage.getTargetIds());
 
         while (page.hasNextPage()) {
-            targetIdPage = getTargetIdPage(mapToJob.getQuery(), mapToJob.getTargetDB(), page.getEncryptedNextCursor());
+            targetIdPage =
+                    getTargetIdPage(
+                            mapToJob.getQuery(),
+                            mapToJob.getTargetDB(),
+                            page.getEncryptedNextCursor());
             page = targetIdPage.getPage();
             allTargetIds.addAll(targetIdPage.getTargetIds());
         }
@@ -54,7 +64,8 @@ public class MapToTask implements Runnable {
         return allTargetIds.stream().toList();
     }
 
-    private MapToSearchResult getTargetIdPage(String query, UniProtDataType targetDataType, String cursor) {
+    private MapToSearchResult getTargetIdPage(
+            String query, UniProtDataType targetDataType, String cursor) {
         return Failsafe.with(
                         retryPolicy.onRetry(
                                 e ->

@@ -5,15 +5,15 @@ import org.uniprot.store.config.UniProtDataType;
 
 public interface MapToSearchService {
     int MAP_TO_PAGE_SIZE = 100;
-    int MAX_TARGET_IDS = 500000; //resuse idmapping
+    int MAX_TARGET_IDS = 500000; // resuse idmapping
 
     static void checkTheResultLimits(Long totalElements) {
         if (totalElements > MAX_TARGET_IDS) {
-            throw new IllegalStateException("No of target ids: %d is greater than the limit: %d".formatted(totalElements, MAX_TARGET_IDS));
+            throw new IllegalStateException(
+                    "No of target ids: %d is greater than the limit: %d"
+                            .formatted(totalElements, MAX_TARGET_IDS));
         }
     }
 
-    MapToSearchResult getTargetIds(
-            String query,
-            UniProtDataType target, String cursor);
+    MapToSearchResult getTargetIds(String query, UniProtDataType target, String cursor);
 }

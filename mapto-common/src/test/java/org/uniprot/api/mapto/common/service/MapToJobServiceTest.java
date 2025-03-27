@@ -1,5 +1,14 @@
 package org.uniprot.api.mapto.common.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,26 +19,15 @@ import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 public class MapToJobServiceTest {
 
     public static final JobStatus JOB_STATUS = JobStatus.RUNNING;
     public static final String ID = "id";
     private static final List<String> TARGET_IDS = List.of();
-    @Mock
-    private MapToJobRepository jobRepository;
+    @Mock private MapToJobRepository jobRepository;
 
-    @Mock
-    private MapToJob mapToJob;
+    @Mock private MapToJob mapToJob;
 
     private MapToJobService jobService;
 
@@ -50,8 +48,7 @@ public class MapToJobServiceTest {
         String id = "ID";
         when(this.mapToJob.getId()).thenReturn(id);
         when(this.jobRepository.findById(id)).thenReturn(Optional.of(mapToJob));
-        assertThrows(
-                RuntimeException.class, () -> this.jobService.createMapToJob(mapToJob));
+        assertThrows(RuntimeException.class, () -> this.jobService.createMapToJob(mapToJob));
     }
 
     @Test

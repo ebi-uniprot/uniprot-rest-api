@@ -6,10 +6,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.uniprot.api.rest.service.request.BasicRequestConverter;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
+import lombok.*;
 
 /**
  * Represents a request object containing the details to create a query to send to Solr.
@@ -19,6 +16,7 @@ import lombok.Singular;
 @Getter
 @AllArgsConstructor
 @Builder(builderClassName = "SolrRequestBuilder", toBuilder = true)
+@EqualsAndHashCode
 public class SolrRequest {
     public static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     private String query;

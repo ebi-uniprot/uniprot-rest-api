@@ -9,14 +9,10 @@ import org.uniprot.api.mapto.common.service.MapToJobService;
 
 @ExtendWith(MockitoExtension.class)
 class MapToTaskTest {
-    @Mock
-    private MapToSearchService mapToSearchService;
-    @Mock
-    private MapToJobService mapToJobService;
-    @Mock
-    private MapToJob mapToJob;
+    @Mock private MapToSearchService mapToSearchService;
+    @Mock private MapToJobService mapToJobService;
+    @Mock private MapToJob mapToJob;
 
     @Test
-    void run_withinTheLimits() {
-    }
+    void run_withinTheLimits() {}
 }

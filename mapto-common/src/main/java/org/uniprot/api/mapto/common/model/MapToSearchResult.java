@@ -1,9 +1,10 @@
 package org.uniprot.api.mapto.common.model;
 
-import lombok.Data;
+import java.util.List;
+
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 
-import java.util.List;
+import lombok.Data;
 
 @Data
 public class MapToSearchResult {
