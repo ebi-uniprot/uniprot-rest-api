@@ -40,7 +40,7 @@ public class MapToTask implements Runnable {
         mapToJobService.updateStatus(mapToJob.getId(), JobStatus.RUNNING);
 
         MapToSearchResult targetIdPage =
-                getTargetIdPage(mapToJob.getQuery(), mapToJob.getTargetDB(), null);
+                getTargetIdPage(mapToJob, null);
         CursorPage page = targetIdPage.getPage();
         checkTheResultLimits(page.getTotalElements());
         List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
@@ -54,8 +54,7 @@ public class MapToTask implements Runnable {
         while (page.hasNextPage()) {
             targetIdPage =
                     getTargetIdPage(
-                            mapToJob.getQuery(),
-                            mapToJob.getTargetDB(),
+                            mapToJob,
                             page.getEncryptedNextCursor());
             page = targetIdPage.getPage();
             allTargetIds.addAll(targetIdPage.getTargetIds());
@@ -65,13 +64,13 @@ public class MapToTask implements Runnable {
     }
 
     private MapToSearchResult getTargetIdPage(
-            String query, UniProtDataType targetDataType, String cursor) {
+            MapToJob mapToJob, String cursor) {
         return Failsafe.with(
                         retryPolicy.onRetry(
                                 e ->
                                         log.warn(
                                                 "Batch call to solr server failed. Failure #{}. Retrying...",
                                                 e.getAttemptCount())))
-                .get(() -> mapToSearchService.getTargetIds(query, targetDataType, cursor));
+                .get(() -> mapToSearchService.getTargetIds(mapToJob, cursor));
     }
 }

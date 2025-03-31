@@ -1,5 +1,6 @@
 package org.uniprot.api.mapto.common.service;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,8 +46,10 @@ class MapToJobSubmissionServiceTest {
 
     @Test
     void submit() {
-        mapToJobSubmissionService.submit(mapToJobRequest);
+        String jobId = mapToJobSubmissionService.submit(mapToJobRequest);
+
         verify(jobTaskExecutor)
                 .execute(new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy));
+        assertSame(ID, jobId);
     }
 }

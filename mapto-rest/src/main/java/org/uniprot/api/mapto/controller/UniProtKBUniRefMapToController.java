@@ -7,6 +7,9 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.mapto.common.service.MapToJobSubmissionService;
+import org.uniprot.api.mapto.request.MapToSearchRequest;
+import org.uniprot.api.mapto.request.UniProtKBMapToSearchRequest;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -18,14 +21,19 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 @RestController
 @RequestMapping("/mapto/uniprotkb/uniref")
 public class UniProtKBUniRefMapToController {
+    private final MapToJobSubmissionService mapToJobSubmissionService;
+    private final MapToRequestConverter mapToRequestConverter;
 
-    public UniProtKBUniRefMapToController() {}
+    public UniProtKBUniRefMapToController(MapToJobSubmissionService mapToJobSubmissionService, MapToRequestConverter mapToRequestConverter) {
+        this.mapToJobSubmissionService = mapToJobSubmissionService;
+        this.mapToRequestConverter = mapToRequestConverter;
+    }
 
     @PostMapping(value = "/run")
     public ResponseEntity<JobSubmitResponse> submitMapToJob(
-            @Valid @ModelAttribute UniProtKBSearchRequest request) {
-        JobSubmitResponse response = null;
-        return ResponseEntity.ok(response);
+            @Valid @ModelAttribute UniProtKBMapToSearchRequest request) {
+        String jobId = mapToJobSubmissionService.submit(mapToRequestConverter.convert(request));
+        return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
 
     @GetMapping(

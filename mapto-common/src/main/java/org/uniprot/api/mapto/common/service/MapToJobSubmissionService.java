@@ -31,7 +31,7 @@ public class MapToJobSubmissionService {
         this.retryPolicy = retryPolicy;
     }
 
-    public void submit(MapToJobRequest mapToJobRequest) {
+    public String submit(MapToJobRequest mapToJobRequest) {
         String jobId = hashGenerator.generateHash(mapToJobRequest);
         MapToJob mapToJob = mapToJobService.createMapToJob(jobId, mapToJobRequest);
         MapToSearchService mapToSearchService =
@@ -39,5 +39,6 @@ public class MapToJobSubmissionService {
         MapToTask mapToTask =
                 new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy);
         jobTaskExecutor.execute(mapToTask);
+        return jobId;
     }
 }

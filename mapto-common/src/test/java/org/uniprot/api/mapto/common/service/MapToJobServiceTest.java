@@ -1,23 +1,29 @@
 package org.uniprot.api.mapto.common.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.uniprot.store.config.UniProtDataType.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.mapto.common.model.MapToJob;
+import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.store.config.UniProtDataType;
 
 @ExtendWith(MockitoExtension.class)
 public class MapToJobServiceTest {
@@ -25,11 +31,20 @@ public class MapToJobServiceTest {
     public static final JobStatus JOB_STATUS = JobStatus.RUNNING;
     public static final String ID = "id";
     private static final List<String> TARGET_IDS = List.of();
+    public static final UniProtDataType SOURCE = UNIPROTKB;
+    public static final UniProtDataType TARGET = UNIREF;
+    public static final String QUERY = "query";
     @Mock private MapToJobRepository jobRepository;
 
     @Mock private MapToJob mapToJob;
 
     private MapToJobService jobService;
+    @Mock
+    private MapToJobRequest mapToJobRequest;
+    @Mock
+    private Map<String, String> extraParams;
+    @Captor
+    private ArgumentCaptor<MapToJob> mapToJobCaptor;
 
     @BeforeEach
     void setUp() {
@@ -107,5 +122,24 @@ public class MapToJobServiceTest {
         when(jobRepository.findById(ID)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> jobService.setTargetIds(ID, TARGET_IDS));
+    }
+
+    @Test
+    void createMapToJob() {
+        when(mapToJobRequest.getSource()).thenReturn(SOURCE);
+        when(mapToJobRequest.getTarget()).thenReturn(TARGET);
+        when(mapToJobRequest.getQuery()).thenReturn(QUERY);
+        when(mapToJobRequest.getExtraParams()).thenReturn(extraParams);
+
+        jobService.createMapToJob(ID, mapToJobRequest);
+
+        verify(jobRepository).save(mapToJobCaptor.capture());
+        MapToJob capturedMapToJob = mapToJobCaptor.getValue();
+        assertSame(SOURCE, capturedMapToJob.getSourceDB());
+        assertSame(TARGET, capturedMapToJob.getTargetDB());
+        assertSame(QUERY, capturedMapToJob.getQuery());
+        assertSame(extraParams, capturedMapToJob.getExtraParams());
+        assertSame(capturedMapToJob.getCreated(), capturedMapToJob.getUpdated());
+        assertNotNull(capturedMapToJob.getCreated());
     }
 }

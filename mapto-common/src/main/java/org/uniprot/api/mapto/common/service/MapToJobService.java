@@ -75,6 +75,7 @@ public class MapToJobService {
                         mapToJobRequest.getTarget(),
                         mapToJobRequest.getQuery(),
                         now);
+        mapToJob.setExtraParams(mapToJobRequest.getExtraParams());
         mapToJob.setUpdated(now);
         mapToJob.setStatus(JobStatus.NEW);
         return createMapToJob(mapToJob);

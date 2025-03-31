@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -30,6 +31,7 @@ public class MapToJob implements Serializable {
     private final UniProtDataType targetDB;
     private final String query; // query to run against the source collection
     private JobStatus status;
+    private Map<String,String> extraParams;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

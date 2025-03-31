@@ -1,14 +1,5 @@
 package org.uniprot.api.mapto.common.search;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.mapto.common.search.MapToSearchService.MAP_TO_PAGE_SIZE;
-
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +9,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToSearchResult;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
-import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverter;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.mapto.common.search.MapToSearchService.MAP_TO_PAGE_SIZE;
+import static org.uniprot.store.config.UniProtDataType.UNIREF;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBMapToSearchServiceTest {
@@ -32,23 +37,28 @@ class UniProtKBMapToSearchServiceTest {
     private static final String UNI_REF_CLUSTER_50_1 = "uniRefCluster50_1";
     private static final String UNI_REF_CLUSTER_100_1 = "uniRefCluster100_1";
     public static final String QUERY = "query";
+    private final UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
     @Mock private UniprotQueryRepository uniprotQueryRepository;
+    @Mock
+    private UniProtKBRequestConverter uniProtKBRequestConverter;
     @InjectMocks private UniProtKBMapToSearchService uniProtKBMapToSearchService;
     @Mock private QueryResult<UniProtDocument> queryResult;
     @Mock private CursorPage page;
-    private SolrRequest request;
+    @Mock private MapToJob mapToJob;
+    @Mock private SolrRequest solrRequest;
     private Stream<UniProtDocument> content;
     private final UniProtDocument uniProtDocument0 = new UniProtDocument();
     private final UniProtDocument uniProtDocument1 = new UniProtDocument();
 
     @BeforeEach
     void setUp() {
-        request =
-                SolrRequest.builder()
-                        .query(QUERY)
-                        .rows(MAP_TO_PAGE_SIZE)
-                        .fields("uniref_cluster_50,uniref_cluster_90,uniref_cluster_100")
-                        .build();
+        lenient().when(mapToJob.getTargetDB()).thenReturn(UNIREF);
+        lenient().when(mapToJob.getQuery()).thenReturn(QUERY);
+        searchRequest.setQuery(mapToJob.getQuery());
+        searchRequest.setSize(MAP_TO_PAGE_SIZE);
+        searchRequest.setIncludeIsoform(Optional.ofNullable(mapToJob.getExtraParams().get("includeIsoform")).orElse("false"));
+        searchRequest.setFields("uniref_cluster_50,uniref_cluster_90,uniref_cluster_100");
+        when(uniProtKBRequestConverter.createSearchSolrRequest(searchRequest)).thenReturn(solrRequest);
         uniProtDocument0.unirefCluster50 = UNI_REF_CLUSTER_50_0;
         uniProtDocument0.unirefCluster90 = UNI_REF_CLUSTER_90_0;
         uniProtDocument0.unirefCluster100 = UNI_REF_CLUSTER_100_0;
@@ -60,12 +70,12 @@ class UniProtKBMapToSearchServiceTest {
     @Test
     void getTargetIds_uniRef() {
         content = Stream.of(uniProtDocument0, uniProtDocument1);
-        when(uniprotQueryRepository.searchPage(request, CURSOR)).thenReturn(queryResult);
+        when(uniprotQueryRepository.searchPage(solrRequest, CURSOR)).thenReturn(queryResult);
         when(queryResult.getPage()).thenReturn(page);
         when(queryResult.getContent()).thenReturn(content);
 
         MapToSearchResult targetIds =
-                uniProtKBMapToSearchService.getTargetIds(QUERY, UniProtDataType.UNIREF, CURSOR);
+                uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
 
         assertSame(page, targetIds.getPage());
         assertThat(
@@ -81,12 +91,12 @@ class UniProtKBMapToSearchServiceTest {
     @Test
     void getTargetIds_uniRefEmptyResults() {
         content = Stream.of();
-        when(uniprotQueryRepository.searchPage(request, CURSOR)).thenReturn(queryResult);
+        when(uniprotQueryRepository.searchPage(solrRequest, CURSOR)).thenReturn(queryResult);
         when(queryResult.getPage()).thenReturn(page);
         when(queryResult.getContent()).thenReturn(content);
 
         MapToSearchResult targetIds =
-                uniProtKBMapToSearchService.getTargetIds(QUERY, UniProtDataType.UNIREF, CURSOR);
+                uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
 
         assertSame(page, targetIds.getPage());
         assertThat(targetIds.getTargetIds(), empty());
