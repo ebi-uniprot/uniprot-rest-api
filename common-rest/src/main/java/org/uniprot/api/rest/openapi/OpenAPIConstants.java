@@ -650,6 +650,11 @@ public class OpenAPIConstants {
     public static final String FIELDS_UNIPARC_DESCRIPTION =
             FIELDS_DESCRIPTION
                     + "  <a href='https://rest.uniprot.org/configure/uniparc/result-fields' target='_blank' rel='noopener noreferrer'>List of valid fields</a>";
+    public static final String XREF_ID_UNIPARC_DESCRIPTION = "id of the database";
+    public static final String XREF_ID_UNIPARC_EXAMPLE = "Q0GNZ6";
+    public static final String XREF_INCLUDE_SOURCES_UNIPARC_DESCRIPTION =
+            "need to retrieve sources";
+    public static final String XREF_INCLUDE_SOURCES_UNIPARC_EXAMPLE = "true";
     public static final String FIELDS_UNIPARC_EXAMPLE = "upi,organism,length";
     public static final String SEQUENCE_UNIPARC_DESCRIPTION = "Protein Sequence";
     public static final String SEQUENCE_UNIPARC_EXAMPLE = "MLMPKRTKYR";
