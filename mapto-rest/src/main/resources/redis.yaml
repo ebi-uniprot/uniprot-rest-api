@@ -1,0 +1,13 @@
+---
+singleServerConfig:
+  password: null
+  address: "redis://127.0.0.1:6379"
+
+#To run redis locally
+#Step 1: Install redis
+  # brew install redis
+  # For other OS check https://redis.io/docs/getting-started/
+#Step 3: Start the server
+  #redis-server
+# Step 4: To stop ctrl+c
+

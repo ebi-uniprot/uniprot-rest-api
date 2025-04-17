@@ -92,4 +92,11 @@ public class JobStatusResponse {
         this.processedEntries = processedEntries;
         this.lastUpdated = lastUpdated;
     }
+
+    public JobStatusResponse(JobStatus jobStatus, LocalDateTime start, Long totalEntries, LocalDateTime updated) {
+        this(jobStatus);
+        this.start = start;
+        this.totalEntries = totalEntries;
+        this.lastUpdated = updated;
+    }
 }
