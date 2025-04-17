@@ -1,6 +1,13 @@
 package org.uniprot.api.mapto.common.model;
 
-import net.jodah.failsafe.RetryPolicy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.uniprot.store.config.UniProtDataType.UNIREF;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,13 +18,7 @@ import org.uniprot.api.mapto.common.search.MapToSearchService;
 import org.uniprot.api.mapto.common.service.MapToJobService;
 import org.uniprot.store.config.UniProtDataType;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.uniprot.store.config.UniProtDataType.UNIREF;
+import net.jodah.failsafe.RetryPolicy;
 
 @ExtendWith(MockitoExtension.class)
 class MapToTaskTest {
@@ -26,16 +27,11 @@ class MapToTaskTest {
     public static final String ID = "jobId";
     public static final String CURSOR = "cursor";
     private final RetryPolicy<Object> retryPolicy = new RetryPolicy<>();
-    @Mock
-    private MapToSearchService mapToSearchService;
-    @Mock
-    private MapToJobService mapToJobService;
-    @Mock
-    private MapToJob mapToJob;
-    @Mock
-    private MapToSearchResult searchResult;
-    @Mock
-    private CursorPage page;
+    @Mock private MapToSearchService mapToSearchService;
+    @Mock private MapToJobService mapToJobService;
+    @Mock private MapToJob mapToJob;
+    @Mock private MapToSearchResult searchResult;
+    @Mock private CursorPage page;
     private MapToTask mapToTask;
 
     @BeforeEach
@@ -84,8 +80,14 @@ class MapToTaskTest {
         mapToTask.run();
 
         verify(mapToSearchService, times(2)).getTargetIds(any(), any());
-        verify(mapToJobService).setTargetIds(same(ID), argThat(ids -> ids.size() == 19 &&
-                ids.containsAll(targetIds0) && ids.containsAll(targetIds1)));
+        verify(mapToJobService)
+                .setTargetIds(
+                        same(ID),
+                        argThat(
+                                ids ->
+                                        ids.size() == 19
+                                                && ids.containsAll(targetIds0)
+                                                && ids.containsAll(targetIds1)));
     }
 
     @Test
@@ -98,13 +100,21 @@ class MapToTaskTest {
         List<String> targetIds1 = getIds("target_1", 9);
         when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);
         when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
-        when(mapToSearchService.getTargetIds(mapToJob, CURSOR)).thenThrow(RuntimeException.class).thenReturn(searchResult);
+        when(mapToSearchService.getTargetIds(mapToJob, CURSOR))
+                .thenThrow(RuntimeException.class)
+                .thenReturn(searchResult);
 
         mapToTask.run();
 
         verify(mapToSearchService, times(3)).getTargetIds(any(), any());
-        verify(mapToJobService).setTargetIds(same(ID), argThat(ids -> ids.size() == 19 &&
-                ids.containsAll(targetIds0) && ids.containsAll(targetIds1)));
+        verify(mapToJobService)
+                .setTargetIds(
+                        same(ID),
+                        argThat(
+                                ids ->
+                                        ids.size() == 19
+                                                && ids.containsAll(targetIds0)
+                                                && ids.containsAll(targetIds1)));
     }
 
     private List<String> getIds(String prefix, int count) {

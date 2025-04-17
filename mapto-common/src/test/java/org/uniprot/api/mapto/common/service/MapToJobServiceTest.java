@@ -39,12 +39,9 @@ public class MapToJobServiceTest {
     @Mock private MapToJob mapToJob;
 
     private MapToJobService jobService;
-    @Mock
-    private MapToJobRequest mapToJobRequest;
-    @Mock
-    private Map<String, String> extraParams;
-    @Captor
-    private ArgumentCaptor<MapToJob> mapToJobCaptor;
+    @Mock private MapToJobRequest mapToJobRequest;
+    @Mock private Map<String, String> extraParams;
+    @Captor private ArgumentCaptor<MapToJob> mapToJobCaptor;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +67,7 @@ public class MapToJobServiceTest {
     void testFindById() {
         String id = "ID";
         when(this.jobRepository.findById(id)).thenReturn(Optional.of(this.mapToJob));
-        Assertions.assertEquals(Optional.of(this.mapToJob), this.jobService.findMapToJob(id));
+        Assertions.assertEquals(this.mapToJob, this.jobService.findMapToJob(id));
     }
 
     @Test

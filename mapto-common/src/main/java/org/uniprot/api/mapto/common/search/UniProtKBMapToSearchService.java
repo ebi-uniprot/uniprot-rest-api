@@ -1,5 +1,13 @@
 package org.uniprot.api.mapto.common.search;
 
+import static org.uniprot.store.config.UniProtDataType.UNIREF;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -11,18 +19,10 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearc
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-
-import static org.uniprot.store.config.UniProtDataType.UNIREF;
-
 @Component
 public class UniProtKBMapToSearchService implements MapToSearchService {
     private final UniprotQueryRepository repository;
-    private final UniProtKBRequestConverter converter;
+    private final UniProtKBRequestConverter uniProtKBRequestConverter;
     private final Map<UniProtDataType, List<String>> targetFields =
             Map.of(UNIREF, List.of("uniref_cluster_50", "uniref_cluster_90", "uniref_cluster_100"));
     private final Map<UniProtDataType, Function<UniProtDocument, List<String>>> targetMappings =
@@ -34,9 +34,11 @@ public class UniProtKBMapToSearchService implements MapToSearchService {
                                     uniProtDocument.unirefCluster90,
                                     uniProtDocument.unirefCluster100));
 
-    public UniProtKBMapToSearchService(UniprotQueryRepository repository, UniProtKBRequestConverter converter) {
+    public UniProtKBMapToSearchService(
+            UniprotQueryRepository repository,
+            UniProtKBRequestConverter uniProtKBRequestConverter) {
         this.repository = repository;
-        this.converter = converter;
+        this.uniProtKBRequestConverter = uniProtKBRequestConverter;
     }
 
     @Override
@@ -44,12 +46,15 @@ public class UniProtKBMapToSearchService implements MapToSearchService {
         UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
         searchRequest.setQuery(mapToJob.getQuery());
         searchRequest.setSize(MAP_TO_PAGE_SIZE);
-        searchRequest.setIncludeIsoform(Optional.ofNullable(mapToJob.getExtraParams().get(INCLUDE_ISOFORM)).orElse("false"));
+        searchRequest.setIncludeIsoform(
+                Optional.ofNullable(mapToJob.getExtraParams().get(INCLUDE_ISOFORM))
+                        .orElse("false"));
         UniProtDataType target = mapToJob.getTargetDB();
         searchRequest.setFields(String.join(",", targetFields.get(target)));
 
         QueryResult<UniProtDocument> resultPage =
-                repository.searchPage(converter.createSearchSolrRequest(searchRequest), cursor);
+                repository.searchPage(
+                        uniProtKBRequestConverter.createSearchSolrRequest(searchRequest), cursor);
         CursorPage page = (CursorPage) resultPage.getPage();
         List<String> targetIds =
                 resultPage

@@ -9,7 +9,6 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.mapto.common.search.MapToSearchService;
 import org.uniprot.api.mapto.common.service.MapToJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.store.config.UniProtDataType;
 
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +38,7 @@ public class MapToTask implements Runnable {
     public void run() {
         mapToJobService.updateStatus(mapToJob.getId(), JobStatus.RUNNING);
 
-        MapToSearchResult targetIdPage =
-                getTargetIdPage(mapToJob, null);
+        MapToSearchResult targetIdPage = getTargetIdPage(mapToJob, null);
         CursorPage page = targetIdPage.getPage();
         checkTheResultLimits(page.getTotalElements());
         List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
@@ -52,10 +50,7 @@ public class MapToTask implements Runnable {
         LinkedHashSet<String> allTargetIds = new LinkedHashSet<>(targetIdPage.getTargetIds());
 
         while (page.hasNextPage()) {
-            targetIdPage =
-                    getTargetIdPage(
-                            mapToJob,
-                            page.getEncryptedNextCursor());
+            targetIdPage = getTargetIdPage(mapToJob, page.getEncryptedNextCursor());
             page = targetIdPage.getPage();
             allTargetIds.addAll(targetIdPage.getTargetIds());
         }
@@ -63,8 +58,7 @@ public class MapToTask implements Runnable {
         return allTargetIds.stream().toList();
     }
 
-    private MapToSearchResult getTargetIdPage(
-            MapToJob mapToJob, String cursor) {
+    private MapToSearchResult getTargetIdPage(MapToJob mapToJob, String cursor) {
         return Failsafe.with(
                         retryPolicy.onRetry(
                                 e ->

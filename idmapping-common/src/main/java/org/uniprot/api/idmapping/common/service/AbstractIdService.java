@@ -50,7 +50,7 @@ public abstract class AbstractIdService<T> {
     @Value("${id.mapping.facet.ids.batch.size:5000}")
     private int idBatchSize;
 
-    public AbstractIdService(
+    protected AbstractIdService(
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStreamTemplate,
             FacetConfig facetConfig,

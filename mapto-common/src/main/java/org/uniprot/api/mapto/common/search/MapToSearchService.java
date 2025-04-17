@@ -2,7 +2,6 @@ package org.uniprot.api.mapto.common.search;
 
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToSearchResult;
-import org.uniprot.store.config.UniProtDataType;
 
 public interface MapToSearchService {
     String INCLUDE_ISOFORM = "includeIsoform";

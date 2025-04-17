@@ -28,6 +28,7 @@ public class SolrQueryConverterUtils {
     public static final String DEF_TYPE = "defType";
     public static final String DEFAULT_FIELD = "df";
     public static final String QUERY_FIELDS = "qf";
+    public static final String FIELDS = "fl";
     public static final String FILTER_QUERY = "fq";
     public static final String HIGHLIGHT = "hl";
     public static final String HIGHLIGHT_FIELDS = "hl.fl";

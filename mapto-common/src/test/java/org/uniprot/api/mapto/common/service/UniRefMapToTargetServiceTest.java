@@ -29,6 +29,7 @@ import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
@@ -42,6 +43,8 @@ class UniRefMapToTargetServiceTest {
     @Mock private FacetTupleStreamTemplate tupleStreamTemplate;
     @Mock private FacetConfig facetConfig;
     @Mock private RequestConverter requestConverter;
+    @Mock private MapToJobService mapToJobService;
+    @Mock private RdfStreamer rdfStreamer;
     private UniRefMapToTargetService mapToTargetService;
     private String id1;
     private String id2;
@@ -55,7 +58,7 @@ class UniRefMapToTargetServiceTest {
     void init() {
         this.mapToTargetService =
                 new UniRefMapToTargetService(
-                        storeStreamer, tupleStreamTemplate, facetConfig, requestConverter);
+                        storeStreamer, tupleStreamTemplate, facetConfig, requestConverter,mapToJobService, rdfStreamer);
         ReflectionTestUtils.setField(
                 this.mapToTargetService, "maxIdMappingToIdsCountEnriched", 100000);
         ReflectionTestUtils.setField(

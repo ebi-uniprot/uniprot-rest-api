@@ -1,8 +1,9 @@
 package org.uniprot.api.mapto.request;
 
+import org.uniprot.store.config.UniProtDataType;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.uniprot.store.config.UniProtDataType;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

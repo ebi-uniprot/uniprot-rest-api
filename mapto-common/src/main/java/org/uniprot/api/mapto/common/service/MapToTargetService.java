@@ -1,9 +1,5 @@
 package org.uniprot.api.mapto.common.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -11,27 +7,40 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.common.service.AbstractIdService;
+import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.request.RequestConverter;
+import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public abstract class MapToTargetService<T> extends AbstractIdService<T> {
-    private final StoreStreamer<T> storeStreamer;
+    private final MapToJobService mapToJobService;
+    private final RdfStreamer rdfStreamer;
 
     protected MapToTargetService(
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RequestConverter requestConverter) {
+            RequestConverter requestConverter, MapToJobService mapToJobService, RdfStreamer rdfStreamer) {
         super(storeStreamer, tupleStream, facetConfig, requestConverter);
-        this.storeStreamer = storeStreamer;
+        this.mapToJobService = mapToJobService;
+        this.rdfStreamer = rdfStreamer;
+    }
+
+    public QueryResult<T> getMappedEntries(String jobId, SearchRequest searchRequest) {
+        MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
+        return getMappedEntries(searchRequest, mapToJob.getTargetIds());
     }
 
     public QueryResult<T> getMappedEntries(SearchRequest searchRequest, List<String> ids) {
-        // move logic of getting target ids form controller to here. TODO
         List<Facet> facets = null;
         validateMappedIdsEnrichmentLimit(ids.size());
         List<ProblemPair> warnings = new ArrayList<>();
@@ -69,6 +78,17 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
         StoreRequest storeRequest =
                 StoreRequest.builder().fields(streamRequest.getFields()).build();
         return this.storeStreamer.streamEntries(filterAndSortEntries, storeRequest);
+    }
+
+    public Stream<T> streamEntries(String jobId, StreamRequest streamRequest) {
+        MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
+        return streamEntries(streamRequest, mapToJob.getTargetIds());
+    }
+
+    public Stream<String> streamRdf(
+            String jobId, UniRefStreamRequest streamRequest, String dataType, String format) {
+        List<String> entryIds = streamFilterAndSortEntries(streamRequest, mapToJobService.findMapToJob(jobId).getTargetIds());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     protected List<String> streamFilterAndSortEntries(

@@ -8,14 +8,7 @@
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.37-SNAPSHOT</version>
 	</parent>
-
 	<artifactId>mapto-common</artifactId>
-
-	<properties>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -30,6 +23,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<!-- Tests -->
 		<dependency>

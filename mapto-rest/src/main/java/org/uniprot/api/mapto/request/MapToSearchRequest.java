@@ -1,9 +1,10 @@
 package org.uniprot.api.mapto.request;
 
+import org.uniprot.store.config.UniProtDataType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.uniprot.store.config.UniProtDataType;
 
 @Data
 @AllArgsConstructor

@@ -16,26 +16,22 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @RedisHash("mapto")
-@RequiredArgsConstructor
 public class MapToJob implements Serializable {
     @Serial private static final long serialVersionUID = -3919276929568870010L;
-    @Id private final String id;
-    private final UniProtDataType sourceDB;
-    private final UniProtDataType targetDB;
-    private final String query; // query to run against the source collection
+    @Id private String id;
+    private UniProtDataType sourceDB;
+    private UniProtDataType targetDB;
+    private String query; // query to run against the source collection
     private JobStatus status;
-    private Map<String,String> extraParams;
+    private Map<String, String> extraParams;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private final LocalDateTime created;
+    private LocalDateTime created;
 
     private List<String> targetIds;
 

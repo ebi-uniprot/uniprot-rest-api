@@ -1,5 +1,17 @@
 package org.uniprot.api.mapto.common.search;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.mapto.common.search.MapToSearchService.MAP_TO_PAGE_SIZE;
+import static org.uniprot.store.config.UniProtDataType.UNIREF;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,18 +28,6 @@ import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverte
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.mapto.common.search.MapToSearchService.MAP_TO_PAGE_SIZE;
-import static org.uniprot.store.config.UniProtDataType.UNIREF;
-
 @ExtendWith(MockitoExtension.class)
 class UniProtKBMapToSearchServiceTest {
     public static final String CURSOR = "cursor";
@@ -39,8 +39,7 @@ class UniProtKBMapToSearchServiceTest {
     public static final String QUERY = "query";
     private final UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
     @Mock private UniprotQueryRepository uniprotQueryRepository;
-    @Mock
-    private UniProtKBRequestConverter uniProtKBRequestConverter;
+    @Mock private UniProtKBRequestConverter uniProtKBRequestConverter;
     @InjectMocks private UniProtKBMapToSearchService uniProtKBMapToSearchService;
     @Mock private QueryResult<UniProtDocument> queryResult;
     @Mock private CursorPage page;
@@ -56,9 +55,12 @@ class UniProtKBMapToSearchServiceTest {
         lenient().when(mapToJob.getQuery()).thenReturn(QUERY);
         searchRequest.setQuery(mapToJob.getQuery());
         searchRequest.setSize(MAP_TO_PAGE_SIZE);
-        searchRequest.setIncludeIsoform(Optional.ofNullable(mapToJob.getExtraParams().get("includeIsoform")).orElse("false"));
+        searchRequest.setIncludeIsoform(
+                Optional.ofNullable(mapToJob.getExtraParams().get("includeIsoform"))
+                        .orElse("false"));
         searchRequest.setFields("uniref_cluster_50,uniref_cluster_90,uniref_cluster_100");
-        when(uniProtKBRequestConverter.createSearchSolrRequest(searchRequest)).thenReturn(solrRequest);
+        when(uniProtKBRequestConverter.createSearchSolrRequest(searchRequest))
+                .thenReturn(solrRequest);
         uniProtDocument0.unirefCluster50 = UNI_REF_CLUSTER_50_0;
         uniProtDocument0.unirefCluster90 = UNI_REF_CLUSTER_90_0;
         uniProtDocument0.unirefCluster100 = UNI_REF_CLUSTER_100_0;
@@ -74,8 +76,7 @@ class UniProtKBMapToSearchServiceTest {
         when(queryResult.getPage()).thenReturn(page);
         when(queryResult.getContent()).thenReturn(content);
 
-        MapToSearchResult targetIds =
-                uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
+        MapToSearchResult targetIds = uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
 
         assertSame(page, targetIds.getPage());
         assertThat(
@@ -95,8 +96,7 @@ class UniProtKBMapToSearchServiceTest {
         when(queryResult.getPage()).thenReturn(page);
         when(queryResult.getContent()).thenReturn(content);
 
-        MapToSearchResult targetIds =
-                uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
+        MapToSearchResult targetIds = uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
 
         assertSame(page, targetIds.getPage());
         assertThat(targetIds.getTargetIds(), empty());

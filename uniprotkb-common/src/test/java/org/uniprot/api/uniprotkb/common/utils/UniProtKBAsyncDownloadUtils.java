@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
+import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
 
 import java.util.HashMap;
 
@@ -46,7 +47,7 @@ public class UniProtKBAsyncDownloadUtils {
     public static int totalNonIsoformEntries;
 
     public static final UniProtKBEntry TEMPLATE_ENTRY =
-            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+            UniProtEntryMocker.create(SP_CANONICAL);
     public static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -142,6 +143,9 @@ public class UniProtKBAsyncDownloadUtils {
         }
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
+        convert.unirefCluster50 = "UniRef50_P0390" + (i / 4 + 1);
+        convert.unirefCluster90 = "UniRef90_P0390" + (i / 4 + 1);
+        convert.unirefCluster100 = "UniRef100_P0390" + (i / 4 + 1);
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
         storeClient.saveEntry(uniProtKBEntry);

@@ -23,14 +23,17 @@ public class MapToJobService {
                 .findById(mapToJob.getId())
                 .ifPresent(
                         job -> {
-                            throw new RuntimeException(
+                            throw new IllegalArgumentException(
                                     "Mapto job exists with id + " + mapToJob.getId());
                         });
         return this.jobRepository.save(mapToJob);
     }
 
-    public Optional<MapToJob> findMapToJob(String id) {
-        return this.jobRepository.findById(id);
+    public MapToJob findMapToJob(String id) {
+        return this.jobRepository.findById(id).orElseThrow(
+                () ->
+                        new IllegalArgumentException(
+                                "Mapto job does not exist with id + " + id));
     }
 
     public void deleteMapToJob(String jobId) {
@@ -43,11 +46,7 @@ public class MapToJobService {
 
     public void updateStatus(String id, JobStatus jobStatus) {
         MapToJob mapToJob =
-                findMapToJob(id)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Mapto job does not exist with id + " + id));
+                findMapToJob(id);
         mapToJob.setStatus(jobStatus);
         mapToJob.setUpdated(LocalDateTime.now());
         jobRepository.save(mapToJob);
@@ -55,11 +54,7 @@ public class MapToJobService {
 
     public void setTargetIds(String id, List<String> allMappedIds) {
         MapToJob mapToJob =
-                findMapToJob(id)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Mapto job does not exist with id + " + id));
+                findMapToJob(id);
         mapToJob.setTargetIds(allMappedIds);
         mapToJob.setUpdated(LocalDateTime.now());
         mapToJob.setStatus(JobStatus.FINISHED);
@@ -68,13 +63,12 @@ public class MapToJobService {
 
     public MapToJob createMapToJob(String jobId, MapToJobRequest mapToJobRequest) {
         LocalDateTime now = LocalDateTime.now();
-        MapToJob mapToJob =
-                new MapToJob(
-                        jobId,
-                        mapToJobRequest.getSource(),
-                        mapToJobRequest.getTarget(),
-                        mapToJobRequest.getQuery(),
-                        now);
+        MapToJob mapToJob = new MapToJob();
+        mapToJob.setId(jobId);
+        mapToJob.setSourceDB(mapToJobRequest.getSource());
+        mapToJob.setTargetDB(mapToJobRequest.getTarget());
+        mapToJob.setQuery(mapToJobRequest.getQuery());
+        mapToJob.setCreated(now);
         mapToJob.setExtraParams(mapToJobRequest.getExtraParams());
         mapToJob.setUpdated(now);
         mapToJob.setStatus(JobStatus.NEW);

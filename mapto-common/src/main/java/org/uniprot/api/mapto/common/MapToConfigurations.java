@@ -1,13 +1,18 @@
 package org.uniprot.api.mapto.common;
 
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.mapto.common.service.MapToHashGenerator;
+
+import net.jodah.failsafe.RetryPolicy;
 
 @Configuration
 public class MapToConfigurations {
 
     private static final String SALT_STR = "MAP_TO_SALT";
+    // todo define retry configs
 
     @Bean
     public MapToHashGenerator mapToHashGenerator() {
@@ -20,5 +25,13 @@ public class MapToConfigurations {
                     return builder.toCharArray();
                 },
                 SALT_STR);
+    }
+
+    @Bean
+    public RetryPolicy<Object> retryPolicy() {
+        return new RetryPolicy<>()
+                .handle(Exception.class)
+                .withMaxRetries(3)
+                .withDelay(Duration.ofMillis(20));
     }
 }

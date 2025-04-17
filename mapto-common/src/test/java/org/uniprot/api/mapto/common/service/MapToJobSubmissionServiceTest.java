@@ -16,6 +16,7 @@ import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.model.MapToTask;
 import org.uniprot.api.mapto.common.search.MapToSearchFacade;
 import org.uniprot.api.mapto.common.search.MapToSearchService;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.store.config.UniProtDataType;
 
 import net.jodah.failsafe.RetryPolicy;
@@ -46,10 +47,10 @@ class MapToJobSubmissionServiceTest {
 
     @Test
     void submit() {
-        String jobId = mapToJobSubmissionService.submit(mapToJobRequest);
+        JobSubmitResponse jobSubmitResponse = mapToJobSubmissionService.submit(mapToJobRequest);
 
         verify(jobTaskExecutor)
                 .execute(new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy));
-        assertSame(ID, jobId);
+        assertSame(ID, jobSubmitResponse.getJobId());
     }
 }
