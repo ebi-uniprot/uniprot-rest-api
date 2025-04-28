@@ -19,8 +19,15 @@ public class UniRefMapToTargetService extends MapToTargetService<UniRefEntryLigh
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             FacetConfig uniRefEntryFacetConfig,
             RequestConverter uniRefRequestConverter,
-            MapToJobService mapToJobService, RdfStreamer uniRefRdfStreamer) {
-        super(storeStreamer, tupleStream, uniRefEntryFacetConfig, uniRefRequestConverter, mapToJobService, uniRefRdfStreamer);
+            MapToJobService mapToJobService,
+            RdfStreamer uniRefRdfStreamer) {
+        super(
+                storeStreamer,
+                tupleStream,
+                uniRefEntryFacetConfig,
+                uniRefRequestConverter,
+                mapToJobService,
+                uniRefRdfStreamer);
     }
 
     @Override

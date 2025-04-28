@@ -1,5 +1,9 @@
 package org.uniprot.api.mapto.common.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -17,10 +21,6 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 public abstract class MapToTargetService<T> extends AbstractIdService<T> {
     private final MapToJobService mapToJobService;
     private final RdfStreamer rdfStreamer;
@@ -29,7 +29,9 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RequestConverter requestConverter, MapToJobService mapToJobService, RdfStreamer rdfStreamer) {
+            RequestConverter requestConverter,
+            MapToJobService mapToJobService,
+            RdfStreamer rdfStreamer) {
         super(storeStreamer, tupleStream, facetConfig, requestConverter);
         this.mapToJobService = mapToJobService;
         this.rdfStreamer = rdfStreamer;
@@ -87,7 +89,9 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
 
     public Stream<String> streamRdf(
             String jobId, UniRefStreamRequest streamRequest, String dataType, String format) {
-        List<String> entryIds = streamFilterAndSortEntries(streamRequest, mapToJobService.findMapToJob(jobId).getTargetIds());
+        List<String> entryIds =
+                streamFilterAndSortEntries(
+                        streamRequest, mapToJobService.findMapToJob(jobId).getTargetIds());
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 

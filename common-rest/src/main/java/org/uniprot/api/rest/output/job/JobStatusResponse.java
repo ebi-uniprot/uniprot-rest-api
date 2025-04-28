@@ -93,7 +93,8 @@ public class JobStatusResponse {
         this.lastUpdated = lastUpdated;
     }
 
-    public JobStatusResponse(JobStatus jobStatus, LocalDateTime start, Long totalEntries, LocalDateTime updated) {
+    public JobStatusResponse(
+            JobStatus jobStatus, LocalDateTime start, Long totalEntries, LocalDateTime updated) {
         this(jobStatus);
         this.start = start;
         this.totalEntries = totalEntries;

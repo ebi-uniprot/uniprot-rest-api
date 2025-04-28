@@ -58,7 +58,12 @@ class UniRefMapToTargetServiceTest {
     void init() {
         this.mapToTargetService =
                 new UniRefMapToTargetService(
-                        storeStreamer, tupleStreamTemplate, facetConfig, requestConverter,mapToJobService, rdfStreamer);
+                        storeStreamer,
+                        tupleStreamTemplate,
+                        facetConfig,
+                        requestConverter,
+                        mapToJobService,
+                        rdfStreamer);
         ReflectionTestUtils.setField(
                 this.mapToTargetService, "maxIdMappingToIdsCountEnriched", 100000);
         ReflectionTestUtils.setField(

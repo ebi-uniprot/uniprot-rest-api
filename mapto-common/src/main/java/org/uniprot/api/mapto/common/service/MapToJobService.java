@@ -2,7 +2,6 @@ package org.uniprot.api.mapto.common.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.mapto.common.model.MapToJob;
@@ -30,10 +29,12 @@ public class MapToJobService {
     }
 
     public MapToJob findMapToJob(String id) {
-        return this.jobRepository.findById(id).orElseThrow(
-                () ->
-                        new IllegalArgumentException(
-                                "Mapto job does not exist with id + " + id));
+        return this.jobRepository
+                .findById(id)
+                .orElseThrow(
+                        () ->
+                                new IllegalArgumentException(
+                                        "Mapto job does not exist with id + " + id));
     }
 
     public void deleteMapToJob(String jobId) {
@@ -45,16 +46,14 @@ public class MapToJobService {
     }
 
     public void updateStatus(String id, JobStatus jobStatus) {
-        MapToJob mapToJob =
-                findMapToJob(id);
+        MapToJob mapToJob = findMapToJob(id);
         mapToJob.setStatus(jobStatus);
         mapToJob.setUpdated(LocalDateTime.now());
         jobRepository.save(mapToJob);
     }
 
     public void setTargetIds(String id, List<String> allMappedIds) {
-        MapToJob mapToJob =
-                findMapToJob(id);
+        MapToJob mapToJob = findMapToJob(id);
         mapToJob.setTargetIds(allMappedIds);
         mapToJob.setUpdated(LocalDateTime.now());
         mapToJob.setStatus(JobStatus.FINISHED);

@@ -1,5 +1,15 @@
 package org.uniprot.api.mapto.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +31,6 @@ import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
-
 @RestController
 @RequestMapping(UniProtKBUniRefMapToController.RESOURCE_PATH)
 public class UniProtKBUniRefMapToController extends BasicSearchController<UniRefEntryLight> {
@@ -43,8 +44,12 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
 
     public UniProtKBUniRefMapToController(
             MapToJobSubmissionService mapToJobSubmissionService,
-            MapToRequestConverter mapToRequestConverter, ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<UniRefEntryLight> converterContextFactory, UniRefMapToTargetService uniRefMapToTargetService, ThreadPoolTaskExecutor downloadTaskExecutor, Gatekeeper downloadGatekeeper) {
+            MapToRequestConverter mapToRequestConverter,
+            ApplicationEventPublisher eventPublisher,
+            MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
+            UniRefMapToTargetService uniRefMapToTargetService,
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 converterContextFactory,
@@ -60,7 +65,8 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
     public ResponseEntity<JobSubmitResponse> submitMapToJob(
             @Valid @ModelAttribute UniProtKBMapToSearchRequest request) {
         request.setTo(UniProtDataType.UNIREF);
-        JobSubmitResponse jobSubmitResponse = mapToJobSubmissionService.submit(mapToRequestConverter.convert(request));
+        JobSubmitResponse jobSubmitResponse =
+                mapToJobSubmissionService.submit(mapToRequestConverter.convert(request));
         return ResponseEntity.ok(jobSubmitResponse);
     }
 
@@ -75,44 +81,61 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
     @GetMapping(
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<JobDetailResponse> getJobDetails(@PathVariable String jobId, HttpServletRequest request) {
-        JobDetailResponse jobDetail = mapToJobSubmissionService.getJobDetails(jobId, request.getRequestURL().toString(), UNIPROTKB_UNIREF);
+    public ResponseEntity<JobDetailResponse> getJobDetails(
+            @PathVariable String jobId, HttpServletRequest request) {
+        JobDetailResponse jobDetail =
+                mapToJobSubmissionService.getJobDetails(
+                        jobId, request.getRequestURL().toString(), UNIPROTKB_UNIREF);
         return ResponseEntity.ok(jobDetail);
     }
 
     @GetMapping(value = "/results/{jobId}")
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getMapToEntries(
-            @PathVariable String jobId, @Valid @ModelAttribute UniRefSearchRequest searchRequest, HttpServletRequest request,
+            @PathVariable String jobId,
+            @Valid @ModelAttribute UniRefSearchRequest searchRequest,
+            HttpServletRequest request,
             HttpServletResponse response) {
-        return getSearchResponse(uniRefMapToTargetService.getMappedEntries(jobId, searchRequest), searchRequest.getFields(), false, request, response);
+        return getSearchResponse(
+                uniRefMapToTargetService.getMappedEntries(jobId, searchRequest),
+                searchRequest.getFields(),
+                false,
+                request,
+                response);
     }
 
-    @GetMapping(value = "/results/stream/{jobId}",
+    @GetMapping(
+            value = "/results/stream/{jobId}",
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>>
-    streamMapToEntries(
-            @PathVariable String jobId,
-            @Valid @ModelAttribute UniRefStreamRequest streamRequest, HttpServletRequest request) {
+            streamMapToEntries(
+                    @PathVariable String jobId,
+                    @Valid @ModelAttribute UniRefStreamRequest streamRequest,
+                    HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         MediaType contentType = getAcceptHeader(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(
-                    () -> uniRefMapToTargetService.streamRdf(jobId, streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    () ->
+                            uniRefMapToTargetService.streamRdf(
+                                    jobId, streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);
         } else {
             return super.stream(
-                    () -> uniRefMapToTargetService.streamEntries(jobId, streamRequest), streamRequest, contentType, request);
+                    () -> uniRefMapToTargetService.streamEntries(jobId, streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 
@@ -122,7 +145,8 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntryLight entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            UniRefEntryLight entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

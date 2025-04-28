@@ -1,6 +1,5 @@
 package org.uniprot.api.mapto.common.service;
 
-import net.jodah.failsafe.RetryPolicy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
@@ -13,7 +12,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
-import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import net.jodah.failsafe.RetryPolicy;
 
 @Service
 public class MapToJobSubmissionService {
@@ -66,11 +65,10 @@ public class MapToJobSubmissionService {
         jobDetailResponse.setTo(mapToJob.getTargetDB().name());
         if (JobStatus.FINISHED == mapToJob.getStatus()) {
             jobDetailResponse.setRedirectURL(
-                    getRedirectPathToResults(
-                            jobId, requestUrl, mappingType));
-            //jobDetailResponse.setWarnings(getWarnings(job));
+                    getRedirectPathToResults(jobId, requestUrl, mappingType));
+            // jobDetailResponse.setWarnings(getWarnings(job));
         } else if (JobStatus.ERROR == mapToJob.getStatus()) {
-           // jobDetailResponse.setErrors(getLimitExceedError(job));
+            // jobDetailResponse.setErrors(getLimitExceedError(job));
         }
 
         return jobDetailResponse;

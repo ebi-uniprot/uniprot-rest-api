@@ -46,8 +46,7 @@ public class UniProtKBAsyncDownloadUtils {
 
     public static int totalNonIsoformEntries;
 
-    public static final UniProtKBEntry TEMPLATE_ENTRY =
-            UniProtEntryMocker.create(SP_CANONICAL);
+    public static final UniProtKBEntry TEMPLATE_ENTRY = UniProtEntryMocker.create(SP_CANONICAL);
     public static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),

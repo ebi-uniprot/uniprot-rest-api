@@ -261,8 +261,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE
-                                                        + "?query=(length:[0 TO 1000])")
+                                                SEARCH_RESOURCE + "?query=(length:[0 TO 1000])")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
@@ -291,8 +290,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE
-                                                        + "?query=(length:[1 TO 1000])")
+                                                SEARCH_RESOURCE + "?query=(length:[1 TO 1000])")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
