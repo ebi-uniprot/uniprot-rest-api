@@ -1,12 +1,14 @@
 package org.uniprot.api.rest.validation;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.uniprot.store.config.UniProtDataType.UNIPROTKB;
 import static org.uniprot.store.search.SolrQueryUtil.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,12 +66,13 @@ public @interface ValidSolrQueryFields {
         @Autowired private ApplicationContext applicationContext;
 
         private Map<String, String> whiteListFields;
+        private UniProtDataType uniProtDataType;
 
         @Override
         public void initialize(ValidSolrQueryFields constraintAnnotation) {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
-                UniProtDataType uniProtDataType = constraintAnnotation.uniProtDataType();
+                this.uniProtDataType = constraintAnnotation.uniProtDataType();
                 this.searchFieldConfig =
                         SearchFieldConfigFactory.getSearchFieldConfig(uniProtDataType);
                 this.messagePrefix = constraintAnnotation.messagePrefix();
@@ -168,9 +171,7 @@ public @interface ValidSolrQueryFields {
                 validField = isValidField(context, fieldName, SearchFieldType.GENERAL, value);
             } else if (inputQuery instanceof TermRangeQuery) {
                 TermRangeQuery rangeQuery = (TermRangeQuery) inputQuery;
-                String fieldName = rangeQuery.getField();
-                String value = rangeQuery.toString("");
-                validField = isValidField(context, fieldName, SearchFieldType.RANGE, value);
+                validField = isValidField(context, rangeQuery);
             } else if (inputQuery instanceof PhraseQuery) {
                 PhraseQuery phraseQuery = (PhraseQuery) inputQuery;
                 String fieldName = phraseQuery.getTerms()[0].field();
@@ -191,6 +192,19 @@ public @interface ValidSolrQueryFields {
                 validField = false;
             }
             return validField;
+        }
+
+        private boolean isValidField(ConstraintValidatorContext context, TermRangeQuery rangeQuery) {
+            String fieldName = rangeQuery.getField();
+            String fieldValue = rangeQuery.toString(fieldName);
+            if (UNIPROTKB.equals(uniProtDataType) && "length".equals(fieldName)) {
+                int lower = Integer.parseInt(new String(rangeQuery.getLowerTerm().bytes, StandardCharsets.UTF_8));
+                if (lower <= 0) {
+                    addFieldValueErrorMessage(fieldName, fieldValue, (ConstraintValidatorContextImpl) context);
+                    return false;
+                }
+            }
+            return isValidField(context, fieldName, SearchFieldType.RANGE, fieldValue);
         }
 
         private boolean isValidField(
