@@ -52,7 +52,7 @@ class StatisticsControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results[0].items[0].query",
-                                is("(reviewed:true) AND (previous_release_date:2021-01-25)")))
+                                is("(reviewed:true) AND (previous_release_date:2021-01-26)")))
                 .andExpect(jsonPath("$.results[0].items[0].count", is(329)))
                 .andExpect(jsonPath("$.results[0].items[0].entryCount", is(254)))
                 .andExpect(jsonPath("$.results[1].categoryName", is("TOP_ORGANISM")))
@@ -104,7 +104,7 @@ class StatisticsControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results[0].items[0].query",
-                                is("(previous_release_date:2021-01-25)")))
+                                is("(previous_release_date:2021-01-26)")))
                 .andExpect(jsonPath("$.results[0].items[0].count", is(329)))
                 .andExpect(jsonPath("$.results[0].items[0].entryCount", is(254)))
                 .andExpect(jsonPath("$.results[1].categoryName", is("TOP_ORGANISM")))

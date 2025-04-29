@@ -91,4 +91,4 @@ VALUES (1,'Fungi','(taxonomy_id:4751)', 39);
 INSERT INTO attribute_query (id, attribute_name, query, statistics_category_id)
 VALUES (2,'Insecta','(fragment:true)', 39);
 INSERT INTO attribute_query (id, attribute_name, query, statistics_category_id)
-VALUES (3,'AMINO_ACID_U','(previous_release_date:previous_release_date)', 45);
+VALUES (3,'AMINO_ACID_U','(previous_release_date::previous_release_date)', 45);

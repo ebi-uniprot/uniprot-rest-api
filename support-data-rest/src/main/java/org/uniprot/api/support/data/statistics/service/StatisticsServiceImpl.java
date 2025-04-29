@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.statistics.entity.*;
@@ -217,7 +218,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             result =
                     result.replace(
                             PREVIOUS_RELEASE_DATE,
-                            ":" + simpleDateFormat.format(previousReleaseDate));
+                            simpleDateFormat.format(DateUtils.addDays(previousReleaseDate, 1)));
         }
         EntryType entryType = entry.getEntryType();
         String prepend =
