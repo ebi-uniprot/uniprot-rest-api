@@ -26,6 +26,7 @@ public class TurtlePrologs {
                     + "@prefix taxon: <http://purl.uniprot.org/taxonomy/> .\n"
                     + "@prefix tissue: <http://purl.uniprot.org/tissues/> .\n"
                     + "@prefix up: <http://purl.uniprot.org/core/> .\n"
+                    + "@prefix database: <http://purl.uniprot.org/database/> .\n"
                     + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
     public static final String UNIREF_PROLOG =
             "@base <http://purl.uniprot.org/uniref/> .\n"
