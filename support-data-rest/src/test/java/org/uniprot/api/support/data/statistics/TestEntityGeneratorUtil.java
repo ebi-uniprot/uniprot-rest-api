@@ -32,22 +32,22 @@ public class TestEntityGeneratorUtil {
     public static final String[] LABELS = new String[] {LABEL_0, LABEL_1, LABEL_2};
     public static final Long[] ATTRIBUTE_QUERY_IDS = new Long[] {123L, 3333L};
     public static final String[] QUERY_TEMPLATES =
-            new String[] {"(query:query)", "(previous_release_date:previous_release_date)"};
+            new String[] {"(query:query)", "(previous_release_date::previous_release_date)"};
     public static final String[] QUERIES =
             new String[] {
                 "(reviewed:true) AND (query:query)",
-                "(reviewed:true) AND (previous_release_date:2022-05-25)",
+                "(reviewed:true) AND (previous_release_date:2022-05-26)",
                 "(reviewed:false) AND (query:query)",
                 "(reviewed:true) AND (query:query)",
-                "(reviewed:true) AND (previous_release_date:2022-05-25)"
+                "(reviewed:true) AND (previous_release_date:2022-05-26)"
             };
     public static final String[] QUERIES_COMMON =
             new String[] {
                 "(query:query)",
-                "(previous_release_date:2022-05-25)",
+                "(previous_release_date:2022-05-26)",
                 "(query:query)",
                 "(query:query)",
-                "(previous_release_date:2022-05-25)"
+                "(previous_release_date:2022-05-26)"
             };
     public static final AttributeQuery[] ATTRIBUTE_QUERIES =
             new AttributeQuery[] {createAttributeQuery(0), createAttributeQuery(1)};

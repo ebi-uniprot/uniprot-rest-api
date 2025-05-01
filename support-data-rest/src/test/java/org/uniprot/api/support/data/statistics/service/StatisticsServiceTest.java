@@ -85,9 +85,10 @@ class StatisticsServiceTest {
                                 STATISTICS_ENTRIES[0].getValueCount()
                                         + STATISTICS_ENTRIES[1].getValueCount())
                         .items(
-                                List.of(
-                                        statisticsModuleStatisticsAttribute0,
-                                        statisticsModuleStatisticsAttribute1))
+                                new ArrayList<>(
+                                        List.of(
+                                                statisticsModuleStatisticsAttribute0,
+                                                statisticsModuleStatisticsAttribute1)))
                         .label(LABELS[0])
                         .searchField(SEARCH_FIELDS[0])
                         .build();
@@ -95,7 +96,7 @@ class StatisticsServiceTest {
                 StatisticsModuleStatisticsCategoryImpl.builder()
                         .categoryName(CATEGORY_1)
                         .totalCount(STATISTICS_ENTRIES[3].getValueCount())
-                        .items(List.of(statisticsModuleStatisticsAttribute3))
+                        .items(new ArrayList<>(List.of(statisticsModuleStatisticsAttribute3)))
                         .label(LABELS[1])
                         .searchField(SEARCH_FIELDS[1])
                         .build();
@@ -103,7 +104,7 @@ class StatisticsServiceTest {
                 StatisticsModuleStatisticsCategoryImpl.builder()
                         .categoryName(CATEGORY_2)
                         .totalCount(STATISTICS_ENTRIES[4].getValueCount())
-                        .items(List.of(statisticsModuleStatisticsAttribute4))
+                        .items(new ArrayList<>(List.of(statisticsModuleStatisticsAttribute4)))
                         .label(LABELS[2])
                         .searchField(SEARCH_FIELDS[2])
                         .build();
