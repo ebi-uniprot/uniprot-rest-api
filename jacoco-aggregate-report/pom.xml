@@ -108,6 +108,18 @@
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>mapto-common</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>mapto-rest</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
