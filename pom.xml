@@ -23,7 +23,7 @@
 
 	<properties>
 		<awaitility.version>4.2.0</awaitility.version>
-		<commons-compress.version>1.20</commons-compress.version>
+		<commons-compress.version>1.26.0</commons-compress.version>
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<failsafe.version>2.0.1</failsafe.version>
 		<hamcrest-library.version>2.2</hamcrest-library.version>
