@@ -89,7 +89,7 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
         return ResponseEntity.ok(jobDetail);
     }
 
-    @GetMapping(value = "/results/{jobId}")
+    @GetMapping(value = "/results/{jobId}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getMapToEntries(
             @PathVariable String jobId,
             @Valid @ModelAttribute UniRefSearchRequest searchRequest,

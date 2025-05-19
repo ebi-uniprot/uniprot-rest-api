@@ -55,7 +55,9 @@ public class MapToTask implements Runnable {
             allTargetIds.addAll(targetIdPage.getTargetIds());
         }
 
-        return allTargetIds.stream().toList();
+        List<String> ids = allTargetIds.stream().toList();
+        log.info("Total number of target ids are {}", ids.size());
+        return ids;
     }
 
     private MapToSearchResult getTargetIdPage(MapToJob mapToJob, String cursor) {

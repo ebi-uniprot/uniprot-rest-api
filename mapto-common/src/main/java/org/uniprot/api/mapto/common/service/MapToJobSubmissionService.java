@@ -39,12 +39,17 @@ public class MapToJobSubmissionService {
 
     public JobSubmitResponse submit(MapToJobRequest mapToJobRequest) {
         String jobId = hashGenerator.generateHash(mapToJobRequest);
-        MapToJob mapToJob = mapToJobService.createMapToJob(jobId, mapToJobRequest);
-        MapToSearchService mapToSearchService =
-                mapToSearchFacade.getMapToSearchService(mapToJobRequest.getSource());
-        MapToTask mapToTask =
-                new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy);
-        jobTaskExecutor.execute(mapToTask);
+        // create if the job doesn't exit. TODO handle error out jobs
+        if (!mapToJobService.mapToJobExists(jobId)) {
+            MapToJob mapToJob = mapToJobService.createMapToJob(jobId, mapToJobRequest);
+            MapToSearchService mapToSearchService =
+                    mapToSearchFacade.getMapToSearchService(mapToJobRequest.getSource());
+            MapToTask mapToTask =
+                    new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy);
+            jobTaskExecutor.execute(mapToTask);
+        } else {
+            mapToJobService.updateUpdated(jobId);
+        }
         return new JobSubmitResponse(jobId);
     }
 

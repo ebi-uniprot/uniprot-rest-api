@@ -2,10 +2,7 @@ package org.uniprot.api.mapto.common.search;
 
 import static org.uniprot.store.config.UniProtDataType.UNIREF;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import org.springframework.stereotype.Component;

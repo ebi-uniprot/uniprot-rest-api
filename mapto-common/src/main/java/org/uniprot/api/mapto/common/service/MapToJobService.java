@@ -52,6 +52,12 @@ public class MapToJobService {
         jobRepository.save(mapToJob);
     }
 
+    public void updateUpdated(String jobId) {
+        MapToJob mapToJob = findMapToJob(jobId);
+        mapToJob.setUpdated(LocalDateTime.now());
+        jobRepository.save(mapToJob);
+    }
+
     public void setTargetIds(String id, List<String> allMappedIds) {
         MapToJob mapToJob = findMapToJob(id);
         mapToJob.setTargetIds(allMappedIds);
