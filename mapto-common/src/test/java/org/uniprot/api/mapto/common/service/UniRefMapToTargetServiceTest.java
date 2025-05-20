@@ -31,6 +31,7 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
@@ -41,7 +42,7 @@ import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
 class UniRefMapToTargetServiceTest {
     @Mock private StoreStreamer<UniRefEntryLight> storeStreamer;
     @Mock private FacetTupleStreamTemplate tupleStreamTemplate;
-    @Mock private FacetConfig facetConfig;
+    @Mock private UniRefFacetConfig facetConfig;
     @Mock private RequestConverter requestConverter;
     @Mock private MapToJobService mapToJobService;
     @Mock private RdfStreamer rdfStreamer;

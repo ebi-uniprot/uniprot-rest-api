@@ -1,7 +1,6 @@
 package org.uniprot.api.mapto.controller;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.oneOf;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -250,34 +249,6 @@ public abstract class MapToControllerIT {
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
         String results = getJobResults(jobId, Map.of("query", "*", "size", "5"));
-        verifyResultsWithLimit(results);
-    }
-
-    @Test
-    @Disabled
-    void submitMapToJob_facets() throws Exception {
-        String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
-        await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
-        String results = getJobResults(jobId, Map.of("query", "*", "facets", "identity"));
         verifyResultsWithLimit(results);
     }
 

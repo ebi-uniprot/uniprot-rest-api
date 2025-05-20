@@ -6,6 +6,7 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
@@ -17,7 +18,7 @@ public class UniRefMapToTargetService extends MapToTargetService<UniRefEntryLigh
     protected UniRefMapToTargetService(
             @Qualifier("uniRefEntryStoreStreamer") StoreStreamer<UniRefEntryLight> storeStreamer,
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
-            FacetConfig uniRefEntryFacetConfig,
+            UniRefFacetConfig uniRefEntryFacetConfig,
             RequestConverter uniRefRequestConverter,
             MapToJobService mapToJobService,
             RdfStreamer uniRefRdfStreamer) {

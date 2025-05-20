@@ -1,7 +1,16 @@
 package org.uniprot.api.mapto.controller;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
 import static org.uniprot.store.search.SolrCollection.*;
 
@@ -12,15 +21,20 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -99,6 +113,44 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 taxRepository);
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient);
+    }
+
+    @Test
+    void submitJobAndVerifyGetResultWithFacets() throws Exception {
+        // when
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobFinished(jobId));
+        String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(jobResultsUrl, jobId)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        .param("query", "*:*")
+                        .param("facets", "identity");
+        ResultActions response = mockMvc.perform(requestBuilder);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.facets").exists())
+                .andExpect(jsonPath("$.facets.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].label", equalTo("Clusters")))
+                .andExpect(jsonPath("$.facets[0].name", equalTo("identity")))
+                .andExpect(jsonPath("$.facets[0].allowMultipleSelection", is(true)))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(3)))
+                // Verify first value (100%)
+                .andExpect(jsonPath("$.facets[0].values[0].label", is("100%")))
+                .andExpect(jsonPath("$.facets[0].values[0].value", is("1.0")))
+                .andExpect(jsonPath("$.facets[0].values[0].count", is(4)))
+                // Verify second value (90%)
+                .andExpect(jsonPath("$.facets[0].values[1].label", is("90%")))
+                .andExpect(jsonPath("$.facets[0].values[1].value", is("0.9")))
+                .andExpect(jsonPath("$.facets[0].values[1].count", is(4)))
+                // Verify third value (50%)
+                .andExpect(jsonPath("$.facets[0].values[2].label", is("50%")))
+                .andExpect(jsonPath("$.facets[0].values[2].value", is("0.5")))
+                .andExpect(jsonPath("$.facets[0].values[2].count", is(4)));
     }
 
     @Override
