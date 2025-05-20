@@ -68,15 +68,18 @@ public class MapToJobSubmissionService {
         JobDetailResponse jobDetailResponse = new JobDetailResponse();
         jobDetailResponse.setFrom(mapToJob.getSourceDB().name());
         jobDetailResponse.setTo(mapToJob.getTargetDB().name());
+        jobDetailResponse.setQuery(mapToJob.getQuery());
+        jobDetailResponse.setIncludeIsoform(mapToJob.getExtraParams().get("includeIsoform"));
         if (JobStatus.FINISHED == mapToJob.getStatus()) {
             jobDetailResponse.setRedirectURL(
                     getRedirectPathToResults(jobId, requestUrl, mappingType));
-            // jobDetailResponse.setWarnings(getWarnings(job));
-        } else if (JobStatus.ERROR == mapToJob.getStatus()) {
-            // jobDetailResponse.setErrors(getLimitExceedError(job));
         }
-
         return jobDetailResponse;
+    }
+
+    public boolean isJobFinished(String jobId) {
+        MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
+        return mapToJob.getStatus() == JobStatus.FINISHED;
     }
 
     private String getRedirectPathToResults(String jobId, String requestUrl, String mappingType) {

@@ -101,4 +101,34 @@ class UniProtKBMapToSearchServiceTest {
         assertSame(page, targetIds.getPage());
         assertThat(targetIds.getTargetIds(), empty());
     }
+
+    @Test
+    void getTargetIds_uniRefNullValues() {
+        uniProtDocument0.unirefCluster50 = null;
+        uniProtDocument0.unirefCluster90 = null;
+        uniProtDocument0.unirefCluster100 = null;
+        content = Stream.of(uniProtDocument0);
+        when(uniprotQueryRepository.searchPage(solrRequest, CURSOR)).thenReturn(queryResult);
+        when(queryResult.getPage()).thenReturn(page);
+        when(queryResult.getContent()).thenReturn(content);
+        MapToSearchResult targetIds = uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
+        assertSame(page, targetIds.getPage());
+        assertThat(targetIds.getTargetIds(), empty());
+    }
+
+    @Test
+    void getTargetIds_uniRefNullValues2() {
+        uniProtDocument0.unirefCluster50 = null;
+        uniProtDocument0.unirefCluster90 = null;
+        content = Stream.of(uniProtDocument0, uniProtDocument1);
+        when(uniprotQueryRepository.searchPage(solrRequest, CURSOR)).thenReturn(queryResult);
+        when(queryResult.getPage()).thenReturn(page);
+        when(queryResult.getContent()).thenReturn(content);
+        MapToSearchResult targetIds = uniProtKBMapToSearchService.getTargetIds(mapToJob, CURSOR);
+
+        assertSame(page, targetIds.getPage());
+        assertThat(
+                targetIds.getTargetIds(),
+                hasItems(UNI_REF_CLUSTER_100_0, UNI_REF_CLUSTER_50_1, UNI_REF_CLUSTER_100_1));
+    }
 }

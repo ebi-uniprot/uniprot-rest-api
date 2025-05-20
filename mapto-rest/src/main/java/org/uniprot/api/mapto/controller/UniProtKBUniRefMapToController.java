@@ -17,11 +17,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
 import org.uniprot.api.mapto.common.service.MapToJobSubmissionService;
 import org.uniprot.api.mapto.common.service.UniRefMapToTargetService;
 import org.uniprot.api.mapto.request.UniProtKBMapToSearchRequest;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
@@ -89,12 +91,25 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
         return ResponseEntity.ok(jobDetail);
     }
 
-    @GetMapping(value = "/results/{jobId}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/results/{jobId}",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getMapToEntries(
             @PathVariable String jobId,
             @Valid @ModelAttribute UniRefSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
+
+        if (!mapToJobSubmissionService.isJobFinished(jobId)) {
+            throw new ResourceNotFoundException("{search.not.found}");
+        }
+
         return getSearchResponse(
                 uniRefMapToTargetService.getMappedEntries(jobId, searchRequest),
                 searchRequest.getFields(),
@@ -120,6 +135,14 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
                     @PathVariable String jobId,
                     @Valid @ModelAttribute UniRefStreamRequest streamRequest,
                     HttpServletRequest request) {
+        JobStatusResponse status = mapToJobSubmissionService.getJobStatus(jobId);
+        if (status.getJobStatus() != JobStatus.FINISHED) {
+            throw new ResourceNotFoundException("{search.not.found}");
+        }
+
+        this.uniRefMapToTargetService.validateMappedIdsEnrichmentLimit(
+                Math.toIntExact(status.getTotalEntries()));
+
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         MediaType contentType = getAcceptHeader(request);
         if (acceptedRdfContentType.isPresent()) {

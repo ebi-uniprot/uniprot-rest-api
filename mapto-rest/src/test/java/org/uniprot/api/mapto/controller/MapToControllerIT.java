@@ -1,6 +1,7 @@
 package org.uniprot.api.mapto.controller;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.oneOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -137,12 +138,56 @@ public abstract class MapToControllerIT {
     }
 
     @Test
-    void submitMapToJob() throws Exception {
+    void testSubmitJobAndVerifyGetStatus() throws Exception {
+        // when
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        ResultActions resultActions = callGetJobStatus(jobId);
+        // then
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                .andExpect(
+                        jsonPath(
+                                "$.jobStatus",
+                                oneOf(
+                                        JobStatus.FINISHED.toString(),
+                                        JobStatus.NEW.toString(),
+                                        JobStatus.RUNNING.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
+    @Test
+    void submitJobAndVerifyGetDetails() throws Exception {
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        ResultActions response = callGetJobDetails(jobId);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.from", equalTo("UNIPROTKB")))
+                .andExpect(jsonPath("$.to", equalTo("UNIREF")))
+                .andExpect(jsonPath("$.query", equalTo("*:*")))
+                .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
+    }
+
+    @Test
+    void submitJobToFinishAndVerifyGetStatus() throws Exception {
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
         ResultActions resultActions = callGetJobStatus(jobId);
         resultActions
                 .andDo(log())
@@ -159,8 +204,26 @@ public abstract class MapToControllerIT {
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
-        String results = getJobResults(jobId, Map.of("query", "*"));
-        verifyResults(results);
+    }
+
+    @Test
+    void submitJobToFinishAndVerifyGetDetails() throws Exception {
+        // when
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobFinished(jobId));
+        ResultActions response = callGetJobDetails(jobId);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.redirectURL", Matchers.endsWith(jobId)))
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.from", equalTo("UNIPROTKB")))
+                .andExpect(jsonPath("$.to", equalTo("UNIREF")))
+                .andExpect(jsonPath("$.query", equalTo("*:*")))
+                .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
     }
 
     @Test
@@ -274,6 +337,26 @@ public abstract class MapToControllerIT {
         verifyResultsWithSort(results);
     }
 
+    @ParameterizedTest(name = "[{index}] contentType {0}")
+    @MethodSource("getResultsContentTypes")
+    void submitJobAndGetResults(MediaType mediaType) throws Exception {
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobFinished(jobId));
+        String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(jobResultsUrl, jobId)
+                        .header(ACCEPT, mediaType.toString())
+                        .param("query", "*:*");
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
+    }
+
     @Test
     void submitMapToJobAndStreamResults() throws Exception {
         String query = "*:*";
@@ -385,6 +468,13 @@ public abstract class MapToControllerIT {
     private Stream<Arguments> getContentTypes() {
         return ControllerITUtils.getContentTypes(
                         "/mapto" + getPath() + "/results/stream", requestMappingHandlerMapping)
+                .stream()
+                .map(Arguments::of);
+    }
+
+    private Stream<Arguments> getResultsContentTypes() {
+        return ControllerITUtils.getContentTypes(
+                        "/mapto" + getPath() + "/results", requestMappingHandlerMapping)
                 .stream()
                 .map(Arguments::of);
     }

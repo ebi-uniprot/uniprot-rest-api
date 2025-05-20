@@ -25,11 +25,19 @@ public class UniProtKBMapToSearchService implements MapToSearchService {
     private final Map<UniProtDataType, Function<UniProtDocument, List<String>>> targetMappings =
             Map.of(
                     UNIREF,
-                    uniProtDocument ->
-                            List.of(
-                                    uniProtDocument.unirefCluster50,
-                                    uniProtDocument.unirefCluster90,
-                                    uniProtDocument.unirefCluster100));
+                    uniProtDocument -> {
+                        List<String> unirefIds = new ArrayList<>();
+                        if (uniProtDocument.unirefCluster50 != null) {
+                            unirefIds.add(uniProtDocument.unirefCluster50);
+                        }
+                        if (uniProtDocument.unirefCluster90 != null) {
+                            unirefIds.add(uniProtDocument.unirefCluster90);
+                        }
+                        if (uniProtDocument.unirefCluster100 != null) {
+                            unirefIds.add(uniProtDocument.unirefCluster100);
+                        }
+                        return unirefIds;
+                    });
 
     public UniProtKBMapToSearchService(
             UniprotQueryRepository repository,
