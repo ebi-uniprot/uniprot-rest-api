@@ -34,7 +34,7 @@ public class MapToJobService {
                 .orElseThrow(
                         () ->
                                 new IllegalArgumentException(
-                                        "Mapto job does not exist with id + " + id));
+                                        "Mapto job does not exist with id : " + id));
     }
 
     public void deleteMapToJob(String jobId) {

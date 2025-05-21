@@ -24,7 +24,6 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrFacetRequest;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.facet.Facet;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
