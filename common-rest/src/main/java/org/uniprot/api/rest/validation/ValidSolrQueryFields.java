@@ -194,13 +194,18 @@ public @interface ValidSolrQueryFields {
             return validField;
         }
 
-        private boolean isValidField(ConstraintValidatorContext context, TermRangeQuery rangeQuery) {
+        private boolean isValidField(
+                ConstraintValidatorContext context, TermRangeQuery rangeQuery) {
             String fieldName = rangeQuery.getField();
             String fieldValue = rangeQuery.toString(fieldName);
             if (UNIPROTKB.equals(uniProtDataType) && "length".equals(fieldName)) {
-                int lower = Integer.parseInt(new String(rangeQuery.getLowerTerm().bytes, StandardCharsets.UTF_8));
+                int lower =
+                        Integer.parseInt(
+                                new String(
+                                        rangeQuery.getLowerTerm().bytes, StandardCharsets.UTF_8));
                 if (lower <= 0) {
-                    addFieldValueErrorMessage(fieldName, fieldValue, (ConstraintValidatorContextImpl) context);
+                    addFieldValueErrorMessage(
+                            fieldName, fieldValue, (ConstraintValidatorContextImpl) context);
                     return false;
                 }
             }
