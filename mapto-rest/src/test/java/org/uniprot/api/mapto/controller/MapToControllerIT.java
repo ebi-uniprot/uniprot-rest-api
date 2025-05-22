@@ -1,7 +1,32 @@
 package org.uniprot.api.mapto.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.embedded.JettyConfig;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -41,32 +66,9 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -74,14 +76,10 @@ import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 public abstract class MapToControllerIT {
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
     public static final ObjectMapper MAPPER = new ObjectMapper();
-    @Autowired
-    protected SolrClient solrClient;
-    @Autowired
-    protected MapToJobRepository mapToJobRepository;
-    @Autowired
-    protected MockMvc mockMvc;
-    @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Autowired protected SolrClient solrClient;
+    @Autowired protected MapToJobRepository mapToJobRepository;
+    @Autowired protected MockMvc mockMvc;
+    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     private MiniSolrCloudCluster cluster;
 
@@ -153,11 +151,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(
                         jsonPath(
                                 "$.jobStatus",
@@ -200,11 +198,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -236,7 +234,7 @@ public abstract class MapToControllerIT {
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
 
-        //then
+        // then
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
@@ -259,13 +257,13 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobResults(jobId, Map.of("query","*"));
+        ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]",containsString("not supported")));;
-
+                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
+        ;
     }
 
     @Test
@@ -274,13 +272,12 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobResults(jobId, Map.of("query","*"));
+        ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]",containsString("not supported")));
-
+                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
     }
 
     @Test
@@ -289,13 +286,12 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobResults(jobId, Map.of("query","*"));
+        ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]",containsString("not supported")));
-
+                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
     }
 
     @Test
@@ -304,8 +300,10 @@ public abstract class MapToControllerIT {
         String query = "accession:P00001";
         String jobId = callRunAPIAndVerify(query, false);
 
-        //then
-        MvcResult mvcResult = callGetJobResultsAsStream(jobId, Map.of("query", "*:*"), APPLICATION_JSON).andReturn();
+        // then
+        MvcResult mvcResult =
+                callGetJobResultsAsStream(jobId, Map.of("query", "*:*"), APPLICATION_JSON)
+                        .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
         assertThat(response.getContentAsString(), containsString("not found"));
@@ -313,7 +311,9 @@ public abstract class MapToControllerIT {
 
     @Test
     void streamResultsRandomJobId() throws Exception {
-        MvcResult mvcResult = callGetJobResultsAsStream("jobId", Map.of("query", "*:*"), APPLICATION_JSON).andReturn();
+        MvcResult mvcResult =
+                callGetJobResultsAsStream("jobId", Map.of("query", "*:*"), APPLICATION_JSON)
+                        .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
         assertThat(response.getContentAsString(), containsString("not found"));
@@ -334,11 +334,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -363,11 +363,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -390,11 +390,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -430,9 +430,7 @@ public abstract class MapToControllerIT {
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
-                get(jobResultsUrl, jobId)
-                        .header(ACCEPT, "un/supported")
-                        .param("query", "*:*");
+                get(jobResultsUrl, jobId).header(ACCEPT, "un/supported").param("query", "*:*");
 
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
@@ -454,11 +452,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -482,11 +480,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -508,11 +506,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
@@ -535,11 +533,11 @@ public abstract class MapToControllerIT {
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(
                         header().stringValues(
-                                HttpHeaders.VARY,
-                                ACCEPT,
-                                ACCEPT_ENCODING,
-                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));

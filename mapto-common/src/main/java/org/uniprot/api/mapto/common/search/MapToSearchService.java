@@ -5,10 +5,10 @@ import org.uniprot.api.mapto.common.model.MapToSearchResult;
 
 public abstract class MapToSearchService {
     public static final String INCLUDE_ISOFORM = "includeIsoform";
-    public static final  int MAP_TO_PAGE_SIZE = 100;
+    public static final int MAP_TO_PAGE_SIZE = 100;
     private final Integer maxIdMappingToIdsCount;
 
-    protected MapToSearchService( Integer maxIdMappingToIdsCount) {
+    protected MapToSearchService(Integer maxIdMappingToIdsCount) {
         this.maxIdMappingToIdsCount = maxIdMappingToIdsCount;
     }
 

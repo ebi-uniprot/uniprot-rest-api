@@ -167,7 +167,7 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
 
     @Override
     protected String getQueryInLimits() {
-        return "accession:(P00001  OR P00002 OR P00003 OR P00004)" ;
+        return "accession:(P00001  OR P00002 OR P00003 OR P00004)";
     }
 
     @Override

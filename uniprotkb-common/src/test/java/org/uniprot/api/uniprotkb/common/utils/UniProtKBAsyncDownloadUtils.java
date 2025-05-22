@@ -1,5 +1,15 @@
 package org.uniprot.api.uniprotkb.common.utils;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
+import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
+
+import java.util.HashMap;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -31,16 +41,6 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.HashMap;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
-import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
 
 public class UniProtKBAsyncDownloadUtils {
 
@@ -102,7 +102,9 @@ public class UniProtKBAsyncDownloadUtils {
     }
 
     public static void saveMoreEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient, int limit)
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            int limit)
             throws Exception {
         int i = 10;
         for (; i <= limit; i++) {

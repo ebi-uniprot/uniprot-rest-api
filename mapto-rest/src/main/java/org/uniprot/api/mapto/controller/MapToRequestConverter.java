@@ -25,7 +25,7 @@ public class MapToRequestConverter {
         if (isUniProtKBSourceType(request)) {
             return Map.of(
                     INCLUDE_ISOFORM,
-                    "" + ((UniProtKBMapToSearchRequest) request).isIncludeIsoform());
+                    String.valueOf(((UniProtKBMapToSearchRequest) request).isIncludeIsoform()));
         }
         return Map.of();
     }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
 import org.uniprot.api.mapto.common.service.MapToJobSubmissionService;
 import org.uniprot.api.mapto.common.service.UniRefMapToTargetService;
@@ -109,13 +110,10 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
         if (!mapToJobSubmissionService.isJobFinished(jobId)) {
             throw new ResourceNotFoundException("{search.not.found}");
         }
-
+        QueryResult<UniRefEntryLight> mappedEntries =
+                uniRefMapToTargetService.getMappedEntries(jobId, searchRequest);
         return getSearchResponse(
-                uniRefMapToTargetService.getMappedEntries(jobId, searchRequest),
-                searchRequest.getFields(),
-                false,
-                request,
-                response);
+                mappedEntries, searchRequest.getFields(), false, request, response);
     }
 
     @GetMapping(

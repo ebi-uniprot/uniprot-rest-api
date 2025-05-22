@@ -1,5 +1,10 @@
 package org.uniprot.api.mapto.common.search;
 
+import static org.uniprot.store.config.UniProtDataType.UNIREF;
+
+import java.util.*;
+import java.util.function.Function;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -11,11 +16,6 @@ import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverte
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.*;
-import java.util.function.Function;
-
-import static org.uniprot.store.config.UniProtDataType.UNIREF;
 
 @Component
 public class UniProtKBMapToSearchService extends MapToSearchService {
