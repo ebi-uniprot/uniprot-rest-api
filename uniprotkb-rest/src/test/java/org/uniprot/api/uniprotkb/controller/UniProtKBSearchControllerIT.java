@@ -2263,7 +2263,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()

@@ -22,15 +22,6 @@ public class UniParcDatabasesStreamRequest extends UniParcGetByIdRequest impleme
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
     private String fields;
 
-    @Parameter(description = XREF_ID_UNIPARC_DESCRIPTION, example = XREF_ID_UNIPARC_EXAMPLE)
-    private String id;
-
-    @Parameter(
-            description = XREF_INCLUDE_SOURCES_UNIPARC_DESCRIPTION,
-            example = XREF_INCLUDE_SOURCES_UNIPARC_EXAMPLE,
-            hidden = true)
-    private boolean includeSources;
-
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(regexp = "^true$|^false$", message = "{search.uniparc.invalid.download}")
     private String download;

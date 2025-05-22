@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
-import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -223,7 +222,6 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results.size()", is(4)))
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(false))));
     }
@@ -246,7 +244,6 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", iterableWithSize(4)))
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
-                .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism.taxonId", hasItem(9606)));
     }
@@ -270,7 +267,6 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", iterableWithSize(5)))
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")))
                 .andExpect(
                         jsonPath(
                                 "$.results[*].database",
@@ -280,50 +276,6 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         "UniProtKB/TrEMBL",
                                         "EMBL",
                                         "UniProtKB/TrEMBL")));
-    }
-
-    @Test
-    void testGetByAccessionWithCrossRefIdFilterSuccess() throws Exception {
-        // when
-        saveEntry();
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
-                                        .param("id", "embl1"));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(4)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
-                .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].properties[*].key", not("sources")));
-    }
-
-    @Test
-    void testGetByAccessionWithIncludeSourcesSuccess() throws Exception {
-        // when
-        saveEntry();
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
-                                        .param("includeSources", "true"));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(5)))
-                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")));
     }
 
     @Test
@@ -375,12 +327,10 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                         content()
                                 .string(
                                         containsString(
-                                                "Database\tIdentifier\tVersion\tOrganism\tFirst seen\tLast seen\tActive")),
-                        content().string(not(containsString(SOURCES)))),
+                                                "Database\tIdentifier\tVersion\tOrganism\tFirst seen\tLast seen\tActive"))),
                 Arguments.of(MediaType.APPLICATION_JSON, jsonPath("$.results.size()", is(25))),
                 Arguments.of(
                         MediaType.APPLICATION_XML,
-                        content().string(not(containsString(SOURCES))),
                         xpath("count(//dbReferences/dbReference)").number(25.0)));
     }
 
@@ -411,59 +361,6 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.results[*].active", everyItem(is(true))));
-    }
-
-    @Test
-    void StreamByAccessionWithCrossRefIdFilterSuccess() throws Exception {
-        // when
-        saveEntry();
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getStreamRequestPath(), getIdPathValue())
-                        .param("id", "embl1")
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
-
-        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
-
-        // then
-        getMockMvc()
-                .perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(4)))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(4)))
-                .andExpect(
-                        jsonPath(
-                                "$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
-                .andExpect(jsonPath("$.results[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[*].organism", notNullValue()));
-    }
-
-    @Test
-    void StreamByAccessionWithIncludeSourcesFilterSuccess() throws Exception {
-        // when
-        saveEntry();
-        MockHttpServletRequestBuilder requestBuilder =
-                get(getStreamRequestPath(), getIdPathValue())
-                        .param("includeSources", "true")
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
-
-        MvcResult response = getMockMvc().perform(requestBuilder).andReturn();
-
-        // then
-        getMockMvc()
-                .perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(25)))
-                .andExpect(
-                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")))
-                .andExpect(jsonPath("$.results[*].database", notNullValue()))
-                .andExpect(jsonPath("$.results[*].organism", notNullValue()));
     }
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
