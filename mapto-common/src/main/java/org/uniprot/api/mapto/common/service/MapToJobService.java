@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
@@ -33,8 +34,8 @@ public class MapToJobService {
                 .findById(id)
                 .orElseThrow(
                         () ->
-                                new IllegalArgumentException(
-                                        "Mapto job does not exist with id + " + id));
+                                new ResourceNotFoundException(
+                                        "Mapto job is not found with id + " + id));
     }
 
     public void deleteMapToJob(String jobId) {

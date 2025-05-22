@@ -3,18 +3,22 @@ package org.uniprot.api.mapto.common.search;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToSearchResult;
 
-public interface MapToSearchService {
-    String INCLUDE_ISOFORM = "includeIsoform";
-    int MAP_TO_PAGE_SIZE = 100;
-    int MAX_TARGET_IDS = 500000; // resuse idmapping
+public abstract class MapToSearchService {
+    public static final String INCLUDE_ISOFORM = "includeIsoform";
+    public static final  int MAP_TO_PAGE_SIZE = 100;
+    private final Integer maxIdMappingToIdsCount;
 
-    static void checkTheResultLimits(Long totalElements) {
-        if (totalElements > MAX_TARGET_IDS) {
+    protected MapToSearchService( Integer maxIdMappingToIdsCount) {
+        this.maxIdMappingToIdsCount = maxIdMappingToIdsCount;
+    }
+
+    public void checkTargetLimits(Long totalElements) {
+        if (totalElements > maxIdMappingToIdsCount) {
             throw new IllegalStateException(
                     "No of target ids: %d is greater than the limit: %d"
-                            .formatted(totalElements, MAX_TARGET_IDS));
+                            .formatted(totalElements, maxIdMappingToIdsCount));
         }
     }
 
-    MapToSearchResult getTargetIds(MapToJob mapToJob, String cursor);
+    public abstract MapToSearchResult getTargetIds(MapToJob mapToJob, String cursor);
 }

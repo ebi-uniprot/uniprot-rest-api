@@ -65,13 +65,24 @@ public class UniRefAsyncDownloadUtils {
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
 
+    public static void saveAdditionalEntries(
+            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
+            throws Exception {
+        for (int i = 1; i <= 20; i++) {
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef50, storeClient);
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef90, storeClient);
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef100, storeClient);
+        }
+        cloudSolrClient.commit(SolrCollection.uniref.name());
+    }
+
     private static void saveEntry(
             CloudSolrClient cloudSolrClient,
             int i,
             UniRefType type,
             UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
-        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
+        UniRefEntry entry = UniRefEntryMocker.createAdditionalEntry(i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();

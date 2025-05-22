@@ -1,7 +1,5 @@
 package org.uniprot.api.mapto.common.model;
 
-import static org.uniprot.api.mapto.common.search.MapToSearchService.checkTheResultLimits;
-
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -40,8 +38,8 @@ public class MapToTask implements Runnable {
 
         MapToSearchResult targetIdPage = getTargetIdPage(mapToJob, null);
         CursorPage page = targetIdPage.getPage();
-        checkTheResultLimits(page.getTotalElements());
         List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
+        mapToSearchService.checkTargetLimits(page.getTotalElements());
 
         mapToJobService.setTargetIds(mapToJob.getId(), allTargetIds);
     }

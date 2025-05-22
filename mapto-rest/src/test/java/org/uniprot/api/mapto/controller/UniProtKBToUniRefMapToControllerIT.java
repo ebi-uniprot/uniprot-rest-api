@@ -111,14 +111,16 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 uniProtKBSolrClient,
                 uniProtKBStoreClient,
                 taxRepository);
+        UniProtKBAsyncDownloadUtils.saveMoreEntries(cloudSolrClient, uniProtKBStoreClient, 20);
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient);
+        UniRefAsyncDownloadUtils.saveAdditionalEntries(cloudSolrClient, uniRefStoreClient);
     }
 
     @Test
     void submitJobAndVerifyGetResultWithFacets() throws Exception {
         // when
-        String query = "*:*";
+        String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -160,7 +162,12 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
 
     @Override
     protected Map<String, String> getFilterQuery() {
-        return Map.of("query", "id:UniRef90_P03903");
+        return Map.of("query", "id:UniRef90_P00003");
+    }
+
+    @Override
+    protected String getQueryInLimits() {
+        return "accession:(P00001  OR P00002 OR P00003 OR P00004)" ;
     }
 
     @Override
@@ -169,11 +176,11 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
         assertTrue(
                 organisms.containsAll(
                         List.of(
-                                "UniRef100_P03901",
-                                "UniRef100_P03902",
-                                "UniRef100_P03903",
-                                "UniRef100_P03904",
-                                "UniRef50_P03901")));
+                                "UniRef100_P00001",
+                                "UniRef100_P00002",
+                                "UniRef100_P00003",
+                                "UniRef100_P00004",
+                                "UniRef50_P00001")));
         assertEquals(5, organisms.size());
         String accession =
                 JsonPath.read(resultsJson, "$.results[4].representativeMember.accessions[0]");
@@ -189,23 +196,23 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
 
     @Override
     protected void verifyResultsWithSort(String resultsJson) {
-        List<String> organisms = JsonPath.read(resultsJson, "$.results.*.id");
+        List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.id");
         List<String> expected =
                 List.of(
-                        "UniRef90_P03904",
-                        "UniRef90_P03903",
-                        "UniRef90_P03902",
-                        "UniRef90_P03901",
-                        "UniRef50_P03904",
-                        "UniRef50_P03903",
-                        "UniRef50_P03902",
-                        "UniRef50_P03901",
-                        "UniRef100_P03904",
-                        "UniRef100_P03903",
-                        "UniRef100_P03902",
-                        "UniRef100_P03901");
-        assertEquals(new LinkedList<>(organisms), new LinkedList<>(expected));
-        assertEquals(12, organisms.size());
+                        "UniRef90_P00004",
+                        "UniRef90_P00003",
+                        "UniRef90_P00002",
+                        "UniRef90_P00001",
+                        "UniRef50_P00004",
+                        "UniRef50_P00003",
+                        "UniRef50_P00002",
+                        "UniRef50_P00001",
+                        "UniRef100_P00004",
+                        "UniRef100_P00003",
+                        "UniRef100_P00002",
+                        "UniRef100_P00001");
+        assertEquals(new LinkedList<>(uniRefIds), new LinkedList<>(expected));
+        assertEquals(12, uniRefIds.size());
         String accession =
                 JsonPath.read(resultsJson, "$.results[11].representativeMember.accessions[0]");
         assertEquals("P12301", accession);
@@ -216,8 +223,8 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
     @Override
     protected void verifyResultsWithFilter(String resultsJson) {
         List<String> organisms = JsonPath.read(resultsJson, "$.results.*.id");
-        List<String> expected = List.of("UniRef90_P03903");
-        assertEquals(new LinkedList<>(organisms), new LinkedList<>(expected));
+        List<String> expected = List.of("UniRef90_P00003");
+        assertEquals(new LinkedList<>(expected), new LinkedList<>(organisms));
         assertEquals(1, organisms.size());
         String accession =
                 JsonPath.read(resultsJson, "$.results[0].representativeMember.accessions[0]");
@@ -232,18 +239,18 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
         assertTrue(
                 organisms.containsAll(
                         List.of(
-                                "UniRef100_P03901",
-                                "UniRef100_P03902",
-                                "UniRef100_P03903",
-                                "UniRef100_P03904",
-                                "UniRef90_P03901",
-                                "UniRef90_P03902",
-                                "UniRef90_P03903",
-                                "UniRef90_P03904",
-                                "UniRef50_P03901",
-                                "UniRef50_P03902",
-                                "UniRef50_P03903",
-                                "UniRef50_P03904")));
+                                "UniRef100_P00001",
+                                "UniRef100_P00002",
+                                "UniRef100_P00003",
+                                "UniRef100_P00004",
+                                "UniRef90_P00001",
+                                "UniRef90_P00002",
+                                "UniRef90_P00003",
+                                "UniRef90_P00004",
+                                "UniRef50_P00001",
+                                "UniRef50_P00002",
+                                "UniRef50_P00003",
+                                "UniRef50_P00004")));
         assertEquals(12, organisms.size());
         String accession =
                 JsonPath.read(resultsJson, "$.results[0].representativeMember.accessions[0]");
