@@ -59,7 +59,7 @@ public class UniParcFastaBatchStoreIterable extends BatchStoreIterable<UniParcEn
         builder.uniParcId(light.getUniParcId()).sequence(light.getSequence());
         // populate cross-references from its own store
         Stream<UniParcCrossReference> crossReferences =
-                uniParcCrossReferenceService.getCrossReferences(light);
+                uniParcCrossReferenceService.getCrossReferences(light, true);
         UniParcProteomeIdFilter proteomeIdFilter = new UniParcProteomeIdFilter();
         crossReferences = crossReferences.filter(xRef -> proteomeIdFilter.test(xRef, proteomeId));
         builder.uniParcCrossReferencesSet(crossReferences.toList());

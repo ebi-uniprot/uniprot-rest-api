@@ -92,7 +92,7 @@ public class UniParcBestGuessService {
 
         List<UniParcCrossReference> filteredCrossReferences = new ArrayList<>();
         Stream<UniParcCrossReference> batchStream =
-                this.uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight);
+                this.uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight, false);
         batchStream
                 .filter(xref -> filterCrossReference(xref, databases, taxonomyIds))
                 .forEach(filteredCrossReferences::add);
