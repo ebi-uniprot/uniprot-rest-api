@@ -438,6 +438,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                         jsonPath(
                                 "$.results[*].id", is(List.of("embl1", "embl1", "embl1", "embl1"))))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
+                .andExpect(jsonPath("$.results[*].properties[*].key", not(hasItem("sources"))))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()));
     }
 
