@@ -192,7 +192,8 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         builder.sequenceFeaturesSet(optLightEntry.get().getSequenceFeatures());
         // populate cross-references from its own store
         Stream<UniParcCrossReference> crossReferences =
-                this.uniParcCrossReferenceService.getCrossReferences(optLightEntry.get(), proteomeId != null);
+                this.uniParcCrossReferenceService.getCrossReferences(
+                        optLightEntry.get(), proteomeId != null);
         crossReferences = filterUniParcCrossReferenceStream(crossReferences, request, proteomeId);
         builder.uniParcCrossReferencesSet(crossReferences.toList());
         return builder.build();

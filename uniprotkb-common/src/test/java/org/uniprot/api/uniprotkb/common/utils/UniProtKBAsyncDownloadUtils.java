@@ -9,6 +9,7 @@ import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELE
 import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -101,24 +102,20 @@ public class UniProtKBAsyncDownloadUtils {
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
-    public static void saveMoreEntries(
+    public static void saveEntries(
             CloudSolrClient cloudSolrClient,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             int limit)
             throws Exception {
-        int i = 10;
-        for (; i <= limit; i++) {
-            saveEntry(cloudSolrClient, i, "", storeClient);
+        for (int i = 1; i <= limit; i++) {
+            saveEntry(cloudSolrClient, i, "", i % 2 == 0, storeClient);
         }
-        saveEntry(cloudSolrClient, i++, "-2", storeClient);
-        saveEntry(cloudSolrClient, i++, "-2", storeClient);
-        saveEntry(cloudSolrClient, i++, "", false, storeClient);
-        saveEntry(cloudSolrClient, i, "", false, storeClient);
-        totalNonIsoformEntries = i - 2;
         cloudSolrClient.commit(SolrCollection.uniprot.name());
         saveTaxonomyEntry(cloudSolrClient, 9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
+
+    static AtomicInteger c = new AtomicInteger(0);
 
     public static void saveEntry(
             CloudSolrClient cloudSolrClient,

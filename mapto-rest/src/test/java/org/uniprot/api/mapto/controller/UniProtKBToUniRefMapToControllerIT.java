@@ -1,24 +1,6 @@
 package org.uniprot.api.mapto.controller;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
-import static org.uniprot.store.search.SolrCollection.*;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+import com.jayway.jsonpath.JsonPath;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -53,7 +35,23 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import com.jayway.jsonpath.JsonPath;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
+import static org.uniprot.store.search.SolrCollection.*;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @WebMvcTest({UniProtKBUniRefMapToController.class})
@@ -111,16 +109,15 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 uniProtKBSolrClient,
                 uniProtKBStoreClient,
                 taxRepository);
-        UniProtKBAsyncDownloadUtils.saveMoreEntries(cloudSolrClient, uniProtKBStoreClient, 20);
+        UniProtKBAsyncDownloadUtils.saveEntries(cloudSolrClient, uniProtKBStoreClient, 20);
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient);
-        UniRefAsyncDownloadUtils.saveAdditionalEntries(cloudSolrClient, uniRefStoreClient);
+                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient, 20, "P");
     }
 
     @Test
     void submitJobAndVerifyGetResultWithFacets() throws Exception {
         // when
-        String query = getQueryInLimits();
+        String query = "accession:(P00001  OR P00002 OR P00003)";
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -129,7 +126,8 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 get(jobResultsUrl, jobId)
                         .header(ACCEPT, APPLICATION_JSON_VALUE)
                         .param("query", "*:*")
-                        .param("facets", "identity");
+                        .param("facets", "identity")
+                        .param("size", "0");
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
         response.andDo(log())
@@ -144,15 +142,16 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 // Verify first value (100%)
                 .andExpect(jsonPath("$.facets[0].values[0].label", is("100%")))
                 .andExpect(jsonPath("$.facets[0].values[0].value", is("1.0")))
-                .andExpect(jsonPath("$.facets[0].values[0].count", is(4)))
+                .andExpect(jsonPath("$.facets[0].values[0].count", is(3)))
                 // Verify second value (90%)
                 .andExpect(jsonPath("$.facets[0].values[1].label", is("90%")))
                 .andExpect(jsonPath("$.facets[0].values[1].value", is("0.9")))
-                .andExpect(jsonPath("$.facets[0].values[1].count", is(4)))
+                .andExpect(jsonPath("$.facets[0].values[1].count", is(3)))
                 // Verify third value (50%)
                 .andExpect(jsonPath("$.facets[0].values[2].label", is("50%")))
                 .andExpect(jsonPath("$.facets[0].values[2].value", is("0.5")))
-                .andExpect(jsonPath("$.facets[0].values[2].count", is(4)));
+                .andExpect(jsonPath("$.facets[0].values[2].count", is(3)))
+                .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
     @Override

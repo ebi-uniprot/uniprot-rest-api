@@ -78,9 +78,9 @@ class UniParcBestGuessServiceTest {
         UniParcBestGuessRequest request = new UniParcBestGuessRequest();
 
         // when
-        Mockito.when(uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight1,false ))
+        Mockito.when(uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight1, false))
                 .thenReturn(crossReferences1.stream());
-        Mockito.when(uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight2,false ))
+        Mockito.when(uniParcCrossReferenceService.getCrossReferences(uniParcEntryLight2, false))
                 .thenReturn(crossReferences2.stream());
         // then
         UniParcEntry result = bestGuessService.analyseBestGuess(entries.stream(), request);
@@ -122,7 +122,7 @@ class UniParcBestGuessServiceTest {
         entries.add(createEntryLightWithSequenceLength("UP2", 20, crossReferences2.size()));
 
         // when
-        Mockito.when(uniParcCrossReferenceService.getCrossReferences(entries.get(0),false))
+        Mockito.when(uniParcCrossReferenceService.getCrossReferences(entries.get(0), false))
                 .thenReturn(crossReferences1.stream());
         Mockito.when(uniParcCrossReferenceService.getCrossReferences(entries.get(1), false))
                 .thenReturn(crossReferences2.stream());

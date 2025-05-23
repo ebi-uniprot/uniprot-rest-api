@@ -94,7 +94,7 @@ class UniRefMessageConsumerIT
     void beforeAll() throws Exception {
         prepareDownloadFolders();
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient);
+                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient, 4);
     }
 
     @BeforeEach

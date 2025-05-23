@@ -263,7 +263,6 @@ public abstract class MapToControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
-        ;
     }
 
     @Test
