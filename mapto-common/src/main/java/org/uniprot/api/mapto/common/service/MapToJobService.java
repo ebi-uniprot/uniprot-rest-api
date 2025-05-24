@@ -35,7 +35,7 @@ public class MapToJobService {
                 .orElseThrow(
                         () ->
                                 new ResourceNotFoundException(
-                                        "Mapto job is not found with id + " + id));
+                                        "Mapto job is not found with id " + id));
     }
 
     public void deleteMapToJob(String jobId) {

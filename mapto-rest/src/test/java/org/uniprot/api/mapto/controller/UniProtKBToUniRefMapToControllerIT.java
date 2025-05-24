@@ -1,6 +1,23 @@
 package org.uniprot.api.mapto.controller;
 
-import com.jayway.jsonpath.JsonPath;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
+import static org.uniprot.store.search.SolrCollection.*;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,23 +52,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
-import static org.uniprot.store.search.SolrCollection.*;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @WebMvcTest({UniProtKBUniRefMapToController.class})
@@ -170,7 +171,7 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
     }
 
     @Override
-    protected void verifyResultsWithLimit(String resultsJson) {
+    protected void verifyResultsWithSize(String resultsJson) {
         List<String> organisms = JsonPath.read(resultsJson, "$.results.*.id");
         assertTrue(
                 organisms.containsAll(
@@ -281,5 +282,10 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
     @Override
     protected int getTotalEntries() {
         return 12;
+    }
+
+    @Override
+    protected String getFacets() {
+        return "identity";
     }
 }

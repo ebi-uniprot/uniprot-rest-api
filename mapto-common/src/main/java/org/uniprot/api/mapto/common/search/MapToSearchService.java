@@ -13,7 +13,7 @@ public abstract class MapToSearchService {
     }
 
     public void checkTargetLimits(Long totalElements) {
-        if (totalElements > maxIdMappingToIdsCount) {
+        if (totalElements > getMaxIdMappingToIdsCount()) {
             throw new IllegalStateException(
                     "No of target ids: %d is greater than the limit: %d"
                             .formatted(totalElements, maxIdMappingToIdsCount));
@@ -21,4 +21,8 @@ public abstract class MapToSearchService {
     }
 
     public abstract MapToSearchResult getTargetIds(MapToJob mapToJob, String cursor);
+
+    public Integer getMaxIdMappingToIdsCount() {
+        return maxIdMappingToIdsCount;
+    }
 }

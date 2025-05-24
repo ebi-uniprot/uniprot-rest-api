@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
@@ -100,7 +101,8 @@ public class MapToJobServiceTest {
     void updateStatus_whenJobNotExist() {
         when(jobRepository.findById(ID)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> jobService.updateStatus(ID, JOB_STATUS));
+        assertThrows(
+                ResourceNotFoundException.class, () -> jobService.updateStatus(ID, JOB_STATUS));
     }
 
     @Test
@@ -118,7 +120,8 @@ public class MapToJobServiceTest {
     void setTargetIds_whenJobNotExist() {
         when(jobRepository.findById(ID)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> jobService.setTargetIds(ID, TARGET_IDS));
+        assertThrows(
+                ResourceNotFoundException.class, () -> jobService.setTargetIds(ID, TARGET_IDS));
     }
 
     @Test

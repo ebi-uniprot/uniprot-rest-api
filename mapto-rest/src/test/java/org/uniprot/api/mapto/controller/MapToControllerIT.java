@@ -166,10 +166,9 @@ public abstract class MapToControllerIT {
                 .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
-    protected abstract String getQueryInLimits();
-
     @Test
     void submitJobAndVerifyGetDetails() throws Exception {
+        // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
@@ -186,10 +185,12 @@ public abstract class MapToControllerIT {
 
     @Test
     void submitJobToFinishAndVerifyGetStatus() throws Exception {
+        // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
+        // then
         ResultActions resultActions = callGetJobStatus(jobId);
         resultActions
                 .andDo(log())
@@ -215,8 +216,8 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobDetails(jobId);
         // then
+        ResultActions response = callGetJobDetails(jobId);
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -236,7 +237,7 @@ public abstract class MapToControllerIT {
 
         // then
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages[0]", containsString("not found")));
@@ -244,7 +245,9 @@ public abstract class MapToControllerIT {
 
     @Test
     void getResultsRandomJobId() throws Exception {
+        // when
         ResultActions response = callGetJobResults("jobId", Map.of("query", "*"));
+        // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -253,6 +256,7 @@ public abstract class MapToControllerIT {
 
     @Test
     void submitJobAndGetResultsExceedingTheEnrichmentLimit() throws Exception {
+        // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
@@ -262,41 +266,38 @@ public abstract class MapToControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
-    }
-
-    @Test
-    void submitJobAndGetResultsExceedingToIdLimit() throws Exception {
-        String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
-        await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                containsString("UniProt data enrichment is not supported")));
     }
 
     @Test
     void submitJobAndGetResultsExceedingTheFacetLimit() throws Exception {
-        String query = "*:*";
+        String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
+        ResultActions response =
+                callGetJobResults(jobId, Map.of("query", "*", "facets", getFacets(), "size", "0"));
         // then
         response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages[0]", containsString("not supported")));
+                .andExpect(jsonPath("$.warnings.size()", is(1)))
+                .andExpect(jsonPath("$.warnings[0].code", is(20)))
+                .andExpect(
+                        jsonPath(
+                                "$.warnings[0].message",
+                                containsString(
+                                        "Filters are not supported for mapping results with more than")))
+                .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
     @Test
     void submitJobAndStreamResultsBeforeItFinishes() throws Exception {
         // when
-        String query = "accession:P00001";
+        String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
 
         // then
@@ -319,33 +320,16 @@ public abstract class MapToControllerIT {
     }
 
     @Test
-    void submitMapToJob_limit() throws Exception {
+    void submitMapToJob_size() throws Exception {
+        // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
+        // then
         String results = getJobResults(jobId, Map.of("query", "*", "size", "5"));
-        verifyResultsWithLimit(results);
+        verifyResultsWithSize(results);
     }
-
-    protected abstract void verifyResultsWithLimit(String results);
 
     @Test
     void submitMapToJob_filter() throws Exception {
@@ -353,23 +337,7 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
+        // then
         String results = getJobResults(jobId, getFilterQuery());
         verifyResultsWithFilter(results);
     }
@@ -380,23 +348,7 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
+        // then
         String results = getJobResults(jobId, getSortQuery());
         verifyResultsWithSort(results);
     }
@@ -408,6 +360,7 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
+        // then
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobResultsUrl, jobId)
@@ -415,8 +368,7 @@ public abstract class MapToControllerIT {
                         .param("query", "*:*");
 
         ResultActions response = mockMvc.perform(requestBuilder);
-        // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
     }
@@ -427,13 +379,24 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
+        // then
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobResultsUrl, jobId).header(ACCEPT, "un/supported").param("query", "*:*");
 
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
-        response.andDo(print());
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        APPLICATION_JSON_VALUE.toString()))
+                .andExpect(
+                        jsonPath(
+                                "$.messages[0]",
+                                equalTo(
+                                        "Invalid request received. Requested media type/format not accepted: 'un/supported'.")));
     }
 
     @Test
@@ -442,51 +405,29 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
         String results = getJobResultsAsStream(jobId, Map.of("query", "*:*"), APPLICATION_JSON);
         verifyResults(results);
     }
 
+    @Test
+    void submitMapToJobAndStreamResultsWithDownloadFile() throws Exception {
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobFinished(jobId));
+        String results =
+                getJobResultsAsStream(
+                        jobId, Map.of("query", "*:*", "download", "true"), APPLICATION_JSON);
+        verifyResults(results);
+    }
+
     @ParameterizedTest(name = "[{index}] contentType {0}")
-    @MethodSource("getContentTypes")
+    @MethodSource("getStreamContentTypes")
     void submitMapToJobAndStreamResults_differentFormats(MediaType mediaType) throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
         getJobResultsAsStream(jobId, Map.of("query", "*:*"), mediaType);
     }
 
@@ -496,23 +437,6 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
         String results = getJobResultsAsStream(jobId, getFilterQuery(), APPLICATION_JSON);
         verifyResultsWithFilter(results);
     }
@@ -523,61 +447,15 @@ public abstract class MapToControllerIT {
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
-        getAndVerifyDetails(jobId);
-        ResultActions resultActions = callGetJobStatus(jobId);
-        resultActions
-                .andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
-                .andExpect(
-                        header().stringValues(
-                                        HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
-                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
-                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
-                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist())
-                .andExpect(jsonPath("$.totalEntries", equalTo(getTotalEntries())));
         String results = getJobResultsAsStream(jobId, getSortQuery(), APPLICATION_JSON);
         verifyResultsWithSort(results);
     }
 
-    private Stream<Arguments> getContentTypes() {
-        return ControllerITUtils.getContentTypes(
-                        "/mapto" + getPath() + "/results/stream", requestMappingHandlerMapping)
-                .stream()
-                .map(Arguments::of);
-    }
+    protected abstract String getQueryInLimits();
 
-    private Stream<Arguments> getResultsContentTypes() {
-        return ControllerITUtils.getContentTypes(
-                        "/mapto" + getPath() + "/results", requestMappingHandlerMapping)
-                .stream()
-                .map(Arguments::of);
-    }
+    protected abstract void verifyResultsWithSize(String results);
 
-    protected String getJobResultsAsStream(
-            String jobId, Map<String, String> query, MediaType mediaType) throws Exception {
-        MvcResult response = callGetJobResultsAsStream(jobId, query, mediaType).andReturn();
-
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"));
-
-        return response.getResponse().getContentAsString();
-    }
-
-    private ResultActions callGetJobResultsAsStream(
-            String jobId, Map<String, String> queryParams, MediaType mediaType) throws Exception {
-        String jobStreamUrl = getDownloadAPIsBasePath() + "/results/stream/{jobId}";
-        MockHttpServletRequestBuilder requestBuilder =
-                get(jobStreamUrl, jobId).header(ACCEPT, mediaType);
-        queryParams.forEach(requestBuilder::param);
-        return mockMvc.perform(requestBuilder);
-    }
+    protected abstract String getFacets();
 
     protected abstract String getPath();
 
@@ -590,6 +468,16 @@ public abstract class MapToControllerIT {
     protected abstract void verifyResultsWithFilter(String results);
 
     protected abstract void verifyResults(String results);
+
+    protected abstract String getDownloadAPIsBasePath();
+
+    protected abstract List<SolrCollection> getSolrCollections();
+
+    protected abstract Collection<TupleStreamTemplate> getTupleStreamTemplates();
+
+    protected abstract Collection<FacetTupleStreamTemplate> getFacetTupleStreamTemplates();
+
+    protected abstract int getTotalEntries();
 
     protected Callable<Boolean> isJobFinished(String jobId) {
         return () -> (getJobStatus(jobId).equals(JobStatus.FINISHED));
@@ -655,14 +543,12 @@ public abstract class MapToControllerIT {
         return mockMvc.perform(requestBuilder);
     }
 
-    protected abstract String getDownloadAPIsBasePath();
-
     protected String callRunAPIAndVerify(String query, boolean includeIsoform) throws Exception {
 
         ResultActions response = callPostJobStatus(query, includeIsoform);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
@@ -672,11 +558,34 @@ public abstract class MapToControllerIT {
         return jobId;
     }
 
-    protected abstract List<SolrCollection> getSolrCollections();
+    protected ResultActions callPostJobStatus(String query, boolean includeIsoform)
+            throws Exception {
+        MockHttpServletRequestBuilder requestBuilder =
+                post(getDownloadAPIsBasePath() + "/run")
+                        .header(ACCEPT, APPLICATION_JSON)
+                        .param("query", query)
+                        .param("includeIsoform", "" + includeIsoform);
+        return this.mockMvc.perform(requestBuilder);
+    }
 
-    protected abstract Collection<TupleStreamTemplate> getTupleStreamTemplates();
+    protected String getJobResultsAsStream(
+            String jobId, Map<String, String> query, MediaType mediaType) throws Exception {
+        MvcResult response = callGetJobResultsAsStream(jobId, query, mediaType).andReturn();
+        boolean isDownload = Boolean.valueOf(query.getOrDefault("download", "false"));
+        if (isDownload) {
+            mockMvc.perform(asyncDispatch(response))
+                    .andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().exists("Content-Disposition"));
+        } else {
+            mockMvc.perform(asyncDispatch(response))
+                    .andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().doesNotExist("Content-Disposition"));
+        }
 
-    protected abstract Collection<FacetTupleStreamTemplate> getFacetTupleStreamTemplates();
+        return response.getResponse().getContentAsString();
+    }
 
     @AfterEach
     void tearDown() {
@@ -724,15 +633,27 @@ public abstract class MapToControllerIT {
         }
     }
 
-    protected ResultActions callPostJobStatus(String query, boolean includeIsoform)
-            throws Exception {
-        MockHttpServletRequestBuilder requestBuilder =
-                post(getDownloadAPIsBasePath() + "/run")
-                        .header(ACCEPT, APPLICATION_JSON)
-                        .param("query", query)
-                        .param("includeIsoform", "" + includeIsoform);
-        return this.mockMvc.perform(requestBuilder);
+    private Stream<Arguments> getStreamContentTypes() {
+        return ControllerITUtils.getContentTypes(
+                        getDownloadAPIsBasePath() + "/results/stream", requestMappingHandlerMapping)
+                .stream()
+                .map(Arguments::of);
     }
 
-    protected abstract int getTotalEntries();
+    private Stream<Arguments> getResultsContentTypes() {
+        return ControllerITUtils.getContentTypes(
+                        getDownloadAPIsBasePath() + "/results/{jobId}",
+                        requestMappingHandlerMapping)
+                .stream()
+                .map(Arguments::of);
+    }
+
+    private ResultActions callGetJobResultsAsStream(
+            String jobId, Map<String, String> queryParams, MediaType mediaType) throws Exception {
+        String jobStreamUrl = getDownloadAPIsBasePath() + "/results/stream/{jobId}";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(jobStreamUrl, jobId).header(ACCEPT, mediaType);
+        queryParams.forEach(requestBuilder::param);
+        return mockMvc.perform(requestBuilder);
+    }
 }

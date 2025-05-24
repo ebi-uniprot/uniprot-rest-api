@@ -62,6 +62,7 @@
 
 	<modules>
 		<module>common-rest</module>
+		<module>support-data-common</module>
 		<module>uniprotkb-common</module>
 		<module>uniprotkb-rest</module>
 		<module>idmapping-common</module>
@@ -70,15 +71,14 @@
 		<module>uniparc-rest</module>
 		<module>uniref-common</module>
 		<module>uniref-rest</module>
-		<module>support-data-common</module>
 		<module>async-download-rest</module>
+		<module>mapto-common</module>
+		<module>mapto-rest</module>
 		<module>support-data-rest</module>
 		<module>proteome-rest</module>
 		<module>unisave-rest</module>
 		<module>aa-rest</module>
 		<module>help-centre-rest</module>
-		<module>mapto-common</module>
-		<module>mapto-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 

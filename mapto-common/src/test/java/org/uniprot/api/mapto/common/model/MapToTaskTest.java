@@ -47,7 +47,8 @@ class MapToTaskTest {
         when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
         when(searchResult.getPage()).thenReturn(page);
         when(page.getTotalElements()).thenReturn(1000000L);
-
+        doCallRealMethod().when(mapToSearchService).checkTargetLimits(1000000L);
+        when(mapToSearchService.getMaxIdMappingToIdsCount()).thenReturn(30);
         assertThrows(IllegalStateException.class, () -> mapToTask.run());
     }
 
