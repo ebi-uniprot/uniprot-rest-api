@@ -1,6 +1,5 @@
 package org.uniprot.api.mapto.common.model;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.uniprot.store.config.UniProtDataType.UNIREF;
@@ -46,17 +45,17 @@ class MapToTaskTest {
     void run_beyondTheLimits() {
         when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
         when(searchResult.getPage()).thenReturn(page);
-        when(page.getTotalElements()).thenReturn(1000000L);
-        doCallRealMethod().when(mapToSearchService).checkTargetLimits(1000000L);
-        when(mapToSearchService.getMaxIdMappingToIdsCount()).thenReturn(30);
-        assertThrows(IllegalStateException.class, () -> mapToTask.run());
+        when(mapToSearchService.validateTargetLimit(any())).thenReturn("Limit exceeded");
+        mapToTask.run();
+        verify(mapToJobService).setErrors(any(), any());
+        verify(mapToJobService, never()).setTargetIds(any(), any());
     }
 
     @Test
     void run_withinTheLimits() {
         when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
         when(searchResult.getPage()).thenReturn(page);
-        when(page.getTotalElements()).thenReturn(10L);
+        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds = getIds("target", 10);
         when(searchResult.getTargetIds()).thenReturn(targetIds);
 
@@ -69,9 +68,9 @@ class MapToTaskTest {
     @Test
     void run_withinTheLimitsAndSubsequentCalls() {
         when(searchResult.getPage()).thenReturn(page);
-        when(page.getTotalElements()).thenReturn(19L);
         when(page.hasNextPage()).thenReturn(true).thenReturn(false);
         when(page.getEncryptedNextCursor()).thenReturn(CURSOR);
+        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds0 = getIds("target_0", 10);
         List<String> targetIds1 = getIds("target_1", 9);
         when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);
@@ -94,9 +93,9 @@ class MapToTaskTest {
     @Test
     void run_withinTheLimitsAndSubsequentCallsOnRetry() {
         when(searchResult.getPage()).thenReturn(page);
-        when(page.getTotalElements()).thenReturn(19L);
         when(page.hasNextPage()).thenReturn(true).thenReturn(false);
         when(page.getEncryptedNextCursor()).thenReturn(CURSOR);
+        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds0 = getIds("target_0", 10);
         List<String> targetIds1 = getIds("target_1", 9);
         when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);

@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 
 @Service
 public class MapToJobService {
@@ -79,5 +81,14 @@ public class MapToJobService {
         mapToJob.setUpdated(now);
         mapToJob.setStatus(JobStatus.NEW);
         return createMapToJob(mapToJob);
+    }
+
+    public void setErrors(String jobId, String error) {
+        MapToJob mapToJob = findMapToJob(jobId);
+        mapToJob.setStatus(JobStatus.ERROR);
+        ProblemPair problemPair =
+                new ProblemPair(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), error);
+        mapToJob.setErrors(List.of(problemPair));
+        jobRepository.save(mapToJob);
     }
 }

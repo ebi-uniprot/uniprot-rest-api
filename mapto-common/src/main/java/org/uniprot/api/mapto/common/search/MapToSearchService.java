@@ -12,12 +12,13 @@ public abstract class MapToSearchService {
         this.maxIdMappingToIdsCount = maxIdMappingToIdsCount;
     }
 
-    public void checkTargetLimits(Long totalElements) {
-        if (totalElements > getMaxIdMappingToIdsCount()) {
-            throw new IllegalStateException(
-                    "No of target ids: %d is greater than the limit: %d"
-                            .formatted(totalElements, maxIdMappingToIdsCount));
+    public String validateTargetLimit(Long totalElements) {
+        Integer limit = getMaxIdMappingToIdsCount();
+        if (limit != null && totalElements > limit) {
+            return "Number of target ids: %d exceeds the allowed limit: %d"
+                    .formatted(totalElements, limit);
         }
+        return null;
     }
 
     public abstract MapToSearchResult getTargetIds(MapToJob mapToJob, String cursor);

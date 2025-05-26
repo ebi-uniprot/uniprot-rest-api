@@ -9,7 +9,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
@@ -212,7 +211,7 @@ public abstract class MapToControllerIT {
     @Test
     void submitJobToFinishAndVerifyGetDetails() throws Exception {
         // when
-        String query = "*:*";
+        String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -225,7 +224,7 @@ public abstract class MapToControllerIT {
                 .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.from", equalTo("UNIPROTKB")))
                 .andExpect(jsonPath("$.to", equalTo("UNIREF")))
-                .andExpect(jsonPath("$.query", equalTo("*:*")))
+                .andExpect(jsonPath("$.query", equalTo(query)))
                 .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
     }
 
@@ -257,7 +256,7 @@ public abstract class MapToControllerIT {
     @Test
     void submitJobAndGetResultsExceedingTheEnrichmentLimit() throws Exception {
         // when
-        String query = "*:*";
+        String query = getQueryBeyondEnrichmentLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -270,6 +269,22 @@ public abstract class MapToControllerIT {
                         jsonPath(
                                 "$.messages[0]",
                                 containsString("UniProt data enrichment is not supported")));
+    }
+
+    @Test
+    void submitJobAndGetResultsExceedingTheToIdsLimit() throws Exception {
+        // when
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobErrored(jobId));
+        ResultActions response = callGetJobStatus(jobId);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is("ERROR")));
+        // TODO add logic in getDetails method to return error message
     }
 
     @Test
@@ -375,7 +390,7 @@ public abstract class MapToControllerIT {
 
     @Test
     void submitJobAndGetResultsNonSupportedType() throws Exception {
-        String query = "*:*";
+        String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -453,6 +468,8 @@ public abstract class MapToControllerIT {
 
     protected abstract String getQueryInLimits();
 
+    protected abstract String getQueryBeyondEnrichmentLimits();
+
     protected abstract void verifyResultsWithSize(String results);
 
     protected abstract String getFacets();
@@ -481,6 +498,10 @@ public abstract class MapToControllerIT {
 
     protected Callable<Boolean> isJobFinished(String jobId) {
         return () -> (getJobStatus(jobId).equals(JobStatus.FINISHED));
+    }
+
+    protected Callable<Boolean> isJobErrored(String jobId) {
+        return () -> (getJobStatus(jobId).equals(JobStatus.ERROR));
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
@@ -528,7 +549,7 @@ public abstract class MapToControllerIT {
         // when
         ResultActions response = callGetJobDetails(jobId);
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.redirectURL", Matchers.endsWith(jobId)))

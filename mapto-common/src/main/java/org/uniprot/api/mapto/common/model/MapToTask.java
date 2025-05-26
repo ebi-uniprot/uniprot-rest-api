@@ -34,14 +34,21 @@ public class MapToTask implements Runnable {
 
     @Override
     public void run() {
-        mapToJobService.updateStatus(mapToJob.getId(), JobStatus.RUNNING);
+        String jobId = mapToJob.getId();
+        mapToJobService.updateStatus(jobId, JobStatus.RUNNING);
 
         MapToSearchResult targetIdPage = getTargetIdPage(mapToJob, null);
         CursorPage page = targetIdPage.getPage();
         List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
-        mapToSearchService.checkTargetLimits(page.getTotalElements());
-
-        mapToJobService.setTargetIds(mapToJob.getId(), allTargetIds);
+        String error = mapToSearchService.validateTargetLimit(Long.valueOf(allTargetIds.size()));
+        // TODO handle error when solr is down or any exception is throwb.
+        //  we should set the status to error with error message.
+        // we should not set the whole stacktrace
+        if (error != null) {
+            mapToJobService.setErrors(jobId, error);
+        } else {
+            mapToJobService.setTargetIds(jobId, allTargetIds);
+        }
     }
 
     private List<String> getAllTargetIds(MapToSearchResult targetIdPage, CursorPage page) {

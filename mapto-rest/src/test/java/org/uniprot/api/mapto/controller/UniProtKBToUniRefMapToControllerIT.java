@@ -171,6 +171,11 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
     }
 
     @Override
+    protected String getQueryBeyondEnrichmentLimits() {
+        return "accession:(P00001  OR P00002 OR P00003 OR P00004 OR P00005)";
+    }
+
+    @Override
     protected void verifyResultsWithSize(String resultsJson) {
         List<String> organisms = JsonPath.read(resultsJson, "$.results.*.id");
         assertTrue(

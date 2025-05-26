@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -28,6 +29,7 @@ public class MapToJob implements Serializable {
     private String query; // query to run against the source collection
     private JobStatus status;
     private Map<String, String> extraParams;
+    private List<ProblemPair> errors;
 
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
