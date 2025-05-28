@@ -108,7 +108,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     public Stream<String> streamRdf(StreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = requestConverter.createStreamSolrRequest(streamRequest);
         List<String> idStream = getDocumentIdStream().fetchIds(solrRequest).toList();
-        return getRdfStreamer().stream(idStream.stream(), dataType, format);
+        return getRdfStreamer().stream(idStream, dataType, format);
     }
 
     protected DefaultDocumentIdStream<D> getDocumentIdStream() {
@@ -116,8 +116,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public String getRdf(String id, String dataType, String format) {
-        return getRdfStreamer().stream(Stream.of(id), dataType, format)
-                .collect(Collectors.joining());
+        return getRdfStreamer().stream(List.of(id), dataType, format).collect(Collectors.joining());
     }
 
     protected RdfStreamer getRdfStreamer() {

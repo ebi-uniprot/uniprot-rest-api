@@ -1,9 +1,10 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RdfPrologs;
-import org.uniprot.api.rest.service.TurtlePrologs;
+import org.uniprot.api.rest.service.RdfService;
 
 @Component
 public class PrologProvider {
@@ -20,67 +21,24 @@ public class PrologProvider {
     public static final String LITERATURE = "citations";
     public static final String SUBCELLULAR = "locations";
     public static final String TAXONOMY = "taxonomy";
+    public static final String PREFIX_BASE = "@base";
+    public static final String PREFIX_PREFIX = "@prefix";
 
-    public String getProLog(String dataType, String format) {
+    public String getProLog(
+            List<String> firstBatch,
+            RdfServiceFactory rdfServiceFactory,
+            String dataType,
+            String format) {
+        RdfService<String> rdfService;
         switch (format) {
             case RDF:
-                return getForRdf(dataType);
             case TURTLE:
-                return getForTurtle(dataType);
+                rdfService = rdfServiceFactory.getRdfService(dataType, format);
+                return rdfService.getProlog(firstBatch);
             case N_TRIPLES:
                 return NTriplesPrologs.N_TRIPLES_COMMON_PROLOG;
             default:
                 throw new IllegalArgumentException(String.format("Unsupported format %s", format));
-        }
-    }
-
-    private String getForRdf(String dataType) {
-        switch (dataType) {
-            case UNIPROT:
-                return RdfPrologs.UNIPROT_PROLOG;
-            case UNIREF:
-                return RdfPrologs.UNIREF_PROLOG;
-            case UNIPARC:
-                return RdfPrologs.UNIPARC_PROLOG;
-            case XREF:
-                return RdfPrologs.XREF_PROLOG;
-            case DISEASE:
-                return RdfPrologs.DISEASE_PROLOG;
-            case KEYWORD:
-                return RdfPrologs.KEYWORD_PROLOG;
-            case LITERATURE:
-                return RdfPrologs.LITERATURE_PROLOG;
-            case SUBCELLULAR:
-                return RdfPrologs.SUBCELLULAR_LOCATION_PROLOG;
-            case TAXONOMY:
-                return RdfPrologs.TAXONOMY_PROLOG;
-            default:
-                throw new IllegalArgumentException(String.format("Invalid type %s", dataType));
-        }
-    }
-
-    private String getForTurtle(String dataType) {
-        switch (dataType) {
-            case UNIPROT:
-                return TurtlePrologs.UNIPROT_PROLOG;
-            case UNIREF:
-                return TurtlePrologs.UNIREF_PROLOG;
-            case UNIPARC:
-                return TurtlePrologs.UNIPARC_PROLOG;
-            case XREF:
-                return TurtlePrologs.XREF_PROLOG;
-            case DISEASE:
-                return TurtlePrologs.DISEASE_PROLOG;
-            case KEYWORD:
-                return TurtlePrologs.KEYWORD_PROLOG;
-            case LITERATURE:
-                return TurtlePrologs.LITERATURE_PROLOG;
-            case SUBCELLULAR:
-                return TurtlePrologs.SUBCELLULAR_LOCATION_PROLOG;
-            case TAXONOMY:
-                return TurtlePrologs.TAXONOMY_PROLOG;
-            default:
-                throw new IllegalArgumentException(String.format("Invalid type %s", dataType));
         }
     }
 

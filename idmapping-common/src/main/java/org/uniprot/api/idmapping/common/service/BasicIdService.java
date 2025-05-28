@@ -172,7 +172,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return this.rdfStreamer.stream(entryIds.stream(), dataType, format);
+        return this.rdfStreamer.stream(entryIds, dataType, format);
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);

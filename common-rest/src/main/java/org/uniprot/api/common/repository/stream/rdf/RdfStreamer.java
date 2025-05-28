@@ -34,43 +34,50 @@ public class RdfStreamer {
         this.rdfEntryCountProvider = rdfEntryCountProvider;
     }
 
-    public Stream<String> stream(Stream<String> entryIds, String dataType, String format) {
-        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
-                getBatchRdfXmlStoreIterable(entryIds, dataType, format);
-
-        Stream<String> rdfStringStream =
-                StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
-                        .flatMap(Collection::stream)
-                        .onClose(
-                                () ->
-                                        log.debug(
-                                                "Finished streaming over search results and fetching from RDF server."));
-
-        // prepend rdf prolog then rdf data and then append closing rdf tag
-        return getFullResponseAsStream(dataType, format, rdfStringStream);
+    public Stream<String> stream(List<String> entryIds, String dataType, String format) {
+        return stream(entryIds, dataType, format, null);
     }
 
     public Stream<String> stream(
-            Stream<String> entryIds, String dataType, String format, LongConsumer consumer) {
+            List<String> entryIds, String dataType, String format, LongConsumer consumer) {
+        if (entryIds == null || entryIds.isEmpty()) {
+            return Stream.empty();
+        }
+        // get the first batch to make a call to extract prolog
+        List<String> firstBatch = entryIds.subList(0, Math.min(this.batchSize, entryIds.size()));
         BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
-                getBatchRdfXmlStoreIterable(entryIds, dataType, format);
+                getBatchRdfXmlStoreIterable(entryIds.stream(), dataType, format);
 
         Stream<String> rdfStringStream =
-                StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
-                        .flatMap(Collection::stream)
-                        .map(
-                                singleBatchResponse -> {
-                                    consumer.accept(
-                                            rdfEntryCountProvider.getEntryCount(
-                                                    singleBatchResponse, dataType, format));
-                                    return singleBatchResponse;
-                                })
-                        .onClose(
-                                () ->
-                                        log.debug(
-                                                "Finished streaming over search results and fetching from RDF server."));
+                createRdfStream(batchRDFXMLStoreIterable, dataType, format, consumer);
 
-        return getFullResponseAsStream(dataType, format, rdfStringStream);
+        return concatenateWithPrologAndClosingTag(firstBatch, dataType, format, rdfStringStream);
+    }
+
+    private Stream<String> createRdfStream(
+            BatchRdfXmlStoreIterable batchIterator,
+            String dataType,
+            String format,
+            LongConsumer consumer) {
+        Stream<String> baseStream =
+                StreamSupport.stream(batchIterator.spliterator(), false)
+                        .flatMap(Collection::stream);
+
+        if (consumer != null) {
+            baseStream =
+                    baseStream.map(
+                            response -> {
+                                consumer.accept(
+                                        rdfEntryCountProvider.getEntryCount(
+                                                response, dataType, format));
+                                return response;
+                            });
+        }
+
+        return baseStream.onClose(
+                () ->
+                        log.debug(
+                                "Finished streaming over search results and fetching from RDF server."));
     }
 
     private BatchRdfXmlStoreIterable getBatchRdfXmlStoreIterable(
@@ -82,11 +89,16 @@ public class RdfStreamer {
                 batchSize);
     }
 
-    private Stream<String> getFullResponseAsStream(
-            String dataType, String format, Stream<String> rdfStringStream) {
+    private Stream<String> concatenateWithPrologAndClosingTag(
+            List<String> firstBatch,
+            String dataType,
+            String format,
+            Stream<String> rdfStringStream) {
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
-                Stream.of(prologProvider.getProLog(dataType, format)),
+                Stream.of(
+                        prologProvider.getProLog(
+                                firstBatch, this.rdfServiceFactory, dataType, format)),
                 Stream.concat(rdfStringStream, Stream.of(prologProvider.getClosingTag(format))));
     }
 

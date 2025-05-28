@@ -1,13 +1,14 @@
 package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 
 import java.util.stream.Stream;
 
@@ -50,8 +51,48 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
 
     @BeforeEach
     void setUp() {
-        when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(getRestTemple().getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+        DefaultUriBuilderFactory handler =
+                new DefaultUriBuilderFactory("http://localhost/{dataType}/{format}/{ids}");
+        when(getRestTemple().getUriTemplateHandler()).thenReturn(handler);
+        // Match by URI.toString()
+        when(getRestTemple()
+                        .getForObject(
+                                argThat(
+                                        uri ->
+                                                uri != null
+                                                        && uri.toString()
+                                                                .equals(
+                                                                        "http://localhost"
+                                                                                + getIdRequestPathWithoutPathVariable()
+                                                                                + "rdf/Q8DIA7")),
+                                eq(String.class)))
+                .thenReturn(SAMPLE_RDF);
+
+        when(getRestTemple()
+                        .getForObject(
+                                argThat(
+                                        uri ->
+                                                uri != null
+                                                        && uri.toString()
+                                                                .equals(
+                                                                        "http://localhost"
+                                                                                + getIdRequestPathWithoutPathVariable()
+                                                                                + "ttl/Q8DIA7")),
+                                eq(String.class)))
+                .thenReturn(SAMPLE_TTL);
+
+        when(getRestTemple()
+                        .getForObject(
+                                argThat(
+                                        uri ->
+                                                uri != null
+                                                        && uri.toString()
+                                                                .equals(
+                                                                        "http://localhost"
+                                                                                + getIdRequestPathWithoutPathVariable()
+                                                                                + "nt/Q8DIA7")),
+                                eq(String.class)))
+                .thenReturn(SAMPLE_N_TRIPLES);
     }
 
     @Test
@@ -69,16 +110,7 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        equalTo(
-                                                getRdfProlog()
-                                                        + "\n"
-                                                        + "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n"
-                                                        + "</rdf:RDF>\n")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF + "\n")));
     }
 
     @ParameterizedTest(name = "[{index}] for {0}")

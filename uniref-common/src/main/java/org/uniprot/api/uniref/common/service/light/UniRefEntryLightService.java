@@ -156,7 +156,7 @@ public class UniRefEntryLightService
             UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
+        return rdfStreamer.stream(entryIds, dataType, format);
     }
 
     @Override

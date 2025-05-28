@@ -28,10 +28,10 @@ public class TagPositionProvider {
     public int getStartingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                String rdfStartingTag = "</owl:Ontology>";
+                String rdfStartingTag = "</owl:Ontology>\n";
                 return body.indexOf(rdfStartingTag) + rdfStartingTag.length();
             case TURTLE:
-                String ttlStartingTag = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
+                String ttlStartingTag = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n";
                 return body.indexOf(ttlStartingTag) + ttlStartingTag.length();
             case N_TRIPLES:
                 return 0;

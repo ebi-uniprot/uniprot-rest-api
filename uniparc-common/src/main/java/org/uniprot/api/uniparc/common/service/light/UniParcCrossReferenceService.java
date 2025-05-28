@@ -157,17 +157,21 @@ public class UniParcCrossReferenceService {
                 .filter(xref -> uniParcDatabaseIdFilter.apply(xref, request.getId()));
     }
 
-    public Stream<UniParcCrossReference> getCrossReferences(UniParcEntryLight uniParcEntryLight, boolean includeSources) {
+    public Stream<UniParcCrossReference> getCrossReferences(
+            UniParcEntryLight uniParcEntryLight, boolean includeSources) {
         BatchStoreIterable<UniParcCrossReferencePair> batchIterable =
                 new BatchStoreIterable<>(
                         generateUniParcCrossReferenceKeys(uniParcEntryLight),
                         this.crossReferenceStoreClient,
                         this.crossReferenceStoreRetryPolicy,
                         1);
-        Stream<UniParcCrossReference> uniParcCrossReferenceStream = StreamSupport.stream(batchIterable.spliterator(), false)
-                .flatMap(Collection::stream)
-                .flatMap(pair -> pair.getValue().stream());
-        return includeSources ? uniParcCrossReferenceStream : uniParcCrossReferenceStream.map(this::hideSources);
+        Stream<UniParcCrossReference> uniParcCrossReferenceStream =
+                StreamSupport.stream(batchIterable.spliterator(), false)
+                        .flatMap(Collection::stream)
+                        .flatMap(pair -> pair.getValue().stream());
+        return includeSources
+                ? uniParcCrossReferenceStream
+                : uniParcCrossReferenceStream.map(this::hideSources);
     }
 
     private Stream<UniParcCrossReference> getFilteredCrossReferences(

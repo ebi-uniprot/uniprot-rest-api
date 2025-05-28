@@ -72,7 +72,8 @@ class RdfStreamerTest {
         when(rdfServiceFactory.getRdfService(DATA_TYPE, FORMAT)).thenReturn(rdfService);
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-        when(prologProvider.getProLog(DATA_TYPE, FORMAT)).thenReturn(RDF_PROLOG);
+        when(prologProvider.getProLog(IDS, rdfServiceFactory, DATA_TYPE, FORMAT))
+                .thenReturn(RDF_PROLOG);
         when(prologProvider.getClosingTag(FORMAT)).thenReturn(RDF_CLOSE_TAG);
     }
 
@@ -81,7 +82,7 @@ class RdfStreamerTest {
         when(tagPositionProvider.getStartingPosition(any(), eq(FORMAT))).thenReturn(169);
         when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
 
-        Stream<String> rdfStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
         String rdfString = rdfStream.collect(Collectors.joining());
 
         // 1 batch
@@ -101,7 +102,7 @@ class RdfStreamerTest {
         when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
 
         Stream<String> rdfStream =
-                rdfStreamer.stream(Stream.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
+                rdfStreamer.stream(List.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
 
         String rdfString = rdfStream.collect(Collectors.joining());
         // 3 batches
@@ -125,7 +126,7 @@ class RdfStreamerTest {
 
     @Test
     void stream_whenRemoteServerResponseIsEmpty() {
-        Stream<String> rdfStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
 
         String rdfString = rdfStream.collect(Collectors.joining());
         assertEquals(EMPTY_RESPONSE, rdfString);
@@ -133,7 +134,7 @@ class RdfStreamerTest {
 
     @Test
     void stream_whenRemoteServerThrowsException() {
-        Stream<String> idsStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> idsStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
         when(restTemplate.getForObject(any(), any())).thenThrow(RestClientException.class);
         assertThrows(RestClientException.class, idsStream::count);
     }

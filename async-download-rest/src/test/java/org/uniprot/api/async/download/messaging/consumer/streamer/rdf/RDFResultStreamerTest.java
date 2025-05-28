@@ -38,7 +38,7 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
         List<String> redfList = List.of("rdf1", "rdf2", "rdf3");
         Stream<String> rdf = redfList.stream();
         when(rdfStreamer.stream(
-                        eq(ids),
+                        eq(ids.toList()),
                         eq(rdfResultStreamer.getDataType()),
                         eq(RDF),
                         any(LongConsumer.class)))
