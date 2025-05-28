@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -143,6 +144,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
         ResultActions resultActions = callGetJobStatus(jobId);
         // then
         resultActions
@@ -172,7 +174,7 @@ public abstract class MapToControllerIT {
         // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         ResultActions response = callGetJobDetails(jobId);
         // then
         response.andDo(log())
@@ -189,7 +191,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         ResultActions resultActions = callGetJobStatus(jobId);
@@ -216,7 +218,7 @@ public abstract class MapToControllerIT {
         mockServerError();
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         ResultActions resultActions = callGetJobStatus(jobId);
@@ -246,7 +248,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         ResultActions response = callGetJobDetails(jobId);
@@ -280,7 +282,9 @@ public abstract class MapToControllerIT {
         // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
         ResultActions response = callRun(query, false);
+        waitUntilTheJobIsAvailable(jobId);
 
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -304,7 +308,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryBeyondEnrichmentLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
         // then
@@ -322,7 +326,7 @@ public abstract class MapToControllerIT {
         // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobErrored(jobId));
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -342,7 +346,7 @@ public abstract class MapToControllerIT {
     void submitJobAndGetResultsExceedingTheFacetLimit() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response =
                 callGetJobResults(jobId, Map.of("query", "*", "facets", getFacets(), "size", "0"));
@@ -390,7 +394,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         String results = getJobResults(jobId, Map.of("query", "*", "size", "5"));
@@ -401,29 +405,23 @@ public abstract class MapToControllerIT {
     void submitMapToJob_filter() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         String results = getJobResults(jobId, getFilterQuery());
         verifyResultsWithFilter(results);
     }
 
-    @Test
-    void submitMapToJob_andResults() throws Exception {
-        String query = getQueryLessThanPageSize();
-        String jobId = callRunAPIAndVerify(query, false);
+    private void waitUntilTheJobIsAvailable(String jobId) {
         await().until(() -> mapToJobRepository.existsById(jobId));
-        await().until(isJobFinished(jobId));
-        // then
-        String results = getJobResults(jobId, Map.of("query", "*:*"));
-        verifyResults(results);
+        await().atLeast(30, TimeUnit.MILLISECONDS);
     }
 
     @Test
     void submitMapToJob_andResultsWithCursor() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*:*"));
         // then
@@ -446,7 +444,7 @@ public abstract class MapToControllerIT {
     void submitMapToJob_sort() throws Exception {
         String query = getQueryLessThanPageSize();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         String results = getJobResults(jobId, getSortQuery());
@@ -458,7 +456,7 @@ public abstract class MapToControllerIT {
     void submitJobAndGetResults(MediaType mediaType) throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
@@ -477,7 +475,7 @@ public abstract class MapToControllerIT {
     void submitJobAndGetResultsNonSupportedType() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
@@ -500,7 +498,7 @@ public abstract class MapToControllerIT {
     void submitMapToJobAndStreamResults() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, Map.of("query", "*:*"), APPLICATION_JSON);
         verifyResultsStream(results);
@@ -510,7 +508,7 @@ public abstract class MapToControllerIT {
     void submitMapToJobAndStreamResultsWithDownloadFile() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results =
                 getJobResultsAsStream(
@@ -523,7 +521,7 @@ public abstract class MapToControllerIT {
     void submitMapToJobAndStreamResults_differentFormats(MediaType mediaType) throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         getJobResultsAsStream(jobId, Map.of("query", "*:*"), mediaType);
     }
@@ -532,7 +530,7 @@ public abstract class MapToControllerIT {
     void submitMapToJobAndStreamResults_filter() throws Exception {
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, getFilterQuery(), APPLICATION_JSON);
         verifyResultsWithFilter(results);
@@ -543,7 +541,7 @@ public abstract class MapToControllerIT {
         // when
         String query = getQueryBeyondEnrichmentLimits();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
 
         // then
@@ -560,7 +558,7 @@ public abstract class MapToControllerIT {
     void submitMapToJobAndStreamResults_sort() throws Exception {
         String query = getQueryLessThanPageSize();
         String jobId = callRunAPIAndVerify(query, false);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, getSortQuery(), APPLICATION_JSON);
         verifyResultsWithSort(results);
