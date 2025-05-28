@@ -10,7 +10,6 @@ import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.PredefinedAPIStatus;
 
 @Service
 public class MapToJobService {
@@ -83,12 +82,11 @@ public class MapToJobService {
         return createMapToJob(mapToJob);
     }
 
-    public void setErrors(String jobId, String error) {
+    public void setErrors(String jobId, ProblemPair error) {
         MapToJob mapToJob = findMapToJob(jobId);
         mapToJob.setStatus(JobStatus.ERROR);
-        ProblemPair problemPair =
-                new ProblemPair(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), error);
-        mapToJob.setErrors(List.of(problemPair));
+        mapToJob.setErrors(List.of(error));
+        mapToJob.setUpdated(LocalDateTime.now());
         jobRepository.save(mapToJob);
     }
 }

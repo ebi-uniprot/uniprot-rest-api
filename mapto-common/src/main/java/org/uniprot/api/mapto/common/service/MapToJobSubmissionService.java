@@ -1,5 +1,6 @@
 package org.uniprot.api.mapto.common.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
@@ -23,29 +24,37 @@ public class MapToJobSubmissionService {
     private final MapToJobService mapToJobService;
     private final MapToSearchFacade mapToSearchFacade;
     private final RetryPolicy<Object> retryPolicy;
+    private final Integer maxTargetIdCount;
 
     public MapToJobSubmissionService(
             ThreadPoolTaskExecutor jobTaskExecutor,
             MapToHashGenerator hashGenerator,
             MapToJobService mapToJobService,
             MapToSearchFacade mapToSearchFacade,
-            RetryPolicy<Object> retryPolicy) {
+            RetryPolicy<Object> retryPolicy,
+            @Value("${id.mapping.max.to.ids.count:#{null}}") Integer maxTargetIdCount) {
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = hashGenerator;
         this.mapToJobService = mapToJobService;
         this.mapToSearchFacade = mapToSearchFacade;
         this.retryPolicy = retryPolicy;
+        this.maxTargetIdCount = maxTargetIdCount;
     }
 
     public JobSubmitResponse submit(MapToJobRequest mapToJobRequest) {
         String jobId = hashGenerator.generateHash(mapToJobRequest);
-        // create if the job doesn't exit. TODO handle error out jobs
+        // TODO handle error out jobs
         if (!mapToJobService.mapToJobExists(jobId)) {
             MapToJob mapToJob = mapToJobService.createMapToJob(jobId, mapToJobRequest);
             MapToSearchService mapToSearchService =
                     mapToSearchFacade.getMapToSearchService(mapToJobRequest.getSource());
             MapToTask mapToTask =
-                    new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy);
+                    new MapToTask(
+                            mapToSearchService,
+                            mapToJobService,
+                            mapToJob,
+                            retryPolicy,
+                            maxTargetIdCount);
             jobTaskExecutor.execute(mapToTask);
         } else {
             mapToJobService.updateUpdated(jobId);
@@ -57,8 +66,11 @@ public class MapToJobSubmissionService {
         MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
         return new JobStatusResponse(
                 mapToJob.getStatus(),
+                null,
+                mapToJob.getErrors(),
                 mapToJob.getCreated(),
                 mapToJob.getTargetIds() != null ? (long) mapToJob.getTargetIds().size() : null,
+                null,
                 mapToJob.getUpdated());
     }
 

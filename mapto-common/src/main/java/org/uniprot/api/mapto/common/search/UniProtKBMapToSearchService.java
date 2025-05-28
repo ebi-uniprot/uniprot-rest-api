@@ -5,7 +5,6 @@ import static org.uniprot.store.config.UniProtDataType.UNIREF;
 import java.util.*;
 import java.util.function.Function;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
@@ -27,24 +26,22 @@ public class UniProtKBMapToSearchService extends MapToSearchService {
             Map.of(
                     UNIREF,
                     uniProtDocument -> {
-                        List<String> unirefIds = new ArrayList<>();
+                        List<String> uniRefIds = new ArrayList<>();
                         if (uniProtDocument.unirefCluster50 != null) {
-                            unirefIds.add(uniProtDocument.unirefCluster50);
+                            uniRefIds.add(uniProtDocument.unirefCluster50);
                         }
                         if (uniProtDocument.unirefCluster90 != null) {
-                            unirefIds.add(uniProtDocument.unirefCluster90);
+                            uniRefIds.add(uniProtDocument.unirefCluster90);
                         }
                         if (uniProtDocument.unirefCluster100 != null) {
-                            unirefIds.add(uniProtDocument.unirefCluster100);
+                            uniRefIds.add(uniProtDocument.unirefCluster100);
                         }
-                        return unirefIds;
+                        return uniRefIds;
                     });
 
     public UniProtKBMapToSearchService(
-            @Value("${id.mapping.max.to.ids.count:#{null}}") Integer maxIdMappingToIdsCount,
             UniprotQueryRepository repository,
             UniProtKBRequestConverter uniProtKBRequestConverter) {
-        super(maxIdMappingToIdsCount);
         this.repository = repository;
         this.uniProtKBRequestConverter = uniProtKBRequestConverter;
     }

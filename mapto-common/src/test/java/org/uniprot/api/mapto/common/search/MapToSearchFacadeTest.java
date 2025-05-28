@@ -21,4 +21,11 @@ class MapToSearchFacadeTest {
 
         assertEquals(uniProtKBMapToSearchService, result);
     }
+
+    @Test
+    void getMapToSearchService_invalid() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> mapToSearchFacade.getMapToSearchService(UniProtDataType.LITERATURE));
+    }
 }

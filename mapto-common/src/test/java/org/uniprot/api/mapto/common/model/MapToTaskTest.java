@@ -25,6 +25,7 @@ class MapToTaskTest {
     public static final UniProtDataType UNIPROT_DATA_TYPE = UNIREF;
     public static final String ID = "jobId";
     public static final String CURSOR = "cursor";
+    private static final Integer MAX_TARGET_ID_COUNT = 19;
     private final RetryPolicy<Object> retryPolicy = new RetryPolicy<>();
     @Mock private MapToSearchService mapToSearchService;
     @Mock private MapToJobService mapToJobService;
@@ -38,15 +39,28 @@ class MapToTaskTest {
         lenient().when(mapToJob.getId()).thenReturn(ID);
         lenient().when(mapToJob.getQuery()).thenReturn(QUERY);
         lenient().when(mapToJob.getTargetDB()).thenReturn(UNIPROT_DATA_TYPE);
-        mapToTask = new MapToTask(mapToSearchService, mapToJobService, mapToJob, retryPolicy);
+        mapToTask =
+                new MapToTask(
+                        mapToSearchService,
+                        mapToJobService,
+                        mapToJob,
+                        retryPolicy,
+                        MAX_TARGET_ID_COUNT);
     }
 
     @Test
     void run_beyondTheLimits() {
-        when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
         when(searchResult.getPage()).thenReturn(page);
-        when(mapToSearchService.validateTargetLimit(any())).thenReturn("Limit exceeded");
+        when(page.hasNextPage()).thenReturn(true).thenReturn(false);
+        when(page.getEncryptedNextCursor()).thenReturn(CURSOR);
+        List<String> targetIds0 = getIds("target_0", 10);
+        List<String> targetIds1 = getIds("target_1", 10);
+        when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);
+        when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
+        when(mapToSearchService.getTargetIds(mapToJob, CURSOR)).thenReturn(searchResult);
+
         mapToTask.run();
+
         verify(mapToJobService).setErrors(any(), any());
         verify(mapToJobService, never()).setTargetIds(any(), any());
     }
@@ -55,7 +69,6 @@ class MapToTaskTest {
     void run_withinTheLimits() {
         when(mapToSearchService.getTargetIds(mapToJob, null)).thenReturn(searchResult);
         when(searchResult.getPage()).thenReturn(page);
-        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds = getIds("target", 10);
         when(searchResult.getTargetIds()).thenReturn(targetIds);
 
@@ -66,11 +79,24 @@ class MapToTaskTest {
     }
 
     @Test
+    void run_withinTheLimitsAndSolrFailing() {
+        String message = "Error in Processing";
+        when(mapToSearchService.getTargetIds(mapToJob, null))
+                .thenThrow(new RuntimeException(message));
+
+        mapToTask.run();
+
+        verify(mapToJobService)
+                .setErrors(
+                        eq(ID),
+                        argThat(pp -> pp.getCode() == 50 && pp.getMessage().equals(message)));
+    }
+
+    @Test
     void run_withinTheLimitsAndSubsequentCalls() {
         when(searchResult.getPage()).thenReturn(page);
         when(page.hasNextPage()).thenReturn(true).thenReturn(false);
         when(page.getEncryptedNextCursor()).thenReturn(CURSOR);
-        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds0 = getIds("target_0", 10);
         List<String> targetIds1 = getIds("target_1", 9);
         when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);
@@ -95,7 +121,6 @@ class MapToTaskTest {
         when(searchResult.getPage()).thenReturn(page);
         when(page.hasNextPage()).thenReturn(true).thenReturn(false);
         when(page.getEncryptedNextCursor()).thenReturn(CURSOR);
-        when(mapToSearchService.validateTargetLimit(any())).thenReturn(null);
         List<String> targetIds0 = getIds("target_0", 10);
         List<String> targetIds1 = getIds("target_1", 9);
         when(searchResult.getTargetIds()).thenReturn(targetIds0).thenReturn(targetIds1);

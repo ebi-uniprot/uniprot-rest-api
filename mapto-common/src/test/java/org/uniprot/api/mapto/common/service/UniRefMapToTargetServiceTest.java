@@ -30,6 +30,7 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
@@ -39,6 +40,9 @@ import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
 
 @ExtendWith(MockitoExtension.class)
 class UniRefMapToTargetServiceTest {
+    private static final String JOB_ID = "jobId";
+    public static final String DATA_TYPE = "dataType";
+    public static final String FORMAT = "format";
     @Mock private StoreStreamer<UniRefEntryLight> storeStreamer;
     @Mock private FacetTupleStreamTemplate tupleStreamTemplate;
     @Mock private UniRefFacetConfig facetConfig;
@@ -53,6 +57,8 @@ class UniRefMapToTargetServiceTest {
     private UniRefEntryLight entry1;
     private UniRefEntryLight entry2;
     private UniRefEntryLight entry3;
+    @Mock private MapToJob mapToJob;
+    @Mock private Stream resultStream;
 
     @BeforeEach
     void init() {
@@ -84,13 +90,14 @@ class UniRefMapToTargetServiceTest {
     @Test
     void testGetMappedEntriesWithoutSolr() {
         // when
-        UniRefSearchRequest searchRequest = new UniRefSearchRequest();
-        searchRequest.setSize(10);
-        when(this.storeStreamer.streamEntries(eq(toIds), any()))
-                .thenReturn(Stream.of(entry1, entry2, entry3));
+        UniRefSearchRequest searchRequest = mockMappedEntriesWithoutSolr();
         // then
         QueryResult<UniRefEntryLight> result =
                 this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+        assertMappedEntriesWithoutSolr(result);
+    }
+
+    private void assertMappedEntriesWithoutSolr(QueryResult<UniRefEntryLight> result) {
         assertNotNull(result);
         List<UniRefEntryLight> entries = result.getContent().collect(Collectors.toList());
         assertFalse(entries.isEmpty());
@@ -98,6 +105,14 @@ class UniRefMapToTargetServiceTest {
         assertEquals(List.of(entry1, entry2, entry3), entries);
         assertNull(result.getFacets());
         assertTrue(result.getWarnings().isEmpty());
+    }
+
+    private UniRefSearchRequest mockMappedEntriesWithoutSolr() {
+        UniRefSearchRequest searchRequest = new UniRefSearchRequest();
+        searchRequest.setSize(10);
+        when(this.storeStreamer.streamEntries(eq(toIds), any()))
+                .thenReturn(Stream.of(entry1, entry2, entry3));
+        return searchRequest;
     }
 
     @Test
@@ -260,22 +275,46 @@ class UniRefMapToTargetServiceTest {
     @Test
     void testStreamEntriesWithoutSolr() {
         // when
-        UniRefStreamRequest streamRequest = new UniRefStreamRequest();
-        when(this.storeStreamer.streamEntries(eq(toIds), any()))
-                .thenReturn(Stream.of(entry1, entry2, entry3));
+        UniRefStreamRequest streamRequest = mockStreamEntriesWithoutSolr();
         // then
         Stream<UniRefEntryLight> result =
                 this.mapToTargetService.streamEntries(streamRequest, toIds);
+        assertStreamEntries(result);
+    }
+
+    private void assertStreamEntries(Stream<UniRefEntryLight> result) {
         assertNotNull(result);
         List<UniRefEntryLight> entries = result.toList();
         assertEquals(3, entries.size());
         assertEquals(List.of(entry1, entry2, entry3), entries);
     }
 
+    private UniRefStreamRequest mockStreamEntriesWithoutSolr() {
+        UniRefStreamRequest streamRequest = new UniRefStreamRequest();
+        when(this.storeStreamer.streamEntries(eq(toIds), any()))
+                .thenReturn(Stream.of(entry1, entry2, entry3));
+        return streamRequest;
+    }
+
     @Test
     void testStreamEntriesWithSolr() throws IOException {
         // when
         UniRefStreamRequest streamRequest = new UniRefStreamRequest();
+        mockStreamEntriesWithSolr(streamRequest);
+        // then
+        Stream<UniRefEntryLight> result =
+                this.mapToTargetService.streamEntries(streamRequest, toIds);
+        assertStreamEntriesWithSolr(result);
+    }
+
+    private void assertStreamEntriesWithSolr(Stream<UniRefEntryLight> result) {
+        assertNotNull(result);
+        List<UniRefEntryLight> entries = result.toList();
+        assertEquals(3, entries.size());
+        assertEquals(List.of(entry3, entry2, entry1), entries);
+    }
+
+    private void mockStreamEntriesWithSolr(UniRefStreamRequest streamRequest) throws IOException {
         streamRequest.setSort("id desc"); // sort by descending order
         SolrRequest solrRequest = mock(SolrRequest.class);
         when(this.requestConverter.createStreamIdsSolrRequest(
@@ -303,12 +342,54 @@ class UniRefMapToTargetServiceTest {
         when(tupleStream.read()).thenReturn(tuple1, tuple2, tuple3, eofTuple);
         when(this.storeStreamer.streamEntries(eq(List.of(id3, id2, id1)), any()))
                 .thenReturn(Stream.of(entry3, entry2, entry1));
-        // then
-        Stream<UniRefEntryLight> result =
-                this.mapToTargetService.streamEntries(streamRequest, toIds);
-        assertNotNull(result);
-        List<UniRefEntryLight> entries = result.toList();
-        assertEquals(3, entries.size());
-        assertEquals(List.of(entry3, entry2, entry1), entries);
+    }
+
+    @Test
+    void streamEntries_withJobIdWithoutSolr() {
+        mockStreamEntriesWithoutSolr();
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTargetIds()).thenReturn(toIds);
+        UniRefStreamRequest streamRequest = new UniRefStreamRequest();
+
+        Stream<UniRefEntryLight> result = mapToTargetService.streamEntries(JOB_ID, streamRequest);
+
+        assertStreamEntries(result);
+    }
+
+    @Test
+    void streamEntries_withJobIdWithSolr() throws IOException {
+        UniRefStreamRequest streamRequest = new UniRefStreamRequest();
+        mockStreamEntriesWithSolr(streamRequest);
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTargetIds()).thenReturn(toIds);
+
+        Stream<UniRefEntryLight> result = mapToTargetService.streamEntries(JOB_ID, streamRequest);
+
+        assertStreamEntriesWithSolr(result);
+    }
+
+    @Test
+    void streamRdf() {
+        UniRefStreamRequest streamRequest = new UniRefStreamRequest();
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTargetIds()).thenReturn(toIds);
+        when(rdfStreamer.stream(any(Stream.class), same(DATA_TYPE), same(FORMAT)))
+                .thenReturn(resultStream);
+
+        Stream<String> result =
+                mapToTargetService.streamRdf(JOB_ID, streamRequest, DATA_TYPE, FORMAT);
+        assertSame(resultStream, result);
+    }
+
+    @Test
+    void getMappedEntries_withJobId() {
+        UniRefSearchRequest uniRefSearchRequest = mockMappedEntriesWithoutSolr();
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTargetIds()).thenReturn(toIds);
+
+        QueryResult<UniRefEntryLight> mappedEntries =
+                mapToTargetService.getMappedEntries(JOB_ID, uniRefSearchRequest);
+
+        assertMappedEntriesWithoutSolr(mappedEntries);
     }
 }

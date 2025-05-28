@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.download.model.JobStatus.*;
 import static org.uniprot.store.config.UniProtDataType.*;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
@@ -29,7 +31,7 @@ import org.uniprot.store.config.UniProtDataType;
 @ExtendWith(MockitoExtension.class)
 public class MapToJobServiceTest {
 
-    public static final JobStatus JOB_STATUS = JobStatus.RUNNING;
+    public static final JobStatus JOB_STATUS = RUNNING;
     public static final String ID = "id";
     private static final List<String> TARGET_IDS = List.of();
     public static final UniProtDataType SOURCE = UNIPROTKB;
@@ -94,6 +96,29 @@ public class MapToJobServiceTest {
 
         verify(mapToJob).setStatus(JOB_STATUS);
         verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(mapToJob);
+    }
+
+    @Test
+    void updateUpdated() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+
+        jobService.updateUpdated(ID);
+
+        verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(mapToJob);
+    }
+
+    @Test
+    void setErrors() {
+        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+
+        ProblemPair errors = new ProblemPair(20, "message");
+        jobService.setErrors(ID, errors);
+
+        verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(mapToJob).setErrors(List.of(errors));
+        verify(mapToJob).setStatus(ERROR);
         verify(jobRepository).save(mapToJob);
     }
 
