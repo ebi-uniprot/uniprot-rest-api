@@ -39,6 +39,7 @@ import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.common.service.TestConfig;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -107,7 +108,8 @@ class UniRefMessageConsumerIT
         downloadRequest.setFormat("json");
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("id,name,organism");
-        UniRefAsyncDownloadUtils.setUp(restTemplate);
+        // todo pass actual id
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref", "");
     }
 
     @Override

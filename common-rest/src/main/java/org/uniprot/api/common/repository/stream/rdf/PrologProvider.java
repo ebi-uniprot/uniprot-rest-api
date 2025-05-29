@@ -3,7 +3,6 @@ package org.uniprot.api.common.repository.stream.rdf;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RdfService;
 
 @Component
@@ -36,7 +35,7 @@ public class PrologProvider {
                 rdfService = rdfServiceFactory.getRdfService(dataType, format);
                 return rdfService.getProlog(firstBatch);
             case N_TRIPLES:
-                return NTriplesPrologs.N_TRIPLES_COMMON_PROLOG;
+                return "";
             default:
                 throw new IllegalArgumentException(String.format("Unsupported format %s", format));
         }

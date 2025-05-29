@@ -2,14 +2,20 @@ package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 
 /**
@@ -88,5 +94,38 @@ public class ControllerITUtils {
                         .orElse(null);
         assertThat(mappingInfo, notNullValue());
         return mappingInfo.getProducesCondition().getProducibleMediaTypes();
+    }
+
+    public static void mockRestTemplateResponsesForRDFFormats(
+            RestTemplate restTemplate, String dataType, String ids) {
+        String urlTemplate = "http://localhost/{dataType}/{format}/{ids}";
+        String urlRdf = getUrlWithFormat(dataType, "rdf", ids, urlTemplate);
+        String urlTtl = getUrlWithFormat(dataType, "ttl", ids, urlTemplate);
+        String urlNt = getUrlWithFormat(dataType, "nt", ids, urlTemplate);
+        DefaultUriBuilderFactory handler = new DefaultUriBuilderFactory(urlTemplate);
+        when(restTemplate.getUriTemplateHandler()).thenReturn(handler);
+        // Match by URI.toString()
+        when(restTemplate.getForObject(
+                        argThat(uri -> uri != null && uri.toString().equals(urlRdf)),
+                        eq(String.class)))
+                .thenReturn(SAMPLE_RDF);
+
+        when(restTemplate.getForObject(
+                        argThat(uri -> uri != null && uri.toString().equals(urlTtl)),
+                        eq(String.class)))
+                .thenReturn(SAMPLE_TTL);
+
+        when(restTemplate.getForObject(
+                        argThat(uri -> uri != null && uri.toString().equals(urlNt)),
+                        eq(String.class)))
+                .thenReturn(SAMPLE_N_TRIPLES);
+    }
+
+    private static String getUrlWithFormat(
+            String dataType, String format, String ids, String urlTemplate) {
+        return urlTemplate
+                .replace("{dataType}", dataType)
+                .replace("{format}", format)
+                .replace("{ids}", ids);
     }
 }

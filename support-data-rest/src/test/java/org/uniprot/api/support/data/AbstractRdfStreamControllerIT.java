@@ -31,8 +31,6 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
 
     protected abstract String getSearchAccession();
 
-    protected abstract String getRdfProlog();
-
     @Test
     void idSuccessRdfContentType() throws Exception {
         when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
@@ -54,17 +52,7 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        equalTo(
-                                                getRdfProlog()
-                                                        + "\n\n"
-                                                        + "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n"
-                                                        + "\n"
-                                                        + "</rdf:RDF>\n")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 
     @Test

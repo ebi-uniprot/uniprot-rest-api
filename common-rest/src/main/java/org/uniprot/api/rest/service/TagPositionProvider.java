@@ -2,11 +2,18 @@ package org.uniprot.api.rest.service;
 
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class TagPositionProvider {
     public static final String RDF = "rdf";
     public static final String TURTLE = "ttl";
     public static final String N_TRIPLES = "nt";
+    public static final String RDF_LAST_HEADER = "</owl:Ontology>";
+    public static final String TURTLE_LAST_HEADER =
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
+    public static final String RDF_CLOSING_TAG = "</rdf:RDF>";
 
     /**
      * Example: Start XML Tag Begin <?xml version='1.0' encoding='UTF-8'?> <rdf:RDF
@@ -28,11 +35,9 @@ public class TagPositionProvider {
     public int getStartingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                String rdfStartingTag = "</owl:Ontology>\n";
-                return body.indexOf(rdfStartingTag) + rdfStartingTag.length();
+                return getStartIndexOfBody(body, RDF_LAST_HEADER);
             case TURTLE:
-                String ttlStartingTag = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n";
-                return body.indexOf(ttlStartingTag) + ttlStartingTag.length();
+                return getStartIndexOfBody(body, TURTLE_LAST_HEADER);
             case N_TRIPLES:
                 return 0;
             default:
@@ -56,12 +61,33 @@ public class TagPositionProvider {
     public int getEndingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                return body.indexOf("</rdf:RDF>");
+                int index = body.indexOf(RDF_CLOSING_TAG);
+                if (index == -1) {
+                    log.error("No RDF closing tag found in body {}", body);
+                    throw new IllegalArgumentException(
+                            "Unable to find RDF closing tag : " + RDF_CLOSING_TAG);
+                }
+                return index;
             case TURTLE:
             case N_TRIPLES:
                 return body.length();
             default:
                 throw new IllegalArgumentException("Invalid format " + format);
         }
+    }
+
+    private int getStartIndexOfBody(String body, String lastHeader) {
+        int indexOfLastHeader = body.indexOf(lastHeader);
+        if (indexOfLastHeader == -1) {
+            log.error("No last header found in body {}", body);
+            throw new IllegalArgumentException("Unable to find last header : " + lastHeader);
+        }
+        int indexOfNewLine = body.indexOf('\n', indexOfLastHeader);
+        if (indexOfNewLine == -1) {
+            log.error("No new line found in the last header in body {}", body);
+            throw new IllegalArgumentException(
+                    "Unable to find new line in last header : " + lastHeader);
+        }
+        return indexOfNewLine + 1;
     }
 }

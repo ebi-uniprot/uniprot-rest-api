@@ -53,7 +53,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterRe
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
@@ -1082,11 +1081,6 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.UNIPROT_PROLOG;
-    }
-
-    @Override
     protected String getIdRequestPathWithoutPathVariable() {
         return "/uniprotkb/";
     }
@@ -1284,8 +1278,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                     .string(
                                                             equalTo(
                                                                     AbstractStreamControllerIT
-                                                                                    .SAMPLE_RDF
-                                                                            + "\n")))
+                                                                            .SAMPLE_RDF)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -1295,8 +1288,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                     .string(
                                                             equalTo(
                                                                     AbstractStreamControllerIT
-                                                                                    .SAMPLE_TTL
-                                                                            + "\n")))
+                                                                            .SAMPLE_TTL)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -1306,8 +1298,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                     .string(
                                                             equalTo(
                                                                     AbstractStreamControllerIT
-                                                                                    .SAMPLE_N_TRIPLES
-                                                                            + "\n")))
+                                                                            .SAMPLE_N_TRIPLES)))
                                     .build())
                     .build();
         }

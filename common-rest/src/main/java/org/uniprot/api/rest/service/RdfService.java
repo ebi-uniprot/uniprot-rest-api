@@ -84,6 +84,7 @@ public class RdfService<T> implements StoreService<T> {
         T rdfResponse = body;
         if (this.clazz == String.class) {
             String bodyString = (String) body;
+            // index of last header tag
             int startingPosition = tagPositionProvider.getStartingPosition(bodyString, format);
             int indexOfCloseTag = tagPositionProvider.getEndingPosition(bodyString, format);
             rdfResponse = (T) bodyString.substring(startingPosition, indexOfCloseTag);

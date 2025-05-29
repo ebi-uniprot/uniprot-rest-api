@@ -34,17 +34,17 @@ public abstract class RDFResultStreamerTest<T extends DownloadRequest, R extends
         when(request.getDownloadJobId()).thenReturn(ID);
         when(jobService.find(ID)).thenReturn(Optional.ofNullable(job));
         when(request.getFormat()).thenReturn(APPLICATION_RDF_XML);
-        Stream<String> ids = Stream.of("id1", "id2", "id3");
+        List<String> ids = List.of("id1", "id2", "id3");
         List<String> redfList = List.of("rdf1", "rdf2", "rdf3");
         Stream<String> rdf = redfList.stream();
         when(rdfStreamer.stream(
-                        eq(ids.toList()),
+                        eq(ids),
                         eq(rdfResultStreamer.getDataType()),
                         eq(RDF),
                         any(LongConsumer.class)))
                 .thenReturn(rdf);
 
-        Stream<String> result = rdfResultStreamer.stream(request, ids);
+        Stream<String> result = rdfResultStreamer.stream(request, ids.stream());
 
         assertThat(result).hasSameElementsAs(redfList);
     }

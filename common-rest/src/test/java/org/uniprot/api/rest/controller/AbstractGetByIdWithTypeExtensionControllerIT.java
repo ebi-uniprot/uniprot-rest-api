@@ -40,9 +40,11 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
 
     protected abstract String getSearchAccession();
 
-    protected abstract String getRdfProlog();
-
     protected abstract String getIdRequestPathWithoutPathVariable();
+
+    protected String getRDFType() {
+        return getIdRequestPathWithoutPathVariable();
+    }
 
     @BeforeAll
     void init() {
@@ -63,8 +65,9 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                                                         && uri.toString()
                                                                 .equals(
                                                                         "http://localhost"
-                                                                                + getIdRequestPathWithoutPathVariable()
-                                                                                + "rdf/Q8DIA7")),
+                                                                                + getRDFType()
+                                                                                + "rdf/"
+                                                                                + getSearchAccession())),
                                 eq(String.class)))
                 .thenReturn(SAMPLE_RDF);
 
@@ -76,8 +79,9 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                                                         && uri.toString()
                                                                 .equals(
                                                                         "http://localhost"
-                                                                                + getIdRequestPathWithoutPathVariable()
-                                                                                + "ttl/Q8DIA7")),
+                                                                                + getRDFType()
+                                                                                + "ttl/"
+                                                                                + getSearchAccession())),
                                 eq(String.class)))
                 .thenReturn(SAMPLE_TTL);
 
@@ -89,8 +93,9 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                                                         && uri.toString()
                                                                 .equals(
                                                                         "http://localhost"
-                                                                                + getIdRequestPathWithoutPathVariable()
-                                                                                + "nt/Q8DIA7")),
+                                                                                + getRDFType()
+                                                                                + "nt/"
+                                                                                + getSearchAccession())),
                                 eq(String.class)))
                 .thenReturn(SAMPLE_N_TRIPLES);
     }
@@ -110,7 +115,7 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(equalTo(SAMPLE_RDF + "\n")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 
     @ParameterizedTest(name = "[{index}] for {0}")

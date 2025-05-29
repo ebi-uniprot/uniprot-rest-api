@@ -229,7 +229,7 @@ class RdfServiceTest {
                     + "</rdf:Description>\n"
                     + "<rdf:Description rdf:about=\"P12345\">\n"
                     + "<rdf:type rdf:resource=\"http://purl.uniprot.org/core/Protein\"/>\n"
-                    + "</rdf:Description>\n";
+                    + "</rdf:Description>";
     private static String RDF_ENDING_TAG = "</rdf:RDF>";
 
     private static String TURTLE_PROLOG_BODY =

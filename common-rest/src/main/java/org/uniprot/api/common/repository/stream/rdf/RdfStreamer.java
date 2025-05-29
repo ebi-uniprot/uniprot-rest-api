@@ -50,7 +50,10 @@ public class RdfStreamer {
 
         Stream<String> rdfStringStream =
                 createRdfStream(batchRDFXMLStoreIterable, dataType, format, consumer);
-
+        //        String temp = concatenateWithPrologAndClosingTag(firstBatch, dataType, format,
+        // rdfStringStream).collect(Collectors.joining());
+        //        System.out.println(temp);
+        //        return Stream.of(temp);
         return concatenateWithPrologAndClosingTag(firstBatch, dataType, format, rdfStringStream);
     }
 

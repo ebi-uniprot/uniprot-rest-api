@@ -1,11 +1,9 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
 
@@ -25,16 +23,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RdfPrologs;
-import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
@@ -83,8 +78,8 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
 
     @BeforeEach
     void setUp() {
-        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(
+                restTemplate, "uniparc", UNIPARC_ID);
     }
 
     @Test
@@ -242,57 +237,19 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(containsString(SOURCES))))
-                                    .resultMatcher(
-                                            content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
+                                    .resultMatcher(content().string(equalTo(SAMPLE_RDF)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(containsString(SOURCES))))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    TurtlePrologs.UNIPARC_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
+                                    .resultMatcher(content().string(equalTo(SAMPLE_TTL)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(containsString(SOURCES))))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    NTriplesPrologs
-                                                                            .N_TRIPLES_COMMON_PROLOG)))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    """
-                                                                                <sample>text</sample>
-                                                                                <anotherSample>text2</anotherSample>
-                                                                                <someMore>text3</someMore>
-                                                                            </rdf:RDF>""")))
-                                    .resultMatcher(content().string(not(containsString(SOURCES))))
+                                    .resultMatcher(content().string(equalTo(SAMPLE_N_TRIPLES)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

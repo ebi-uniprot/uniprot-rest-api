@@ -46,7 +46,6 @@ import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.config.UniProtDataType;
@@ -202,15 +201,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n\n"
-                                                        + "</rdf:RDF>")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 
     @Test

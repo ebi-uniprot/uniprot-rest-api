@@ -44,6 +44,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.common.service.TestConfig;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -116,7 +117,8 @@ class UniProtKBMessageConsumerIT
         downloadRequest.setFormat("json");
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("accession,id,gene_names");
-        UniProtKBAsyncDownloadUtils.setUp(restTemplate);
+        // todo pass actual id
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb", "");
         embeddingsQueueConfigProperties.setMaxEntryCount(MAX_ENTRY_COUNT);
     }
 
