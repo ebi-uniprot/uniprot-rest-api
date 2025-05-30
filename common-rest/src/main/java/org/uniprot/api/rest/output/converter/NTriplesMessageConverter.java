@@ -17,6 +17,6 @@ public class NTriplesMessageConverter extends AbstractEntityIdHttpMessageConvert
 
     @Override
     protected void writeEntity(String entity, OutputStream outputStream) throws IOException {
-        outputStream.write((entity + "\n").getBytes());
+        outputStream.write((entity).getBytes());
     }
 }

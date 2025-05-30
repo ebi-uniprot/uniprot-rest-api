@@ -23,6 +23,6 @@ class RdfMessageConverterTest {
         String result = outputStream.toString("UTF-8");
 
         assertNotNull(result);
-        assertEquals("entity\n", result);
+        assertEquals("entity", result);
     }
 }

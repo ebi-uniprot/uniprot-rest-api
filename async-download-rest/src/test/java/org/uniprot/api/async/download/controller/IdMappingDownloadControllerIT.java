@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.async.download.common.RedisUtil.jobCreatedInRedis;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -283,6 +282,7 @@ public class IdMappingDownloadControllerIT {
                 .thenReturn(
                         "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
                                 + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
+                                + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
                                 + "<UPI000012A72A> rdf:type up:Protein ;\n"
                                 + "<UPI000012A73A> rdf:type up:Protein ;\n"
                                 + "<SAMPLE> rdf:type up:Protein ;");
@@ -293,6 +293,7 @@ public class IdMappingDownloadControllerIT {
                 .thenReturn(
                         "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
                                 + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
+                                + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
                                 + "<UniRef100_P21802> rdf:type up:Protein ;\n"
                                 + "<UniRef100_P21803> rdf:type up:Protein ;\n"
                                 + "<SAMPLE> rdf:type up:Protein ;");
@@ -1352,7 +1353,7 @@ public class IdMappingDownloadControllerIT {
                 assertTrue(text.contains("<SAMPLE> rdf:type up:Protein ;"));
                 break;
             case UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE:
-                assertTrue(text.contains(SAMPLE_N_TRIPLES));
+                assertTrue(text.contains("<http://purl.uniprot.org/uniprot/SAMPLE>"));
                 break;
             case UniProtMediaType.RDF_MEDIA_TYPE_VALUE:
                 assertTrue(text.contains("<rdf:RDF"));

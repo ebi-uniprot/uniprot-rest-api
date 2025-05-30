@@ -50,14 +50,19 @@ public abstract class AbstractStreamControllerIT {
                     + "</rdf:RDF>";
 
     public static final String SAMPLE_N_TRIPLES =
-            "<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .";
+            "<http://purl.uniprot.org/uniprot/P05067> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/Protein> .\n"
+                    + "<http://purl.uniprot.org/uniprot/P05067> <http://purl.uniprot.org/core/reviewed> \"true\"^^<http://www.w3.org/2001/XMLSchema#boolean> .\n"
+                    + "<http://purl.uniprot.org/uniprot/P05067> <http://purl.uniprot.org/core/created> \"1987-08-13\"^^<http://www.w3.org/2001/XMLSchema#date> .\n"
+                    + "<http://purl.uniprot.org/uniprot/P05067> <http://purl.uniprot.org/core/modified> \"2025-04-09\"^^<http://www.w3.org/2001/XMLSchema#date> .";
 
     public static final String SAMPLE_TTL =
-            "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
+            "@base <http://purl.uniprot.org/uniprot/> .\n"
+                    + "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
                     + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
                     + "@prefix uniref: <http://purl.uniprot.org/uniref/> .\n"
                     + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-                    + "<SAMPLE> rdf:type up:Protein ;";
+                    + "value1 value2 value3 .\n"
+                    + "anothervalue1 anothervalue2 anothervalue3 .";
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 

@@ -1,5 +1,6 @@
 package org.uniprot.api.support.data;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,8 +32,6 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
 
     protected abstract String getSearchAccession();
 
-    protected abstract String getRdfProlog();
-
     @Test
     void idSuccessRdfContentType() throws Exception {
         when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
@@ -54,17 +53,35 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
+    }
+
+    @Test
+    void streamRDFFormatWithMissingLastHeaderFailure() throws Exception {
+        when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(getRestTemple().getForObject(any(), any())).thenReturn("<random/>");
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .queryParam("query", "id:" + getSearchAccession())
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
-                                        equalTo(
-                                                getRdfProlog()
-                                                        + "\n\n"
-                                                        + "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n"
-                                                        + "\n"
-                                                        + "</rdf:RDF>\n")));
+                                        containsString(
+                                                "<messages>Unable to find last header : &lt;/owl:Ontology&gt;</messages>")));
     }
 
     @Test

@@ -33,7 +33,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
@@ -462,10 +461,5 @@ class SubcellularLocationStreamControllerIT extends AbstractRdfStreamControllerI
     @Override
     protected String getSearchAccession() {
         return searchAccession;
-    }
-
-    @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.SUBCELLULAR_LOCATION_PROLOG;
     }
 }

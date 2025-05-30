@@ -31,7 +31,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
@@ -238,11 +237,6 @@ class CrossRefStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Override
     protected String getSearchAccession() {
         return searchAccession;
-    }
-
-    @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.XREF_PROLOG;
     }
 
     private void saveEntry(long suffix) {

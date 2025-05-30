@@ -346,18 +346,6 @@ class UniRefLightGetIdControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "<?xml version='1.0' encoding='UTF-8'?>\n"
-                                                        + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\" xmlns:uniref=\"http://purl.uniprot.org/uniref/\">\n"
-                                                        + "<owl:Ontology rdf:about=\"\">\n"
-                                                        + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
-                                                        + "</owl:Ontology>\n"
-                                                        + "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n"
-                                                        + "</rdf:RDF>")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 }

@@ -43,7 +43,6 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceStoreClient;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.cv.taxonomy.TaxonomyRepo;
@@ -126,15 +125,7 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n\n"
-                                                        + "</rdf:RDF>")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 
     @Test

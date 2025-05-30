@@ -49,6 +49,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.common.service.TestConfig;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -120,7 +121,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpRestTemplate() {
-        UniProtKBAsyncDownloadUtils.setUp(restTemplate);
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb");
     }
 
     @Test
