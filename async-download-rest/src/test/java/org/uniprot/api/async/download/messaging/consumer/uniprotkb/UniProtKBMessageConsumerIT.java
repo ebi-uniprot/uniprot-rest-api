@@ -117,8 +117,7 @@ class UniProtKBMessageConsumerIT
         downloadRequest.setFormat("json");
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("accession,id,gene_names");
-        // todo pass actual id
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb");
         embeddingsQueueConfigProperties.setMaxEntryCount(MAX_ENTRY_COUNT);
     }
 

@@ -187,7 +187,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Override
     protected void saveEntry() {
-        initUniprotKbDataStore();
+        initUniProtKbDataStore();
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
@@ -197,7 +197,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         return ACCESSION_RESOURCE;
     }
 
-    void initUniprotKbDataStore() {
+    void initUniProtKbDataStore() {
         UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
 
         DataStoreManager dsm = getStoreManager();

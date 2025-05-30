@@ -107,8 +107,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpRestTemplate() {
-        // todo pass actual id
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref");
     }
 
     @Test

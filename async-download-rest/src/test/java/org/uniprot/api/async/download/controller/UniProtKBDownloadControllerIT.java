@@ -121,8 +121,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpRestTemplate() {
-        // todo pass actual ids
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniprotkb");
     }
 
     @Test

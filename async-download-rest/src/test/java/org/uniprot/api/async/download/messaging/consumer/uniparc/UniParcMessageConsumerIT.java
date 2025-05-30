@@ -116,7 +116,7 @@ class UniParcMessageConsumerIT
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("upi,length,organism");
         // todo pass actual id
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniparc", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniparc");
     }
 
     @Override

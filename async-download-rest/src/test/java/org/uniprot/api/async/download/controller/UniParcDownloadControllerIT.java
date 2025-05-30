@@ -117,8 +117,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpRestTemplate() {
-        // tODO pass actual ids
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniparc", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniparc");
     }
 
     @Test

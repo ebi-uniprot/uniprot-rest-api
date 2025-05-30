@@ -59,8 +59,7 @@ class UniParcLightGetIdControllerIT extends BaseUniParcGetByIdControllerTest {
 
     @BeforeEach
     void setUp() {
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(
-                restTemplate, "uniparc", UNIPARC_ID);
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniparc");
     }
 
     @Test

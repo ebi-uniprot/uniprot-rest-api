@@ -108,8 +108,7 @@ class UniRefMessageConsumerIT
         downloadRequest.setFormat("json");
         downloadRequest.setQuery("Human");
         downloadRequest.setFields("id,name,organism");
-        // todo pass actual id
-        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref", "");
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref");
     }
 
     @Override
