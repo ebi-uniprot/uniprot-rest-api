@@ -35,9 +35,9 @@ public class TagPositionProvider {
     public int getStartingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                return getStartIndexOfBody(body, RDF_LAST_HEADER);
+                return getBodyStartIndexAfterHeader(body, RDF_LAST_HEADER);
             case TURTLE:
-                return getStartIndexOfBody(body, TURTLE_LAST_HEADER);
+                return getBodyStartIndexAfterHeader(body, TURTLE_LAST_HEADER);
             case N_TRIPLES:
                 return 0;
             default:
@@ -76,7 +76,7 @@ public class TagPositionProvider {
         }
     }
 
-    private int getStartIndexOfBody(String body, String lastHeader) {
+    private int getBodyStartIndexAfterHeader(String body, String lastHeader) {
         int indexOfLastHeader = body.indexOf(lastHeader);
         if (indexOfLastHeader == -1) {
             log.error("No last header found in body {}", body);
