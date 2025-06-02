@@ -64,7 +64,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 
-    @Value("${id.mapping.max.to.ids.count:#{null}}") // value to 500k
+    @Value("${mapping.max.to.ids.count:#{null}}") // value to 500k
     private Integer maxIdMappingToIdsCount;
 
     @Autowired

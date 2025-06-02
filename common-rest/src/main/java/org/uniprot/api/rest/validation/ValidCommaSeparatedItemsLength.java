@@ -32,7 +32,7 @@ public @interface ValidCommaSeparatedItemsLength {
     class ListLengthValidator
             implements ConstraintValidator<ValidCommaSeparatedItemsLength, String> {
 
-        @Value("${id.mapping.max.from.ids.count:#{null}}")
+        @Value("${mapping.max.from.ids.count:#{null}}")
         private Integer maxLength;
 
         @Override

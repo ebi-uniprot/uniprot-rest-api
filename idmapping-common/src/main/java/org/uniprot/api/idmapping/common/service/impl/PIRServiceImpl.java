@@ -71,8 +71,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
             @Value(
                             "${id.mapping.pir.url:https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async}")
                     String pirMappingUrl,
-            @Value("${id.mapping.max.to.ids.count:#{null}}") Integer maxIdMappingToIdsCount,
-            @Value("${id.mapping.max.to.ids.enrich.count:#{null}}")
+            @Value("${mapping.max.to.ids.count:#{null}}") Integer maxIdMappingToIdsCount,
+            @Value("${mapping.max.to.ids.enrich.count:#{null}}")
                     Integer maxIdMappingToIdsCountEnriched) {
 
         super(defaultPageSize);

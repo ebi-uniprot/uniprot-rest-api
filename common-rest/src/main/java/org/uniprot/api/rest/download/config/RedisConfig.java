@@ -19,7 +19,7 @@ import org.springframework.core.io.Resource;
 public class RedisConfig {
     @Bean(destroyMethod = "shutdown")
     @Profile("redis & live")
-    public RedissonClient redisson(@Value("${download.redis.config.file}") Resource configFile)
+    public RedissonClient redisson(@Value("${redis.config.file}") Resource configFile)
             throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
         return Redisson.create(config);

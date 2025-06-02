@@ -74,13 +74,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobControllerIT {
-    @Value("${id.mapping.max.from.ids.count}")
+    @Value("${mapping.max.from.ids.count}")
     private Integer maxCountCSV;
 
-    @Value("${id.mapping.max.to.ids.enrich.count}")
+    @Value("${mapping.max.to.ids.enrich.count}")
     private Integer maxAllowedIdsToEnrich;
 
-    @Value("${id.mapping.max.to.ids.count}")
+    @Value("${mapping.max.to.ids.count}")
     private Integer maxAllowedToIds;
 
     private static final String JOB_SUBMIT_ENDPOINT = IDMAPPING_PATH + "/run";
@@ -495,7 +495,7 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from
      * and to result without any uniprot data in the status/{jobId} response. So to do that we just
      * return the plain results url redirect without any db in the path even though the mapped to id
      * is uniprotkb, uniparc or uniref ids plain result url :
@@ -549,7 +549,7 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from
      * and to result without any uniprot data. So to do that we just return the plain results url
      * redirect without any db in the path even though the mapped to id is uniprotkb, uniparc or
      * uniref ids plain result url : https://localhost/idmapping/results/{jobId}

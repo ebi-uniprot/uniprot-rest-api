@@ -31,10 +31,10 @@ import org.uniprot.api.rest.download.model.JobStatus;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractIdMappingPIRResultsControllerIT {
-    @Value("${id.mapping.max.from.ids.count}")
+    @Value("${mapping.max.from.ids.count}")
     protected Integer maxFromIdsAllowed;
 
-    @Value("${id.mapping.max.to.ids.count}")
+    @Value("${mapping.max.to.ids.count}")
     protected Integer maxToIdsAllowed;
 
     @Autowired protected JobOperation idMappingResultJobOp;

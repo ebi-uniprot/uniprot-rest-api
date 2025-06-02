@@ -32,7 +32,7 @@ public class MapToJobSubmissionService {
             MapToJobService mapToJobService,
             MapToSearchFacade mapToSearchFacade,
             RetryPolicy<Object> retryPolicy,
-            @Value("${id.mapping.max.to.ids.count:#{null}}") Integer maxTargetIdCount) {
+            @Value("${mapping.max.to.ids.count:#{null}}") Integer maxTargetIdCount) {
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = hashGenerator;
         this.mapToJobService = mapToJobService;
