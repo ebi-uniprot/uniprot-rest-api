@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
@@ -130,12 +131,15 @@ class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControlle
                         });
     }
 
-    @BeforeAll
-    void saveEntriesStore() throws Exception {
+    @BeforeEach
+    void setUp() {
         when(idMappingRdfRestTemplate.getUriTemplateHandler())
                 .thenReturn(new DefaultUriBuilderFactory());
         when(idMappingRdfRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
 
+    @BeforeAll
+    void saveEntriesStore() throws Exception {
         saveEntries(cloudSolrClient, storeClient);
     }
 

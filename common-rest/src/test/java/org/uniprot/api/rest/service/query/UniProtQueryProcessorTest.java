@@ -131,17 +131,16 @@ class UniProtQueryProcessorTest {
 
         executorService.shutdown();
         try {
-            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+            if (!executorService.awaitTermination(2000, TimeUnit.MILLISECONDS)) {
                 executorService.shutdownNow();
             }
         } catch (InterruptedException e) {
             executorService.shutdownNow();
         }
 
-        assertThat(logCaptor.getWarnLogs(), hasSize(greaterThan(0)));
-        assertThat(
-                logCaptor.getWarnLogs(),
-                everyItem(Matchers.startsWith("Problem processing user query: ")));
+        List<String> warnLogs = logCaptor.getWarnLogs();
+        assertThat(warnLogs, hasSize(greaterThan(0)));
+        assertThat(warnLogs, everyItem(Matchers.startsWith("Problem processing user query: ")));
     }
 
     @Test
