@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.api.common.repository.stream.rdf.PrologProvider.PREFIX_BASE;
+import static org.uniprot.api.common.repository.stream.rdf.PrologProvider.PREFIX_PREFIX;
+
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +14,6 @@ public class TagPositionProvider {
     public static final String TURTLE = "ttl";
     public static final String N_TRIPLES = "nt";
     public static final String RDF_LAST_HEADER = "</owl:Ontology>";
-    public static final String TURTLE_LAST_HEADER =
-            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
     public static final String RDF_CLOSING_TAG = "</rdf:RDF>";
 
     /**
@@ -37,7 +38,7 @@ public class TagPositionProvider {
             case RDF:
                 return getBodyStartIndexAfterHeader(body, RDF_LAST_HEADER);
             case TURTLE:
-                return getBodyStartIndexAfterHeader(body, TURTLE_LAST_HEADER);
+                return getBodyStartIndexAfterTurtleHeader(body);
             case N_TRIPLES:
                 return 0;
             default:
@@ -89,5 +90,21 @@ public class TagPositionProvider {
                     "Unable to find new line in last header : " + lastHeader);
         }
         return indexOfNewLine + 1;
+    }
+
+    private int getBodyStartIndexAfterTurtleHeader(String content) {
+        int index = 0;
+        for (String line : content.lines().toList()) {
+            if (!isTurtleProlog(line)) {
+                return index;
+            }
+            index += line.length() + 1;
+        }
+        log.error("No body found in content {}", content);
+        throw new IllegalArgumentException("Unable to find turtle body.");
+    }
+
+    boolean isTurtleProlog(String line) {
+        return line.startsWith(PREFIX_BASE) || line.startsWith(PREFIX_PREFIX);
     }
 }

@@ -44,9 +44,26 @@ class TagPositionProviderTest {
 
     @Test
     void testGetStartingPositionTurtleSuccess() {
-        String body = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n<some:Triple>";
+        String body =
+                "@base <http://purl.uniprot.org/uniprot/> .\n"
+                        + "@prefix annotation: <http://purl.uniprot.org/annotation/> .\n"
+                        + "@prefix citation: <http://purl.uniprot.org/citations/> .\n"
+                        + "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
+                        + "@prefix disease: <http://purl.uniprot.org/diseases/> .\n<some:Triple>";
         int pos = provider.getStartingPosition(body, "ttl");
         assertEquals(body.indexOf("<some:Triple>"), pos);
+    }
+
+    @Test
+    void testGetStartingPositionTurtleFailureWithoutBody() {
+        String body =
+                "@base <http://purl.uniprot.org/uniprot/> .\n"
+                        + "@prefix annotation: <http://purl.uniprot.org/annotation/> .\n"
+                        + "@prefix citation: <http://purl.uniprot.org/citations/> .\n"
+                        + "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
+                        + "@prefix disease: <http://purl.uniprot.org/diseases/> .\n";
+        assertThrows(
+                IllegalArgumentException.class, () -> provider.getStartingPosition(body, "ttl"));
     }
 
     @Test

@@ -97,7 +97,7 @@ public class RdfService<T> implements StoreService<T> {
             case TURTLE:
                 StringBuilder prologBuilder = new StringBuilder();
                 content.lines()
-                        .takeWhile(this::isTurtleProlog)
+                        .takeWhile(tagPositionProvider::isTurtleProlog)
                         .forEach(line -> prologBuilder.append(line).append('\n'));
                 return prologBuilder.toString();
             case RDF:
@@ -106,9 +106,5 @@ public class RdfService<T> implements StoreService<T> {
             default:
                 return "";
         }
-    }
-
-    private boolean isTurtleProlog(String line) {
-        return line.startsWith(PREFIX_BASE) || line.startsWith(PREFIX_PREFIX);
     }
 }
