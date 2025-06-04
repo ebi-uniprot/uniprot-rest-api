@@ -19,7 +19,10 @@ import java.util.stream.Stream;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -338,6 +341,41 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
+    }
+
+    @Test
+    void streamTSVWithPfam() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
+                        .param("query", "*:*")
+                        .param("fields", "upi,Pfam");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE.toString()))
+                .andExpect(
+                        content()
+                                .string(
+                                        "Entry\tPfam\n"
+                                                + "UPI0000283A01\tSIG000001\n"
+                                                + "UPI0000283A02\tSIG000002\n"
+                                                + "UPI0000283A03\tSIG000003\n"
+                                                + "UPI0000283A04\tSIG000004\n"
+                                                + "UPI0000283A05\tSIG000005\n"
+                                                + "UPI0000283A06\tSIG000006\n"
+                                                + "UPI0000283A07\tSIG000007\n"
+                                                + "UPI0000283A08\tSIG000008\n"
+                                                + "UPI0000283A09\tSIG000009\n"
+                                                + "UPI0000283A10\tSIG000010\n"));
     }
 
     @Override
