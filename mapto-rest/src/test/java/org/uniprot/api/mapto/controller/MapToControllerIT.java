@@ -414,7 +414,7 @@ public abstract class MapToControllerIT {
 
     private void waitUntilTheJobIsAvailable(String jobId) {
         await().until(() -> mapToJobRepository.existsById(jobId));
-        await().atLeast(30, TimeUnit.MILLISECONDS);
+        await().atLeast(50, TimeUnit.MILLISECONDS);
     }
 
     @Test
@@ -574,15 +574,11 @@ public abstract class MapToControllerIT {
 
     protected abstract String getFacets();
 
-    protected abstract String getPath();
-
     protected abstract void verifyResultsWithSort(String results);
 
     protected abstract Map<String, String> getSortQuery();
 
     protected abstract Map<String, String> getFilterQuery();
-
-    protected abstract void verifyResults(String results);
 
     protected abstract void verifyResultsWithPaginationPageOne(String resultsJson);
 

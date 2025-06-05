@@ -50,6 +50,7 @@ public class MapToTask implements Runnable {
             mapToJobService.setErrors(
                     jobId,
                     new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), e.getMessage()));
+            log.error("Job with id %s finished with error %s".formatted(jobId, e.getMessage()));
         }
     }
 

@@ -9,10 +9,8 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.mapto.controller.UniProtKBUniRefMapToController.UNIPROTKB_UNIREF;
 import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.*;
@@ -170,7 +168,7 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                         .param("facets", "identity");
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets").exists())
@@ -252,11 +250,6 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
     }
 
     @Override
-    protected String getPath() {
-        return UNIPROTKB_UNIREF;
-    }
-
-    @Override
     protected void verifyResultsWithSort(String resultsJson) {
         List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.id");
         List<String> expected =
@@ -276,29 +269,6 @@ class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
                 JsonPath.read(resultsJson, "$.results[8].representativeMember.accessions[0]");
         assertEquals("P12301", accession);
         String memberId = JsonPath.read(resultsJson, "$.results[8].representativeMember.memberId");
-        assertEquals("P12301_HUMAN", memberId);
-    }
-
-    @Override
-    protected void verifyResults(String resultsJson) {
-        List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.id");
-        List<String> expected =
-                List.of(
-                        "UniRef100_P00001",
-                        "UniRef100_P00002",
-                        "UniRef100_P00003",
-                        "UniRef50_P00001",
-                        "UniRef50_P00002",
-                        "UniRef50_P00003",
-                        "UniRef90_P00001",
-                        "UniRef90_P00002",
-                        "UniRef90_P00003");
-        assertEquals(new LinkedList<>(expected), new LinkedList<>(uniRefIds));
-        assertEquals(9, uniRefIds.size());
-        String accession =
-                JsonPath.read(resultsJson, "$.results[0].representativeMember.accessions[0]");
-        assertEquals("P12301", accession);
-        String memberId = JsonPath.read(resultsJson, "$.results[0].representativeMember.memberId");
         assertEquals("P12301_HUMAN", memberId);
     }
 

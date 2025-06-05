@@ -43,7 +43,7 @@ public abstract class AbstractIdService<T> {
     @Value("${mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
     // Maximum number of `to` ids supported with faceting query
-    @Value("${mapping.max.to.ids.with.facets.count:#{null}}") // value to 10k
+    @Value("${mapping.max.to.ids.with.facets.count:#{null}}") // value to 25k
     private Integer maxIdMappingToIdsCountWithFacets;
 
     // config related to faceting
