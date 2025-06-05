@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.AfterAll;
@@ -41,7 +42,8 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"))
                     .withExposedPorts(5672, 15672)
                     .waitingFor(Wait.forLogMessage(".*Server startup complete.*", 1))
-                    .withStartupTimeout(Duration.ofMinutes(2));
+                    .withStartupTimeout(Duration.ofMinutes(2))
+                    .withTmpFs(Map.of("/var/lib/rabbitmq", "rw"));
 
     @Container
     protected static GenericContainer<?> redisContainer =

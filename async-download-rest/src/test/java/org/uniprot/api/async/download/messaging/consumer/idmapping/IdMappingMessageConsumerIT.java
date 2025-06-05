@@ -20,6 +20,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
@@ -141,7 +143,11 @@ public class IdMappingMessageConsumerIT {
 
     @Container
     private static final RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"))
+                    .withExposedPorts(5672, 15672)
+                    .waitingFor(Wait.forLogMessage(".*Server startup complete.*", 1))
+                    .withStartupTimeout(Duration.ofMinutes(2))
+                    .withTmpFs(Map.of("/var/lib/rabbitmq", "rw"));
 
     @Container
     private static final GenericContainer<?> redisContainer =
