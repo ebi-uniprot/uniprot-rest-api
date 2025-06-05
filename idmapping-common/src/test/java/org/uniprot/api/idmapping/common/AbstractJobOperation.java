@@ -21,7 +21,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
  * @created 03/03/2021
  */
 public abstract class AbstractJobOperation implements JobOperation {
-    public static final int DEFAULT_IDS_COUNT = 20; // same as id.mapping.max.from.ids.count
+    public static final int DEFAULT_IDS_COUNT = 20; // same as mapping.max.from.ids.count
     private final IdMappingJobCacheService cacheService;
 
     public AbstractJobOperation(IdMappingJobCacheService cacheService) {
