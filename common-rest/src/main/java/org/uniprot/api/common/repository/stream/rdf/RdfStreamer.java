@@ -50,10 +50,7 @@ public class RdfStreamer {
 
         Stream<String> rdfStringStream =
                 createRdfStream(batchRDFXMLStoreIterable, dataType, format, consumer);
-        //        String temp = concatenateWithPrologAndClosingTag(firstBatch, dataType, format,
-        // rdfStringStream).collect(Collectors.joining());
-        //        System.out.println(temp);
-        //        return Stream.of(temp);
+
         return concatenateWithPrologAndClosingTag(firstBatch, dataType, format, rdfStringStream);
     }
 
@@ -100,7 +97,7 @@ public class RdfStreamer {
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
                 Stream.of(
-                        prologProvider.getProLog(
+                        prologProvider.getProlog(
                                 firstBatch, this.rdfServiceFactory, dataType, format)),
                 Stream.concat(rdfStringStream, Stream.of(prologProvider.getClosingTag(format))));
     }

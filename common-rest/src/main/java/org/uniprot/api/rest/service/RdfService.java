@@ -60,7 +60,7 @@ public class RdfService<T> implements StoreService<T> {
     }
 
     public String getProlog(List<String> ids) {
-        if (!(this.clazz == String.class)) {
+        if (this.clazz != String.class) {
             return "";
         }
         T response = getEntriesByAccessions(ids, this.dataType, this.format);
@@ -103,6 +103,7 @@ public class RdfService<T> implements StoreService<T> {
             case RDF:
                 int startingPosition = tagPositionProvider.getStartingPosition(content, format);
                 return content.substring(0, startingPosition);
+            case N_TRIPLES:
             default:
                 return "";
         }

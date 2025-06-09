@@ -23,7 +23,7 @@ public class PrologProvider {
     public static final String PREFIX_BASE = "@base";
     public static final String PREFIX_PREFIX = "@prefix";
 
-    public String getProLog(
+    public String getProlog(
             List<String> firstBatch,
             RdfServiceFactory rdfServiceFactory,
             String dataType,
@@ -32,10 +32,9 @@ public class PrologProvider {
         switch (format) {
             case RDF:
             case TURTLE:
+            case N_TRIPLES:
                 rdfService = rdfServiceFactory.getRdfService(dataType, format);
                 return rdfService.getProlog(firstBatch);
-            case N_TRIPLES:
-                return "";
             default:
                 throw new IllegalArgumentException(String.format("Unsupported format %s", format));
         }
