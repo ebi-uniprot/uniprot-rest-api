@@ -60,7 +60,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final HashGenerator<IdMappingJobRequest> hashGenerator;
     private final IdMappingRepository idMappingRepository;
 
-    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
+    @Value("${mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
 
     private static final String SALT_STR = "UNIPROT_IDMAPPING_SALT";

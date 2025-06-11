@@ -26,7 +26,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
-import org.uniprot.api.async.download.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.async.download.controller.TestAsyncConfig;
 import org.uniprot.api.async.download.controller.UniRefAsyncConfig;
 import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
@@ -46,6 +45,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.util.UniRefAsyncDownloadUtils;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -95,7 +95,7 @@ class UniRefMessageConsumerIT
     void beforeAll() throws Exception {
         prepareDownloadFolders();
         UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient);
+                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient, 4);
     }
 
     @BeforeEach

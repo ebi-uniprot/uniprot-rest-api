@@ -34,4 +34,9 @@ public class UniRefSearchRequest extends UniRefBasicRequest implements SearchReq
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
+
+    @Override
+    public void removeFacets() {
+        this.facets = null;
+    }
 }
