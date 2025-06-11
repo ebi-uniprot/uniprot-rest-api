@@ -120,16 +120,16 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
         return facetTupleStreamTemplate;
     }
 
-    @BeforeAll
-    void saveEntriesStore() throws Exception {
-        saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
-    }
-
     @BeforeEach
     void setUp() throws Exception {
         when(idMappingRdfRestTemplate.getUriTemplateHandler())
                 .thenReturn(new DefaultUriBuilderFactory());
         when(idMappingRdfRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
+
+    @BeforeAll
+    void saveEntriesStore() throws Exception {
+        saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
     }
 
     @Test

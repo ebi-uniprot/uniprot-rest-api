@@ -237,7 +237,7 @@ public class UniProtEntryService
             UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = uniProtKBRequestConverter.createStreamSolrRequest(streamRequest);
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
+        return rdfStreamer.stream(entryIds, dataType, format);
     }
 
     @Override

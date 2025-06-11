@@ -141,7 +141,6 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }

@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.api.common.repository.stream.rdf.PrologProvider.*;
+
 import java.net.URI;
 import java.util.*;
 
@@ -57,6 +59,18 @@ public class RdfService<T> implements StoreService<T> {
                 getEntriesByAccessions(Collections.singletonList(id), dataType, format));
     }
 
+    public String getProlog(List<String> ids) {
+        if (this.clazz != String.class) {
+            return "";
+        }
+        T response = getEntriesByAccessions(ids, this.dataType, this.format);
+
+        if (response == null) {
+            return "";
+        }
+        return extractPrologDeclarations(response.toString());
+    }
+
     private T getEntriesByAccessions(List<String> accessions, String dataType, String format) {
         String commaSeparatedIds = String.join(",", accessions);
         DefaultUriBuilderFactory handler =
@@ -70,10 +84,28 @@ public class RdfService<T> implements StoreService<T> {
         T rdfResponse = body;
         if (this.clazz == String.class) {
             String bodyString = (String) body;
+            // index of last header tag
             int startingPosition = tagPositionProvider.getStartingPosition(bodyString, format);
             int indexOfCloseTag = tagPositionProvider.getEndingPosition(bodyString, format);
             rdfResponse = (T) bodyString.substring(startingPosition, indexOfCloseTag);
         }
         return rdfResponse;
+    }
+
+    private String extractPrologDeclarations(String content) {
+        switch (format) {
+            case TURTLE:
+                StringBuilder prologBuilder = new StringBuilder();
+                content.lines()
+                        .takeWhile(tagPositionProvider::isTurtleProlog)
+                        .forEach(line -> prologBuilder.append(line).append('\n'));
+                return prologBuilder.toString();
+            case RDF:
+                int startingPosition = tagPositionProvider.getStartingPosition(content, format);
+                return content.substring(0, startingPosition);
+            case N_TRIPLES:
+            default:
+                return "";
+        }
     }
 }

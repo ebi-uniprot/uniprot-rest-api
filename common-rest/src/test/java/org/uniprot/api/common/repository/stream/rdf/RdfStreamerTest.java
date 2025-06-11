@@ -1,12 +1,14 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -69,11 +71,15 @@ class RdfStreamerTest {
         rdfService =
                 new RdfService<>(
                         tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);
-        when(rdfServiceFactory.getRdfService(DATA_TYPE, FORMAT)).thenReturn(rdfService);
-        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-        when(prologProvider.getProLog(DATA_TYPE, FORMAT)).thenReturn(RDF_PROLOG);
-        when(prologProvider.getClosingTag(FORMAT)).thenReturn(RDF_CLOSE_TAG);
+        lenient().when(rdfServiceFactory.getRdfService(DATA_TYPE, FORMAT)).thenReturn(rdfService);
+        lenient()
+                .when(restTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        lenient().when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+        lenient()
+                .when(prologProvider.getProlog(IDS, rdfServiceFactory, DATA_TYPE, FORMAT))
+                .thenReturn(RDF_PROLOG);
+        lenient().when(prologProvider.getClosingTag(FORMAT)).thenReturn(RDF_CLOSE_TAG);
     }
 
     @Test
@@ -81,7 +87,7 @@ class RdfStreamerTest {
         when(tagPositionProvider.getStartingPosition(any(), eq(FORMAT))).thenReturn(169);
         when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
 
-        Stream<String> rdfStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
         String rdfString = rdfStream.collect(Collectors.joining());
 
         // 1 batch
@@ -101,7 +107,7 @@ class RdfStreamerTest {
         when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
 
         Stream<String> rdfStream =
-                rdfStreamer.stream(Stream.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
+                rdfStreamer.stream(List.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
 
         String rdfString = rdfStream.collect(Collectors.joining());
         // 3 batches
@@ -125,7 +131,7 @@ class RdfStreamerTest {
 
     @Test
     void stream_whenRemoteServerResponseIsEmpty() {
-        Stream<String> rdfStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
 
         String rdfString = rdfStream.collect(Collectors.joining());
         assertEquals(EMPTY_RESPONSE, rdfString);
@@ -133,8 +139,30 @@ class RdfStreamerTest {
 
     @Test
     void stream_whenRemoteServerThrowsException() {
-        Stream<String> idsStream = rdfStreamer.stream(IDS.stream(), DATA_TYPE, FORMAT);
+        Stream<String> idsStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT);
         when(restTemplate.getForObject(any(), any())).thenThrow(RestClientException.class);
         assertThrows(RestClientException.class, idsStream::count);
+    }
+
+    @Test
+    void stream_whenEntityIdsEmpty() {
+        Stream<String> idsStream = rdfStreamer.stream(List.of(), DATA_TYPE, FORMAT);
+        assertTrue(idsStream.toList().isEmpty());
+    }
+
+    @Test
+    void stream_whenLongConsumerProvided_entryCountIsConsumed() {
+        when(tagPositionProvider.getStartingPosition(any(), eq(FORMAT))).thenReturn(169);
+        when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
+        when(rdfEntryCountProvider.getEntryCount(any(), eq(DATA_TYPE), eq(FORMAT))).thenReturn(123);
+
+        AtomicLong consumedCount = new AtomicLong();
+        LongConsumer longConsumer = value -> consumedCount.set(value);
+
+        Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT, longConsumer);
+
+        rdfStream.collect(Collectors.toList());
+
+        assertEquals(123L, consumedCount.get());
     }
 }

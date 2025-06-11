@@ -23,7 +23,6 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.common.keyword.repository.KeywordRepository;
@@ -113,11 +112,6 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
     @Override
     protected String getSearchAccession() {
         return KEYWORD_ACCESSION;
-    }
-
-    @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.KEYWORD_PROLOG;
     }
 
     @Override

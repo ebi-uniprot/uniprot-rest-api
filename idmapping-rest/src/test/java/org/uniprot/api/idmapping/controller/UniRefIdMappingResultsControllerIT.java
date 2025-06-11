@@ -47,7 +47,6 @@ import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -356,15 +355,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RdfPrologs.UNIREF_PROLOG)))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "    <sample>text</sample>\n"
-                                                        + "    <anotherSample>text2</anotherSample>\n"
-                                                        + "    <someMore>text3</someMore>\n\n"
-                                                        + "</rdf:RDF>")));
+                .andExpect(content().string(equalTo(SAMPLE_RDF)));
     }
 
     @Test

@@ -1,12 +1,20 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.api.common.repository.stream.rdf.PrologProvider.PREFIX_BASE;
+import static org.uniprot.api.common.repository.stream.rdf.PrologProvider.PREFIX_PREFIX;
+
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class TagPositionProvider {
     public static final String RDF = "rdf";
     public static final String TURTLE = "ttl";
     public static final String N_TRIPLES = "nt";
+    public static final String RDF_LAST_HEADER = "</owl:Ontology>";
+    public static final String RDF_CLOSING_TAG = "</rdf:RDF>";
 
     /**
      * Example: Start XML Tag Begin <?xml version='1.0' encoding='UTF-8'?> <rdf:RDF
@@ -28,11 +36,9 @@ public class TagPositionProvider {
     public int getStartingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                String rdfStartingTag = "</owl:Ontology>";
-                return body.indexOf(rdfStartingTag) + rdfStartingTag.length();
+                return getBodyStartIndexAfterHeader(body, RDF_LAST_HEADER);
             case TURTLE:
-                String ttlStartingTag = "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
-                return body.indexOf(ttlStartingTag) + ttlStartingTag.length();
+                return getBodyStartIndexAfterTurtleHeader(body);
             case N_TRIPLES:
                 return 0;
             default:
@@ -56,12 +62,49 @@ public class TagPositionProvider {
     public int getEndingPosition(String body, String format) {
         switch (format) {
             case RDF:
-                return body.indexOf("</rdf:RDF>");
+                int index = body.indexOf(RDF_CLOSING_TAG);
+                if (index == -1) {
+                    log.error("No RDF closing tag found in body {}", body);
+                    throw new IllegalArgumentException(
+                            "Unable to find RDF closing tag : " + RDF_CLOSING_TAG);
+                }
+                return index;
             case TURTLE:
             case N_TRIPLES:
                 return body.length();
             default:
                 throw new IllegalArgumentException("Invalid format " + format);
         }
+    }
+
+    private int getBodyStartIndexAfterHeader(String body, String lastHeader) {
+        int indexOfLastHeader = body.indexOf(lastHeader);
+        if (indexOfLastHeader == -1) {
+            log.error("No last header found in body {}", body);
+            throw new IllegalArgumentException("Unable to find last header : " + lastHeader);
+        }
+        int indexOfNewLine = body.indexOf('\n', indexOfLastHeader);
+        if (indexOfNewLine == -1) {
+            log.error("No new line found in the last header in body {}", body);
+            throw new IllegalArgumentException(
+                    "Unable to find new line in last header : " + lastHeader);
+        }
+        return indexOfNewLine + 1;
+    }
+
+    private int getBodyStartIndexAfterTurtleHeader(String content) {
+        int index = 0;
+        for (String line : content.lines().toList()) {
+            if (!isTurtleProlog(line)) {
+                return index;
+            }
+            index += line.length() + 1;
+        }
+        log.error("No body found in content {}", content);
+        throw new IllegalArgumentException("Unable to find turtle body.");
+    }
+
+    boolean isTurtleProlog(String line) {
+        return line.startsWith(PREFIX_BASE) || line.startsWith(PREFIX_PREFIX);
     }
 }

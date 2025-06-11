@@ -38,7 +38,7 @@ public abstract class RDFResultStreamer<T extends DownloadRequest, R extends Dow
     public Stream<String> stream(T request, Stream<String> ids) {
         R job = getJob(request);
         return rdfStreamer.stream(
-                ids,
+                ids.toList(),
                 getDataType(),
                 SUPPORTED_RDF_TYPES.get(UniProtMediaType.valueOf(request.getFormat())),
                 entries -> heartbeatProducer.generateForResults(job, entries));
