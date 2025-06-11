@@ -43,7 +43,6 @@ public class MapToJobSubmissionService {
 
     public JobSubmitResponse submit(MapToJobRequest mapToJobRequest) {
         String jobId = hashGenerator.generateHash(mapToJobRequest);
-        // TODO handle error out jobs
         if (!mapToJobService.mapToJobExists(jobId)) {
             MapToJob mapToJob = mapToJobService.createMapToJob(jobId, mapToJobRequest);
             MapToSearchService mapToSearchService =

@@ -16,12 +16,13 @@ public class MapToRequestConverter {
         String query = request.getQuery();
         MapToJobRequest mapToJobRequest =
                 new MapToJobRequest(request.getFrom(), request.getTo(), query);
-        mapToJobRequest.setExtraParams(getExtraParams(request));
+        Map<String, String> extraParams = getExtraParams(request);
+        mapToJobRequest.setExtraParams(extraParams);
 
         return mapToJobRequest;
     }
 
-    private static Map<String, String> getExtraParams(MapToSearchRequest request) {
+    private Map<String, String> getExtraParams(MapToSearchRequest request) {
         if (isUniProtKBSourceType(request)) {
             return Map.of(
                     INCLUDE_ISOFORM,
@@ -30,7 +31,7 @@ public class MapToRequestConverter {
         return Map.of();
     }
 
-    private static boolean isUniProtKBSourceType(MapToSearchRequest request) {
+    private boolean isUniProtKBSourceType(MapToSearchRequest request) {
         return request.getFrom().equals(UniProtDataType.UNIPROTKB);
     }
 }

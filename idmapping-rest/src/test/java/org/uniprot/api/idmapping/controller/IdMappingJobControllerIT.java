@@ -495,8 +495,8 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from
-     * and to result without any uniprot data in the status/{jobId} response. So to do that we just
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from and
+     * to result without any uniprot data in the status/{jobId} response. So to do that we just
      * return the plain results url redirect without any db in the path even though the mapped to id
      * is uniprotkb, uniparc or uniref ids plain result url :
      * https://localhost/idmapping/results/{jobId}
@@ -549,8 +549,8 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from
-     * and to result without any uniprot data. So to do that we just return the plain results url
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from and
+     * to result without any uniprot data. So to do that we just return the plain results url
      * redirect without any db in the path even though the mapped to id is uniprotkb, uniparc or
      * uniref ids plain result url : https://localhost/idmapping/results/{jobId}
      */

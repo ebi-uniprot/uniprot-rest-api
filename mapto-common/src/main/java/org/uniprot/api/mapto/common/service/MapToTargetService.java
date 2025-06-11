@@ -50,7 +50,8 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
             // unset facets if mapped to ids exceeds the allowed limit
             // and set the warning
             if (facetingDisallowed(searchRequest, ids)) {
-                warnings.add(removeFacetsAndGetFacetWarning(searchRequest));
+                ProblemPair facetWarning = removeFacetsAndGetFacetWarning(searchRequest);
+                warnings.add(facetWarning);
             }
             SolrStreamFacetResponse solrStreamResponse =
                     searchMappedIdsFacetsBySearchRequest(searchRequest, ids);

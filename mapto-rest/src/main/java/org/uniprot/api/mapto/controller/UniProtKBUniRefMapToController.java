@@ -20,6 +20,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
+import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.service.MapToJobSubmissionService;
 import org.uniprot.api.mapto.common.service.UniRefMapToTargetService;
 import org.uniprot.api.mapto.request.UniProtKBMapToSearchRequest;
@@ -68,8 +69,8 @@ public class UniProtKBUniRefMapToController extends BasicSearchController<UniRef
     public ResponseEntity<JobSubmitResponse> submitMapToJob(
             @Valid @ModelAttribute UniProtKBMapToSearchRequest request) {
         request.setTo(UniProtDataType.UNIREF);
-        JobSubmitResponse jobSubmitResponse =
-                mapToJobSubmissionService.submit(mapToRequestConverter.convert(request));
+        MapToJobRequest mapToJobRequest = mapToRequestConverter.convert(request);
+        JobSubmitResponse jobSubmitResponse = mapToJobSubmissionService.submit(mapToJobRequest);
         return ResponseEntity.ok(jobSubmitResponse);
     }
 
