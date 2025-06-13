@@ -373,7 +373,7 @@ class UniRefMapToTargetServiceTest {
         UniRefStreamRequest streamRequest = new UniRefStreamRequest();
         when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
         when(mapToJob.getTargetIds()).thenReturn(toIds);
-        when(rdfStreamer.stream(any(Stream.class), same(DATA_TYPE), same(FORMAT)))
+        when(rdfStreamer.stream(any(List.class), same(DATA_TYPE), same(FORMAT)))
                 .thenReturn(resultStream);
 
         Stream<String> result =

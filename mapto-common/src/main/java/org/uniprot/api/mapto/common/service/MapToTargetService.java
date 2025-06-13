@@ -93,7 +93,7 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
         List<String> entryIds =
                 streamFilterAndSortEntries(
                         streamRequest, mapToJobService.findMapToJob(jobId).getTargetIds());
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
+        return rdfStreamer.stream(entryIds, dataType, format);
     }
 
     protected List<String> streamFilterAndSortEntries(
