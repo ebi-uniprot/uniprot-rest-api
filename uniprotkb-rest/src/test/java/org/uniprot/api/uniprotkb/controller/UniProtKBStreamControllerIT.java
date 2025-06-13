@@ -3,9 +3,11 @@ package org.uniprot.api.uniprotkb.controller;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
@@ -14,16 +16,19 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +43,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -97,6 +105,9 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private MockMvc mockMvc;
 
+    @MockBean(name = "uniProtRdfRestTemplate")
+    private RestTemplate uniProtRdfRestTemplate;
+
     @Autowired
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
@@ -121,6 +132,20 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         when(solrClient.query(anyString(), any())).thenReturn(response);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+    }
+
+    @BeforeEach
+    void setUp() throws Exception {
+        DefaultUriBuilderFactory handler = Mockito.mock(DefaultUriBuilderFactory.class);
+        when(uniProtRdfRestTemplate.getUriTemplateHandler()).thenReturn(handler);
+
+        UriBuilder uriBuilder = Mockito.mock(UriBuilder.class);
+        when(handler.builder()).thenReturn(uriBuilder);
+
+        URI uniProtRdfServiceURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(eq("uniprotkb"), eq("ttl"), any())).thenReturn(uniProtRdfServiceURI);
+        when(uniProtRdfRestTemplate.getForObject(eq(uniProtRdfServiceURI), any()))
+                .thenReturn(SAMPLE_TTL);
     }
 
     @Test

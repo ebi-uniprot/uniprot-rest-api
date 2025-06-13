@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
@@ -119,12 +120,15 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
         return facetTupleStreamTemplate;
     }
 
-    @BeforeAll
-    void saveEntriesStore() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         when(idMappingRdfRestTemplate.getUriTemplateHandler())
                 .thenReturn(new DefaultUriBuilderFactory());
         when(idMappingRdfRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
 
+    @BeforeAll
+    void saveEntriesStore() throws Exception {
         saveEntries(cloudSolrClient, storeClient, xrefStoreClient);
     }
 

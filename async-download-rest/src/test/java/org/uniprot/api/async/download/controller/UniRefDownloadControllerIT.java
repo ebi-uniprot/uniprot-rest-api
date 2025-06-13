@@ -41,6 +41,7 @@ import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.common.service.TestConfig;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -106,7 +107,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeEach
     void setUpRestTemplate() {
-        UniRefAsyncDownloadUtils.setUp(restTemplate);
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "uniref");
     }
 
     @Test

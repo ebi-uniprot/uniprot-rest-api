@@ -90,7 +90,7 @@ public class UniParcLightEntryService
 
     private Stream<String> getRdfStream(String dataType, String format, SolrRequest solrRequest) {
         List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).toList();
-        return rdfStreamer.stream(entryIds.stream(), dataType, format);
+        return rdfStreamer.stream(entryIds, dataType, format);
     }
 
     public QueryResult<UniParcEntryLight> searchByFieldId(

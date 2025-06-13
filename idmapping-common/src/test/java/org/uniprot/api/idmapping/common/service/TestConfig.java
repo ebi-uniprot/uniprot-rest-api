@@ -36,7 +36,8 @@ public class TestConfig {
     private final GenericContainer redisServer =
             new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION))
                     .withExposedPorts(6379)
-                    .withReuse(true);
+                    .withReuse(true)
+                    .withCommand("redis-server --save \"\" --appendonly no");
 
     @PostConstruct
     public void postConstruct() {

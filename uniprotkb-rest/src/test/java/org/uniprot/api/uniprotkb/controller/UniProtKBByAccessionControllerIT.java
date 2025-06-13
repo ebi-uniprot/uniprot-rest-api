@@ -45,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControllerIT;
+import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
@@ -52,9 +53,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterRe
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
-import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RdfPrologs;
-import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
@@ -189,7 +187,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Override
     protected void saveEntry() {
-        initUniprotKbDataStore();
+        initUniProtKbDataStore();
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
@@ -199,7 +197,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         return ACCESSION_RESOURCE;
     }
 
-    void initUniprotKbDataStore() {
+    void initUniProtKbDataStore() {
         UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
 
         DataStoreManager dsm = getStoreManager();
@@ -1083,11 +1081,6 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.UNIPROT_PROLOG;
-    }
-
-    @Override
     protected String getIdRequestPathWithoutPathVariable() {
         return "/uniprotkb/";
     }
@@ -1283,16 +1276,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .resultMatcher(
                                             MockMvcResultMatchers.content()
                                                     .string(
-                                                            containsString(
-                                                                    "<?xml version='1.0' encoding='UTF-8'?>\n"
-                                                                            + "<rdf:RDF xml:base=\"http://purl.uniprot.org/uniprot/\" xmlns=\"http://purl.uniprot.org/core/\" xmlns:ECO=\"http://purl.obolibrary.org/obo/ECO_\" xmlns:annotation=\"http://purl.uniprot.org/annotation/\" xmlns:citation=\"http://purl.uniprot.org/citations/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:disease=\"http://purl.uniprot.org/diseases/\" xmlns:enzyme=\"http://purl.uniprot.org/enzyme/\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:go=\"http://purl.obolibrary.org/obo/GO_\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:keyword=\"http://purl.uniprot.org/keywords/\" xmlns:location=\"http://purl.uniprot.org/locations/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:position=\"http://purl.uniprot.org/position/\" xmlns:pubmed=\"http://purl.uniprot.org/pubmed/\" xmlns:range=\"http://purl.uniprot.org/range/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:tissue=\"http://purl.uniprot.org/tissues/\">\n"
-                                                                            + "<owl:Ontology rdf:about=\"http://purl.uniprot.org/uniprot/\">\n"
-                                                                            + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
-                                                                            + "</owl:Ontology>\n"
-                                                                            + "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                            equalTo(
+                                                                    AbstractStreamControllerIT
+                                                                            .SAMPLE_RDF)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -1300,16 +1286,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .resultMatcher(
                                             MockMvcResultMatchers.content()
                                                     .string(
-                                                            startsWith(
-                                                                    TurtlePrologs.UNIPROT_PROLOG)))
-                                    .resultMatcher(
-                                            MockMvcResultMatchers.content()
-                                                    .string(
-                                                            containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                            equalTo(
+                                                                    AbstractStreamControllerIT
+                                                                            .SAMPLE_TTL)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -1317,17 +1296,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .resultMatcher(
                                             MockMvcResultMatchers.content()
                                                     .string(
-                                                            startsWith(
-                                                                    NTriplesPrologs
-                                                                            .N_TRIPLES_COMMON_PROLOG)))
-                                    .resultMatcher(
-                                            MockMvcResultMatchers.content()
-                                                    .string(
-                                                            containsString(
-                                                                    "    <sample>text</sample>\n"
-                                                                            + "    <anotherSample>text2</anotherSample>\n"
-                                                                            + "    <someMore>text3</someMore>\n"
-                                                                            + "</rdf:RDF>")))
+                                                            equalTo(
+                                                                    AbstractStreamControllerIT
+                                                                            .SAMPLE_N_TRIPLES)))
                                     .build())
                     .build();
         }

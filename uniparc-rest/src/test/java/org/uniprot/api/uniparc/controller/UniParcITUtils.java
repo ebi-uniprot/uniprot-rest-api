@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.convertToUniParcEntryLight;
 
 import java.util.HashMap;

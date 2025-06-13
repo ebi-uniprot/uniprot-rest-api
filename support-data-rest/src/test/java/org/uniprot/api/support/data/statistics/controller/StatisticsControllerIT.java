@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.Duration;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,7 +30,9 @@ class StatisticsControllerIT {
     @Container
     private static final PostgreSQLContainer<?> postgreSQL =
             new PostgreSQLContainer<>(DockerImageName.parse(POSTGRES_IMAGE_VERSION))
-                    .withInitScript("init.sql");
+                    .withStartupTimeout(Duration.ofMinutes(2))
+                    .withInitScript("init.sql")
+                    .withTmpFs(Map.of("/var/lib/postgresql/data", "rw"));
 
     @DynamicPropertySource
     static void postgreSQLProperties(DynamicPropertyRegistry registry) {

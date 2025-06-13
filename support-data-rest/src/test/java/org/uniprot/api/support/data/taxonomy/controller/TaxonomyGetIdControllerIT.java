@@ -30,7 +30,6 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
@@ -235,11 +234,6 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
     @Override
     protected String getSearchAccession() {
         return TAX_ID;
-    }
-
-    @Override
-    protected String getRdfProlog() {
-        return RdfPrologs.TAXONOMY_PROLOG;
     }
 
     @Override

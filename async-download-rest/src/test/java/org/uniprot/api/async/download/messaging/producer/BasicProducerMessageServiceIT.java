@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
@@ -23,6 +25,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
@@ -57,7 +60,11 @@ public abstract class BasicProducerMessageServiceIT {
 
     @Container
     protected static RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse(RABBITMQ_IMAGE_VERSION));
+            new RabbitMQContainer(DockerImageName.parse(RABBITMQ_IMAGE_VERSION))
+                    .withExposedPorts(5672, 15672)
+                    .waitingFor(Wait.forLogMessage(".*Server startup complete.*", 1))
+                    .withStartupTimeout(Duration.ofMinutes(2))
+                    .withTmpFs(Map.of("/var/lib/rabbitmq", "rw"));
 
     @PreDestroy
     public void preDestroy() {
