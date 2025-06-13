@@ -74,7 +74,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
-public abstract class MapToControllerIT {
+public abstract class AbstractMapToControllerIT {
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
     protected static final String SERVER_ERROR = "There is an error from the server side";
     public static final ObjectMapper MAPPER = new ObjectMapper();

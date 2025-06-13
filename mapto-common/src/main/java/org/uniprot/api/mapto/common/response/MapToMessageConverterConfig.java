@@ -1,8 +1,8 @@
 package org.uniprot.api.mapto.common.response;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -14,9 +14,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
-import org.uniprot.core.parser.tsv.unirule.UniRuleEntryValueMapper;
+import org.uniprot.core.parser.tsv.EntityValueMapper;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Configuration
 @Getter
@@ -30,24 +35,33 @@ public class MapToMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXlsConverter());
                 converters.add(new ListMessageConverter(downloadGatekeeper));
+                String idField =
+                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.MAPTO_ID)
+                                .getReturnFieldByName("id")
+                                .getName();
+                EntityValueMapper<MapToEntryId> entityValueMapper =
+                        (entity, fieldNames) -> Map.of(idField, entity.getId());
                 converters.add(
                         new XlsMessageConverter<>(
                                 MapToEntryId.class,
-                                null,
-                                null,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                        UniProtDataType.MAPTO_ID),
+                                entityValueMapper,
                                 downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 MapToEntryId.class,
-                                null,
-                                null,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                        UniProtDataType.MAPTO_ID),
+                                entityValueMapper,
                                 downloadGatekeeper));
 
                 JsonMessageConverter<MapToEntryId> jsonMessageConverter =
                         new JsonMessageConverter<>(
                                 new ObjectMapper(),
                                 MapToEntryId.class,
-                                null,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(
+                                        UniProtDataType.MAPTO_ID),
                                 downloadGatekeeper);
                 converters.add(0, jsonMessageConverter);
             }
@@ -56,7 +70,7 @@ public class MapToMessageConverterConfig {
 
     @Bean
     public MessageConverterContextFactory<MapToEntryId>
-    mapToEntryIdMessageConverterContextFactory() {
+            mapToEntryIdMessageConverterContextFactory() {
         MessageConverterContextFactory<MapToEntryId> contextFactory =
                 new MessageConverterContextFactory<>();
         List.of(

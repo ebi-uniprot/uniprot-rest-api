@@ -1,13 +1,15 @@
 package org.uniprot.api.mapto.common.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
+import org.uniprot.api.mapto.common.model.MapToEntryId;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.model.MapToTask;
-import org.uniprot.api.mapto.common.model.MapToEntryId;
 import org.uniprot.api.mapto.common.search.MapToSearchFacade;
 import org.uniprot.api.mapto.common.search.MapToSearchService;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -15,8 +17,6 @@ import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
 import net.jodah.failsafe.RetryPolicy;
-
-import java.util.List;
 
 @Service
 public class MapToJobSubmissionService {
@@ -91,8 +91,10 @@ public class MapToJobSubmissionService {
         return jobDetailResponse;
     }
 
-    public List<MapToEntryId> getMapToEntryIds(String jobId){
-        return mapToJobService.findMapToJob(jobId).getTargetIds().stream().map(MapToEntryId::new).toList();
+    public List<MapToEntryId> getMapToEntryIds(String jobId) {
+        return mapToJobService.findMapToJob(jobId).getTargetIds().stream()
+                .map(MapToEntryId::new)
+                .toList();
     }
 
     public boolean isJobFinished(String jobId) {

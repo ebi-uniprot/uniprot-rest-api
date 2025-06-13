@@ -1,11 +1,11 @@
 package org.uniprot.api.mapto.common.model;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor

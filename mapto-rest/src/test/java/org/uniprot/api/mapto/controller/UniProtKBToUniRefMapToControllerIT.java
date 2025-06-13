@@ -72,7 +72,7 @@ import com.jayway.jsonpath.JsonPath;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBToUniRefMapToControllerIT extends MapToControllerIT {
+class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
 
     @SpyBean private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
