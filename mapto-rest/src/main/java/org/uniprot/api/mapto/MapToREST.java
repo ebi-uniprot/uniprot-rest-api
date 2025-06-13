@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.uniprot.api.idmapping.common.response.IdMappingMessageConverterConfig;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniRefIdMappingResultsConfig;
@@ -43,6 +44,7 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
             @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,
                     classes = {
+                            IdMappingMessageConverterConfig.class,
                         UniProtKBIdMappingResultsConfig.class,
                         UniRefIdMappingResultsConfig.class,
                         UniParcIdMappingResultsConfig.class,
