@@ -61,7 +61,7 @@ public class IdMappingConfig {
     @Bean
     @Profile("live")
     public IdMappingJobCacheService idMappingJobCacheService(
-            @Value("${id.mapping.cache.config.file}") Resource cacheConfig,
+            @Value("${mapping.cache.config.file}") Resource cacheConfig,
             RedissonClient redissonClient)
             throws IOException {
 

@@ -15,97 +15,109 @@
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>proteome-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>support-data-common</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>support-data-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniparc-common</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniparc-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprotkb-common</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprotkb-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniref-common</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniref-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>unisave-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>aa-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>idmapping-common</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>idmapping-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>help-centre-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>async-download-rest</artifactId>
-			<version>${uniprot-core.version}</version>
+			<version>${version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>mapto-common</artifactId>
+			<version>${version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>mapto-rest</artifactId>
+			<version>${version}</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

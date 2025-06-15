@@ -1,4 +1,4 @@
-package org.uniprot.api.async.download.common;
+package org.uniprot.api.uniref.common.util;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -42,10 +42,12 @@ public class UniRefAsyncDownloadUtils {
             UniRefQueryRepository unirefQueryRepository,
             CloudSolrClient cloudSolrClient,
             SolrClient solrClient,
-            UniProtStoreClient<UniRefEntryLight> storeClient)
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            int entryCount,
+            String accessionPrefix)
             throws Exception {
         ReflectionTestUtils.setField(unirefQueryRepository, "solrClient", cloudSolrClient);
-        saveEntries(cloudSolrClient, storeClient);
+        saveEntries(cloudSolrClient, storeClient, entryCount, accessionPrefix);
         long queryHits = 100L;
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
@@ -54,13 +56,27 @@ public class UniRefAsyncDownloadUtils {
         when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
-    protected static void saveEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
+    public static void saveEntriesInSolrAndStore(
+            UniRefQueryRepository unirefQueryRepository,
+            CloudSolrClient cloudSolrClient,
+            SolrClient solrClient,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            int entryCount)
             throws Exception {
-        for (int i = 1; i <= 4; i++) {
-            saveEntry(cloudSolrClient, i, UniRefType.UniRef50, storeClient);
-            saveEntry(cloudSolrClient, i, UniRefType.UniRef90, storeClient);
-            saveEntry(cloudSolrClient, i, UniRefType.UniRef100, storeClient);
+        saveEntriesInSolrAndStore(
+                unirefQueryRepository, cloudSolrClient, solrClient, storeClient, entryCount, null);
+    }
+
+    protected static void saveEntries(
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            int entryCount,
+            String accessionPrefix)
+            throws Exception {
+        for (int i = 1; i <= entryCount; i++) {
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef50, storeClient, accessionPrefix);
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef90, storeClient, accessionPrefix);
+            saveEntry(cloudSolrClient, i, UniRefType.UniRef100, storeClient, accessionPrefix);
         }
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
@@ -69,9 +85,16 @@ public class UniRefAsyncDownloadUtils {
             CloudSolrClient cloudSolrClient,
             int i,
             UniRefType type,
-            UniProtStoreClient<UniRefEntryLight> storeClient)
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            String accessionPrefix)
             throws Exception {
-        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
+        UniRefEntry entry;
+        if (accessionPrefix != null) {
+            entry = UniRefEntryMocker.createEntry(i, type, accessionPrefix);
+        } else {
+            entry = UniRefEntryMocker.createEntry(i, type);
+        }
+
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();

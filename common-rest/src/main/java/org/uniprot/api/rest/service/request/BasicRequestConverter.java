@@ -168,6 +168,7 @@ public class BasicRequestConverter {
         requestBuilder.fieldBoosts(queryConfig.getFieldBoosts());
         requestBuilder.staticBoosts(queryConfig.getStaticBoosts());
         requestBuilder.highlightFields(queryConfig.getHighlightFields());
+        requestBuilder.fields(queryConfig.getFields());
 
         return requestBuilder;
     }
