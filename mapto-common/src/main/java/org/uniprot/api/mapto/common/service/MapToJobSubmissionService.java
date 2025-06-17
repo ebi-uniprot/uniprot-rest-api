@@ -1,12 +1,9 @@
 package org.uniprot.api.mapto.common.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.common.request.JobDetailResponse;
-import org.uniprot.api.mapto.common.model.MapToEntryId;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.model.MapToTask;
@@ -89,12 +86,6 @@ public class MapToJobSubmissionService {
                     getRedirectPathToResults(jobId, requestUrl, mappingType));
         }
         return jobDetailResponse;
-    }
-
-    public List<MapToEntryId> getMapToEntryIds(String jobId) {
-        return mapToJobService.findMapToJob(jobId).getTargetIds().stream()
-                .map(MapToEntryId::new)
-                .toList();
     }
 
     public boolean isJobFinished(String jobId) {

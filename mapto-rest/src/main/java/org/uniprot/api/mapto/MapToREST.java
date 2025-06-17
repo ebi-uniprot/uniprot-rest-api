@@ -44,7 +44,7 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
             @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,
                     classes = {
-                            IdMappingMessageConverterConfig.class,
+                        IdMappingMessageConverterConfig.class,
                         UniProtKBIdMappingResultsConfig.class,
                         UniRefIdMappingResultsConfig.class,
                         UniParcIdMappingResultsConfig.class,

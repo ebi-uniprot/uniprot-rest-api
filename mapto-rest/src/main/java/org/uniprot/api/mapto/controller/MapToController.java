@@ -7,20 +7,22 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.common.request.IdMappingStreamRequest;
 import org.uniprot.api.mapto.common.model.MapToEntryId;
+import org.uniprot.api.mapto.common.model.MapToPageRequest;
 import org.uniprot.api.mapto.common.service.MapToJobSubmissionService;
+import org.uniprot.api.mapto.common.service.MapToTargetIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -29,13 +31,15 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 @RequestMapping(UniProtKBUniRefMapToController.MAPTO)
 public class MapToController extends BasicSearchController<MapToEntryId> {
     private final MapToJobSubmissionService mapToJobSubmissionService;
+    private final MapToTargetIdService mapToTargetIdService;
 
     public MapToController(
             MapToJobSubmissionService mapToJobSubmissionService,
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<MapToEntryId> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
-            Gatekeeper downloadGatekeeper) {
+            Gatekeeper downloadGatekeeper,
+            MapToTargetIdService mapToTargetIdService) {
         super(
                 eventPublisher,
                 converterContextFactory,
@@ -43,6 +47,7 @@ public class MapToController extends BasicSearchController<MapToEntryId> {
                 MAPTO_ENTRY_ID,
                 downloadGatekeeper);
         this.mapToJobSubmissionService = mapToJobSubmissionService;
+        this.mapToTargetIdService = mapToTargetIdService;
     }
 
     @GetMapping(
@@ -61,10 +66,25 @@ public class MapToController extends BasicSearchController<MapToEntryId> {
             throw new ResourceNotFoundException("{search.not.found}");
         }
         return super.stream(
-                () -> mapToJobSubmissionService.getMapToEntryIds(jobId).stream(),
+                () -> mapToTargetIdService.getMapToEntryIds(jobId).stream(),
                 streamRequest,
                 getAcceptHeader(request),
                 request);
+    }
+
+    @GetMapping(
+            value = "/results/{jobId}",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext<MapToEntryId>> getMapToIds(
+            @PathVariable String jobId,
+            @Valid @ModelAttribute MapToPageRequest pageRequest,
+            HttpServletRequest servletRequest,
+            HttpServletResponse servletResponse) {
+        if (!mapToJobSubmissionService.isJobFinished(jobId)) {
+            throw new ResourceNotFoundException("{search.not.found}");
+        }
+        QueryResult<MapToEntryId> mappedIds = mapToTargetIdService.getMappedIds(pageRequest, jobId);
+        return super.getSearchResponse(mappedIds, null, servletRequest, servletResponse);
     }
 
     @Override
