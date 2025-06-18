@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -80,6 +81,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     @SpyBean private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private TaxonomyLineageRepository taxRepository;
+    @Autowired protected MockMvc mockMvc;
 
     @Autowired
     @Qualifier("uniProtKBTupleStream")
@@ -237,6 +239,11 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     @Override
     protected String getQueryInLimits() {
         return "accession:(P00001  OR P00002 OR P00003 OR P00004)";
+    }
+
+    @Override
+    protected MockMvc getMockMvc() {
+        return this.mockMvc;
     }
 
     @Override
