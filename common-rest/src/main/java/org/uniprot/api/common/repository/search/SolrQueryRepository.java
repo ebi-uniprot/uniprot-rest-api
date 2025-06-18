@@ -6,12 +6,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.SolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -131,9 +131,9 @@ public abstract class SolrQueryRepository<T extends Document> {
                 .flatMap(Collection::stream);
     }
 
-    public QueryResponse query(SolrQuery solrQuery) {
+    public QueryResponse query(SolrParams solrParams) {
         try {
-            return solrClient.query(collection.name(), solrQuery);
+            return solrClient.query(collection.name(), solrParams);
         } catch (SolrServerException | IOException e) {
             throw new QueryRetrievalException(
                     "Unexpected error retrieving data from our Repository", e);

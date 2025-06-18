@@ -58,6 +58,7 @@ public class MessageConverterContextFactory<T> {
         UNIPROTKB_INTERACTION,
         UNIRULE,
         HELP,
-        ARBA
+        ARBA,
+        MAPTO_ENTRY_ID
     }
 }
