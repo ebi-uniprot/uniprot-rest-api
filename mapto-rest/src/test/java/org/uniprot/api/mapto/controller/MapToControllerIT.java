@@ -1,5 +1,20 @@
 package org.uniprot.api.mapto.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.search.SolrCollection.*;
+
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -41,20 +56,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.Collection;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.store.search.SolrCollection.*;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @WebMvcTest({MapToController.class})
@@ -103,7 +104,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     }
 
     @Test
-    void testStreamMapToEntries() throws Exception {
+    void testStreamMapToEntryIds() throws Exception {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
@@ -138,6 +139,149 @@ class MapToControllerIT extends BaseMapToControllerIT {
                                         "UniRef100_P00003")));
     }
 
+    @Test
+    void testGetMapToEntryIds() throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].id",
+                                hasItems(
+                                        "UniRef50_P00002",
+                                        "UniRef90_P00002",
+                                        "UniRef100_P00002",
+                                        "UniRef50_P00004",
+                                        "UniRef90_P00004",
+                                        "UniRef100_P00004",
+                                        "UniRef50_P00001",
+                                        "UniRef90_P00001",
+                                        "UniRef100_P00001",
+                                        "UniRef50_P00003")));
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
+
+        MockHttpServletRequestBuilder requestBuilderNext =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("cursor", cursor);
+        ResultActions responseNext = mockMvc.perform(requestBuilderNext);
+        responseNext
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].id",
+                                hasItems("UniRef90_P00003", "UniRef100_P00003")));
+    }
+
+    @Test
+    void testGetMapToEntryIds_customPageSize() throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("size", "11");
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(11)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].id",
+                                hasItems(
+                                        "UniRef50_P00002",
+                                        "UniRef90_P00002",
+                                        "UniRef100_P00002",
+                                        "UniRef50_P00004",
+                                        "UniRef90_P00004",
+                                        "UniRef100_P00004",
+                                        "UniRef50_P00001",
+                                        "UniRef90_P00001",
+                                        "UniRef100_P00001",
+                                        "UniRef50_P00003",
+                                        "UniRef90_P00003")));
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
+
+        MockHttpServletRequestBuilder requestBuilderNext =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("cursor", cursor);
+        ResultActions responseNext = mockMvc.perform(requestBuilderNext);
+        responseNext
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].id", hasItems("UniRef100_P00003")));
+    }
+
+    @Test
+    void testGetMapToAllEntryIds() throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("size", "20");
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(12)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].id",
+                                hasItems(
+                                        "UniRef50_P00002",
+                                        "UniRef90_P00002",
+                                        "UniRef100_P00002",
+                                        "UniRef50_P00004",
+                                        "UniRef90_P00004",
+                                        "UniRef100_P00004",
+                                        "UniRef50_P00001",
+                                        "UniRef90_P00001",
+                                        "UniRef100_P00001",
+                                        "UniRef50_P00003",
+                                        "UniRef90_P00003",
+                                        "UniRef100_P00003")));
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, nullValue());
+    }
+
     @ParameterizedTest
     @ValueSource(
             strings = {
@@ -146,7 +290,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE
             })
-    void testStreamMapToEntriesWithDifferentMediaTypes(String mediaType) throws Exception {
+    void testStreamMapToEntryIds_withDifferentMediaTypes(String mediaType) throws Exception {
         // when
         String query = getQueryInLimits();
         String jobId = callRunAPIAndVerify(query, false);
@@ -171,8 +315,32 @@ class MapToControllerIT extends BaseMapToControllerIT {
                                                 "form-data; name=\"attachment\"; filename=\"mapto_")));
     }
 
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE
+            })
+    void testResultMapToEntryIds_withDifferentMediaTypes(String mediaType) throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId).header(HttpHeaders.ACCEPT, mediaType);
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType));
+    }
+
     @Test
-    void testStreamMapToEntriesLimitExceedJobNotFound() throws Exception {
+    void testStreamMapToEntryIds_limitExceedJobNotFound() throws Exception {
         // when
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query, false);
@@ -196,7 +364,31 @@ class MapToControllerIT extends BaseMapToControllerIT {
     }
 
     @Test
-    void testStreamMapToEntriesRandomJobId() throws Exception {
+    void testResultsMapToEntryIds_limitExceedJobNotFound() throws Exception {
+        // when
+        String query = "*:*";
+        String jobId = callRunAPIAndVerify(query, false);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.url")
+                                .value("http://localhost/mapto/results/mPHeqb5eJX"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.messages[0]")
+                                .value("Resource not found"));
+    }
+
+    @Test
+    void testStreamMapToEntryIds_randomJobId() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getMapToStreamPath(), "random").header(ACCEPT, MediaType.APPLICATION_JSON);
@@ -215,8 +407,32 @@ class MapToControllerIT extends BaseMapToControllerIT {
                                 .value("Resource not found"));
     }
 
+    @Test
+    void testResultsMapToEntryIds_randomJobId() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), "random").header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.url")
+                                .value("http://localhost/mapto/results/random"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.messages[0]")
+                                .value("Resource not found"));
+    }
+
     private String getMapToStreamPath() {
         return "/mapto/stream/{jobId}";
+    }
+
+    private String getMapToResultPath() {
+        return "/mapto/results/{jobId}";
     }
 
     @Override

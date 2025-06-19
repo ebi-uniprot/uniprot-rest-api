@@ -74,7 +74,12 @@ public class MapToController extends BasicSearchController<MapToEntryId> {
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<MapToEntryId>> getMapToIds(
             @PathVariable String jobId,
             @Valid @ModelAttribute MapToPageRequest pageRequest,
@@ -83,7 +88,8 @@ public class MapToController extends BasicSearchController<MapToEntryId> {
         if (!mapToJobSubmissionService.isJobFinished(jobId)) {
             throw new ResourceNotFoundException("{search.not.found}");
         }
-        QueryResult<MapToEntryId> mappedIds = mapToTargetIdService.getMappedIds(pageRequest, jobId);
+        QueryResult<MapToEntryId> mappedIds =
+                mapToTargetIdService.getMapToEntryIds(pageRequest, jobId);
         return super.getSearchResponse(mappedIds, null, servletRequest, servletResponse);
     }
 
