@@ -25,7 +25,7 @@ public class MapToTargetIdService {
         this.defaultPageSize = defaultPageSize;
     }
 
-    public QueryResult<MapToEntryId> getMappedIds(MapToPageRequest request, String jobId) {
+    public QueryResult<MapToEntryId> getMapToEntryIds(MapToPageRequest request, String jobId) {
         int pageSize = Objects.isNull(request.getSize()) ? defaultPageSize : request.getSize();
 
         MapToJob mapToJob = mapToJobService.findMapToJob(jobId);

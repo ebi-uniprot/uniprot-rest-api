@@ -58,7 +58,7 @@ class UniRefMapToTargetServiceTest {
     private UniRefEntryLight entry2;
     private UniRefEntryLight entry3;
     @Mock private MapToJob mapToJob;
-    @Mock private Stream resultStream;
+    @Mock private Stream<String> resultStream;
 
     @BeforeEach
     void init() {
