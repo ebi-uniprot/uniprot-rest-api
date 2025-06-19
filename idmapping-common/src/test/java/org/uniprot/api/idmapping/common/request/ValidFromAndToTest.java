@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.validation.ConstraintValidatorContext;
-
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +48,7 @@ class ValidFromAndToTest {
     }
 
     @Test
-    void testInvalidFromToWithTaxId() {
+    void testTaxIdIgnoredForOtherFromTo() {
         String from = "UniProtKB_AC-ID";
         String to = "UniProtKB-Swiss-Prot";
         String taxId = "taxId";
@@ -63,9 +61,7 @@ class ValidFromAndToTest {
         validator.initialize(validFromTo);
         ConstraintValidatorContextImpl context = mock(ConstraintValidatorContextImpl.class);
         boolean isValid = validator.isValid(request, context);
-        Assertions.assertFalse(isValid);
-        Assertions.assertEquals(1, validator.errorMesssage.size());
-        Assertions.assertEquals("Invalid parameter 'taxId'", validator.errorMesssage.get(0));
+        Assertions.assertTrue(isValid);
     }
 
     @Test
@@ -106,17 +102,11 @@ class ValidFromAndToTest {
     private ValidFromAndTo getMockedValidFromAndTo() {
         ValidFromAndTo validFromAndTo = Mockito.mock(ValidFromAndTo.class);
         Mockito.when(validFromAndTo.from()).thenReturn("from");
-        Mockito.when(validFromAndTo.taxId()).thenReturn("taxId");
         Mockito.when(validFromAndTo.to()).thenReturn("to");
         return validFromAndTo;
     }
 
     static class FakeValidFromAndToValidator extends ValidFromAndTo.ValidFromAndToValidator {
         List<String> errorMesssage = new ArrayList<>();
-
-        @Override
-        protected void buildErrorMessage(boolean isValid, ConstraintValidatorContext context) {
-            errorMesssage.add("Invalid parameter 'taxId'");
-        }
     }
 }
