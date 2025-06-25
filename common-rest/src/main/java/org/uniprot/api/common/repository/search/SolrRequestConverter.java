@@ -50,6 +50,7 @@ public class SolrRequestConverter {
             setHighlightFieldsConfigs(solrQuery, request);
         }
         setQueryFields(solrQuery, request);
+        setSpellCheck(solrQuery);
 
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());

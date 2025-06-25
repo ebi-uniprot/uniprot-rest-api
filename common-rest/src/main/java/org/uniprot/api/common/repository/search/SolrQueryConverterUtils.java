@@ -34,6 +34,9 @@ public class SolrQueryConverterUtils {
     public static final String HIGHLIGHT_FIELDS = "hl.fl";
     public static final String HIGHLIGHT_PRE = "hl.simple.pre";
     public static final String HIGHLIGHT_POST = "hl.simple.post";
+    public static final String SPELL_CHECK = "spellcheck";
+    public static final String SPELL_CHECK_ONLY_POPULAR = "spellcheck.onlyMorePopular";
+    public static final String SPELLCHECK_EXTENDED_RESULTS = "spellcheck.extendedResults";
 
     private SolrQueryConverterUtils() {}
 
@@ -124,6 +127,12 @@ public class SolrQueryConverterUtils {
         if (notNullNotEmpty(request.getQueryField())) {
             solrQuery.add(QUERY_FIELDS, request.getQueryField());
         }
+    }
+
+    static void setSpellCheck(ModifiableSolrParams solrQuery) {
+        solrQuery.add(SPELL_CHECK, "true");
+        solrQuery.add(SPELL_CHECK_ONLY_POPULAR, "true");
+        solrQuery.add(SPELLCHECK_EXTENDED_RESULTS, "true");
     }
 
     static void setDefaults(ModifiableSolrParams solrQuery, String defaultField) {
