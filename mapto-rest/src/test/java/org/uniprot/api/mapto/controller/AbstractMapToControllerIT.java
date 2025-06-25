@@ -10,7 +10,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
@@ -124,7 +123,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
         // then
         ResultActions resultActions = callGetJobStatus(jobId);
         resultActions
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
@@ -491,7 +490,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     protected String getJobResults(String jobId, Map<String, String> queryParams) throws Exception {
         ResultActions response = callGetJobResults(jobId, queryParams);
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
