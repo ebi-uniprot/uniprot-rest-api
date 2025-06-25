@@ -17,7 +17,6 @@ import javax.validation.Payload;
 import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +40,10 @@ public @interface ValidFromAndTo {
 
     String to() default "to";
 
-    String taxId() default "taxId";
-
     @Slf4j
     class ValidFromAndToValidator implements ConstraintValidator<ValidFromAndTo, Object> {
         private String fromFieldName;
         private String toFieldName;
-        private String taxIdFieldName;
         private List<UniProtDatabaseDetail> dbDetails;
 
         private static final Set<String> UNIPROT_GROUP_TYPES =
@@ -59,7 +55,6 @@ public @interface ValidFromAndTo {
         public void initialize(ValidFromAndTo constraintAnnotation) {
             this.fromFieldName = constraintAnnotation.from();
             this.toFieldName = constraintAnnotation.to();
-            this.taxIdFieldName = constraintAnnotation.taxId();
             this.dbDetails = IdMappingFieldConfig.getAllIdMappingTypes();
         }
 
@@ -70,7 +65,6 @@ public @interface ValidFromAndTo {
             try {
                 String fromValue = BeanUtils.getProperty(value, this.fromFieldName);
                 String toValue = BeanUtils.getProperty(value, this.toFieldName);
-                String taxIdValue = BeanUtils.getProperty(value, this.taxIdFieldName);
 
                 // SwissProt type cannot be in from type
                 boolean isValidFrom =
@@ -80,7 +74,7 @@ public @interface ValidFromAndTo {
                                                 db.getName().equals(fromValue)
                                                         && !SWISSPROT_STR.equals(fromValue));
 
-                isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
+                isValid = isValidFrom && isValidPair(fromValue, toValue);
                 if (!isValid) {
                     ConstraintValidatorContextImpl contextImpl =
                             (ConstraintValidatorContextImpl) context;
@@ -94,10 +88,8 @@ public @interface ValidFromAndTo {
             return isValid;
         }
 
-        private boolean isValidPair(
-                String from, String to, String taxId, ConstraintValidatorContext context) {
+        private boolean isValidPair(String from, String to) {
             boolean isValid = true;
-            boolean isTaxIdPassed = Utils.notNullNotEmpty(taxId);
 
             // Non-UniProt from types (e.g. PIR, PDB etc) can only be mapped to either Trembl or
             // Swissprot type
@@ -118,26 +110,12 @@ public @interface ValidFromAndTo {
                                 .anyMatch(db -> db.getName().equals(to) && !ACC_ID_STR.equals(to));
             }
 
-            if (!GENENAME_STR.equals(from)
-                    && isTaxIdPassed) { // if taxId is passed for other than gene name, add error
-                buildErrorMessage(isValid, context);
-                isValid = false;
-            }
-
             return isValid;
         }
 
         private boolean isUniProtKBOrSwissProt(String to) {
             return IdMappingFieldConfig.ACC_STR.equals(to)
                     || IdMappingFieldConfig.SWISSPROT_STR.equals(to);
-        }
-
-        protected void buildErrorMessage(boolean isValid, ConstraintValidatorContext context) {
-            if (isValid) {
-                context.disableDefaultConstraintViolation();
-            }
-            context.buildConstraintViolationWithTemplate("Invalid parameter 'taxId'")
-                    .addConstraintViolation();
         }
     }
 }
