@@ -16,6 +16,8 @@ import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.uniprot.core.util.Utils;
 
@@ -36,6 +38,8 @@ public @interface ValidSolrQuerySyntax {
     Class<? extends Payload>[] payload() default {};
 
     class QuerySyntaxValidator implements ConstraintValidator<ValidSolrQuerySyntax, String> {
+        @Value("${max.solr.or.clause.count:#{null}}")
+        private Integer maxOrClauses;
 
         @Override
         public void initialize(ValidSolrQuerySyntax constraintAnnotation) {}
@@ -49,10 +53,22 @@ public @interface ValidSolrQuerySyntax {
                     qp.setAllowLeadingWildcard(true);
                     queryString = escapeSpecialCharacters(queryString);
                     Query parsedQuery = qp.parse(queryString);
-                    if (!isValidWildcardQuery(parsedQuery)) {
+                    ValidationResult validationResult = validate(parsedQuery);
+                    if (!validationResult.wildcardValid) {
                         String errorMessage = "{search.invalid.query.wildcard}";
                         context.disableDefaultConstraintViolation();
                         context.buildConstraintViolationWithTemplate(errorMessage)
+                                .addConstraintViolation();
+                        isValid = false;
+                    }
+                    if (validationResult.orClauseCount > getMaxOrClauses()) {
+                        ConstraintValidatorContextImpl contextImpl =
+                                (ConstraintValidatorContextImpl) context;
+                        String errorMessage = "{too.many.or.clauses.error}";
+                        contextImpl.disableDefaultConstraintViolation();
+                        contextImpl.addMessageParameter("0", maxOrClauses);
+                        contextImpl
+                                .buildConstraintViolationWithTemplate(errorMessage)
                                 .addConstraintViolation();
                         isValid = false;
                     }
@@ -63,23 +79,36 @@ public @interface ValidSolrQuerySyntax {
             return isValid;
         }
 
-        private boolean isValidWildcardQuery(Query inputQuery) {
-            boolean isValid = true;
+        private int getMaxOrClauses() {
+            return this.maxOrClauses;
+        }
+
+        void setMaxOrClauses(int maxOrClauses) {
+            this.maxOrClauses = maxOrClauses;
+        }
+
+        public ValidationResult validate(Query query) {
+            ValidationResult result = new ValidationResult();
+            traverseQueryTree(query, result);
+            return result;
+        }
+
+        private void traverseQueryTree(Query inputQuery, ValidationResult validationResult) {
             if (inputQuery instanceof WildcardQuery) {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
                 String value = wildcardQuery.getTerm().text();
                 if (hasMultipleMiddleAsteriskWildcard(value)) {
-                    isValid = false;
+                    validationResult.wildcardValid = false;
                 }
             } else if (inputQuery instanceof BooleanQuery) {
-                BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
-                for (BooleanClause clause : booleanQuery.clauses()) {
-                    if (!isValidWildcardQuery(clause.getQuery())) {
-                        isValid = false;
+                for (BooleanClause clause : ((BooleanQuery) inputQuery).clauses()) {
+                    if (clause.getOccur() == BooleanClause.Occur.SHOULD) {
+                        validationResult.orClauseCount++;
                     }
+                    traverseQueryTree(clause.getQuery(), validationResult);
+                    if (!validationResult.wildcardValid) return;
                 }
             }
-            return isValid;
         }
 
         private boolean hasMultipleMiddleAsteriskWildcard(String value) {
@@ -95,6 +124,11 @@ public @interface ValidSolrQuerySyntax {
                 value = value.substring(0, value.length() - 1);
             }
             return value;
+        }
+
+        class ValidationResult {
+            boolean wildcardValid = true;
+            int orClauseCount = 0;
         }
     }
 }
