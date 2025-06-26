@@ -1,26 +1,15 @@
 package org.uniprot.api.idmapping.common.request;
 
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+import org.uniprot.api.rest.request.PageRequest;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.PositiveOrZero;
-
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created 25/02/2021
  *
  * @author Edd
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class IdMappingPageRequest {
-    @Parameter(hidden = true)
-    private String cursor;
-
-    @Parameter(description = SIZE_DESCRIPTION, example = SIZE_EXAMPLE)
-    @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    private Integer size;
-}
+public class IdMappingPageRequest extends PageRequest {}

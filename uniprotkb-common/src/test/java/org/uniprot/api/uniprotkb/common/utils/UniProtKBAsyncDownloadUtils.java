@@ -6,8 +6,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
+import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -45,8 +47,7 @@ public class UniProtKBAsyncDownloadUtils {
 
     public static int totalNonIsoformEntries;
 
-    public static final UniProtKBEntry TEMPLATE_ENTRY =
-            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+    public static final UniProtKBEntry TEMPLATE_ENTRY = UniProtEntryMocker.create(SP_CANONICAL);
     public static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -84,7 +85,7 @@ public class UniProtKBAsyncDownloadUtils {
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
-    public static void saveEntries(
+    private static void saveEntries(
             CloudSolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
             throws Exception {
         int i = 1;
@@ -100,6 +101,21 @@ public class UniProtKBAsyncDownloadUtils {
         saveTaxonomyEntry(cloudSolrClient, 9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
+
+    public static void saveEntries(
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            int limit)
+            throws Exception {
+        for (int i = 1; i <= limit; i++) {
+            saveEntry(cloudSolrClient, i, "", i % 2 == 0, storeClient);
+        }
+        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        saveTaxonomyEntry(cloudSolrClient, 9606L);
+        cloudSolrClient.commit(SolrCollection.taxonomy.name());
+    }
+
+    static AtomicInteger c = new AtomicInteger(0);
 
     public static void saveEntry(
             CloudSolrClient cloudSolrClient,
@@ -142,6 +158,15 @@ public class UniProtKBAsyncDownloadUtils {
         }
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
+        if (i % 10 == 0) {
+            convert.unirefCluster50 = "UniRef50_" + "P00001";
+            convert.unirefCluster90 = "UniRef90_" + "P00001";
+            convert.unirefCluster100 = "UniRef100_" + "P00001";
+        } else {
+            convert.unirefCluster50 = "UniRef50_" + acc;
+            convert.unirefCluster90 = "UniRef90_" + acc;
+            convert.unirefCluster100 = "UniRef100_" + acc;
+        }
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
         storeClient.saveEntry(uniProtKBEntry);

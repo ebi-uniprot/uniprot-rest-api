@@ -59,16 +59,16 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControllerIT {
 
-    @Value("${id.mapping.max.to.ids.with.facets.count}")
+    @Value("${mapping.max.to.ids.with.facets.count}")
     protected Integer maxIdsWithFacets;
 
-    @Value("${id.mapping.max.from.ids.count}")
+    @Value("${mapping.max.from.ids.count}")
     protected Integer maxFromIdsAllowed;
 
-    @Value("${id.mapping.max.to.ids.count}")
+    @Value("${mapping.max.to.ids.count}")
     protected Integer maxToIdsAllowed;
 
-    @Value("${id.mapping.max.to.ids.enrich.count}")
+    @Value("${mapping.max.to.ids.enrich.count}")
     protected Integer maxToIdsEnrichAllowed;
 
     protected abstract String getIdMappingResultPath();

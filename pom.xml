@@ -62,6 +62,7 @@
 
 	<modules>
 		<module>common-rest</module>
+		<module>support-data-common</module>
 		<module>uniprotkb-common</module>
 		<module>uniprotkb-rest</module>
 		<module>idmapping-common</module>
@@ -70,8 +71,9 @@
 		<module>uniparc-rest</module>
 		<module>uniref-common</module>
 		<module>uniref-rest</module>
-		<module>support-data-common</module>
 		<module>async-download-rest</module>
+		<module>mapto-common</module>
+		<module>mapto-rest</module>
 		<module>support-data-rest</module>
 		<module>proteome-rest</module>
 		<module>unisave-rest</module>
@@ -235,6 +237,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

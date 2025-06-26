@@ -66,13 +66,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobControllerIT {
-    @Value("${id.mapping.max.from.ids.count}")
+    @Value("${mapping.max.from.ids.count}")
     private Integer maxCountCSV;
 
-    @Value("${id.mapping.max.to.ids.enrich.count}")
+    @Value("${mapping.max.to.ids.enrich.count}")
     private Integer maxAllowedIdsToEnrich;
 
-    @Value("${id.mapping.max.to.ids.count}")
+    @Value("${mapping.max.to.ids.count}")
     private Integer maxAllowedToIds;
 
     private static final String JOB_SUBMIT_ENDPOINT = IDMAPPING_PATH + "/run";
@@ -328,17 +328,16 @@ class IdMappingJobControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", hasSize(2)))
+                .andExpect(jsonPath("$.messages", hasSize(1)))
                 .andExpect(
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid",
-                                        "Invalid parameter 'taxId'")));
+                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid")));
     }
 
     @Test
-    void submittingJobWithValidFromToWithInvalidTaxIdCausesBadRequest() throws Exception {
+    void submittingJobWithValidAnyFromToWithTaxIdCausesSuccess() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -350,11 +349,9 @@ class IdMappingJobControllerIT {
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages", notNullValue()))
-                .andExpect(jsonPath("$.messages", hasSize(1)))
-                .andExpect(jsonPath("$.messages[*]", contains("Invalid parameter 'taxId'")));
+                .andExpect(jsonPath("$.jobId").value("9Sv6fK80gq"));
     }
 
     @Test
@@ -487,8 +484,8 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
-     * and to result without any uniprot data in the status/{jobId} response. So to do that we just
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from and
+     * to result without any uniprot data in the status/{jobId} response. So to do that we just
      * return the plain results url redirect without any db in the path even though the mapped to id
      * is uniprotkb, uniparc or uniref ids plain result url :
      * https://localhost/idmapping/results/{jobId}
@@ -541,8 +538,8 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
-     * and to result without any uniprot data. So to do that we just return the plain results url
+     * If the mapped ids are more than mapping.max.to.ids.enrich.count we return the plain from and
+     * to result without any uniprot data. So to do that we just return the plain results url
      * redirect without any db in the path even though the mapped to id is uniprotkb, uniparc or
      * uniref ids plain result url : https://localhost/idmapping/results/{jobId}
      */

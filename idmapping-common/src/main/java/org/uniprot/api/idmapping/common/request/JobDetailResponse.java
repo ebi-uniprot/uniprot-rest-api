@@ -18,6 +18,8 @@ import lombok.EqualsAndHashCode;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobDetailResponse extends IdMappingJobRequest {
     private String redirectURL;
+    private String query;
+    private String includeIsoform;
     private List<ProblemPair> warnings;
     private List<ProblemPair> errors;
 }

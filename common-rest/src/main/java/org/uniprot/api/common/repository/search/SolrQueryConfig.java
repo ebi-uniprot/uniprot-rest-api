@@ -28,6 +28,9 @@ public class SolrQueryConfig {
     private String queryFields;
 
     @Setter(AccessLevel.NONE)
+    private String fields;
+
+    @Setter(AccessLevel.NONE)
     private String extraOptmisableQueryFields;
 
     @Setter(AccessLevel.NONE)
