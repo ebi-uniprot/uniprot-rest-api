@@ -15,10 +15,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.search.SolrCollection.*;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
@@ -138,7 +135,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     void submitJobAndVerifyGetResultWithFacets() throws Exception {
         // when
         String query = "accession:(P00001  OR P00002 OR P00003)";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
@@ -178,7 +175,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     void submitJobAndVerifyGetResultWithFacetsAndResults() throws Exception {
         // when
         String query = "accession:(P00001  OR P00002 OR P00003)";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         await().until(() -> mapToJobRepository.existsById(jobId));
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
@@ -224,6 +221,27 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
                                         "UniRef90_P00001",
                                         "UniRef90_P00002",
                                         "UniRef90_P00003")));
+    }
+
+    @Test
+    void submitJobAndVerifyGetResultWithEmptyResult() throws Exception {
+        // when
+        String randomString = UUID.randomUUID().toString();
+        String query = randomString;
+        String jobId = callRunAPIAndVerify(query);
+        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(isJobFinished(jobId));
+        String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(jobResultsUrl, jobId)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        .param("query", "*:*");
+        ResultActions response = mockMvc.perform(requestBuilder);
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.request.MapToSearchRequest;
-import org.uniprot.api.mapto.request.UniProtKBMapToSearchRequest;
 import org.uniprot.store.config.UniProtDataType;
 
 @Component
@@ -24,9 +23,7 @@ public class MapToRequestConverter {
 
     private Map<String, String> getExtraParams(MapToSearchRequest request) {
         if (isUniProtKBSourceType(request)) {
-            return Map.of(
-                    INCLUDE_ISOFORM,
-                    String.valueOf(((UniProtKBMapToSearchRequest) request).isIncludeIsoform()));
+            return Map.of(INCLUDE_ISOFORM, String.valueOf(request.isIncludeIsoform()));
         }
         return Map.of();
     }

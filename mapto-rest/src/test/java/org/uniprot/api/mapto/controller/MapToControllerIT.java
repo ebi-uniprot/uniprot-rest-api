@@ -107,7 +107,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testStreamMapToEntryIds() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         MockHttpServletRequestBuilder requestBuilder =
@@ -143,7 +143,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testGetMapToEntryIds() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
 
@@ -194,7 +194,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testGetMapToEntryIds_customPageSize() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
 
@@ -247,7 +247,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testGetMapToAllEntryIds() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
 
@@ -293,7 +293,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testStreamMapToEntryIds_withDifferentMediaTypes(String mediaType) throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         MockHttpServletRequestBuilder requestBuilder =
@@ -326,7 +326,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testResultMapToEntryIds_withDifferentMediaTypes(String mediaType) throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         MockHttpServletRequestBuilder requestBuilder =
@@ -343,7 +343,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testStreamMapToEntryIds_limitExceedJobNotFound() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         MockHttpServletRequestBuilder requestBuilder =
@@ -367,7 +367,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     void testResultsMapToEntryIds_limitExceedJobNotFound() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         MockHttpServletRequestBuilder requestBuilder =

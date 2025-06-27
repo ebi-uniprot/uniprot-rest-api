@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
@@ -158,12 +159,24 @@ public abstract class BaseMapToControllerIT {
 
     protected abstract String getQueryInLimits();
 
+    protected String callRunAPIAndVerify(String query) throws Exception {
+
+        ResultActions response = callRun(query);
+
+        return verifyRunResponseAndGetJobId(response);
+    }
+
     protected String callRunAPIAndVerify(String query, boolean includeIsoform) throws Exception {
 
         ResultActions response = callRun(query, includeIsoform);
 
+        return verifyRunResponseAndGetJobId(response);
+    }
+
+    private static @NotNull String verifyRunResponseAndGetJobId(ResultActions response)
+            throws Exception {
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
@@ -173,12 +186,20 @@ public abstract class BaseMapToControllerIT {
         return jobId;
     }
 
+    protected ResultActions callRun(String query) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder =
+                post(getDownloadAPIsBasePath() + "/run")
+                        .header(ACCEPT, APPLICATION_JSON)
+                        .param("query", query);
+        return getMockMvc().perform(requestBuilder);
+    }
+
     protected ResultActions callRun(String query, boolean includeIsoform) throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, APPLICATION_JSON)
                         .param("query", query)
-                        .param("includeIsoform", "" + includeIsoform);
+                        .param("includeIsoform", String.valueOf(includeIsoform));
         return getMockMvc().perform(requestBuilder);
     }
 

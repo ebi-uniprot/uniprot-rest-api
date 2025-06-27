@@ -43,7 +43,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void testSubmitJobAndVerifyGetStatus() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         ResultActions resultActions = callGetJobStatus(jobId);
         // then
@@ -73,7 +73,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndVerifyGetDetails() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         ResultActions response = callGetJobDetails(jobId);
         // then
@@ -90,7 +90,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobToFinishAndVerifyGetStatus() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -117,7 +117,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
         // when
         mockServerError();
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -147,7 +147,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobToFinishAndVerifyGetDetails() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -167,7 +167,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndGetResultsBeforeItFinishes() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
 
         // then
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
@@ -181,9 +181,9 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void runSameJobTwice_returnsSameJobId() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
-        ResultActions response = callRun(query, false);
+        ResultActions response = callRun(query);
         waitUntilTheJobIsAvailable(jobId);
 
         response.andDo(log())
@@ -207,7 +207,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndGetResultsExceedingTheEnrichmentLimit() throws Exception {
         // when
         String query = getQueryBeyondEnrichmentLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*"));
@@ -225,7 +225,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndGetResultsExceedingTheToIdsLimit() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobErrored(jobId));
         ResultActions response = callGetJobStatus(jobId);
@@ -245,7 +245,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitJobAndGetResultsExceedingTheFacetLimit() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response =
@@ -268,7 +268,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndStreamResultsBeforeItFinishes() throws Exception {
         // when
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
 
         // then
         MvcResult mvcResult =
@@ -293,7 +293,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitMapToJob_size() throws Exception {
         // when
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -304,7 +304,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJob_filter() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -315,7 +315,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJob_andResultsWithCursor() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         ResultActions response = callGetJobResults(jobId, Map.of("query", "*:*"));
@@ -338,7 +338,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJob_sort() throws Exception {
         String query = getQueryLessThanPageSize();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -350,7 +350,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @MethodSource("getResultsContentTypes")
     void submitJobAndGetResults(MediaType mediaType) throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -369,7 +369,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitJobAndGetResultsNonSupportedType() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         // then
@@ -392,7 +392,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJobAndStreamResults() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, Map.of("query", "*:*"), APPLICATION_JSON);
@@ -402,7 +402,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJobAndStreamResultsWithDownloadFile() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results =
@@ -415,7 +415,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @MethodSource("getStreamContentTypes")
     void submitMapToJobAndStreamResults_differentFormats(MediaType mediaType) throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         getJobResultsAsStream(jobId, Map.of("query", "*:*"), mediaType);
@@ -424,7 +424,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJobAndStreamResults_filter() throws Exception {
         String query = getQueryInLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, getFilterQuery(), APPLICATION_JSON);
@@ -435,7 +435,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     void submitJobAndStreamExceedingTheEnrichmentLimit() throws Exception {
         // when
         String query = getQueryBeyondEnrichmentLimits();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
 
@@ -452,7 +452,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
     @Test
     void submitMapToJobAndStreamResults_sort() throws Exception {
         String query = getQueryLessThanPageSize();
-        String jobId = callRunAPIAndVerify(query, false);
+        String jobId = callRunAPIAndVerify(query);
         waitUntilTheJobIsAvailable(jobId);
         await().until(isJobFinished(jobId));
         String results = getJobResultsAsStream(jobId, getSortQuery(), APPLICATION_JSON);
