@@ -2,11 +2,14 @@ package org.uniprot.api.common.repository.search.suggestion;
 
 import static java.util.Collections.emptyList;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.common.util.NamedList;
 import org.springframework.core.convert.converter.Converter;
 import org.uniprot.core.util.Utils;
 
@@ -23,15 +26,48 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
     public List<Suggestion> convert(QueryResponse queryResponse) {
         long resultHits = queryResponse.getResults().getNumFound();
         SpellCheckResponse spellCheckResponse = queryResponse.getSpellCheckResponse();
-        if (resultHits == 0L
-                && Utils.notNull(spellCheckResponse)
-                && Utils.notNullNotEmpty(spellCheckResponse.getCollatedResults())) {
-            return spellCheckResponse.getCollatedResults().stream()
-                    .map(this::getSuggestion)
-                    .collect(Collectors.toList());
-        } else {
-            return emptyList();
+        if (resultHits == 0L && Utils.notNull(spellCheckResponse)) {
+            if (Utils.notNullNotEmpty(spellCheckResponse.getCollatedResults())) {
+                return spellCheckResponse.getCollatedResults().stream()
+                        .map(this::getSuggestion)
+                        .collect(Collectors.toList());
+            } else if (Utils.notNullNotEmpty(spellCheckResponse.getSuggestions())) {
+                Map<String, SpellCheckResponse.Suggestion> suggestionMap =
+                        spellCheckResponse.getSuggestionMap();
+                String query =
+                        String.valueOf(
+                                ((NamedList) (queryResponse.getResponseHeader().get("params")))
+                                        .get("q"));
+
+                List<Suggestion> suggestions = new LinkedList<>();
+                suggestionMap.keySet().stream()
+                        .filter(query::contains)
+                        .forEach(key -> populateSuggestion(suggestionMap, suggestions, key, query));
+                return suggestions;
+            }
         }
+        return emptyList();
+    }
+
+    private void populateSuggestion(
+            Map<String, SpellCheckResponse.Suggestion> suggestionMap,
+            List<Suggestion> suggestions,
+            String key,
+            String query) {
+        SpellCheckResponse.Suggestion suggestion = suggestionMap.get(key);
+        for (int i = 0; i < suggestion.getNumFound(); i++) {
+            String alternative = suggestion.getAlternatives().get(i);
+            int alternativeFrequency = suggestion.getAlternativeFrequencies().get(i);
+            suggestions.add(getSuggestion(key, query, alternative, alternativeFrequency));
+        }
+    }
+
+    private static Suggestion getSuggestion(
+            String key, String query, String alternative, int alternativeFrequency) {
+        return Suggestion.builder()
+                .query(query.replace(key, alternative).replace(" AND ", " "))
+                .hits(alternativeFrequency)
+                .build();
     }
 
     private Suggestion getSuggestion(SpellCheckResponse.Collation collation) {
