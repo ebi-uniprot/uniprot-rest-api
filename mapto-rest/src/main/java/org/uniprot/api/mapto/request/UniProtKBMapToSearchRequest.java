@@ -10,6 +10,7 @@ import lombok.Data;
 public class UniProtKBMapToSearchRequest implements MapToSearchRequest {
     private boolean includeIsoform;
     private UniProtDataType to;
+
     @ValidSolrQuerySyntax
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,

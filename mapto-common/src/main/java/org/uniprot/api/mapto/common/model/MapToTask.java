@@ -1,9 +1,8 @@
 package org.uniprot.api.mapto.common.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.mapto.common.search.MapToSearchService;
@@ -11,8 +10,10 @@ import org.uniprot.api.mapto.common.service.MapToJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 
 @EqualsAndHashCode
 @Slf4j
