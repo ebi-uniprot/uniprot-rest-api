@@ -42,7 +42,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
-import org.uniprot.api.idmapping.common.service.TestConfig;
 import org.uniprot.api.mapto.MapToREST;
 import org.uniprot.api.mapto.common.RedisConfiguration;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -63,7 +62,6 @@ import com.jayway.jsonpath.JsonPath;
 @WebMvcTest({UniProtKBUniRefMapToController.class})
 @ContextConfiguration(
         classes = {
-            TestConfig.class,
             UniRefDataStoreTestConfig.class,
             UniProtKBDataStoreTestConfig.class,
             MapToREST.class,

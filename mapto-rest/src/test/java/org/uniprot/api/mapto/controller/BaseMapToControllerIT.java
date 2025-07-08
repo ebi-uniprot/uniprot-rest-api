@@ -46,10 +46,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.lifecycle.Startables;
-import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
@@ -63,7 +59,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Testcontainers
 public abstract class BaseMapToControllerIT {
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
     protected static final String SERVER_ERROR = "There is an error from the server side";
@@ -78,13 +73,9 @@ public abstract class BaseMapToControllerIT {
 
     protected CloudSolrClient cloudSolrClient;
 
-    @Container
-    protected static GenericContainer<?> redisContainer =
-            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
-
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        Startables.deepStart(redisContainer).join();
+        GenericContainer<?> redisContainer = RedisTestContainer.getInstance();
         assertTrue(redisContainer.isRunning());
         System.setProperty("uniprot.redis.host", redisContainer.getHost());
         System.setProperty(
@@ -144,7 +135,6 @@ public abstract class BaseMapToControllerIT {
             cluster = null;
         }
         mapToJobRepository.deleteAll();
-        redisContainer.stop();
 
         // Delete tempDir content
         FileSystemUtils.deleteRecursively(tempClusterDir);
