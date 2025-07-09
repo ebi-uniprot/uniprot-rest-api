@@ -3,9 +3,6 @@ package org.uniprot.api.idmapping.common.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -18,9 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService;
 
 /**
@@ -30,28 +25,11 @@ import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService
 @TestConfiguration
 @Testcontainers
 public class TestConfig {
-    private static final String REDIS_IMAGE_VERSION = "redis:5.0.3-alpine";
-
-    @Container
-    private final GenericContainer redisServer =
-            new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION))
-                    .withExposedPorts(6379)
-                    .withReuse(true)
-                    .withCommand("redis-server --save \"\" --appendonly no");
-
-    @PostConstruct
-    public void postConstruct() {
-        redisServer.start();
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        this.redisServer.stop();
-    }
 
     @Bean(destroyMethod = "shutdown")
     @Profile("idmapping")
     RedissonClient redisson() {
+        GenericContainer redisServer = RedisTestContainer.getInstance();
         Config config = new Config();
         config.useSingleServer()
                 .setAddress(

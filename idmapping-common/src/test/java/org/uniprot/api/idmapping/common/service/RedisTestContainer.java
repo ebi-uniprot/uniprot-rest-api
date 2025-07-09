@@ -1,4 +1,4 @@
-package org.uniprot.api.mapto.controller;
+package org.uniprot.api.idmapping.common.service;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
