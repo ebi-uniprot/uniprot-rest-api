@@ -1,7 +1,6 @@
 package org.uniprot.api.async.download.messaging.producer;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,8 +9,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
-
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.amqp.core.Message;
@@ -26,7 +24,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.async.download.messaging.config.common.DownloadConfigProperties;
@@ -52,25 +49,15 @@ public abstract class BasicProducerMessageServiceIT {
 
     @TempDir private Path tempDir;
 
-    @Container
-    private static GenericContainer redisServer =
-            new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION))
-                    .withExposedPorts(6379)
-                    .withReuse(true);
+    protected static GenericContainer redisServer =
+            new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION)).withExposedPorts(6379);
 
-    @Container
     protected static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse(RABBITMQ_IMAGE_VERSION))
                     .withExposedPorts(5672, 15672)
                     .waitingFor(Wait.forLogMessage(".*Server startup complete.*", 1))
                     .withStartupTimeout(Duration.ofMinutes(2))
                     .withTmpFs(Map.of("/var/lib/rabbitmq", "rw"));
-
-    @PreDestroy
-    public void preDestroy() {
-        redisServer.stop();
-        rabbitMQContainer.stop();
-    }
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
@@ -82,6 +69,12 @@ public abstract class BasicProducerMessageServiceIT {
         System.setProperty("uniprot.redis.host", redisServer.getHost());
         System.setProperty("uniprot.redis.port", String.valueOf(redisServer.getFirstMappedPort()));
         propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
+    }
+
+    @AfterAll
+    public void cleanUpData() {
+        rabbitMQContainer.stop();
+        redisServer.stop();
     }
 
     protected static void validateDownloadJob(String jobId, DownloadJob downloadJob) {

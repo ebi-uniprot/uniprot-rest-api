@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.common.service;
+package org.uniprot.api.idmapping.common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.RedisTestContainer;
 import org.uniprot.api.idmapping.common.service.impl.RedisCacheMappingJobService;
 
 /**
@@ -37,7 +39,8 @@ public class TestConfig {
                                 + redisServer.getHost()
                                 + ":"
                                 + redisServer.getFirstMappedPort());
-        return Redisson.create(config);
+        RedissonClient client = Redisson.create(config);
+        return client;
     }
 
     @Bean

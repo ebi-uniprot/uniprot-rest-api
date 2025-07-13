@@ -22,8 +22,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
@@ -32,12 +30,9 @@ import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Testcontainers
 public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @Autowired protected AmqpAdmin amqpAdmin;
-
-    @Container
     protected static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"))
                     .withExposedPorts(5672, 15672)
@@ -45,7 +40,6 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
                     .withStartupTimeout(Duration.ofMinutes(2))
                     .withTmpFs(Map.of("/var/lib/rabbitmq", "rw"));
 
-    @Container
     protected static GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 

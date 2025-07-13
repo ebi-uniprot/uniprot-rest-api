@@ -33,7 +33,9 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
             "org.uniprot.api.rest",
             "org.uniprot.api.uniprotkb.common",
             "org.uniprot.api.uniref.common",
-            "org.uniprot.api.idmapping.common",
+            "org.uniprot.api.idmapping.common.service",
+            "org.uniprot.api.idmapping.common.response",
+            "org.uniprot.api.idmapping.common.repository",
             "org.uniprot.api.common.repository.stream.store.uniprotkb",
             "org.uniprot.api.common.repository.stream.rdf",
             "org.uniprot.api.support.data.common"
