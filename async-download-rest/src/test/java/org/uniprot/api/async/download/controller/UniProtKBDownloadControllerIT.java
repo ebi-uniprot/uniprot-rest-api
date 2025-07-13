@@ -48,7 +48,6 @@ import org.uniprot.api.async.download.model.request.ValidDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
-import org.uniprot.api.idmapping.common.service.TestConfig;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
@@ -71,7 +70,6 @@ import lombok.extern.slf4j.Slf4j;
 @WebMvcTest({UniProtKBDownloadController.class})
 @ContextConfiguration(
         classes = {
-            TestConfig.class,
             UniProtKBDataStoreTestConfig.class,
             AsyncDownloadRestApp.class,
             ErrorHandlerConfig.class,
