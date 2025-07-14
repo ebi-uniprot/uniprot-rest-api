@@ -281,11 +281,9 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
-                .andExpect(xpath("//ErrorInfo").exists())
-                .andExpect(xpath("//ErrorInfo/url").string("http://localhost/genecentric/stream"))
-                .andExpect(
-                        xpath("//ErrorInfo/messages[1]/messages")
-                                .string("'query' is a required parameter"));
+                .andExpect(xpath("//errorInfo").exists())
+                .andExpect(xpath("//errorInfo/url").string("http://localhost/genecentric/stream"))
+                .andExpect(xpath("//errorInfo/messages").string("'query' is a required parameter"));
     }
 
     private void saveEntry(int i) {

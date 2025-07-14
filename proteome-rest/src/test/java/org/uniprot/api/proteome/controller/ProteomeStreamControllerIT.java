@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
 
 import java.time.LocalDateTime;
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,10 +28,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
+import org.uniprot.api.rest.controller.AbstractRdfStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -46,12 +47,15 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(ProteomeController.class)
 @ExtendWith(value = {SpringExtension.class})
-class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
-
+class ProteomeStreamControllerIT extends AbstractRdfStreamControllerIT {
     private static final String EXCLUDED_PROTEOME = "UP999999999";
+    public static final String UP_ID = "UP000005010";
 
     @Autowired private ProteomeQueryRepository repository;
     private int totalEntriesSaved;
+
+    @MockBean(name = "proteomeRdfRestTemplate")
+    private RestTemplate restTemplate;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -294,11 +298,9 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
-                .andExpect(xpath("//ErrorInfo").exists())
-                .andExpect(xpath("//ErrorInfo/url").string("http://localhost/proteomes/stream"))
-                .andExpect(
-                        xpath("//ErrorInfo/messages[1]/messages")
-                                .string("'query' is a required parameter"));
+                .andExpect(xpath("//errorInfo").exists())
+                .andExpect(xpath("//errorInfo/url").string("http://localhost/proteomes/stream"))
+                .andExpect(xpath("//errorInfo/messages").string("'query' is a required parameter"));
     }
 
     @Test
@@ -410,5 +412,20 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     private void saveEntry(int i) {
         ProteomeDocument doc = ProteomeControllerITUtils.getProteomeDocument(i);
         storeManager.saveDocs(DataStoreManager.StoreType.PROTEOME, doc);
+    }
+
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getIdField() {
+        return "upid:";
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return UP_ID;
     }
 }

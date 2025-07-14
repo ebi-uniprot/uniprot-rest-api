@@ -7,15 +7,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,10 +27,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
@@ -67,9 +72,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UPID = "UP000005640";
     private static final String EXCLUDED_PROTEOME = "UP999999999";
+    public static final String SOURCES = "sources";
     @Autowired private MockMvc mockMvc;
 
     @Autowired private ProteomeQueryRepository repository;
+
+    @MockBean(name = "proteomeRdfRestTemplate")
+    private RestTemplate restTemplate;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -84,6 +93,11 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected SolrQueryRepository getRepository() {
         return repository;
+    }
+
+    @BeforeEach
+    void setUp() {
+        ControllerITUtils.mockRestTemplateResponsesForRDFFormats(restTemplate, "proteomes");
     }
 
     @Override
@@ -288,6 +302,27 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sample>text</sample>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
+                                    .resultMatcher(content().string(equalTo(SAMPLE_TTL)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(containsString(SOURCES))))
+                                    .resultMatcher(content().string(equalTo(SAMPLE_N_TRIPLES)))
+                                    .build())
                     .build();
         }
 
@@ -332,6 +367,33 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upid' value has invalid format. It should be a valid Proteome UPID")))
                                     .build())
                     .build();
         }
