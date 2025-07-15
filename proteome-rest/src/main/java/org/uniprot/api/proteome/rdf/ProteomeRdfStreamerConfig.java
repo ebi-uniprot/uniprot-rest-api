@@ -60,7 +60,7 @@ public class ProteomeRdfStreamerConfig {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "proteome.rdf.streamer")
+    @ConfigurationProperties(prefix = "proteomes.rdf.streamer")
     public RdfStreamerConfigProperties proteomeStreamerConfigProperties() {
         return new RdfStreamerConfigProperties();
     }
