@@ -84,6 +84,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(jsonPath("$.to", equalTo("UNIREF")))
                 .andExpect(jsonPath("$.query", equalTo("*:*")))
                 .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
+        await().until(isJobFinished(jobId));
     }
 
     @Test
@@ -175,6 +176,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages[0]", containsString("not found")));
+        await().until(isJobFinished(jobId));
     }
 
     @Test
@@ -190,6 +192,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", is(jobId)));
+        await().until(isJobFinished(jobId));
     }
 
     @Test
@@ -277,6 +280,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
         assertThat(response.getContentAsString(), containsString("not found"));
+        await().until(isJobFinished(jobId));
     }
 
     @Test
