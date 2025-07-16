@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data;
+package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
 /**
@@ -39,7 +38,7 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
-                        .queryParam("query", "id:" + getSearchAccession())
+                        .queryParam("query", getIdField() + getSearchAccession())
                         .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -63,7 +62,7 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
-                        .queryParam("query", "id:" + getSearchAccession())
+                        .queryParam("query", getIdField() + getSearchAccession())
                         .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -82,6 +81,10 @@ public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamCo
                                 .string(
                                         containsString(
                                                 "<messages>Unable to find last header : &lt;/owl:Ontology&gt;</messages>")));
+    }
+
+    protected String getIdField() {
+        return "id:";
     }
 
     @Test

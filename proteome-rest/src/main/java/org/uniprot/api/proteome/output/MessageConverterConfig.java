@@ -42,24 +42,30 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new ErrorMessageConverter());
-                converters.add(new ErrorMessageXlsConverter());
-                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(new ListMessageConverter(downloadGatekeeper));
-                converters.add(new GeneCentricFastaMessageConverter(downloadGatekeeper));
+                int index = 0;
 
-                ReturnFieldConfig returnFieldConfig =
+                converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
+                converters.add(index++, new ErrorMessageXMLConverter()); // to handle xml error
+                // messages
+                converters.add(index++, new ListMessageConverter(downloadGatekeeper));
+
+                ReturnFieldConfig proteomeReturnFieldConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PROTEOME);
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 ProteomeEntry.class,
-                                returnFieldConfig,
+                                proteomeReturnFieldConfig,
                                 new ProteomeEntryValueMapper(),
                                 downloadGatekeeper));
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 ProteomeEntry.class,
-                                returnFieldConfig,
+                                proteomeReturnFieldConfig,
                                 new ProteomeEntryValueMapper(),
                                 downloadGatekeeper));
 
@@ -67,11 +73,16 @@ public class MessageConverterConfig {
                         new JsonMessageConverter<>(
                                 ProteomeJsonConfig.getInstance().getSimpleObjectMapper(),
                                 ProteomeEntry.class,
-                                returnFieldConfig,
+                                proteomeReturnFieldConfig,
                                 downloadGatekeeper);
-                converters.add(0, proteomeJsonConverter);
-                converters.add(1, new ProteomeXmlMessageConverter(downloadGatekeeper));
+                converters.add(index++, proteomeJsonConverter);
+                converters.add(index++, new ProteomeXmlMessageConverter(downloadGatekeeper));
+                converters.add(index++, new RdfMessageConverter(downloadGatekeeper));
+                converters.add(index++, new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(index, new NTriplesMessageConverter(downloadGatekeeper));
 
+                // GeneCentric related converters
+                converters.add(index++, new GeneCentricFastaMessageConverter(downloadGatekeeper));
                 JsonMessageConverter<GeneCentricEntry> geneCentricJsonConverter =
                         new JsonMessageConverter<>(
                                 GeneCentricJsonConfig.getInstance().getSimpleObjectMapper(),
@@ -79,8 +90,8 @@ public class MessageConverterConfig {
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
                                         UniProtDataType.GENECENTRIC),
                                 downloadGatekeeper);
-                converters.add(0, geneCentricJsonConverter);
-                converters.add(1, new GeneCentricXmlMessageConverter(downloadGatekeeper));
+                converters.add(index++, geneCentricJsonConverter);
+                converters.add(index, new GeneCentricXmlMessageConverter(downloadGatekeeper));
             }
         };
     }
@@ -95,7 +106,10 @@ public class MessageConverterConfig {
                         proteomeContext(APPLICATION_XML),
                         proteomeContext(APPLICATION_JSON),
                         proteomeContext(TSV_MEDIA_TYPE),
-                        proteomeContext(XLS_MEDIA_TYPE))
+                        proteomeContext(XLS_MEDIA_TYPE),
+                        proteomeContext(RDF_MEDIA_TYPE),
+                        proteomeContext(TURTLE_MEDIA_TYPE),
+                        proteomeContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
