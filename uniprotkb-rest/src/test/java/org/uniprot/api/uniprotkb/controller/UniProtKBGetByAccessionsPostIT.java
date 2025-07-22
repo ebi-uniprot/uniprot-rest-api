@@ -68,7 +68,7 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
         "P00010"
     };
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
@@ -94,7 +94,7 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
-            storeClient.saveEntry(uniProtKBEntry);
+            uniProtKBStoreClient.saveEntry(uniProtKBEntry);
         }
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
