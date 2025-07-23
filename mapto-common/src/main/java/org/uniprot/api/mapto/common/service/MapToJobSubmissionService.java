@@ -1,5 +1,8 @@
 package org.uniprot.api.mapto.common.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -18,7 +21,7 @@ import net.jodah.failsafe.RetryPolicy;
 @Service
 public class MapToJobSubmissionService {
     private static final String RESULTS_SUBPATH = "results/";
-    public static final String MAPTO = "/mapto";
+    private static final String MAPTO = "/mapto";
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final MapToHashGenerator hashGenerator;
     private final MapToJobService mapToJobService;
@@ -66,9 +69,9 @@ public class MapToJobSubmissionService {
         return new JobStatusResponse(
                 mapToJob.getStatus(),
                 null,
-                mapToJob.getErrors(),
+                Optional.ofNullable(mapToJob.getError()).map(List::of).orElse(List.of()),
                 mapToJob.getCreated(),
-                mapToJob.getTargetIds() != null ? (long) mapToJob.getTargetIds().size() : null,
+                mapToJob.getTotalTargetIds(),
                 null,
                 mapToJob.getUpdated());
     }
@@ -80,7 +83,7 @@ public class MapToJobSubmissionService {
         jobDetailResponse.setFrom(mapToJob.getSourceDB().name());
         jobDetailResponse.setTo(mapToJob.getTargetDB().name());
         jobDetailResponse.setQuery(mapToJob.getQuery());
-        jobDetailResponse.setIncludeIsoform(mapToJob.getExtraParams().get("includeIsoform"));
+        jobDetailResponse.setIncludeIsoform(mapToJob.getIncludeIsoform());
         if (JobStatus.FINISHED == mapToJob.getStatus()) {
             jobDetailResponse.setRedirectURL(
                     getRedirectPathToResults(jobId, requestUrl, mappingType));

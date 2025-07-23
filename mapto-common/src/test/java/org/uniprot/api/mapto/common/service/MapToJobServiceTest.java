@@ -1,13 +1,11 @@
 package org.uniprot.api.mapto.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
 import static org.uniprot.store.config.UniProtDataType.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +23,7 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToJobRequest;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
+import org.uniprot.api.mapto.common.repository.MapToResultRepository;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -38,6 +37,7 @@ public class MapToJobServiceTest {
     public static final UniProtDataType TARGET = UNIREF;
     public static final String QUERY = "query";
     @Mock private MapToJobRepository jobRepository;
+    @Mock private MapToResultRepository mapToResultRepository;
 
     @Mock private MapToJob mapToJob;
 
@@ -53,7 +53,6 @@ public class MapToJobServiceTest {
 
     @Test
     void testCreate() {
-        String id = "ID";
         this.jobService.createMapToJob(mapToJob);
         verify(jobRepository).save(mapToJob);
     }
@@ -61,15 +60,15 @@ public class MapToJobServiceTest {
     @Test
     void testCreateDuplicateJob() {
         String id = "ID";
-        when(this.mapToJob.getId()).thenReturn(id);
-        when(this.jobRepository.findById(id)).thenReturn(Optional.of(mapToJob));
+        when(this.mapToJob.getJobId()).thenReturn(id);
+        when(this.jobRepository.findByJobId(id)).thenReturn(Optional.of(mapToJob));
         assertThrows(RuntimeException.class, () -> this.jobService.createMapToJob(mapToJob));
     }
 
     @Test
     void testFindById() {
         String id = "ID";
-        when(this.jobRepository.findById(id)).thenReturn(Optional.of(this.mapToJob));
+        when(this.jobRepository.findByJobId(id)).thenReturn(Optional.of(this.mapToJob));
         Assertions.assertEquals(this.mapToJob, this.jobService.findMapToJob(id));
     }
 
@@ -77,54 +76,51 @@ public class MapToJobServiceTest {
     void testDelete() {
         String id = "ID";
         jobService.deleteMapToJob(id);
-        verify(this.jobRepository).deleteById(id);
+        verify(this.jobRepository).deleteByJobId(id);
     }
 
     @Test
     void testExists() {
         String id = "ID";
         Boolean answer = true;
-        when(this.jobRepository.existsById(id)).thenReturn(answer);
+        when(this.jobRepository.existsByJobId(id)).thenReturn(answer);
         Assertions.assertEquals(answer, jobService.mapToJobExists(id));
     }
 
     @Test
     void updateStatus() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.of(mapToJob));
 
         jobService.updateStatus(ID, JOB_STATUS);
 
         verify(mapToJob).setStatus(JOB_STATUS);
-        verify(mapToJob).setUpdated(any(LocalDateTime.class));
         verify(jobRepository).save(mapToJob);
     }
 
     @Test
     void updateUpdated() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.of(mapToJob));
 
         jobService.updateUpdated(ID);
 
-        verify(mapToJob).setUpdated(any(LocalDateTime.class));
         verify(jobRepository).save(mapToJob);
     }
 
     @Test
     void setErrors() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.of(mapToJob));
 
-        ProblemPair errors = new ProblemPair(20, "message");
-        jobService.setErrors(ID, errors);
+        ProblemPair error = new ProblemPair(20, "message");
+        jobService.setErrors(ID, error);
 
-        verify(mapToJob).setUpdated(any(LocalDateTime.class));
-        verify(mapToJob).setErrors(List.of(errors));
+        verify(mapToJob).setError(error);
         verify(mapToJob).setStatus(ERROR);
         verify(jobRepository).save(mapToJob);
     }
 
     @Test
     void updateStatus_whenJobNotExist() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.empty());
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.empty());
 
         assertThrows(
                 ResourceNotFoundException.class, () -> jobService.updateStatus(ID, JOB_STATUS));
@@ -132,18 +128,17 @@ public class MapToJobServiceTest {
 
     @Test
     void setTargetIds() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.of(mapToJob));
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.of(mapToJob));
 
         jobService.setTargetIds(ID, TARGET_IDS);
 
-        verify(mapToJob).setTargetIds(TARGET_IDS);
-        verify(mapToJob).setUpdated(any(LocalDateTime.class));
+        verify(mapToJob).setTargetIds(List.of());
         verify(jobRepository).save(mapToJob);
     }
 
     @Test
     void setTargetIds_whenJobNotExist() {
-        when(jobRepository.findById(ID)).thenReturn(Optional.empty());
+        when(jobRepository.findByJobId(ID)).thenReturn(Optional.empty());
 
         assertThrows(
                 ResourceNotFoundException.class, () -> jobService.setTargetIds(ID, TARGET_IDS));
@@ -163,8 +158,9 @@ public class MapToJobServiceTest {
         assertSame(SOURCE, capturedMapToJob.getSourceDB());
         assertSame(TARGET, capturedMapToJob.getTargetDB());
         assertSame(QUERY, capturedMapToJob.getQuery());
-        assertSame(extraParams, capturedMapToJob.getExtraParams());
+        assertSame(
+                Boolean.valueOf(extraParams.get("includeIsoform")),
+                capturedMapToJob.getIncludeIsoform());
         assertSame(capturedMapToJob.getCreated(), capturedMapToJob.getUpdated());
-        assertNotNull(capturedMapToJob.getCreated());
     }
 }

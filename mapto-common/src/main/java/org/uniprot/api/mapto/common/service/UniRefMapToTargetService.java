@@ -20,6 +20,7 @@ public class UniRefMapToTargetService extends MapToTargetService<UniRefEntryLigh
             UniRefFacetConfig uniRefEntryFacetConfig,
             RequestConverter uniRefRequestConverter,
             MapToJobService mapToJobService,
+            MapToResultService mapToResultService,
             RdfStreamer uniRefRdfStreamer) {
         super(
                 storeStreamer,
@@ -27,6 +28,7 @@ public class UniRefMapToTargetService extends MapToTargetService<UniRefEntryLigh
                 uniRefEntryFacetConfig,
                 uniRefRequestConverter,
                 mapToJobService,
+                mapToResultService,
                 uniRefRdfStreamer);
     }
 

@@ -39,7 +39,7 @@ public class MapToTask implements Runnable {
 
     @Override
     public void run() {
-        String jobId = mapToJob.getId();
+        String jobId = mapToJob.getJobId();
         try {
             mapToJobService.updateStatus(jobId, JobStatus.RUNNING);
             MapToSearchResult targetIdPage = getTargetIdPage(mapToJob, null);

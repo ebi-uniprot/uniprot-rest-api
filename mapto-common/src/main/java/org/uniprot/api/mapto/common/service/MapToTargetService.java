@@ -23,6 +23,7 @@ import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 
 public abstract class MapToTargetService<T> extends AbstractIdService<T> {
     private final MapToJobService mapToJobService;
+    private final MapToResultService mapToResultService;
     private final RdfStreamer rdfStreamer;
 
     protected MapToTargetService(
@@ -31,45 +32,50 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
             FacetConfig facetConfig,
             RequestConverter requestConverter,
             MapToJobService mapToJobService,
+            MapToResultService mapToResultService,
             RdfStreamer rdfStreamer) {
         super(storeStreamer, tupleStream, facetConfig, requestConverter);
         this.mapToJobService = mapToJobService;
+        this.mapToResultService = mapToResultService;
         this.rdfStreamer = rdfStreamer;
     }
 
     public QueryResult<T> getMappedEntries(String jobId, SearchRequest searchRequest) {
         MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
-        return getMappedEntries(searchRequest, mapToJob.getTargetIds());
-    }
-
-    public QueryResult<T> getMappedEntries(SearchRequest searchRequest, List<String> ids) {
+        Long totalTargetIds = mapToJob.getTotalTargetIds();
+        validateMappedIdsEnrichmentLimit(totalTargetIds);
         List<Facet> facets = null;
-        validateMappedIdsEnrichmentLimit(ids.size());
         List<ProblemPair> warnings = new ArrayList<>();
+        int pageSize = getPageSize(searchRequest);
+        CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, totalTargetIds);
+        List<String> idPage;
+
         if (solrSearchNeededBySearchRequest(searchRequest, false)) {
+            List<String> targetIds = mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
             // unset facets if mapped to ids exceeds the allowed limit
             // and set the warning
-            if (facetingDisallowed(searchRequest, ids)) {
+            if (facetingDisallowed(searchRequest, totalTargetIds)) {
                 ProblemPair facetWarning = removeFacetsAndGetFacetWarning(searchRequest);
                 warnings.add(facetWarning);
             }
             SolrStreamFacetResponse solrStreamResponse =
-                    searchMappedIdsFacetsBySearchRequest(searchRequest, ids);
+                    searchMappedIdsFacetsBySearchRequest(searchRequest, targetIds);
 
+            totalTargetIds = (long) solrStreamResponse.getIds().size();
+            cursor = CursorPage.of(searchRequest.getCursor(), pageSize, totalTargetIds);
+            targetIds = solrStreamResponse.getIds();
+            idPage =
+                    targetIds.subList(
+                            cursor.getOffset().intValue(), CursorPage.getNextOffset(cursor));
             facets = solrStreamResponse.getFacets();
-
-            ids = solrStreamResponse.getIds();
+        } else {
+            // compute the cursor and get subset of accessions as per cursor
+            idPage = mapToResultService.findTargetIdsByMapToJob(mapToJob, cursor);
         }
-
-        // compute the cursor and get subset of accessions as per cursor
-        int pageSize = getPageSize(searchRequest);
-        CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, ids.size());
-        List<String> idsInPage =
-                ids.subList(cursor.getOffset().intValue(), CursorPage.getNextOffset(cursor));
         // get entries from voldemort
-        Stream<T> result = getEntries(idsInPage, searchRequest.getFields());
+        Stream<T> entries = getEntries(idPage, searchRequest.getFields());
         return QueryResult.<T>builder()
-                .content(result)
+                .content(entries)
                 .page(cursor)
                 .facets(facets)
                 .warnings(warnings)
@@ -85,14 +91,17 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
 
     public Stream<T> streamEntries(String jobId, StreamRequest streamRequest) {
         MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
-        return streamEntries(streamRequest, mapToJob.getTargetIds());
+        List<String> allTargetIdsByMapToJob =
+                mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
+        return streamEntries(streamRequest, allTargetIdsByMapToJob);
     }
 
     public Stream<String> streamRdf(
             String jobId, UniRefStreamRequest streamRequest, String dataType, String format) {
-        List<String> entryIds =
-                streamFilterAndSortEntries(
-                        streamRequest, mapToJobService.findMapToJob(jobId).getTargetIds());
+        MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
+        List<String> allTargetIdsByMapToJob =
+                mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
+        List<String> entryIds = streamFilterAndSortEntries(streamRequest, allTargetIdsByMapToJob);
         return rdfStreamer.stream(entryIds, dataType, format);
     }
 

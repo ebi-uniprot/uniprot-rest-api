@@ -52,7 +52,8 @@ public class UniProtKBMapToSearchService extends MapToSearchService {
         searchRequest.setQuery(mapToJob.getQuery());
         searchRequest.setSize(MAP_TO_PAGE_SIZE);
         searchRequest.setIncludeIsoform(
-                Optional.ofNullable(mapToJob.getExtraParams().get(INCLUDE_ISOFORM))
+                Optional.ofNullable(mapToJob.getIncludeIsoform())
+                        .map(String::valueOf)
                         .orElse("false"));
         UniProtDataType target = mapToJob.getTargetDB();
         searchRequest.setFields(String.join(",", targetFields.get(target)));
