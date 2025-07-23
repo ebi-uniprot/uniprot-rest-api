@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode;
 public class JobDetailResponse extends IdMappingJobRequest {
     private String redirectURL;
     private String query;
-    private String includeIsoform;
+    private Boolean includeIsoform;
     private List<ProblemPair> warnings;
     private List<ProblemPair> errors;
 }
