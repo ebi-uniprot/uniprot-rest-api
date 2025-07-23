@@ -397,12 +397,12 @@ class GeneCentricUpIdSearchControllerIT {
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
-                .andExpect(xpath("//ErrorInfo").exists())
+                .andExpect(xpath("//errorInfo").exists())
                 .andExpect(
-                        xpath("//ErrorInfo/url")
+                        xpath("//errorInfo/url")
                                 .string("http://localhost/genecentric/upid/INVALID"))
                 .andExpect(
-                        xpath("//ErrorInfo/messages[1]/messages")
+                        xpath("//errorInfo/messages")
                                 .string(
                                         "The 'upid' value has invalid format. It should be a valid Proteome UPID"));
     }

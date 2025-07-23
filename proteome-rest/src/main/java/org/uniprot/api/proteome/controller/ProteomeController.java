@@ -55,7 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/proteomes")
 public class ProteomeController extends BasicSearchController<ProteomeEntry> {
-
+    private static final String DATA_TYPE = "proteomes";
     private final ProteomeQueryService queryService;
 
     @Autowired
@@ -125,7 +125,10 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = ID_PROTEOME_OPERATION,
@@ -141,7 +144,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                                     schema = @Schema(implementation = Proteome.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
@@ -159,8 +163,14 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        ProteomeEntry entry = queryService.findByUniqueId(upid.toUpperCase());
-        return super.getEntityResponse(entry, fields, request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String rdf = queryService.getRdf(upid, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
+        } else {
+            ProteomeEntry entry = queryService.findByUniqueId(upid.toUpperCase());
+            return super.getEntityResponse(entry, fields, request);
+        }
     }
 
     @GetMapping(
@@ -170,7 +180,10 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = STREAM_PROTEOME_OPERATION,
@@ -191,7 +204,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                                                                     name = "entries"))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
@@ -200,8 +214,19 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        return super.stream(
-                () -> queryService.stream(streamRequest), streamRequest, contentType, request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            queryService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    streamRequest,
+                    contentType,
+                    request);
+        } else {
+            return super.stream(
+                    () -> queryService.stream(streamRequest), streamRequest, contentType, request);
+        }
     }
 
     @Override

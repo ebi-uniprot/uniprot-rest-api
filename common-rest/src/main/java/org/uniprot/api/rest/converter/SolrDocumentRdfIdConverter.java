@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
+import org.uniprot.store.search.document.proteome.ProteomeDocument;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 /**
@@ -15,14 +16,18 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 public class SolrDocumentRdfIdConverter implements Function<Document, String> {
     @Override
     public String apply(Document solrDocument) {
-        String[] parts = solrDocument.getDocumentId().split("-");
-        int idValue;
-        if (solrDocument instanceof TaxonomyDocument
-                || solrDocument instanceof LiteratureDocument) {
-            idValue = Integer.parseInt(parts[0]);
+        if (solrDocument instanceof ProteomeDocument) {
+            return solrDocument.getDocumentId();
         } else {
-            idValue = Integer.parseInt(parts[1]);
+            int idValue;
+            String[] parts = solrDocument.getDocumentId().split("-");
+            if (solrDocument instanceof TaxonomyDocument
+                    || solrDocument instanceof LiteratureDocument) {
+                idValue = Integer.parseInt(parts[0]);
+            } else {
+                idValue = Integer.parseInt(parts[1]);
+            }
+            return String.valueOf(idValue);
         }
-        return String.valueOf(idValue);
     }
 }

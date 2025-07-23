@@ -47,10 +47,10 @@ public class MapToTask implements Runnable {
             List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
             validateTargetIdLimit(jobId, allTargetIds, maxTargetIdCount);
         } catch (Exception e) {
+            log.error("Job with id %s finished with error %s".formatted(jobId, e.getMessage()));
             mapToJobService.setErrors(
                     jobId,
                     new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), e.getMessage()));
-            log.error("Job with id %s finished with error %s".formatted(jobId, e.getMessage()));
         }
     }
 

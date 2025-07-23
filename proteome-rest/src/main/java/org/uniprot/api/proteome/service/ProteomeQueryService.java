@@ -2,6 +2,8 @@ package org.uniprot.api.proteome.service;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.request.RequestConverter;
@@ -19,17 +21,33 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     public static final String PROTEOME_ID_FIELD = "upid";
     private final SearchFieldConfig fieldConfig;
+    private final RdfStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<ProteomeDocument> documentIdStream;
 
     public ProteomeQueryService(
             ProteomeQueryRepository repository,
             SearchFieldConfig proteomeSearchFieldConfig,
-            RequestConverter proteomeRequestConverter) {
+            RdfStreamer proteomeRdfStreamer,
+            RequestConverter proteomeRequestConverter,
+            DefaultDocumentIdStream<ProteomeDocument> documentIdStream) {
         super(repository, new ProteomeEntryConverter(), proteomeRequestConverter);
-        fieldConfig = proteomeSearchFieldConfig;
+        this.fieldConfig = proteomeSearchFieldConfig;
+        this.rdfStreamer = proteomeRdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
     protected SearchFieldItem getIdField() {
         return fieldConfig.getSearchFieldItemByName(PROTEOME_ID_FIELD);
+    }
+
+    @Override
+    protected RdfStreamer getRdfStreamer() {
+        return rdfStreamer;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<ProteomeDocument> getDocumentIdStream() {
+        return documentIdStream;
     }
 }
