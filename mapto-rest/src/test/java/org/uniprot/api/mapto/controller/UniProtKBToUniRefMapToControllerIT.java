@@ -10,6 +10,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
@@ -25,8 +26,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
@@ -43,7 +44,6 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.mapto.MapToREST;
-import org.uniprot.api.mapto.common.RedisConfiguration;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
@@ -59,18 +59,17 @@ import org.uniprot.store.search.SolrCollection;
 import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
-@WebMvcTest({UniProtKBUniRefMapToController.class})
 @ContextConfiguration(
         classes = {
             UniRefDataStoreTestConfig.class,
             UniProtKBDataStoreTestConfig.class,
             MapToREST.class,
-            ErrorHandlerConfig.class,
-            RedisConfiguration.class
+            ErrorHandlerConfig.class
         })
 @ExtendWith(SpringExtension.class)
-@AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureMockMvc
+@SpringBootTest
 class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
 
     @SpyBean private UniprotQueryRepository uniprotQueryRepository;
@@ -134,7 +133,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
         // when
         String query = "accession:(P00001  OR P00002 OR P00003)";
         String jobId = callRunAPIAndVerify(query);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(() -> mapToJobRepository.existsByJobId(jobId));
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
@@ -174,7 +173,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
         // when
         String query = "accession:(P00001  OR P00002 OR P00003)";
         String jobId = callRunAPIAndVerify(query);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(() -> mapToJobRepository.existsByJobId(jobId));
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
@@ -184,7 +183,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
                         .param("facets", "identity");
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets").exists())
@@ -227,7 +226,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
         String randomString = UUID.randomUUID().toString();
         String query = randomString;
         String jobId = callRunAPIAndVerify(query);
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(() -> mapToJobRepository.existsByJobId(jobId));
         await().until(isJobFinished(jobId));
         String jobResultsUrl = getDownloadAPIsBasePath() + "/results/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =

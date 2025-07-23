@@ -45,10 +45,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.idmapping.common.service.RedisTestContainer;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -75,13 +74,12 @@ public abstract class BaseMapToControllerIT {
     protected CloudSolrClient cloudSolrClient;
 
     @DynamicPropertySource
-    public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        GenericContainer<?> redisContainer = RedisTestContainer.getInstance();
-        assertTrue(redisContainer.isRunning());
-        System.setProperty("uniprot.redis.host", redisContainer.getHost());
-        System.setProperty(
-                "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
-        propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
+    public static void setUpThings(DynamicPropertyRegistry registry) {
+        PostgreSQLContainer<?> postgresContainer = PostgresTestContainer.getInstance();
+        assertTrue(postgresContainer.isRunning());
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
     }
 
     @BeforeAll
@@ -196,7 +194,7 @@ public abstract class BaseMapToControllerIT {
     protected abstract MockMvc getMockMvc();
 
     protected void waitUntilTheJobIsAvailable(String jobId) {
-        await().until(() -> mapToJobRepository.existsById(jobId));
+        await().until(() -> mapToJobRepository.existsByJobId(jobId));
         await().atLeast(50, TimeUnit.MILLISECONDS);
     }
 
