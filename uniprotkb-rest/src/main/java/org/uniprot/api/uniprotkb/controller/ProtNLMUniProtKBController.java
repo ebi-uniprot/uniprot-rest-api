@@ -23,7 +23,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniprotkb.common.service.protlm.ProtLMUniProtKBEntryService;
+import org.uniprot.api.uniprotkb.common.service.protnlm.ProtNLMUniProtKBEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -32,14 +32,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RestController
 @RequestMapping(value = UNIPROTKB_RESOURCE)
 @Validated
-public class ProtLMUniProtKBController extends BasicSearchController<UniProtKBEntry> {
+public class ProtNLMUniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
-    private final ProtLMUniProtKBEntryService protLMUniProtKBEntryService;
+    private final ProtNLMUniProtKBEntryService protNLMUniProtKBEntryService;
 
     @Autowired
-    public ProtLMUniProtKBController(
+    public ProtNLMUniProtKBController(
             ApplicationEventPublisher eventPublisher,
-            ProtLMUniProtKBEntryService protLMUniProtKBEntryService,
+            ProtNLMUniProtKBEntryService protNLMUniProtKBEntryService,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
@@ -49,13 +49,13 @@ public class ProtLMUniProtKBController extends BasicSearchController<UniProtKBEn
                 downloadTaskExecutor,
                 MessageConverterContextFactory.Resource.UNIPROTKB,
                 downloadGatekeeper);
-        this.protLMUniProtKBEntryService = protLMUniProtKBEntryService;
+        this.protNLMUniProtKBEntryService = protNLMUniProtKBEntryService;
     }
 
     @GetMapping(
-            value = "/protlm/{accession}",
+            value = "/protnlm/{accession}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getGoogleProtLMEntryByAccession(
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getGoogleProtNLMEntryByAccession(
             @Parameter(
                             description = ACCESSION_UNIPROTKB_DESCRIPTION,
                             example = ACCESSION_UNIPROTKB_EXAMPLE)
@@ -66,7 +66,7 @@ public class ProtLMUniProtKBController extends BasicSearchController<UniProtKBEn
                             message = "{search.invalid.accession.value}")
                     String accession,
             HttpServletRequest request) {
-        UniProtKBEntry entry = protLMUniProtKBEntryService.getProtLMEntry(accession);
+        UniProtKBEntry entry = protNLMUniProtKBEntryService.getProtNLMEntry(accession);
         return super.getEntityResponse(entry, null, request);
     }
 

@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.store.protlm.ProtLMStoreClient;
+import org.uniprot.api.uniprotkb.common.repository.store.protnlm.ProtNLMStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Uniprot;
 import org.uniprot.core.xml.uniprot.GoogleUniProtEntryConverter;
@@ -44,13 +44,13 @@ import org.uniprot.store.indexer.DataStoreManager;
 @ContextConfiguration(classes = {UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
-@WebMvcTest(ProtLMUniProtKBController.class)
+@WebMvcTest(ProtNLMUniProtKBController.class)
 @ExtendWith(value = {SpringExtension.class, MockitoExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProtLMUniProtKBControllerIT {
+class ProtNLMUniProtKBControllerIT {
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
-    private ProtLMStoreClient storeClient;
+    private ProtNLMStoreClient storeClient;
     private String accessionId = "A0A1D5RGX0";
 
     @Autowired private MockMvc mockMvc;
@@ -59,17 +59,17 @@ public class ProtLMUniProtKBControllerIT {
     void init() throws JAXBException {
         DataStoreManager dsm = storeManager;
         storeClient =
-                new ProtLMStoreClient(
+                new ProtNLMStoreClient(
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
-        dsm.addStore(DataStoreManager.StoreType.GOOGLE_PROTLM, storeClient);
+        dsm.addStore(DataStoreManager.StoreType.GOOGLE_PROTNLM, storeClient);
 
-        UniProtKBEntry entry = createProtLMEntry();
-        dsm.saveToStore(DataStoreManager.StoreType.GOOGLE_PROTLM, entry);
+        UniProtKBEntry entry = createProtNLMEntry();
+        dsm.saveToStore(DataStoreManager.StoreType.GOOGLE_PROTNLM, entry);
     }
 
-    private UniProtKBEntry createProtLMEntry() throws JAXBException {
+    private UniProtKBEntry createProtNLMEntry() throws JAXBException {
         String file = "/it/" + accessionId + ".xml";
-        InputStream inputStream = ProtLMUniProtKBControllerIT.class.getResourceAsStream(file);
+        InputStream inputStream = ProtNLMUniProtKBControllerIT.class.getResourceAsStream(file);
 
         JAXBContext jaxbContext = JAXBContext.newInstance("org.uniprot.core.xml.jaxb.uniprot");
 
@@ -86,11 +86,11 @@ public class ProtLMUniProtKBControllerIT {
     }
 
     @Test
-    void testGetProtLMEntry_success() throws Exception {
+    void testGetProtNLMEntry_success() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/uniprotkb/protlm/" + accessionId)
+                        MockMvcRequestBuilders.get("/uniprotkb/protnlm/" + accessionId)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
@@ -105,13 +105,13 @@ public class ProtLMUniProtKBControllerIT {
     }
 
     @Test
-    void testGetProtLMEntry_notFound() throws Exception {
+    void testGetProtNLMEntry_notFound() throws Exception {
         String unknownAccession = "P05067";
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/uniprotkb/protlm/" + unknownAccession)
+                        MockMvcRequestBuilders.get("/uniprotkb/protnlm/" + unknownAccession)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
@@ -120,13 +120,13 @@ public class ProtLMUniProtKBControllerIT {
     }
 
     @Test
-    void testGetProtLMEntry_invalidAccessionPattern() throws Exception {
+    void testGetProtNLMEntry_invalidAccessionPattern() throws Exception {
         String invalidAccession = "!@#INVALID";
 
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/uniprotkb/protlm/" + invalidAccession)
+                        MockMvcRequestBuilders.get("/uniprotkb/protnlm/" + invalidAccession)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
@@ -135,11 +135,11 @@ public class ProtLMUniProtKBControllerIT {
     }
 
     @Test
-    void testGetProtLMEntry_invalidFormat() throws Exception {
+    void testGetProtNLMEntry_invalidFormat() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get("/uniprotkb/protlm/" + accessionId)
+                        MockMvcRequestBuilders.get("/uniprotkb/protnlm/" + accessionId)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE));
 
         // then
@@ -147,7 +147,7 @@ public class ProtLMUniProtKBControllerIT {
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.url")
-                                .value("http://localhost/uniprotkb/protlm/" + accessionId))
+                                .value("http://localhost/uniprotkb/protnlm/" + accessionId))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.messages").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.messages.length()").value(1))
                 .andExpect(
@@ -159,8 +159,8 @@ public class ProtLMUniProtKBControllerIT {
     @TestConfiguration
     static class LocalTestConfig {
         @Bean
-        public ProtLMStoreClient protLMStoreClient() {
-            return new ProtLMStoreClient(
+        public ProtNLMStoreClient protNLMStoreClient() {
+            return new ProtNLMStoreClient(
                     VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         }
     }

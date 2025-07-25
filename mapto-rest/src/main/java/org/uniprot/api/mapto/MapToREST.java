@@ -43,7 +43,7 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                     pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.groupby\\.*"),
             @ComponentScan.Filter(
                     type = FilterType.REGEX,
-                    pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.protlm\\..*"),
+                    pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.protnlm\\..*"),
             @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,
                     classes = {
