@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.common.service.protlm;
+package org.uniprot.api.uniprotkb.common.service.protnlm;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -11,37 +11,37 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.uniprotkb.common.repository.store.protlm.ProtLMStoreClient;
+import org.uniprot.api.uniprotkb.common.repository.store.protnlm.ProtNLMStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 @ExtendWith(MockitoExtension.class)
-class ProtLMUniProtKBEntryServiceTest {
+class ProtNLMUniProtKBEntryServiceTest {
 
-    @Mock private ProtLMStoreClient protLMStoreClient;
+    @Mock private ProtNLMStoreClient protNLMStoreClient;
 
-    @InjectMocks private ProtLMUniProtKBEntryService service;
+    @InjectMocks private ProtNLMUniProtKBEntryService service;
 
     @Test
-    void testGetProtLMEntry_success() {
+    void testGetProtNLMEntry_success() {
         // Given
         String accession = "P12345";
         UniProtKBEntry mockEntry = mock(UniProtKBEntry.class);
-        when(protLMStoreClient.getEntry(accession)).thenReturn(Optional.of(mockEntry));
+        when(protNLMStoreClient.getEntry(accession)).thenReturn(Optional.of(mockEntry));
 
         // When
-        UniProtKBEntry result = service.getProtLMEntry(accession);
+        UniProtKBEntry result = service.getProtNLMEntry(accession);
 
         // Then
         assertNotNull(result);
         assertEquals(mockEntry, result);
-        verify(protLMStoreClient).getEntry(accession);
+        verify(protNLMStoreClient).getEntry(accession);
     }
 
     @Test
-    void testGetProtLMEntry_notFound() {
+    void testGetProtNLMEntry_notFound() {
         // Given
         String accession = "P00000";
-        when(protLMStoreClient.getEntry(accession)).thenReturn(Optional.empty());
+        when(protNLMStoreClient.getEntry(accession)).thenReturn(Optional.empty());
 
         // Then
         ResourceNotFoundException exception =
@@ -49,10 +49,10 @@ class ProtLMUniProtKBEntryServiceTest {
                         ResourceNotFoundException.class,
                         () -> {
                             // When
-                            service.getProtLMEntry(accession);
+                            service.getProtNLMEntry(accession);
                         });
 
         assertEquals("No entry found for accession: P00000", exception.getMessage());
-        verify(protLMStoreClient).getEntry(accession);
+        verify(protNLMStoreClient).getEntry(accession);
     }
 }
