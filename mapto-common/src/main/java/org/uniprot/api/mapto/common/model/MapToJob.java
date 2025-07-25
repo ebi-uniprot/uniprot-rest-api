@@ -24,7 +24,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(indexes = @Index(columnList = "jobId"))
+@Table(indexes = @Index(name = "job_id_index", columnList = "jobId"))
 public class MapToJob implements Serializable {
     @Serial private static final long serialVersionUID = -3919276929568870010L;
 

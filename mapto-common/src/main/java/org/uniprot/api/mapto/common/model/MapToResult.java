@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(indexes = @Index(columnList = "map_to_job_id"))
+@Table(indexes = @Index(name = "map_to_job_id_index", columnList = "map_to_job_id"))
 @AllArgsConstructor
 @NoArgsConstructor
 public class MapToResult implements Serializable {
@@ -21,7 +21,10 @@ public class MapToResult implements Serializable {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "map_to_job_id", nullable = false)
+    @JoinColumn(
+            name = "map_to_job_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_map_to_job_id"))
     private MapToJob mapToJob;
 
     @NotNull private String targetId;

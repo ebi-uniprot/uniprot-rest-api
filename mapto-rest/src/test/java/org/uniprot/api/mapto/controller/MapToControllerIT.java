@@ -2,6 +2,7 @@ package org.uniprot.api.mapto.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
@@ -55,7 +56,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-@ActiveProfiles(profiles = {"offline", "idmapping"})
+@ActiveProfiles(profiles = {"offline"})
 @ContextConfiguration(
         classes = {
             UniRefDataStoreTestConfig.class,
@@ -223,19 +224,38 @@ class MapToControllerIT extends BaseMapToControllerIT {
         assertThat(linkHeader, notNullValue());
         String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
 
-        MockHttpServletRequestBuilder requestBuilderNext =
-                get(getMapToResultPath(), jobId)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("cursor", cursor);
-        ResultActions responseNext = mockMvc.perform(requestBuilderNext);
-        responseNext
-                .andDo(MockMvcResultHandlers.print())
+        MockHttpServletRequestBuilder requestBuilderNext = requestBuilder.param("cursor", cursor);
+        response = mockMvc.perform(requestBuilderNext);
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[*].id", hasItems("UniRef50_P00002")));
+        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertNull(linkHeader);
+    }
+
+    @Test
+    void testGetMapToEntryIds_sendWrongCursor() throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("cursor", "random");
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results").doesNotExist());
     }
 
     @Test

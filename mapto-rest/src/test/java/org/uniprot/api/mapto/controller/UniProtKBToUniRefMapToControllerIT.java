@@ -10,7 +10,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
@@ -58,7 +57,7 @@ import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
 
-@ActiveProfiles(profiles = {"offline", "idmapping"})
+@ActiveProfiles(profiles = {"offline"})
 @ContextConfiguration(
         classes = {
             UniRefDataStoreTestConfig.class,
@@ -183,7 +182,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
                         .param("facets", "identity");
         ResultActions response = mockMvc.perform(requestBuilder);
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets").exists())

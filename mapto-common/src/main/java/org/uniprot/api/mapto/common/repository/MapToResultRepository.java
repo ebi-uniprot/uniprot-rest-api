@@ -1,7 +1,6 @@
 package org.uniprot.api.mapto.common.repository;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +10,7 @@ import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.model.MapToResult;
 
 @Repository
-public interface MapToResultRepository extends PagingAndSortingRepository<MapToResult, UUID> {
+public interface MapToResultRepository extends PagingAndSortingRepository<MapToResult, Long> {
 
     @Query("SELECT mTR.targetId FROM MapToResult mTR  WHERE mTR.mapToJob = :mapToJob")
     List<String> findTargetIdByMapToJob(MapToJob mapToJob, Pageable pageable);

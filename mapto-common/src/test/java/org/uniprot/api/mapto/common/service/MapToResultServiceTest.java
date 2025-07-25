@@ -49,6 +49,7 @@ class MapToResultServiceTest {
     void testFindTargetIdsByMapToJobWithPaging() {
         when(cursorPage.getPageSize()).thenReturn(10);
         when(cursorPage.getOffset()).thenReturn(20L);
+        when(cursorPage.getTotalElements()).thenReturn(200L);
 
         when(mapToResultRepository.findTargetIdByMapToJob(eq(mapToJob), any(Pageable.class)))
                 .thenReturn(TARGET_IDS);
@@ -70,7 +71,7 @@ class MapToResultServiceTest {
     @Test
     void testGetPageableThrowsIfOffsetTooLarge() {
         when(cursorPage.getOffset()).thenReturn(1000L);
-        when(cursorPage.getPageSize()).thenReturn(1);
+        when(cursorPage.getPageSize()).thenReturn(10);
         when(cursorPage.getTotalElements()).thenReturn(10L);
 
         Exception exception =

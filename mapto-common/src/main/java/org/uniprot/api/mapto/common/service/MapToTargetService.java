@@ -47,7 +47,7 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
         List<Facet> facets = null;
         List<ProblemPair> warnings = new ArrayList<>();
         int pageSize = getPageSize(searchRequest);
-        CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, totalTargetIds);
+        CursorPage cursor;
         List<String> idPage;
 
         if (solrSearchNeededBySearchRequest(searchRequest, false)) {
@@ -70,6 +70,7 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
             facets = solrStreamResponse.getFacets();
         } else {
             // compute the cursor and get subset of accessions as per cursor
+            cursor = CursorPage.of(searchRequest.getCursor(), pageSize, totalTargetIds);
             idPage = mapToResultService.findTargetIdsByMapToJob(mapToJob, cursor);
         }
         // get entries from voldemort
