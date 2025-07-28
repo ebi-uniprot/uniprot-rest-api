@@ -46,6 +46,7 @@ public class MapToTask implements Runnable {
             CursorPage page = targetIdPage.getPage();
             List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
             validateTargetIdLimit(jobId, allTargetIds, maxTargetIdCount);
+            mapToJobService.setTargetIds(jobId, allTargetIds);
         } catch (Exception e) {
             log.error("Job with id %s finished with error %s".formatted(jobId, e.getMessage()));
             mapToJobService.setErrors(
@@ -64,8 +65,6 @@ public class MapToTask implements Runnable {
                             PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(),
                             "Number of target ids: %d exceeds the allowed limit: %d"
                                     .formatted(totalTargetIds, targetIdLimit)));
-        } else {
-            mapToJobService.setTargetIds(jobId, allTargetIds);
         }
     }
 

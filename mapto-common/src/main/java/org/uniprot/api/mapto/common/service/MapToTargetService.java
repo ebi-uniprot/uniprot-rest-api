@@ -51,13 +51,13 @@ public abstract class MapToTargetService<T> extends AbstractIdService<T> {
         List<String> idPage;
 
         if (solrSearchNeededBySearchRequest(searchRequest, false)) {
-            List<String> targetIds = mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
             // unset facets if mapped to ids exceeds the allowed limit
             // and set the warning
             if (facetingDisallowed(searchRequest, totalTargetIds)) {
                 ProblemPair facetWarning = removeFacetsAndGetFacetWarning(searchRequest);
                 warnings.add(facetWarning);
             }
+            List<String> targetIds = mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
             SolrStreamFacetResponse solrStreamResponse =
                     searchMappedIdsFacetsBySearchRequest(searchRequest, targetIds);
 
