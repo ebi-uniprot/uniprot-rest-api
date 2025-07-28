@@ -16,11 +16,11 @@ public class PageableUtils {
     }
 
     private static int calculatePageNumber(long offset, long totalElements, int pageSize) {
-        if (offset >= totalElements) {
-            throw new IllegalArgumentException("Offset exceeds total number of elements");
-        }
         if (pageSize <= 0) {
             throw new IllegalArgumentException("Page size must be greater than 0");
+        }
+        if (offset >= totalElements) {
+            throw new IllegalArgumentException("Offset exceeds total number of elements");
         }
         return (int) (offset / pageSize);
     }
