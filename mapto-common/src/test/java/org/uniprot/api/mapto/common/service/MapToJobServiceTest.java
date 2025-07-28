@@ -1,6 +1,7 @@
 package org.uniprot.api.mapto.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.download.model.JobStatus.*;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.mapto.common.model.MapToJob;
@@ -32,7 +34,7 @@ public class MapToJobServiceTest {
 
     public static final JobStatus JOB_STATUS = RUNNING;
     public static final String ID = "id";
-    private static final List<String> TARGET_IDS = List.of();
+    private static final List<String> TARGET_IDS = List.of("abc", "def", "ghi");
     public static final UniProtDataType SOURCE = UNIPROTKB;
     public static final UniProtDataType TARGET = UNIREF;
     public static final String QUERY = "query";
@@ -45,10 +47,11 @@ public class MapToJobServiceTest {
     @Mock private MapToJobRequest mapToJobRequest;
     @Mock private Map<String, String> extraParams;
     @Captor private ArgumentCaptor<MapToJob> mapToJobCaptor;
+    @Mock private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
-        this.jobService = new MapToJobService(jobRepository);
+        this.jobService = new MapToJobService(jobRepository, jdbcTemplate);
     }
 
     @Test
@@ -132,7 +135,7 @@ public class MapToJobServiceTest {
 
         jobService.setTargetIds(ID, TARGET_IDS);
 
-        verify(mapToJob).setTargetIds(List.of());
+        verify(jdbcTemplate).batchUpdate(anyString(), anyList(), eq(TARGET_IDS.size()), any());
         verify(jobRepository).save(mapToJob);
     }
 

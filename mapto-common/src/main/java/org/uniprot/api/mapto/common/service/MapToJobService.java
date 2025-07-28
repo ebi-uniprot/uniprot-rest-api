@@ -2,7 +2,9 @@ package org.uniprot.api.mapto.common.service;
 
 import java.util.List;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.mapto.common.model.MapToJob;
@@ -15,9 +17,11 @@ import org.uniprot.api.rest.download.model.JobStatus;
 public class MapToJobService {
     public static final String INCLUDE_ISOFORM = "includeIsoform";
     private final MapToJobRepository jobRepository;
+    private final JdbcTemplate jdbcTemplate;
 
-    public MapToJobService(MapToJobRepository jobRepository) {
+    public MapToJobService(MapToJobRepository jobRepository, JdbcTemplate jdbcTemplate) {
         this.jobRepository = jobRepository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public MapToJob createMapToJob(MapToJob mapToJob) {
@@ -59,11 +63,12 @@ public class MapToJobService {
         jobRepository.save(mapToJob);
     }
 
+    @Transactional
     public void setTargetIds(String id, List<String> allMappedIds) {
         MapToJob mapToJob = findMapToJob(id);
         List<MapToResult> targetIds =
                 allMappedIds.stream().map(targetId -> new MapToResult(mapToJob, targetId)).toList();
-        mapToJob.setTargetIds(targetIds);
+        batchInsertResults(targetIds);
         mapToJob.setTotalTargetIds((long) allMappedIds.size());
         mapToJob.setStatus(JobStatus.FINISHED);
         jobRepository.save(mapToJob);
@@ -86,5 +91,18 @@ public class MapToJobService {
         mapToJob.setStatus(JobStatus.ERROR);
         mapToJob.setError(error);
         jobRepository.save(mapToJob);
+    }
+
+    private void batchInsertResults(List<MapToResult> results) {
+        String sql = "INSERT INTO map_to_result (map_to_job_id, target_id) VALUES (?, ?)";
+
+        jdbcTemplate.batchUpdate(
+                sql,
+                results,
+                results.size(),
+                (ps, result) -> {
+                    ps.setLong(1, result.getMapToJob().getId());
+                    ps.setString(2, result.getTargetId());
+                });
     }
 }
