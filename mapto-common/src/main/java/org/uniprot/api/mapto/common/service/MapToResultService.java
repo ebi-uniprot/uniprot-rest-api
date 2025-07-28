@@ -3,9 +3,11 @@ package org.uniprot.api.mapto.common.service;
 import static org.uniprot.api.mapto.common.service.PageableUtils.getPageable;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.mapto.common.model.MapToJob;
 import org.uniprot.api.mapto.common.repository.MapToResultRepository;
@@ -18,8 +20,14 @@ public class MapToResultService {
         this.mapToResultRepository = mapToResultRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<String> findAllTargetIdsByMapToJob(MapToJob mapToJob) {
-        return mapToResultRepository.findTargetIdByMapToJob(mapToJob);
+        return streamAllTargetIdsByMapToJob(mapToJob).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Stream<String> streamAllTargetIdsByMapToJob(MapToJob mapToJob) {
+        return mapToResultRepository.streamTargetIdByMapToJob(mapToJob.getId());
     }
 
     public List<String> findTargetIdsByMapToJob(MapToJob mapToJob, CursorPage cursorPage) {

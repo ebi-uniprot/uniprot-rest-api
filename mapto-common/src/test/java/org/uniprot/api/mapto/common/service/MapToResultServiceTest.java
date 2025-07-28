@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,19 @@ class MapToResultServiceTest {
         assertEquals(2, result.size());
         assertEquals("target0", result.get(0));
         verify(mapToResultRepository, times(1)).findTargetIdByMapToJob(mapToJob);
+    }
+
+    @Test
+    void testStreamAllTargetIdsByMapToJob() {
+
+        Stream<String> targetIds = TARGET_IDS.stream();
+        when(mapToResultRepository.streamTargetIdByMapToJob(mapToJob)).thenReturn(targetIds);
+
+        List<String> result = mapToResultRepository.streamTargetIdByMapToJob(mapToJob).toList();
+
+        assertEquals(2, result.size());
+        assertEquals("target0", result.get(0));
+        verify(mapToResultRepository, times(1)).streamTargetIdByMapToJob(mapToJob);
     }
 
     @Test
