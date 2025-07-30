@@ -2,6 +2,7 @@ package org.uniprot.api.mapto.common.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +19,12 @@ public class MapToJobService {
     public static final String INCLUDE_ISOFORM = "includeIsoform";
     private final MapToJobRepository jobRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final int batchSize;
 
-    public MapToJobService(MapToJobRepository jobRepository, JdbcTemplate jdbcTemplate) {
+    public MapToJobService(MapToJobRepository jobRepository, JdbcTemplate jdbcTemplate, @Value("${mapto.jdbc.update.batch_size}") int batchSize) {
         this.jobRepository = jobRepository;
         this.jdbcTemplate = jdbcTemplate;
+        this.batchSize = batchSize;
     }
 
     public MapToJob createMapToJob(MapToJob mapToJob) {
@@ -99,7 +102,7 @@ public class MapToJobService {
         jdbcTemplate.batchUpdate(
                 sql,
                 results,
-                results.size(),
+                batchSize,
                 (ps, result) -> {
                     ps.setLong(1, result.getMapToJob().getId());
                     ps.setString(2, result.getTargetId());

@@ -38,6 +38,7 @@ public class MapToJobServiceTest {
     public static final UniProtDataType SOURCE = UNIPROTKB;
     public static final UniProtDataType TARGET = UNIREF;
     public static final String QUERY = "query";
+    public static final int BATCH_SIZE = 3;
     @Mock private MapToJobRepository jobRepository;
     @Mock private MapToResultRepository mapToResultRepository;
 
@@ -51,7 +52,7 @@ public class MapToJobServiceTest {
 
     @BeforeEach
     void setUp() {
-        this.jobService = new MapToJobService(jobRepository, jdbcTemplate);
+        this.jobService = new MapToJobService(jobRepository, jdbcTemplate, BATCH_SIZE);
     }
 
     @Test
