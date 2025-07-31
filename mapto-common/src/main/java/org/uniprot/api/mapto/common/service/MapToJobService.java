@@ -21,7 +21,10 @@ public class MapToJobService {
     private final JdbcTemplate jdbcTemplate;
     private final int batchSize;
 
-    public MapToJobService(MapToJobRepository jobRepository, JdbcTemplate jdbcTemplate, @Value("${mapto.jdbc.update.batch_size}") int batchSize) {
+    public MapToJobService(
+            MapToJobRepository jobRepository,
+            JdbcTemplate jdbcTemplate,
+            @Value("${mapto.jdbc.update.batch_size}") int batchSize) {
         this.jobRepository = jobRepository;
         this.jdbcTemplate = jdbcTemplate;
         this.batchSize = batchSize;
