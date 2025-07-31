@@ -115,7 +115,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     }
 
     @BeforeAll
-    public void runSaveEntriesInSolrAndStore() throws Exception {
+    void runSaveEntriesInSolrAndStore() throws Exception {
         UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository,
                 cloudSolrClient,

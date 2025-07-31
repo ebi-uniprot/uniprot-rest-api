@@ -6,6 +6,8 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 
 public class PageableUtils {
 
+    private PageableUtils() {}
+
     public static Pageable getPageable(CursorPage cursorPage) {
         long nextPageOffset = cursorPage.getOffset() + cursorPage.getPageSize();
         int pageSize = (int) (nextPageOffset - cursorPage.getOffset());

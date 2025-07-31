@@ -69,7 +69,7 @@ public class MapToTask implements Runnable {
         }
     }
 
-    private static boolean exceedsTargetIdLimit(Integer limit, int totalElements) {
+    private boolean exceedsTargetIdLimit(Integer limit, int totalElements) {
         return limit != null && totalElements > limit;
     }
 

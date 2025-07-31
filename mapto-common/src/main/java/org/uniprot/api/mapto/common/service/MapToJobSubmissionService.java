@@ -58,8 +58,6 @@ public class MapToJobSubmissionService {
                             retryPolicy,
                             maxTargetIdCount);
             jobTaskExecutor.execute(mapToTask);
-        } else {
-            mapToJobService.updateUpdated(jobId);
         }
         return new JobSubmitResponse(jobId);
     }
