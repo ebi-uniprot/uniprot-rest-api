@@ -1,4 +1,4 @@
-package org.uniprot.api.mapto.controller;
+package org.uniprot.api.common.service;
 
 import java.time.Duration;
 
