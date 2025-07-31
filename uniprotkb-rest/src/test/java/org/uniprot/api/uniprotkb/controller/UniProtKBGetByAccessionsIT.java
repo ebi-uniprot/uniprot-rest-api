@@ -104,7 +104,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
@@ -167,7 +167,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
-        storeClient.saveEntry(uniProtKBEntry);
+        uniProtKBStoreClient.saveEntry(uniProtKBEntry);
     }
 
     @Test

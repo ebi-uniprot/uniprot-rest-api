@@ -69,7 +69,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(new HashMap<>());
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @Autowired private MockMvc mockMvc;
 
@@ -108,7 +108,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
             convert.seqLength = i * 35;
             convert.modelOrganism = modelOrganism.get(i - 10);
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
-            storeClient.saveEntry(uniProtKBEntry);
+            uniProtKBStoreClient.saveEntry(uniProtKBEntry);
         }
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }

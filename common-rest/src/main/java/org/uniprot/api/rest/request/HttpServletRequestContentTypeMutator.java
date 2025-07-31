@@ -84,7 +84,7 @@ public class HttpServletRequestContentTypeMutator {
         ExtensionValidationResult result = checkExtensionIsKnown(request);
 
         if (notNullNotEmpty(result.getExtensionUsed())) {
-            // an known extension was used
+            // a known extension was used
             handleRequestedExtension(
                     request, validMediaTypes, result.getExtensionUsed(), result.isEntryResource());
         } else {
