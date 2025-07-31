@@ -102,7 +102,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(new HashMap<>());
-    @Autowired UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
     @Autowired private MockMvc mockMvc;
 
     @MockBean(name = "uniProtRdfRestTemplate")
@@ -597,7 +597,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
-        storeClient.saveEntry(uniProtKBEntry);
+        uniProtKBStoreClient.saveEntry(uniProtKBEntry);
     }
 
     private Stream<Arguments> getAllSortFields() {

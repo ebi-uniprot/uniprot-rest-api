@@ -2406,7 +2406,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.otherOrganism = "Search All";
             doc.organismHostIds.add(9606);
             doc.organismHostNames.add("Search All");
-            doc.organelles.add("Search All");
+            doc.encodedIn.add("Search All");
             doc.rcPlasmid.add("Search All");
             doc.rcTransposon.add("Search All");
             doc.rcStrain.add("Search All");
