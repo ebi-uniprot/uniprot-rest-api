@@ -18,7 +18,6 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
@@ -112,29 +111,5 @@ public class IdMappingDataStoreTestConfig {
             @Qualifier("uniProtKBSolrClient") SolrClient uniProtKBSolrClient)
             throws URISyntaxException {
         return new IdMappingRepository(uniProtKBSolrClient, idMappingSolrClient());
-    }
-
-    @Bean
-    @Profile("offline")
-    public JobOperation idMappingResultJobOp(IdMappingJobCacheService cacheService) {
-        return new IdMappingResultsJobOperation(cacheService);
-    }
-
-    @Bean
-    @Profile("offline")
-    public JobOperation uniProtKBIdMappingJobOp(IdMappingJobCacheService cacheService) {
-        return new UniProtKBIdMappingResultsJobOperation(cacheService);
-    }
-
-    @Bean
-    @Profile("offline")
-    public JobOperation uniRefIdMappingJobOp(IdMappingJobCacheService cacheService) {
-        return new UniRefIdMappingResultsJobOperation(cacheService);
-    }
-
-    @Bean
-    @Profile("offline")
-    public JobOperation uniParcIdMappingJobOp(IdMappingJobCacheService cacheService) {
-        return new UniParcIdMappingResultsJobOperation(cacheService);
     }
 }

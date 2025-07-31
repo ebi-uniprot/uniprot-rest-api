@@ -56,7 +56,8 @@ class UniProtKBMapToSearchServiceTest {
         searchRequest.setQuery(mapToJob.getQuery());
         searchRequest.setSize(MAP_TO_PAGE_SIZE);
         searchRequest.setIncludeIsoform(
-                Optional.ofNullable(mapToJob.getExtraParams().get("includeIsoform"))
+                Optional.ofNullable(mapToJob.getIncludeIsoform())
+                        .map(String::valueOf)
                         .orElse("false"));
         searchRequest.setFields("uniref_cluster_50,uniref_cluster_90,uniref_cluster_100");
         when(uniProtKBRequestConverter.createSearchSolrRequest(searchRequest))

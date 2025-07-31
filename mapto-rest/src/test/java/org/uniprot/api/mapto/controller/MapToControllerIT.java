@@ -2,6 +2,7 @@ package org.uniprot.api.mapto.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
@@ -24,8 +25,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,6 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.mapto.MapToREST;
-import org.uniprot.api.mapto.common.RedisConfiguration;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
@@ -56,19 +56,18 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-@ActiveProfiles(profiles = {"offline", "idmapping"})
-@WebMvcTest({MapToController.class})
+@ActiveProfiles(profiles = {"offline"})
 @ContextConfiguration(
         classes = {
             UniRefDataStoreTestConfig.class,
             UniProtKBDataStoreTestConfig.class,
             MapToREST.class,
-            ErrorHandlerConfig.class,
-            RedisConfiguration.class
+            ErrorHandlerConfig.class
         })
 @ExtendWith(value = {SpringExtension.class})
-@AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureMockMvc
+@SpringBootTest
 class MapToControllerIT extends BaseMapToControllerIT {
     @SpyBean private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
@@ -89,7 +88,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
     private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
 
     @BeforeAll
-    public void runSaveEntriesInSolrAndStore() throws Exception {
+    void runSaveEntriesInSolrAndStore() throws Exception {
         UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository,
                 cloudSolrClient,
@@ -158,16 +157,16 @@ class MapToControllerIT extends BaseMapToControllerIT {
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[*].id",
                                 hasItems(
-                                        "UniRef50_P00002",
-                                        "UniRef90_P00002",
-                                        "UniRef100_P00002",
+                                        "UniRef100_P00003",
+                                        "UniRef90_P00003",
+                                        "UniRef50_P00003",
                                         "UniRef50_P00004",
                                         "UniRef90_P00004",
                                         "UniRef100_P00004",
                                         "UniRef50_P00001",
                                         "UniRef90_P00001",
                                         "UniRef100_P00001",
-                                        "UniRef50_P00003")));
+                                        "UniRef100_P00002")));
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
         String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
@@ -184,8 +183,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results[*].id",
-                                hasItems("UniRef90_P00003", "UniRef100_P00003")));
+                                "$.results[*].id", hasItems("UniRef90_P00002", "UniRef50_P00002")));
     }
 
     @Test
@@ -211,7 +209,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[*].id",
                                 hasItems(
-                                        "UniRef50_P00002",
+                                        "UniRef100_P00003",
                                         "UniRef90_P00002",
                                         "UniRef100_P00002",
                                         "UniRef50_P00004",
@@ -226,19 +224,38 @@ class MapToControllerIT extends BaseMapToControllerIT {
         assertThat(linkHeader, notNullValue());
         String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
 
-        MockHttpServletRequestBuilder requestBuilderNext =
-                get(getMapToResultPath(), jobId)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("cursor", cursor);
-        ResultActions responseNext = mockMvc.perform(requestBuilderNext);
-        responseNext
-                .andDo(MockMvcResultHandlers.log())
+        MockHttpServletRequestBuilder requestBuilderNext = requestBuilder.param("cursor", cursor);
+        response = mockMvc.perform(requestBuilderNext);
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results[*].id", hasItems("UniRef100_P00003")));
+                                "$.results[*].id", hasItems("UniRef50_P00002")));
+        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertNull(linkHeader);
+    }
+
+    @Test
+    void testGetMapToEntryIds_sendWrongCursor() throws Exception {
+        // when
+        String query = getQueryInLimits();
+        String jobId = callRunAPIAndVerify(query);
+        waitUntilTheJobIsAvailable(jobId);
+        await().until(isJobFinished(jobId));
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getMapToResultPath(), jobId)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("cursor", "random");
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results").doesNotExist());
     }
 
     @Test

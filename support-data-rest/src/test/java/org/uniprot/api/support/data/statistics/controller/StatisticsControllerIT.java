@@ -1,11 +1,10 @@
 package org.uniprot.api.support.data.statistics.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,28 +14,20 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.uniprot.api.common.service.PostgresTestContainer;
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@Testcontainers
 class StatisticsControllerIT {
-    private static final String POSTGRES_IMAGE_VERSION = "postgres:11.1";
     @Autowired private MockMvc mockMvc;
 
-    @Container
-    private static final PostgreSQLContainer<?> postgreSQL =
-            new PostgreSQLContainer<>(DockerImageName.parse(POSTGRES_IMAGE_VERSION))
-                    .withStartupTimeout(Duration.ofMinutes(2))
-                    .withInitScript("init.sql");
-
     @DynamicPropertySource
-    static void postgreSQLProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQL::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQL::getUsername);
-        registry.add("spring.datasource.password", postgreSQL::getPassword);
+    public static void setUpThings(DynamicPropertyRegistry registry) {
+        PostgreSQLContainer<?> postgresContainer = PostgresTestContainer.getInstance();
+        assertTrue(postgresContainer.isRunning());
+        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresContainer::getUsername);
+        registry.add("spring.datasource.password", postgresContainer::getPassword);
     }
 
     @Test

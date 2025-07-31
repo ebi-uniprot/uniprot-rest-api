@@ -1,6 +1,7 @@
 package org.uniprot.api.mapto.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.mapto.controller.MapToController.MAPTO;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -40,7 +41,6 @@ import org.uniprot.store.config.UniProtDataType;
 public class UniProtKBUniRefMapToController extends BasicSearchController<UniRefEntryLight> {
     private static final String DATA_TYPE = "uniref";
     public static final String UNIPROTKB_UNIREF = "/uniprotkb/uniref";
-    public static final String MAPTO = "/mapto";
     public static final String RESOURCE_PATH = MAPTO + UNIPROTKB_UNIREF;
     private final MapToJobSubmissionService mapToJobSubmissionService;
     private final MapToRequestConverter mapToRequestConverter;

@@ -62,7 +62,7 @@ public abstract class AbstractIdService<T> {
         this.requestConverter = requestConverter;
     }
 
-    public void validateMappedIdsEnrichmentLimit(int mappedIdsSize) {
+    public void validateMappedIdsEnrichmentLimit(long mappedIdsSize) {
         if (mappedIdsSize > this.maxIdMappingToIdsCountEnriched) {
             throw new InvalidRequestException(
                     PredefinedAPIStatus.ENRICHMENT_WARNING.getErrorMessage(
@@ -126,8 +126,12 @@ public abstract class AbstractIdService<T> {
     }
 
     protected boolean facetingDisallowed(SearchRequest searchRequest, List<String> mappedIds) {
+        return facetingDisallowed(searchRequest, mappedIds.size());
+    }
+
+    protected boolean facetingDisallowed(SearchRequest searchRequest, long count) {
         return Utils.notNullNotEmpty(searchRequest.getFacets())
-                && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;
+                && count > this.maxIdMappingToIdsCountWithFacets;
     }
 
     protected ProblemPair removeFacetsAndGetFacetWarning(SearchRequest searchRequest) {

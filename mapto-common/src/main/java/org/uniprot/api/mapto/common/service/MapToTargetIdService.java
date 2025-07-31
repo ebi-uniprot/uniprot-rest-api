@@ -15,13 +15,16 @@ import org.uniprot.api.mapto.common.model.MapToPageRequest;
 @Service
 public class MapToTargetIdService {
     private final MapToJobService mapToJobService;
+    private final MapToResultService mapToResultService;
     private final Integer defaultPageSize;
 
     protected MapToTargetIdService(
             MapToJobService mapToJobService,
+            MapToResultService mapToResultService,
             @Value("${search.request.converter.defaultRestPageSize:#{null}}")
                     Integer defaultPageSize) {
         this.mapToJobService = mapToJobService;
+        this.mapToResultService = mapToResultService;
         this.defaultPageSize = defaultPageSize;
     }
 
@@ -32,23 +35,17 @@ public class MapToTargetIdService {
 
         // compute the cursor and get subset of accessions as per cursor
         CursorPage cursorPage =
-                CursorPage.of(request.getCursor(), pageSize, mapToJob.getTargetIds().size());
-
-        Stream<MapToEntryId> pageContent =
-                mapToJob
-                        .getTargetIds()
-                        .subList(
-                                cursorPage.getOffset().intValue(),
-                                CursorPage.getNextOffset(cursorPage))
-                        .stream()
-                        .map(MapToEntryId::new);
+                CursorPage.of(request.getCursor(), pageSize, mapToJob.getTotalTargetIds());
+        List<String> mapToJobIds = mapToResultService.findTargetIdsByMapToJob(mapToJob, cursorPage);
+        Stream<MapToEntryId> pageContent = mapToJobIds.stream().map(MapToEntryId::new);
 
         return QueryResult.<MapToEntryId>builder().content(pageContent).page(cursorPage).build();
     }
 
     public List<MapToEntryId> getMapToEntryIds(String jobId) {
-        return mapToJobService.findMapToJob(jobId).getTargetIds().stream()
-                .map(MapToEntryId::new)
-                .toList();
+        MapToJob mapToJob = mapToJobService.findMapToJob(jobId);
+        List<String> allTargetIdsByMapToJob =
+                mapToResultService.findAllTargetIdsByMapToJob(mapToJob);
+        return allTargetIdsByMapToJob.stream().map(MapToEntryId::new).toList();
     }
 }

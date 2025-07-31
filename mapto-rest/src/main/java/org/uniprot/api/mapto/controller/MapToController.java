@@ -1,6 +1,7 @@
 package org.uniprot.api.mapto.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.mapto.controller.MapToController.MAPTO;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.MAPTO_ENTRY_ID;
 
@@ -28,8 +29,9 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
 @RestController
-@RequestMapping(UniProtKBUniRefMapToController.MAPTO)
+@RequestMapping(MAPTO)
 public class MapToController extends BasicSearchController<MapToEntryId> {
+    public static final String MAPTO = "/mapto";
     private final MapToJobSubmissionService mapToJobSubmissionService;
     private final MapToTargetIdService mapToTargetIdService;
 
