@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberStreamRequest;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
 import org.uniprot.core.impl.SequenceBuilder;
@@ -385,6 +387,41 @@ class UniRefEntryStoreRepositoryTest {
 
         assertEquals(SEED_ID, entry.getRepresentativeMember().getMemberId());
         assertEquals(true, entry.getRepresentativeMember().isSeed());
+    }
+
+    @Test
+    void streamEntryMembersSuccess() {
+        UniRefMemberStreamRequest request = new UniRefMemberStreamRequest();
+        request.setId(UNIREF_ID_OK);
+
+        Stream<UniRefMember> result = repository.streamEntryMembers(request);
+
+        List<UniRefMember> members = result.toList();
+        assertNotNull(members);
+        assertFalse(members.isEmpty());
+        assertEquals(28, members.size());
+        UniRefMember seedMember =
+                members.stream()
+                        .filter(uniRefMember -> uniRefMember.isSeed() != null)
+                        .filter(UniRefMember::isSeed)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+        assertEquals(SEED_ID, seedMember.getMemberId());
+        RepresentativeMember repMember =
+                members.stream()
+                        .filter(RepresentativeMember.class::isInstance)
+                        .map(RepresentativeMember.class::cast)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+        assertEquals(REPRESENTATIVE_ID, repMember.getMemberId());
+    }
+
+    @Test
+    void streamEntryMembersInvalidId() {
+        UniRefMemberStreamRequest request = new UniRefMemberStreamRequest();
+        request.setId("invalid");
+
+        assertThrows(ResourceNotFoundException.class, () -> repository.streamEntryMembers(request));
     }
 
     private void createLightEntries(UniRefLightStoreClient lightStoreClient) {

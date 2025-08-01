@@ -1,25 +1,15 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpHeaders.LINK;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.ArrayList;
@@ -39,12 +29,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
@@ -53,11 +47,7 @@ import org.uniprot.api.uniref.common.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.common.repository.store.UniRefMemberStoreClient;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
-import org.uniprot.core.uniref.RepresentativeMember;
-import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.core.uniref.UniRefEntryLight;
-import org.uniprot.core.uniref.UniRefMemberIdType;
-import org.uniprot.core.uniref.UniRefType;
+import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
@@ -93,7 +83,8 @@ class UniRefMembersControllerIT {
     private static final String ID_100 = "UniRef100_P03901";
     private static final String NAME = "Cluster: MoeK5 01";
     private static final String MEMBER_PREFIX_PATH = "/uniref/";
-    private static final String MEMBER_SUFIX_PATH = "/members";
+    private static final String MEMBER_SUFFIX_PATH = "/members";
+    private static final String MEMBER_STREAM_SUFFIX_PATH = "/members/stream";
 
     @Autowired private UniRefQueryRepository repository;
 
@@ -158,7 +149,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFFIX_PATH)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -207,11 +198,125 @@ class UniRefMembersControllerIT {
     }
 
     @Test
+    void streamMembersSuccess() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_STREAM_SUFFIX_PATH)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(28)))
+                // result [0] is a representative with sequence
+                .andExpect(
+                        jsonPath("$.results[0].memberIdType", is("UniProtKB Unreviewed (TrEMBL)")))
+                .andExpect(jsonPath("$.results[0].memberId", is("P12301_HUMAN")))
+                .andExpect(jsonPath("$.results[0].organismName", is("Homo sapiens (human)")))
+                .andExpect(jsonPath("$.results[0].organismTaxId", is(9600)))
+                .andExpect(jsonPath("$.results[0].sequenceLength", is(312)))
+                .andExpect(jsonPath("$.results[0].proteinName", is("some protein name")))
+                .andExpect(jsonPath("$.results[0].accessions[0]", is("P12301")))
+                .andExpect(jsonPath("$.results[0].uniref50Id").doesNotExist())
+                .andExpect(jsonPath("$.results[0].uniref90Id", is("UniRef90_P03943")))
+                .andExpect(jsonPath("$.results[0].uniref100Id", is("UniRef100_P03923")))
+                .andExpect(jsonPath("$.results[0].uniparcId", is("UPI0000083A01")))
+                .andExpect(jsonPath("$.results[0].seed", is(true)))
+                .andExpect(jsonPath("$.results[0].sequence").exists())
+                .andExpect(jsonPath("$.results[0].sequence.length", is(66)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].sequence.md5",
+                                is("A1AA1787022479BC981C0B4422684719")))
+                // result [0] is a member without sequence
+                .andExpect(jsonPath("$.results[1].memberIdType", is("UniProtKB ID")))
+                .andExpect(jsonPath("$.results[1].memberId", is("P32101_HUMAN")))
+                .andExpect(jsonPath("$.results[1].organismName", is("Homo sapiens 1")))
+                .andExpect(jsonPath("$.results[1].organismTaxId", is(9607)))
+                .andExpect(jsonPath("$.results[1].sequenceLength", is(312)))
+                .andExpect(jsonPath("$.results[1].proteinName", is("some protein name")))
+                .andExpect(jsonPath("$.results[1].accessions[0]", is("P32101")))
+                .andExpect(jsonPath("$.results[1].uniref50Id").doesNotExist())
+                .andExpect(jsonPath("$.results[1].uniref90Id", is("UniRef90_P03943")))
+                .andExpect(jsonPath("$.results[1].uniref100Id", is("UniRef100_P03923")))
+                .andExpect(jsonPath("$.results[1].uniparcId", is("UPI0000083A01")))
+                .andExpect(jsonPath("$.results[1].seed").doesNotExist())
+                .andExpect(jsonPath("$.results[1].sequence").doesNotExist());
+    }
+
+    @Test
+    void streamMembersInvalidId() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(MEMBER_PREFIX_PATH + "invalid" + MEMBER_STREAM_SUFFIX_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("download", "invalid"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "The 'download' parameter has invalid format. It should be a boolean true or false.",
+                                        "The 'id' value has invalid format. It should be a valid UniRef Cluster id")));
+    }
+
+    @Test
+    void streamDownloadCompressedFile() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_STREAM_SUFFIX_PATH)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("download", "true");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        "Content-Disposition",
+                                        startsWith(
+                                                "form-data; name=\"attachment\"; filename=\"uniref_")))
+                .andExpect(jsonPath("$.results.size()", is(28)));
+    }
+
+    @Test
+    void streamListContentType() throws Exception {
+        // when
+        MediaType mediaType = LIST_MEDIA_TYPE;
+        MockHttpServletRequestBuilder requestBuilder =
+                get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_STREAM_SUFFIX_PATH)
+                        .header(ACCEPT, mediaType);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType));
+
+        String[] results = response.getResponse().getContentAsString().split("\\n");
+        assertEquals(28, results.length);
+    }
+
+    @Test
     void getFirstPageMembers() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_90 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_90 + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -245,7 +350,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_90 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_90 + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .param("cursor", "3sbq7rwffis")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -277,7 +382,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .param("facetFilter", "member_id_type:uniparc")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -303,7 +408,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .param(
                                         "facetFilter",
@@ -333,7 +438,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .param("facetFilter", "invalid:invalid")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -357,7 +462,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFFIX_PATH)
                                 .param("size", "10")
                                 .param("facetFilter", "invalid:}invalid{")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -379,7 +484,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFFIX_PATH)
                                 .param("facets", "member_id_type,uniprot_member_id_type")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -413,7 +518,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFFIX_PATH)
                                 .param("facets", "invalid")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -436,7 +541,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFFIX_PATH)
                                 .param("size", "0")
                                 .param("facets", facetField)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
@@ -457,7 +562,7 @@ class UniRefMembersControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFIX_PATH)
+                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFFIX_PATH)
                                 .param("size", "-1")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
