@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -26,13 +25,13 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.openapi.StreamResult;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 import org.uniprot.api.uniref.common.service.member.UniRefMemberService;
 import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
-import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberStreamRequest;
 import org.uniprot.core.uniref.UniRefMember;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +47,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefMemberController extends BasicSearchController<UniRefMember> {
-    private static final String DATA_TYPE = "uniref";
     private final UniRefMemberService service;
 
     @Autowired
@@ -93,61 +91,43 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
     }
 
     @GetMapping(
-            value = "/stream",
-            produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
-            })
+            value = "/{id}/members/stream",
+            produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = STREAM_UNIREF_LIGHT_OPERATION,
             description = STREAM_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = StreamResult.class)),
-                                    @Content(
-                                            mediaType = APPLICATION_XML_VALUE,
-                                            array =
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = StreamResult.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
                                             @ArraySchema(
                                                     schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    org.uniprot.core.xml
-                                                                            .jaxb.uniref
-                                                                            .Entry.class,
-                                                            name = "entries"))),
-                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
-                            })
+                                                            @Schema(
+                                                                    implementation =
+                                                                            org.uniprot.core.xml
+                                                                                    .jaxb.uniref
+                                                                                    .Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefMember>>> stream(
             @Valid @ModelAttribute UniRefMemberStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
-            MediaType contentType,
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
+                    MediaType contentType,
             HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);
-        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
-        if (acceptedRdfContentType.isPresent()) {
-            return super.streamRdf(
-                    () -> service.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
-                    streamRequest,
-                    contentType,
-                    request);
-        } else {
-            return super.stream(
-                    () -> service.stream(streamRequest), streamRequest, contentType, request);
-        }
+        return super.stream(
+                () -> service.stream(streamRequest), streamRequest, contentType, request);
     }
 
     @Override
