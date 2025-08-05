@@ -262,6 +262,27 @@ class SuggesterControllerIT {
                 .andExpect(jsonPath("$.suggestions.*.id", contains(id)));
     }
 
+    @Test
+    void suggestKeyword() throws Exception {
+        // given
+        String id = "KW-0005";
+        saveSuggestionDoc(id, "Acetoin biosynthesis", List.of(), KEYWORD, medium);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", KEYWORD.name())
+                                .param("query", "Acet"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.suggestions.*.id", contains(id)));
+    }
+
 
     private void saveSuggestionDoc(String id, String value, List<String> altValues) {
         saveSuggestionDoc(
