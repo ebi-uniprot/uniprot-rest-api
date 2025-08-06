@@ -1,22 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
-import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import javax.xml.xpath.XPathExpressionException;
-
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +31,22 @@ import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import javax.xml.xpath.XPathExpressionException;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
+import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
+import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
 
 /**
  * @author sahmad
@@ -323,7 +322,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", iterableWithSize(5)))
-                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")));
+                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].properties[*].value",
+                                hasItem("UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome")));
     }
 
     @Test
@@ -462,7 +465,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(jsonPath("$.results.size()", is(25)))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem("sources")))
+                .andExpect(jsonPath("$.results[*].properties[*].key", hasItem(SOURCES)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].properties[*].value",
+                                hasItem("UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome")))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()));
     }
