@@ -2274,6 +2274,33 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     }
 
+    @Test
+    void testSearchWithMoreThanAllowedOrClausesFailure() throws Exception {
+        saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                        .param(
+                                                "query",
+                                                "accession:P21802 OR accession:P00001 OR accession:P00002 OR accession:P00003 OR accession:P00004 OR accession:P00005 OR accession:P00006 OR accession:P00007 OR accession:P00008 OR accession:P00009 OR accession:P00010 OR accession:P00011 OR accession:P00012 OR accession:P00013 OR accession:P00014 OR accession:P00015 OR accession:P00016 OR accession:P00017 OR accession:P00018 OR accession:P00019 OR accession:P00020 OR accession:P00021 OR accession:P00022 OR accession:P00023 OR accession:P00024 OR accession:P00025 OR accession:P00026 OR accession:P00027 OR accession:P00028 OR accession:P00029 OR accession:P00030 OR accession:P00031 OR accession:P00032 OR accession:P00033 OR accession:P00034 OR accession:P00035 OR accession:P00036 OR accession:P00037 OR accession:P00038 OR accession:P00039 OR accession:P00040 OR accession:P00041 OR accession:P00042 OR accession:P00043 OR accession:P00044 OR accession:P00045 OR accession:P00046 OR accession:P00047 OR accession:P00048 OR accession:P00049 OR accession:P00050")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.url")
+                                .value("http://localhost/uniprotkb/search"))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.messages[0]")
+                                .value("Too many OR conditions in query. Maximum allowed is 50."));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;

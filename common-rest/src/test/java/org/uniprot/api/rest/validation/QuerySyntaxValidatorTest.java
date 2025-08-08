@@ -30,11 +30,13 @@ class QuerySyntaxValidatorTest {
         "leading and trailing wildcard, *protein* value, true",
         "multiple leading, **defa*ult* value, true",
         "multiple trailing, *defaul*t** value, true",
-        "multiple strip, **defaul*t** value, true"
+        "multiple strip, **defaul*t** value, true",
+        "many OR, a OR b OR c OR d OR e OR f OR g OR h OR i OR j OR j, false"
     })
     void checkValidationUseCase(String desc, String queryString, String expected) {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator =
                 new ValidSolrQuerySyntax.QuerySyntaxValidator();
+        validator.setMaxOrClauses(10);
 
         ConstraintValidatorContextImpl context = Mockito.mock(ConstraintValidatorContextImpl.class);
         HibernateConstraintViolationBuilder builder =
