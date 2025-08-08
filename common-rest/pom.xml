@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
-		<version>1.0.38.1</version>
+		<version>1.0.38.2</version>
 	</parent>
 	<artifactId>common-rest</artifactId>
 	<name>common-rest</name>
