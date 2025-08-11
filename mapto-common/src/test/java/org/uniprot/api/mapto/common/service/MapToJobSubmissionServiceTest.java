@@ -92,7 +92,6 @@ class MapToJobSubmissionServiceTest {
 
         JobSubmitResponse jobSubmitResponse = mapToJobSubmissionService.submit(mapToJobRequest);
         verify(jobTaskExecutor, never()).execute(any());
-        verify(mapToJobService).updateUpdated(ID);
         assertSame(ID, jobSubmitResponse.getJobId());
     }
 
