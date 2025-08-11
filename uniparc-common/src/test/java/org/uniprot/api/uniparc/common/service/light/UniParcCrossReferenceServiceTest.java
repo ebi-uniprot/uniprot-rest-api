@@ -145,9 +145,9 @@ class UniParcCrossReferenceServiceTest {
         assertThat(
                 values,
                 contains(
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome"));
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome"));
         assertEquals(10, content.size());
         assertNotNull(result.getPage());
     }
@@ -240,15 +240,15 @@ class UniParcCrossReferenceServiceTest {
         assertThat(
                 values,
                 contains(
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome",
-                        "WP_168893201:UP000005640:chromosome"));
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome",
+                        "UniProtKB/TrEMBL:WP_168893201:UP000005640:chromosome"));
     }
 }
