@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.common.service.member;
 
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefEntryStoreRepository;
 import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberStreamRequest;
 import org.uniprot.core.uniref.UniRefMember;
 
 /**
@@ -35,5 +38,9 @@ public class UniRefMemberService {
             String message = "Could not get members for id: [" + memberRequest.getId() + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    public Stream<UniRefMember> stream(UniRefMemberStreamRequest streamRequest) {
+        return entryStoreRepository.streamEntryMembers(streamRequest);
     }
 }

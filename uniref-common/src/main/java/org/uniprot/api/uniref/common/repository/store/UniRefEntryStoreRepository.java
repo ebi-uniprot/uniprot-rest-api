@@ -16,6 +16,7 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberStreamRequest;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.AbstractUniRefMemberBuilder;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
@@ -125,6 +126,13 @@ public class UniRefEntryStoreRepository {
                 .page(page)
                 .facets(facets)
                 .build();
+    }
+
+    public Stream<UniRefMember> streamEntryMembers(UniRefMemberStreamRequest memberRequest) {
+        UniRefEntryLight entryLight = getUniRefEntryLightFromStore(memberRequest.getId());
+        List<String> members = entryLight.getMembers();
+        List<String> memberIds = getMemberIds(members);
+        return getUniRefMembers(entryLight, memberIds);
     }
 
     private List<String> getMemberIds(List<String> members) {
