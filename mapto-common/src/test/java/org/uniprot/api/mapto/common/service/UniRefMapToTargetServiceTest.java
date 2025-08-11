@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.io.Tuple;
@@ -48,6 +47,7 @@ class UniRefMapToTargetServiceTest {
     @Mock private UniRefFacetConfig facetConfig;
     @Mock private RequestConverter requestConverter;
     @Mock private MapToJobService mapToJobService;
+    @Mock private MapToResultService mapToResultService;
     @Mock private RdfStreamer rdfStreamer;
     private UniRefMapToTargetService mapToTargetService;
     private String id1;
@@ -69,6 +69,7 @@ class UniRefMapToTargetServiceTest {
                         facetConfig,
                         requestConverter,
                         mapToJobService,
+                        mapToResultService,
                         rdfStreamer);
         ReflectionTestUtils.setField(
                 this.mapToTargetService, "maxIdMappingToIdsCountEnriched", 100000);
@@ -91,15 +92,17 @@ class UniRefMapToTargetServiceTest {
     void testGetMappedEntriesWithoutSolr() {
         // when
         UniRefSearchRequest searchRequest = mockMappedEntriesWithoutSolr();
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToResultService.findTargetIdsByMapToJob(eq(mapToJob), any())).thenReturn(toIds);
         // then
         QueryResult<UniRefEntryLight> result =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertMappedEntriesWithoutSolr(result);
     }
 
     private void assertMappedEntriesWithoutSolr(QueryResult<UniRefEntryLight> result) {
         assertNotNull(result);
-        List<UniRefEntryLight> entries = result.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries = result.getContent().toList();
         assertFalse(entries.isEmpty());
         assertEquals(3, entries.size());
         assertEquals(List.of(entry1, entry2, entry3), entries);
@@ -133,12 +136,18 @@ class UniRefMapToTargetServiceTest {
                 .thenReturn(Stream.of(entry3, entry4));
         when(this.storeStreamer.streamEntries(eq(List.of(id5)), any()))
                 .thenReturn(Stream.of(entry5));
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTotalTargetIds()).thenReturn(5L);
+        when(mapToResultService.findTargetIdsByMapToJob(eq(mapToJob), any()))
+                .thenReturn(List.of(id1, id2))
+                .thenReturn(List.of(id3, id4))
+                .thenReturn(List.of(id5));
         // then
         // page 1
         QueryResult<UniRefEntryLight> result =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertNotNull(result);
-        List<UniRefEntryLight> entries = result.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries = result.getContent().toList();
         assertFalse(entries.isEmpty());
         assertEquals(2, entries.size());
         assertEquals(List.of(entry1, entry2), entries);
@@ -150,9 +159,9 @@ class UniRefMapToTargetServiceTest {
         String nextCursor = cursorPage.getEncryptedNextCursor();
         searchRequest.setCursor(nextCursor);
         QueryResult<UniRefEntryLight> result2 =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertNotNull(result2);
-        List<UniRefEntryLight> entries2 = result2.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries2 = result2.getContent().toList();
         assertEquals(List.of(entry3, entry4), entries2);
         // next cursor - page 3
         CursorPage cursorPage2 = (CursorPage) result2.getPage();
@@ -160,9 +169,9 @@ class UniRefMapToTargetServiceTest {
         String nextCursor2 = cursorPage2.getEncryptedNextCursor();
         searchRequest.setCursor(nextCursor2);
         QueryResult<UniRefEntryLight> result3 =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertNotNull(result3);
-        List<UniRefEntryLight> entries3 = result3.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries3 = result3.getContent().toList();
         assertEquals(List.of(entry5), entries3);
         // try to get cursor when none left
         CursorPage cursorPage3 = (CursorPage) result3.getPage();
@@ -201,11 +210,13 @@ class UniRefMapToTargetServiceTest {
         when(tupleStream.read()).thenReturn(tuple1, tuple2, tuple3, eofTuple);
         when(this.storeStreamer.streamEntries(eq(List.of(id3, id2, id1)), any()))
                 .thenReturn(Stream.of(entry3, entry2, entry1));
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToResultService.findAllTargetIdsByMapToJob(mapToJob)).thenReturn(toIds);
         // then
         QueryResult<UniRefEntryLight> result =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertNotNull(result);
-        List<UniRefEntryLight> entries = result.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries = result.getContent().toList();
         assertFalse(entries.isEmpty());
         assertEquals(3, entries.size());
         assertEquals(List.of(entry3, entry2, entry1), entries);
@@ -234,7 +245,7 @@ class UniRefMapToTargetServiceTest {
         // create mock tuples with facets
         Map<Object, Object> map1 = new HashMap<>();
         map1.put(facetName, "1.0");
-        map1.put("count(*)", Long.valueOf(3));
+        map1.put("count(*)", 3L);
         Tuple tuple1 = new Tuple(map1);
         Map<Object, Object> map2 = new HashMap<>();
         map2.put("EOF", "");
@@ -257,11 +268,14 @@ class UniRefMapToTargetServiceTest {
                             }
                             return eofTuple; // Third and fourth calls return eofTuple
                         });
+        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
+        when(mapToJob.getTotalTargetIds()).thenReturn(5L);
+        when(mapToResultService.findAllTargetIdsByMapToJob(mapToJob)).thenReturn(toIds);
         // then
         QueryResult<UniRefEntryLight> result =
-                this.mapToTargetService.getMappedEntries(searchRequest, toIds);
+                this.mapToTargetService.getMappedEntries(JOB_ID, searchRequest);
         assertNotNull(result);
-        List<UniRefEntryLight> entries = result.getContent().collect(Collectors.toList());
+        List<UniRefEntryLight> entries = result.getContent().toList();
         assertTrue(entries.isEmpty());
         assertEquals(1, result.getFacets().size());
         Facet facet = result.getFacets().stream().toList().get(0);
@@ -348,7 +362,7 @@ class UniRefMapToTargetServiceTest {
     void streamEntries_withJobIdWithoutSolr() {
         mockStreamEntriesWithoutSolr();
         when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
-        when(mapToJob.getTargetIds()).thenReturn(toIds);
+        when(mapToResultService.findAllTargetIdsByMapToJob(mapToJob)).thenReturn(toIds);
         UniRefStreamRequest streamRequest = new UniRefStreamRequest();
 
         Stream<UniRefEntryLight> result = mapToTargetService.streamEntries(JOB_ID, streamRequest);
@@ -361,7 +375,7 @@ class UniRefMapToTargetServiceTest {
         UniRefStreamRequest streamRequest = new UniRefStreamRequest();
         mockStreamEntriesWithSolr(streamRequest);
         when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
-        when(mapToJob.getTargetIds()).thenReturn(toIds);
+        when(mapToResultService.findAllTargetIdsByMapToJob(mapToJob)).thenReturn(toIds);
 
         Stream<UniRefEntryLight> result = mapToTargetService.streamEntries(JOB_ID, streamRequest);
 
@@ -372,24 +386,12 @@ class UniRefMapToTargetServiceTest {
     void streamRdf() {
         UniRefStreamRequest streamRequest = new UniRefStreamRequest();
         when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
-        when(mapToJob.getTargetIds()).thenReturn(toIds);
+        when(mapToResultService.findAllTargetIdsByMapToJob(mapToJob)).thenReturn(List.of());
         when(rdfStreamer.stream(any(List.class), same(DATA_TYPE), same(FORMAT)))
                 .thenReturn(resultStream);
 
         Stream<String> result =
                 mapToTargetService.streamRdf(JOB_ID, streamRequest, DATA_TYPE, FORMAT);
         assertSame(resultStream, result);
-    }
-
-    @Test
-    void getMappedEntries_withJobId() {
-        UniRefSearchRequest uniRefSearchRequest = mockMappedEntriesWithoutSolr();
-        when(mapToJobService.findMapToJob(JOB_ID)).thenReturn(mapToJob);
-        when(mapToJob.getTargetIds()).thenReturn(toIds);
-
-        QueryResult<UniRefEntryLight> mappedEntries =
-                mapToTargetService.getMappedEntries(JOB_ID, uniRefSearchRequest);
-
-        assertMappedEntriesWithoutSolr(mappedEntries);
     }
 }

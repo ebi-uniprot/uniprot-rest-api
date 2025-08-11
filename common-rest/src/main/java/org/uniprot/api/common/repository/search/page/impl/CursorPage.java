@@ -52,9 +52,9 @@ public class CursorPage implements Page {
             String[] parsedCursor = encryptedCursor.split(DELIMITER);
 
             Long offset = Long.valueOf(parsedCursor[0]);
-            String solrCursor = parsedCursor[1];
+            String cursorStr = parsedCursor[1];
 
-            return new CursorPage(solrCursor, offset, pageSize);
+            return new CursorPage(cursorStr, offset, pageSize);
         }
     }
 
@@ -134,7 +134,7 @@ public class CursorPage implements Page {
     }
 
     public static int getNextOffset(CursorPage page) {
-        long nextPageOffset = (long) page.getOffset() + page.getPageSize();
+        long nextPageOffset = page.getOffset() + page.getPageSize();
         if (nextPageOffset > page.getTotalElements()) {
             return page.getTotalElements().intValue();
         } else {

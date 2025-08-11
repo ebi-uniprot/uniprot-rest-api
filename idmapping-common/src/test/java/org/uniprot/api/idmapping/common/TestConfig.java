@@ -58,4 +58,28 @@ public class TestConfig {
     public ThreadPoolTaskExecutor jobTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
+
+    @Bean
+    @Profile("idmapping")
+    public JobOperation idMappingResultJobOp(IdMappingJobCacheService cacheService) {
+        return new IdMappingResultsJobOperation(cacheService);
+    }
+
+    @Bean
+    @Profile("idmapping")
+    public JobOperation uniProtKBIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniProtKBIdMappingResultsJobOperation(cacheService);
+    }
+
+    @Bean
+    @Profile("idmapping")
+    public JobOperation uniRefIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniRefIdMappingResultsJobOperation(cacheService);
+    }
+
+    @Bean
+    @Profile("idmapping")
+    public JobOperation uniParcIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniParcIdMappingResultsJobOperation(cacheService);
+    }
 }

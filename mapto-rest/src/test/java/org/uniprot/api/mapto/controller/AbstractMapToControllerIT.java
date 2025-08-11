@@ -83,7 +83,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(jsonPath("$.from", equalTo("UNIPROTKB")))
                 .andExpect(jsonPath("$.to", equalTo("UNIREF")))
                 .andExpect(jsonPath("$.query", equalTo("*:*")))
-                .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
+                .andExpect(jsonPath("$.includeIsoform", equalTo(false)));
         await().until(isJobFinished(jobId));
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractMapToControllerIT extends BaseMapToControllerIT {
                 .andExpect(jsonPath("$.from", equalTo("UNIPROTKB")))
                 .andExpect(jsonPath("$.to", equalTo("UNIREF")))
                 .andExpect(jsonPath("$.query", equalTo(query)))
-                .andExpect(jsonPath("$.includeIsoform", equalTo("false")));
+                .andExpect(jsonPath("$.includeIsoform", equalTo(false)));
     }
 
     @Test

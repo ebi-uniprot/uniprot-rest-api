@@ -7,8 +7,6 @@ import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 import static org.uniprot.store.config.UniProtDataType.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,20 +39,19 @@ class MapToJobSubmissionServiceTest {
     private static final String QUERY = "query";
     private static final LocalDateTime CREATED = LocalDateTime.now();
     private static final LocalDateTime UPDATED = LocalDateTime.now();
+    private static final Boolean INCLUDE_ISOFORM = false;
+    private static final Integer MAX_TARGET_ID_COUNT = 100;
     @Mock private ThreadPoolTaskExecutor jobTaskExecutor;
     @Mock private MapToHashGenerator hashGenerator;
     @Mock private MapToJobService mapToJobService;
     @Mock private MapToSearchFacade mapToSearchFacade;
     @Mock private RetryPolicy<Object> retryPolicy;
     private MapToJobSubmissionService mapToJobSubmissionService;
-    @Mock public List<ProblemPair> errors;
+    @Mock public ProblemPair error;
 
     @Mock private MapToJobRequest mapToJobRequest;
     @Mock private MapToJob mapToJob;
     @Mock private MapToSearchService mapToSearchService;
-    @Mock private List<String> targetIds;
-    @Mock private Map<String, String> extraParams;
-    private Integer maxTargetIdCount = 100;
 
     @BeforeEach
     void setUp() {
@@ -65,7 +62,7 @@ class MapToJobSubmissionServiceTest {
                         mapToJobService,
                         mapToSearchFacade,
                         retryPolicy,
-                        maxTargetIdCount);
+                        MAX_TARGET_ID_COUNT);
         lenient().when(hashGenerator.generateHash(mapToJobRequest)).thenReturn(ID);
     }
 
@@ -85,7 +82,7 @@ class MapToJobSubmissionServiceTest {
                                 mapToJobService,
                                 mapToJob,
                                 retryPolicy,
-                                maxTargetIdCount));
+                                MAX_TARGET_ID_COUNT));
         assertSame(ID, jobSubmitResponse.getJobId());
     }
 
@@ -103,15 +100,14 @@ class MapToJobSubmissionServiceTest {
     void getJobStatus() {
         when(mapToJobService.findMapToJob(ID)).thenReturn(mapToJob);
         when(mapToJob.getStatus()).thenReturn(STATUS);
-        when(mapToJob.getErrors()).thenReturn(errors);
+        when(mapToJob.getError()).thenReturn(error);
         when(mapToJob.getCreated()).thenReturn(CREATED);
-        when(mapToJob.getTargetIds()).thenReturn(targetIds);
-        when(targetIds.size()).thenReturn(SIZE);
         when(mapToJob.getUpdated()).thenReturn(UPDATED);
 
         JobStatusResponse jobStatus = mapToJobSubmissionService.getJobStatus(ID);
+
         assertSame(STATUS, jobStatus.getJobStatus());
-        assertSame(errors, jobStatus.getErrors());
+        assertSame(error, jobStatus.getErrors().get(0));
         assertSame(CREATED, jobStatus.getStart());
         assertEquals(SIZE, (long) SIZE);
         assertSame(UPDATED, jobStatus.getLastUpdated());
@@ -123,7 +119,7 @@ class MapToJobSubmissionServiceTest {
         when(mapToJob.getSourceDB()).thenReturn(SOURCE_DB);
         when(mapToJob.getTargetDB()).thenReturn(TARGET_DB);
         when(mapToJob.getQuery()).thenReturn(QUERY);
-        when(mapToJob.getExtraParams()).thenReturn(extraParams);
+        when(mapToJob.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORM);
         when(mapToJob.getStatus()).thenReturn(FINISHED);
 
         String requestUrl = "requestUrl";
@@ -134,7 +130,7 @@ class MapToJobSubmissionServiceTest {
         assertSame(SOURCE_DB.name(), jobDetails.getFrom());
         assertSame(TARGET_DB.name(), jobDetails.getTo());
         assertSame(QUERY, jobDetails.getQuery());
-        assertNull(jobDetails.getIncludeIsoform());
+        assertFalse(jobDetails.getIncludeIsoform());
         assertEquals("requemappingType/results/jobId", jobDetails.getRedirectURL());
     }
 
@@ -144,7 +140,7 @@ class MapToJobSubmissionServiceTest {
         when(mapToJob.getSourceDB()).thenReturn(SOURCE_DB);
         when(mapToJob.getTargetDB()).thenReturn(TARGET_DB);
         when(mapToJob.getQuery()).thenReturn(QUERY);
-        when(mapToJob.getExtraParams()).thenReturn(extraParams);
+        when(mapToJob.getIncludeIsoform()).thenReturn(INCLUDE_ISOFORM);
         when(mapToJob.getStatus()).thenReturn(RUNNING);
 
         String requestUrl = "requestUrl";
@@ -155,7 +151,7 @@ class MapToJobSubmissionServiceTest {
         assertSame(SOURCE_DB.name(), jobDetails.getFrom());
         assertSame(TARGET_DB.name(), jobDetails.getTo());
         assertSame(QUERY, jobDetails.getQuery());
-        assertNull(jobDetails.getIncludeIsoform());
+        assertFalse(jobDetails.getIncludeIsoform());
         assertNull(jobDetails.getRedirectURL());
     }
 

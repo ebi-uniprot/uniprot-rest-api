@@ -39,13 +39,13 @@ public class MapToTask implements Runnable {
 
     @Override
     public void run() {
-        String jobId = mapToJob.getId();
+        String jobId = mapToJob.getJobId();
         try {
             mapToJobService.updateStatus(jobId, JobStatus.RUNNING);
             MapToSearchResult targetIdPage = getTargetIdPage(mapToJob, null);
             CursorPage page = targetIdPage.getPage();
             List<String> allTargetIds = getAllTargetIds(targetIdPage, page);
-            validateTargetIdLimit(jobId, allTargetIds, maxTargetIdCount);
+            validateTargetIdLimitAndProcess(jobId, allTargetIds, maxTargetIdCount);
         } catch (Exception e) {
             log.error("Job with id %s finished with error %s".formatted(jobId, e.getMessage()));
             mapToJobService.setErrors(
@@ -54,7 +54,7 @@ public class MapToTask implements Runnable {
         }
     }
 
-    private void validateTargetIdLimit(
+    private void validateTargetIdLimitAndProcess(
             String jobId, List<String> allTargetIds, Integer targetIdLimit) {
         int totalTargetIds = allTargetIds.size();
         if (exceedsTargetIdLimit(targetIdLimit, totalTargetIds)) {
@@ -69,7 +69,7 @@ public class MapToTask implements Runnable {
         }
     }
 
-    private static boolean exceedsTargetIdLimit(Integer limit, int totalElements) {
+    private boolean exceedsTargetIdLimit(Integer limit, int totalElements) {
         return limit != null && totalElements > limit;
     }
 

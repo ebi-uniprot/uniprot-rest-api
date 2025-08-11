@@ -36,7 +36,7 @@ class MapToTaskTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(mapToJob.getId()).thenReturn(ID);
+        lenient().when(mapToJob.getJobId()).thenReturn(ID);
         lenient().when(mapToJob.getQuery()).thenReturn(QUERY);
         lenient().when(mapToJob.getTargetDB()).thenReturn(UNIPROT_DATA_TYPE);
         mapToTask =
