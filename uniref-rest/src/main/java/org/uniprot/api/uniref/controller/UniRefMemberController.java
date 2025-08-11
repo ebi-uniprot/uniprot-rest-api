@@ -94,8 +94,8 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
             value = "/{id}/members/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = STREAM_UNIREF_LIGHT_OPERATION,
-            description = STREAM_UNIREF_LIGHT_OPERATION_DESC,
+            summary = STREAM_ID_UNIREF_MEMBER_OPERATION,
+            description = STREAM_ID_UNIREF_MEMBER_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
