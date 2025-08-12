@@ -108,7 +108,7 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public QueryResult<UniParcEntry> searchByProteomeId(
-            UniParcGetByIdPageSearchRequest searchRequest, String proteomeId) {
+            UniParcGetByProteomeIdRequest searchRequest, String proteomeId) {
         // search uniparc entries from solr
         SolrRequest solrRequest = getRequestConverter().createSearchSolrRequest(searchRequest);
         QueryResult<UniParcDocument> results =
@@ -125,8 +125,7 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
                 .build();
     }
 
-    public Stream<UniParcEntry> streamByProteomeId(
-            UniParcGetByIdStreamRequest streamRequest, String proteomeId) {
+    public Stream<UniParcEntry> streamByProteomeId(StreamRequest streamRequest, String proteomeId) {
         SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
         StoreRequest storeRequest = StoreRequest.builder().proteomeId(proteomeId).build();
         return this.storeStreamer.idsToStoreStream(solrRequest, storeRequest);
