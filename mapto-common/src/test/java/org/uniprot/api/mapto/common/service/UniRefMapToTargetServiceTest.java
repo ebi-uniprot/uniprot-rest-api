@@ -185,8 +185,7 @@ class UniRefMapToTargetServiceTest {
         searchRequest.setSize(10);
         searchRequest.setSort("id desc"); // sort by descending order
         SolrRequest solrRequest = mock(SolrRequest.class);
-        when(this.requestConverter.createSearchIdsSolrRequest(
-                        eq(searchRequest), eq(toIds), eq("id")))
+        when(this.requestConverter.createSearchIdsSolrRequest(searchRequest, toIds, "id"))
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create three mock tuples and map in descending id order
@@ -238,8 +237,7 @@ class UniRefMapToTargetServiceTest {
         SolrRequest solrBatchRequest = mock(SolrRequest.class);
         when(solrRequest.createBatchFacetSolrRequest(any())).thenReturn(solrBatchRequest);
         when(solrBatchRequest.getFacets()).thenReturn(List.of(facetRequest));
-        when(this.requestConverter.createSearchIdsSolrRequest(
-                        eq(searchRequest), eq(toIds), eq("id")))
+        when(this.requestConverter.createSearchIdsSolrRequest(searchRequest, toIds, "id"))
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create mock tuples with facets
@@ -331,8 +329,7 @@ class UniRefMapToTargetServiceTest {
     private void mockStreamEntriesWithSolr(UniRefStreamRequest streamRequest) throws IOException {
         streamRequest.setSort("id desc"); // sort by descending order
         SolrRequest solrRequest = mock(SolrRequest.class);
-        when(this.requestConverter.createStreamIdsSolrRequest(
-                        eq(streamRequest), eq(toIds), eq("id")))
+        when(this.requestConverter.createStreamIdsSolrRequest(streamRequest, toIds, "id"))
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create three mock tuples and map in descending id order

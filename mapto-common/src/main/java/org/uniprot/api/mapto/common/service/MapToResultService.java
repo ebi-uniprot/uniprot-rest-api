@@ -25,7 +25,6 @@ public class MapToResultService {
         return streamAllTargetIdsByMapToJob(mapToJob).toList();
     }
 
-    @Transactional(readOnly = true)
     public Stream<String> streamAllTargetIdsByMapToJob(MapToJob mapToJob) {
         return mapToResultRepository.streamTargetIdByMapToJob(mapToJob.getId());
     }

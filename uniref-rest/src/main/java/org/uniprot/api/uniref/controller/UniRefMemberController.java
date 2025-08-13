@@ -90,6 +90,7 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
         return super.getSearchResponse(results, "", request, response);
     }
 
+    @SuppressWarnings("java:S6856")
     @GetMapping(
             value = "/{id}/members/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})

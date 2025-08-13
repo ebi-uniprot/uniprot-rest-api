@@ -752,13 +752,14 @@ public class OpenAPIConstants {
     public static final String FORMAT_UNIREF_EXAMPLE = "json";
     public static final String ID_UNIREF_MEMBER_OPERATION =
             "Retrieve UniRef cluster members by a single cluster id.";
+    public static final String UNIREF_MEMBER_SEARCH_BY_ID_DESC =
+            "Search UniRef entry by id to return all member data associated with that entry. ";
     public static final String ID_UNIREF_MEMBER_OPERATION_DESC =
-            "Search UniRef entry by id to return all member data associated with that entry. "
-                    + FIELDS_OPERATION_DESC;
+            UNIREF_MEMBER_SEARCH_BY_ID_DESC + FIELDS_OPERATION_DESC;
     public static final String STREAM_ID_UNIREF_MEMBER_OPERATION =
             "Download UniRef cluster members by a single cluster id.";
     public static final String STREAM_ID_UNIREF_MEMBER_OPERATION_DESC =
-            "Search UniRef entry by id to return all member data associated with that entry. ";
+            UNIREF_MEMBER_SEARCH_BY_ID_DESC;
     public static final String ID_UNIREF_OPERATION =
             "Get UniRef cluster entry by a single cluster id.";
     public static final String ID_UNIREF_OPERATION_DESC =

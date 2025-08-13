@@ -16,7 +16,8 @@ public class MapToSearchFacade {
             case UNIPROTKB -> {
                 return uniProtKBMapToSearchService;
             }
+            default -> throw new IllegalArgumentException(
+                    "Illegal or Unsupported Source Data type: " + dataType);
         }
-        throw new IllegalArgumentException("Illegal or Unsupported Source Data type: " + dataType);
     }
 }

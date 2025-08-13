@@ -76,7 +76,7 @@ class IdMappingMessageConsumerIT extends AbstractIdMappingIT {
     @Autowired private MessageConverter messageConverter;
 
     @AfterEach
-    public void cleanUp() {
+    void cleanUp() {
         asyncDownloadFileHandler.deleteAllFiles(ID);
     }
 
