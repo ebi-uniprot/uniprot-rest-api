@@ -25,7 +25,7 @@ public class MapToResultService {
         return streamAllTargetIdsByMapToJob(mapToJob).toList();
     }
 
-    public Stream<String> streamAllTargetIdsByMapToJob(MapToJob mapToJob) {
+    private Stream<String> streamAllTargetIdsByMapToJob(MapToJob mapToJob) {
         return mapToResultRepository.streamTargetIdByMapToJob(mapToJob.getId());
     }
 
