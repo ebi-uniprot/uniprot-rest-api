@@ -75,18 +75,14 @@ public abstract class AbstractIdService<T> {
         SolrRequest solrRequest =
                 this.requestConverter.createSearchIdsSolrRequest(
                         searchRequest, toIds, getSolrIdField());
-        SolrStreamFacetResponse solrStreamResponse =
-                searchBySolrStream(solrRequest, this.idBatchSize);
-        return solrStreamResponse;
+        return searchBySolrStream(solrRequest, this.idBatchSize);
     }
 
     protected SolrStreamFacetResponse searchMappedIdsFacetsByStreamRequest(
             StreamRequest streamRequest, List<String> toIds) {
         SolrRequest solrRequest =
                 requestConverter.createStreamIdsSolrRequest(streamRequest, toIds, getSolrIdField());
-        SolrStreamFacetResponse solrStreamResponse =
-                searchBySolrStream(solrRequest, this.idBatchSize);
-        return solrStreamResponse;
+        return searchBySolrStream(solrRequest, this.idBatchSize);
     }
 
     protected Stream<T> getEntries(List<String> toIds, String fields) {
@@ -103,9 +99,7 @@ public abstract class AbstractIdService<T> {
         // get facets in batches
         List<SolrStreamFacetResponse> facetsInBatches = getFacetsInBatches(solrRequest, batchSize);
         // merge them
-        SolrStreamFacetResponse mergedResponse =
-                SolrStreamFacetResponse.merge(solrRequest, facetsInBatches, idsResponse);
-        return mergedResponse;
+        return SolrStreamFacetResponse.merge(solrRequest, facetsInBatches, idsResponse);
     }
 
     protected abstract String getSolrIdField();
@@ -158,7 +152,7 @@ public abstract class AbstractIdService<T> {
         boolean ignoreLimit =
                 true; // for batch faceting, get all facets and return "limit" number of facets
         // during merge
-        for (int i = 0; solrRequest.getFacets().size() > 0 && i < ids.size(); i += idBatchSize) {
+        for (int i = 0; !solrRequest.getFacets().isEmpty() && i < ids.size(); i += idBatchSize) {
             List<String> idsBatch = ids.subList(i, Math.min(i + idBatchSize, ids.size()));
             SolrRequest solrFacetRequest = solrRequest.createBatchFacetSolrRequest(idsBatch);
             TupleStream facetTupleStream = this.tupleStreamTemplate.create(solrFacetRequest);

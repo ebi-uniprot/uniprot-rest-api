@@ -40,9 +40,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetByIdParameterRe
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.Citation;
-import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.*;
 import org.uniprot.core.proteome.impl.ComponentBuilder;
@@ -149,21 +147,6 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         Taxonomy taxonomy =
                 new TaxonomyBuilder().taxonId(9606).scientificName("Homo sapiens").build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
-        //	String reId = "UP000005641";
-        //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
-        List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
-        CrossReference<ProteomeDatabase> xref1 =
-                new CrossReferenceBuilder<ProteomeDatabase>()
-                        .database(ProteomeDatabase.GENOME_ACCESSION)
-                        .id("ACA121")
-                        .build();
-        CrossReference<ProteomeDatabase> xref2 =
-                new CrossReferenceBuilder<ProteomeDatabase>()
-                        .database(ProteomeDatabase.GENOME_ANNOTATION)
-                        .id("ADFDA121")
-                        .build();
-        xrefs.add(xref1);
-        xrefs.add(xref2);
         List<Component> components = new ArrayList<>();
         Component component1 =
                 new ComponentBuilder()

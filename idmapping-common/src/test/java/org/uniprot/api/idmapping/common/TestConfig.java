@@ -31,7 +31,7 @@ public class TestConfig {
     @Bean(destroyMethod = "shutdown")
     @Profile("idmapping")
     RedissonClient redisson() {
-        GenericContainer redisServer = RedisTestContainer.getInstance();
+        GenericContainer<?> redisServer = RedisTestContainer.getInstance();
         Config config = new Config();
         config.useSingleServer()
                 .setAddress(
@@ -39,8 +39,7 @@ public class TestConfig {
                                 + redisServer.getHost()
                                 + ":"
                                 + redisServer.getFirstMappedPort());
-        RedissonClient client = Redisson.create(config);
-        return client;
+        return Redisson.create(config);
     }
 
     @Bean

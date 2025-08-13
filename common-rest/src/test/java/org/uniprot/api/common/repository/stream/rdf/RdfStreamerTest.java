@@ -157,11 +157,11 @@ class RdfStreamerTest {
         when(rdfEntryCountProvider.getEntryCount(any(), eq(DATA_TYPE), eq(FORMAT))).thenReturn(123);
 
         AtomicLong consumedCount = new AtomicLong();
-        LongConsumer longConsumer = value -> consumedCount.set(value);
+        LongConsumer longConsumer = consumedCount::set;
 
         Stream<String> rdfStream = rdfStreamer.stream(IDS, DATA_TYPE, FORMAT, longConsumer);
 
-        rdfStream.collect(Collectors.toList());
+        rdfStream.toList();
 
         assertEquals(123L, consumedCount.get());
     }
