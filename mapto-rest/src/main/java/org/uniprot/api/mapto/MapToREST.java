@@ -46,6 +46,9 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                     type = FilterType.REGEX,
                     pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.protnlm\\..*"),
             @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.protnlm\\..*"),
+            @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,
                     classes = {
                         IdMappingMessageConverterConfig.class,
