@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtDatabaseDetailResponse;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 
 /**
@@ -32,5 +33,13 @@ class DiseaseConfigureServiceTest {
         List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void getAllDatabases() {
+        DiseaseConfigureService service = new DiseaseConfigureService();
+        List<UniProtDatabaseDetailResponse> result = service.getAllDatabases();
+        assertNotNull(result);
+        assertEquals(3, result.size());
     }
 }
