@@ -29,9 +29,9 @@ import org.uniprot.api.uniparc.common.service.UniParcBestGuessService;
 import org.uniprot.api.uniparc.common.service.UniParcEntryService;
 import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdStreamRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -239,8 +239,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/proteome/{upId}",
             produces = {FASTA_MEDIA_TYPE_VALUE})
     @Operation(
-            // We can not remove this hidden=true, before we fix this JIRA:TRM-32296
-            hidden = true,
             summary = PROTEOME_UPID_FASTA_UNIPARC_OPERATION,
             responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getFastaByProteomeId(
@@ -260,8 +258,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/proteome/{upId}/stream",
             produces = {FASTA_MEDIA_TYPE_VALUE})
     @Operation(
-            // We can not remove this hidden=true, before we fix this JIRA:TRM-32296
-            hidden = true,
             summary = PROTEOME_UPID_UNIPARC_STREAM_OPERATION,
             responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> streamByProteomeId(
