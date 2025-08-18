@@ -2461,7 +2461,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.computationalPubmedIds.add("890123456");
             doc.communityPubmedIds.add("1234567");
             UniProtDatabaseTypes.INSTANCE
-                    .getAllDbTypes()
+                    .getUniProtKBDbTypes()
                     .forEach(
                             db -> {
                                 doc.xrefCountMap.put(

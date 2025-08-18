@@ -288,7 +288,7 @@ public class IdMappingUniProtKBITUtils {
 
     private static List<UniProtKBCrossReference> createDatabases() {
         List<UniProtKBCrossReference> xrefs =
-                UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
+                UniProtDatabaseTypes.INSTANCE.getUniProtKBDbTypes().stream()
                         .map(UniProtDatabaseDetail::getName)
                         .map(UniProtKBCrossReferenceTest::getUniProtDBCrossReference)
                         .collect(Collectors.toList());

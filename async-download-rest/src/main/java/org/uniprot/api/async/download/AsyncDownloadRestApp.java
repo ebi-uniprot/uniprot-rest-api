@@ -14,7 +14,6 @@ import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
 import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniprotkb.common.repository.store.protnlm.ProtNLMStoreClient;
 import org.uniprot.api.uniprotkb.common.service.ec.ECService;
 import org.uniprot.api.uniprotkb.common.service.go.GOService;
 import org.uniprot.api.uniprotkb.common.service.go.client.GOClientImpl;
@@ -50,7 +49,8 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                     pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.protnlm\\..*"),
             @ComponentScan.Filter(
                     type = FilterType.REGEX,
-                    pattern = "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.protnlm\\..*"),
+                    pattern =
+                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.protnlm\\..*"),
             @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,
                     classes = {
