@@ -169,6 +169,27 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is("DB-6789")));
     }
 
+    @Test
+    void searchReturnsSortByAbbrevByDefault() throws Exception {
+        saveEntry(12345);
+        saveEntry(67812);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "*:*")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results[0].id", is("DB-67812")))
+                .andExpect(jsonPath("$.results[1].id", is("DB-12345")));
+    }
+
     static class CrossRefSearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override

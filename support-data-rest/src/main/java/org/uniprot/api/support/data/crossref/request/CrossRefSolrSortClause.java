@@ -9,10 +9,12 @@ import org.uniprot.store.config.UniProtDataType;
 
 @Component
 public class CrossRefSolrSortClause extends AbstractSolrSortClause {
+    private static final String ABBREVIATION = "abbrev";
     private static final String DOC_ID = "id";
 
     @PostConstruct
     public void init() {
+        addDefaultFieldOrderPair(ABBREVIATION, SolrQuery.ORDER.asc);
         addDefaultFieldOrderPair(DOC_ID, SolrQuery.ORDER.asc);
     }
 
