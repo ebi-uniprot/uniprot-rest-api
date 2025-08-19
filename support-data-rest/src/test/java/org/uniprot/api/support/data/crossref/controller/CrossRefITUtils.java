@@ -23,7 +23,7 @@ public class CrossRefITUtils {
         CrossRefEntry crossRefEntry =
                 entryBuilder
                         .id(accession)
-                        .abbrev("NCBIfam" + suffix)
+                        .abbrev("NCBIfam" + suffix % 100)
                         .name("NCBIfam; a protein family database" + suffix)
                         .pubMedId("17151080" + suffix)
                         .doiId("10.1093/nar/gkl1043" + suffix)
