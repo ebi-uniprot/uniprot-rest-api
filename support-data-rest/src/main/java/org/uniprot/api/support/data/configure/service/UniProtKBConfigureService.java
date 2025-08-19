@@ -94,7 +94,7 @@ public class UniProtKBConfigureService {
     }
 
     public List<UniProtDatabaseDetailResponse> getAllDatabases() {
-        return DBX_TYPES.getAllDbTypes().stream()
+        return DBX_TYPES.getUniProtKBDbTypes().stream()
                 .map(UniProtDatabaseDetailResponse::getUniProtDatabaseDetailResponse)
                 .collect(Collectors.toList());
     }

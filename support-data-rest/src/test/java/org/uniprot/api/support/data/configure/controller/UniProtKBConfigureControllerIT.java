@@ -88,7 +88,7 @@ class UniProtKBConfigureControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
         // all cross refs including internal ones
         List<String> allCrossRefs =
-                UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
+                UniProtDatabaseTypes.INSTANCE.getUniProtKBDbTypes().stream()
                         .map(db -> db.getName())
                         .collect(Collectors.toList());
         response.andExpect(jsonPath("$.*.idMappingName").doesNotExist())

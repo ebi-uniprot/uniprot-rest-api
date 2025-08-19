@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtDatabaseDetailResponse;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.DiseaseConfigureService;
 
@@ -76,5 +77,10 @@ public class DiseaseConfigureController {
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
         return service.getSearchItems(PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS);
+    }
+
+    @GetMapping("/allDatabases")
+    public List<UniProtDatabaseDetailResponse> getUniProtAllDatabase() {
+        return service.getAllDatabases();
     }
 }
