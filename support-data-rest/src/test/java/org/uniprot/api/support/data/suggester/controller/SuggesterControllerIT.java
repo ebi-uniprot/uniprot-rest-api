@@ -1,5 +1,19 @@
 package org.uniprot.api.support.data.suggester.controller;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
+import static org.uniprot.store.search.field.SuggestField.Importance.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -22,20 +36,6 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.suggest.SuggestDictionary;
 import org.uniprot.store.search.document.suggest.SuggestDocument;
 import org.uniprot.store.search.field.SuggestField;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
-import static org.uniprot.store.search.field.SuggestField.Importance.*;
 
 /**
  * Created 19/05/19
@@ -245,7 +245,12 @@ class SuggesterControllerIT {
     void suggestDisease() throws Exception {
         // given
         String id = "DI-00001";
-        saveSuggestionDoc(id, "Lung Cancer", List.of("Adenocarcinoma of lung", "Alveolar cell carcinoma"), DISEASE, medium);
+        saveSuggestionDoc(
+                id,
+                "Lung Cancer",
+                List.of("Adenocarcinoma of lung", "Alveolar cell carcinoma"),
+                DISEASE,
+                medium);
 
         // when
         ResultActions response =
@@ -282,7 +287,6 @@ class SuggesterControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.suggestions.*.id", contains(id)));
     }
-
 
     private void saveSuggestionDoc(String id, String value, List<String> altValues) {
         saveSuggestionDoc(
