@@ -328,7 +328,8 @@ class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     is("Computationally mapped entries")))
                     .resultMatcher(jsonPath("$.facets[0].values[3].value", is("4_computationally")))
                     .resultMatcher(
-                            jsonPath("$.facets[0].values[4].label", is("Community mapped entries")))
+                            jsonPath(
+                                    "$.facets[0].values[4].label", is("Community curated entries")))
                     .resultMatcher(jsonPath("$.facets[0].values[4].value", is("5_community")))
                     .build();
         }
