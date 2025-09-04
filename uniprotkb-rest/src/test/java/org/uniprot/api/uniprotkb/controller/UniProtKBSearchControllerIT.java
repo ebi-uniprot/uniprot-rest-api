@@ -1,6 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.time.Instant;
@@ -203,13 +207,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE + "?query=gene:gene" + "\u03B1")
+                                                SEARCH_RESOURCE + "?query=CR4567071")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -218,6 +222,31 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession", contains("P12345")));
+    }
+
+    @Test
+    void searchByXrefMiss_providesSuggestion() throws Exception {
+        // given
+        UniProtKBEntry entry =
+                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345","CR456707")).build();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=CR4567071.1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", is(empty())))
+                .andExpect(jsonPath("$.suggestions[0].hits", notNullValue()));
     }
 
     @Test
@@ -238,7 +267,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -267,7 +296,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -296,7 +325,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -321,7 +350,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -356,7 +385,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -383,7 +412,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -431,7 +460,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -479,7 +508,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -514,7 +543,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -549,7 +578,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -590,7 +619,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -630,7 +659,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -668,7 +697,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -706,7 +735,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -743,7 +772,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -786,7 +815,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -831,7 +860,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -871,7 +900,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -908,7 +937,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -945,7 +974,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -987,7 +1016,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1017,7 +1046,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1049,7 +1078,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1068,7 +1097,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1100,7 +1129,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1130,7 +1159,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1162,7 +1191,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1195,7 +1224,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1227,7 +1256,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1246,7 +1275,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1279,7 +1308,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1311,7 +1340,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1353,7 +1382,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1384,7 +1413,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1421,7 +1450,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1439,7 +1468,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1473,7 +1502,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1503,7 +1532,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1532,7 +1561,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1561,7 +1590,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1591,7 +1620,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1619,7 +1648,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1660,7 +1689,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1691,7 +1720,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1723,7 +1752,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1755,7 +1784,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1784,7 +1813,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1820,7 +1849,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1858,7 +1887,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1891,7 +1920,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1924,7 +1953,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1960,7 +1989,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -1997,7 +2026,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2031,7 +2060,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2066,7 +2095,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2096,7 +2125,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2126,7 +2155,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2162,7 +2191,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 UniProtMediaType.TSV_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2208,7 +2237,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2239,7 +2268,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                                 MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2261,7 +2290,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
@@ -2288,7 +2317,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
-        response.andDo(MockMvcResultHandlers.log())
+        response.andDo(log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
                         MockMvcResultMatchers.header()
