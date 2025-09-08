@@ -35,7 +35,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -207,7 +206,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE + "?query=CR4567071")
+                                                SEARCH_RESOURCE + "?query=gene:gene" + "\u03B1")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
@@ -228,15 +227,14 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void searchByXrefMiss_providesSuggestion() throws Exception {
         // given
         UniProtKBEntry entry =
-                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345","CR456707")).build();
+                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P12345", "CR456707")).build();
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE + "?query=CR4567071.1")
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=CR4567071")
                                         .header(
                                                 HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON_VALUE));
