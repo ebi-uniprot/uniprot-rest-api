@@ -221,6 +221,31 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
+    void searchByAccessionMiss_providesSuggestion() throws Exception {
+        // given
+        UniProtKBEntry entry =
+                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P02345")).build();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=Q02345")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results", is(empty())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.suggestions[0].hits", notNullValue()));
+    }
+
+    @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
