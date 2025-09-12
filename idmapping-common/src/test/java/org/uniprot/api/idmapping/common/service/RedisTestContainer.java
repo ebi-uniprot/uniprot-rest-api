@@ -10,7 +10,8 @@ public class RedisTestContainer {
         REDIS_CONTAINER =
                 new GenericContainer<>(DockerImageName.parse("redis:6-alpine"))
                         .withExposedPorts(6379)
-                        .withReuse(true);
+                        .withReuse(true)
+                        .withCommand("redis-server --save \"\" --appendonly no");
         REDIS_CONTAINER.start();
     }
 
