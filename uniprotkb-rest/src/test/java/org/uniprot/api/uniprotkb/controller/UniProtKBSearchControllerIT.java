@@ -221,31 +221,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
-    void searchByAccessionMiss_providesSuggestion() throws Exception {
-        // given
-        UniProtKBEntry entry =
-                UniProtKBEntryBuilder.from(UniProtEntryMocker.create("P02345")).build();
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                MockMvcRequestBuilders.get(
-                                                SEARCH_RESOURCE + "?query=Q02345")
-                                        .header(
-                                                HttpHeaders.ACCEPT,
-                                                MediaType.APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.results", is(empty())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.suggestions[0].hits", notNullValue()));
-    }
-
-    @Test
     void searchInvalidIncludeIsoformParameterValue() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -2607,6 +2582,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 Triple.of("protein_name", "fibroblost", List.of("fibroblast")),
                 Triple.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
                 Triple.of("cc_disease", "pfeifer", List.of("pfeiffer")),
+                Triple.of("accession_id", "p218o2", List.of("p21802")),
+                Triple.of("id", "p218o2", List.of("p21802")),
                 Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar")));
     }
 
