@@ -3,6 +3,7 @@ package org.uniprot.api.common.repository.search.suggestion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.util.Pair;
@@ -102,6 +104,36 @@ class SuggestionConverterTest {
 
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(0));
+    }
+
+    @Test
+    void suggestionsForSingleWordQueryWhenAlternativesArePresentButNoCollations() {
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(0L);
+        when(queryResponse.getResults()).thenReturn(results);
+
+        SpellCheckResponse spellCheckResponse = mock(SpellCheckResponse.class);
+        when(spellCheckResponse.getCollatedResults()).thenReturn(List.of());
+        NamedList<Object> alternatives = new NamedList<>();
+        alternatives.add("suggestion", List.of("correct"));
+        SpellCheckResponse.Suggestion suggestion = new SpellCheckResponse.Suggestion("incorrect", alternatives);
+        List<SpellCheckResponse.Suggestion> spellCheckSuggestions = List.of(suggestion);
+        when(spellCheckResponse.getSuggestions()).thenReturn(spellCheckSuggestions);
+        when(queryResponse.getSpellCheckResponse()).thenReturn(spellCheckResponse);
+        NamedList<Object> headers = new NamedList<>();
+        NamedList<Object> params = new NamedList<>();
+        headers.add("params", params);
+        params.add("q", "incorrect");
+        when(queryResponse.getHeader()).thenReturn(headers);
+
+
+        // when --------------------------------------------------------------
+        List<Suggestion> suggestions = converter.convert(queryResponse);
+
+        // then --------------------------------------------------------------
+        assertThat(suggestions, hasSize(1));
+        assertThat(suggestions.get(0).getQuery(), is("correct"));
     }
 
     @SuppressWarnings("unchecked")
