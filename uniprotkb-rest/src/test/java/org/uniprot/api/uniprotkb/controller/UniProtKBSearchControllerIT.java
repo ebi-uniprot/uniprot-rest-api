@@ -2582,6 +2582,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 Triple.of("protein_name", "fibroblost", List.of("fibroblast")),
                 Triple.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
                 Triple.of("cc_disease", "pfeifer", List.of("pfeiffer")),
+                Triple.of("accession_id", "p218o2", List.of("p21802")),
+                Triple.of("id", "p218o2", List.of("p21802")),
                 Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar")));
     }
 
