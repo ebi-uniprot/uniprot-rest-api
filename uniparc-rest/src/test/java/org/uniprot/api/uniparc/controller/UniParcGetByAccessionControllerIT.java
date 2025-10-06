@@ -92,7 +92,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
             idParam.resultMatcher(jsonPath("$.sequence.molWeight", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequence.crc64", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequence.md5", notNullValue()));
-            idParam.resultMatcher(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
+            idParam.resultMatcher(jsonPath("$.sequenceFeatures", iterableWithSize(14)));
             idParam.resultMatcher(jsonPath("$.sequenceFeatures[*].database", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequenceFeatures[*].databaseId", notNullValue()));
             idParam.resultMatcher(jsonPath("$.sequenceFeatures[*].locations", notNullValue()));

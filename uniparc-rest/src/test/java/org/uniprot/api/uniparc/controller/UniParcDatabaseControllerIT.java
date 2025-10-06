@@ -1,5 +1,22 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
+import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
+import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.xml.xpath.XPathExpressionException;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,22 +48,6 @@ import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcStreamConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import javax.xml.xpath.XPathExpressionException;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-import static org.uniprot.api.uniparc.common.repository.store.crossref.UniParcCrossReferenceFacetConfig.*;
-import static org.uniprot.api.uniparc.controller.UniParcGetByAccessionControllerIT.SOURCES;
 
 /**
  * @author sahmad
