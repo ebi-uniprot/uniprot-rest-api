@@ -89,7 +89,7 @@ class UniParcLightGetIdControllerIT extends BaseUniParcGetByIdControllerTest {
                             jsonPath("$.commonTaxons[*].commonTaxonId", contains(1234, 9876)))
                     .resultMatcher(jsonPath("$.uniProtKBAccessions", contains("P12301")))
                     .resultMatcher(jsonPath("$.sequence.value", is("MLMPKRTKYRA")))
-                    .resultMatcher(jsonPath("$.sequenceFeatures.size()", is(13)))
+                    .resultMatcher(jsonPath("$.sequenceFeatures.size()", is(14)))
                     .build();
         }
 
