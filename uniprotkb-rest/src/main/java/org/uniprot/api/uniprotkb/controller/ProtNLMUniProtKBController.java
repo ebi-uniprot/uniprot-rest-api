@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Pattern;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -55,6 +56,7 @@ public class ProtNLMUniProtKBController extends BasicSearchController<UniProtKBE
     @GetMapping(
             value = "/protnlm/{accession}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(hidden = true)
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getGoogleProtNLMEntryByAccession(
             @Parameter(
                             description = ACCESSION_UNIPROTKB_DESCRIPTION,
