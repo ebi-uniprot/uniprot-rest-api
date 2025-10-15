@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Pattern;
 
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -28,6 +27,7 @@ import org.uniprot.api.uniprotkb.common.service.protnlm.ProtNLMUniProtKBEntrySer
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController

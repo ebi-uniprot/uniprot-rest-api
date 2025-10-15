@@ -80,6 +80,7 @@ public class DiseaseConfigureController {
     }
 
     @GetMapping("/allDatabases")
+    @Operation(hidden = true)
     public List<UniProtDatabaseDetailResponse> getUniProtAllDatabase() {
         return service.getAllDatabases();
     }
