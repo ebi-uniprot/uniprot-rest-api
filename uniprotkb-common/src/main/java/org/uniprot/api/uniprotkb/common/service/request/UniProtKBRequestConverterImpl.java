@@ -167,7 +167,7 @@ public class UniProtKBRequestConverterImpl implements UniProtKBRequestConverter 
         List<String> result = new ArrayList<>();
         List<String> isoformList = idsList.stream().filter(id -> id.contains("-")).toList();
         if (Utils.notNullNotEmpty(isoformList)) {
-            result.add(BasicRequestConverter.getIdsTermQuery(isoformList, ACCESSION));
+            result.add(getIdsTermQuery(isoformList, ACCESSION));
         }
         List<String> accessionList = idsList.stream().filter(id -> !id.contains("-")).toList();
         if (Utils.notNullNotEmpty(accessionList)) {
