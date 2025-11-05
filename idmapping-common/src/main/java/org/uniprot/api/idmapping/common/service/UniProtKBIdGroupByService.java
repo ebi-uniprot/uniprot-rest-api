@@ -59,20 +59,6 @@ public abstract class UniProtKBIdGroupByService<T> {
         List<String> toIds = idMappingJob.getIdMappingResult().getMappedIds().stream().map(IdMappingStringPair::getTo).toList();
         List<FacetField> facetFields =
                 uniProtEntryService.getFacets(processedQuery, groupByService.getFacetParams(entries), toIds);
-       /* UniProtKBIdMappingSearchRequest searchRequest = new UniProtKBIdMappingSearchRequest();
-        searchRequest.setQuery(query);
-        searchRequest.setFacets(groupByService.getFacetParams(entries));
-        SolrStreamFacetResponse solrStreamFacetResponse = uniProtKBIdService.searchMappedIdsFacetsBySearchRequest(searchRequest, toIds);
-        List<Facet> facets = solrStreamFacetResponse.getFacets();
-
-        if (!facets.isEmpty() && facets.get(0).getValues() != null) {
-            return facets.get(0).getValues().stream()
-                    .filter(facetItem -> facetItem.getCount() > 0)
-                    .map(facetItem -> new FacetField.Count(new FacetField(facetItem.getLabel()), facetItem.getValue(), facetItem.getCount()))
-                    .toList();
-        }
-
-        return List.of();*/
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
                     .filter(count -> count.getCount() > 0)
