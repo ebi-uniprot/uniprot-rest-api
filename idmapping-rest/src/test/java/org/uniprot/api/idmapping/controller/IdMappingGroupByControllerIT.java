@@ -83,6 +83,46 @@ public abstract class IdMappingGroupByControllerIT {
     }
 
     @Test
+    void getGroupBy_invalidJobId() throws Exception {
+        getMockMvc()
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId("12345"))
+                                .param("query", "*"))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void getGroupBy_unfinishedJob() throws Exception {
+        IdMappingJob job =
+                idMappingResultJobOp.createAndPutJobInCache(
+                        this.maxToIdsWithFacetsAllowed - 1, JobStatus.RUNNING);
+        getMockMvc()
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", "*"))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void getGroupBy_toIdsExceedingFacets() throws Exception {
+        IdMappingJob job =
+                idMappingResultJobOp.createAndPutJobInCache(
+                        this.maxToIdsWithFacetsAllowed + 1, JobStatus.FINISHED);
+        getMockMvc()
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", "*"))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .string(containsStringIgnoringCase("filters are not supported")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent").doesNotExist());
+    }
+
+    @Test
     void getGroupBy_chebiUppercaseQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
         IdMappingJob job =
