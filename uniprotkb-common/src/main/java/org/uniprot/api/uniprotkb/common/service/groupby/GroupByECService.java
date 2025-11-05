@@ -29,7 +29,7 @@ public class GroupByECService extends GroupByService<String> {
     }
 
     @Override
-    List<String> getInitialEntries(String parentId) {
+    public List<String> getInitialEntries(String parentId) {
         if (!isTopLevelSearch(parentId)) {
             String shortFormParent = getShortFormEc(parentId);
             return shortFormParent.contains(TOKEN)
@@ -53,7 +53,7 @@ public class GroupByECService extends GroupByService<String> {
     }
 
     @Override
-    protected List<String> getChildEntries(String parent) {
+    public List<String> getChildEntries(String parent) {
         List<String> children = new LinkedList<>();
         String parentEC = parent;
         if (!isTopLevelSearch(parentEC)) {
@@ -65,7 +65,7 @@ public class GroupByECService extends GroupByService<String> {
     }
 
     @Override
-    protected Map<String, String> getFacetParams(List<String> entries) {
+    public Map<String, String> getFacetParams(List<String> entries) {
         String regEx =
                 entries.stream()
                         .map(token -> token + TOKEN_REGEX)
@@ -90,7 +90,7 @@ public class GroupByECService extends GroupByService<String> {
     }
 
     @Override
-    protected void addToAncestors(
+    public void addToAncestors(
             List<String> ancestors,
             List<String> entries,
             String parent,
@@ -104,7 +104,7 @@ public class GroupByECService extends GroupByService<String> {
     }
 
     @Override
-    protected GroupByResult getGroupByResult(
+    public GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<String> ecs,
             List<String> ancestorEntries,
@@ -126,7 +126,7 @@ public class GroupByECService extends GroupByService<String> {
         return id;
     }
 
-    private String getShortFormEc(String fullEc) {
+    public String getShortFormEc(String fullEc) {
         String temp = fullEc;
         while (StringUtils.isNotEmpty(temp) && temp.endsWith(DASH)) {
             temp = temp.substring(0, temp.length() - 2);

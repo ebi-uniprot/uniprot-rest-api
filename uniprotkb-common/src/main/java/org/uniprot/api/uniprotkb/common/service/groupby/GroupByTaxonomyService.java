@@ -26,7 +26,7 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
     }
 
     @Override
-    protected List<TaxonomyEntry> getChildEntries(String parent) {
+    public List<TaxonomyEntry> getChildEntries(String parent) {
         TaxonomyStreamRequest taxonomyStreamRequest = new TaxonomyStreamRequest();
         taxonomyStreamRequest.setQuery(
                 isTopLevelSearch(parent) ? TOP_LEVEL_TAXONOMY_PARENT_QUERY : "parent:" + parent);
@@ -34,7 +34,7 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
     }
 
     @Override
-    protected Map<String, String> getFacetParams(List<TaxonomyEntry> entries) {
+    public Map<String, String> getFacetParams(List<TaxonomyEntry> entries) {
         String taxonomyIds =
                 entries.stream()
                         .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
@@ -44,7 +44,7 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
     }
 
     @Override
-    protected GroupByResult getGroupByResult(
+    public GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<TaxonomyEntry> taxonomyEntries,
             List<TaxonomyEntry> ancestorEntries,

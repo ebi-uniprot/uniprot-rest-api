@@ -26,13 +26,13 @@ public class GroupByGOService extends GroupByService<GoRelation> {
     }
 
     @Override
-    protected List<GoRelation> getChildEntries(String parent) {
+    public List<GoRelation> getChildEntries(String parent) {
         String parentGo = addGoPrefix(parent);
         return goService.getChildren(parentGo);
     }
 
     @Override
-    protected Map<String, String> getFacetParams(List<GoRelation> entries) {
+    public Map<String, String> getFacetParams(List<GoRelation> entries) {
         String goIds =
                 entries.stream()
                         .map(GoRelation::getId)
@@ -57,7 +57,7 @@ public class GroupByGOService extends GroupByService<GoRelation> {
     }
 
     @Override
-    protected GroupByResult getGroupByResult(
+    public GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<GoRelation> goRelations,
             List<GoRelation> ancestorEntries,
