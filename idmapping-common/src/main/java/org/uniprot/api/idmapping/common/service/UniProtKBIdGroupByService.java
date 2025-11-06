@@ -74,8 +74,7 @@ public abstract class UniProtKBIdGroupByService<T> {
                         .toList();
         Map<String, String> facetParams = groupByService.getFacetParams(entries);
         List<FacetField> facetFields =
-                uniProtEntryService.getFacets(
-                        processedQuery, facetParams, toIds);
+                uniProtEntryService.getFacets(processedQuery, facetParams, toIds);
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
                     .filter(count -> count.getCount() > 0)
