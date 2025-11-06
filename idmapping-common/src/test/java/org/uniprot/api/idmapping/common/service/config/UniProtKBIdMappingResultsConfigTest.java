@@ -8,46 +8,47 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanCreationException;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
+import org.uniprot.api.uniprotkb.common.repository.store.ResultsConfig;
 
 class UniProtKBIdMappingResultsConfigTest {
 
     @Test
     void uniProtKBSolrClientWithZk() {
-        UniProtKBIdMappingResultsConfig config = new UniProtKBIdMappingResultsConfig();
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         configProps.setZkHost("localhostMapping:2021");
+        ResultsConfig config = new ResultsConfig();
         SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWithHttpPost() {
-        UniProtKBIdMappingResultsConfig config = new UniProtKBIdMappingResultsConfig();
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         configProps.setHttphost("localhostMapping");
+        ResultsConfig config = new ResultsConfig();
         SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWithUserAndPassword() {
-        UniProtKBIdMappingResultsConfig config = new UniProtKBIdMappingResultsConfig();
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         configProps.setHttphost("localhost");
         configProps.setUsername("userMapping");
         configProps.setPassword("password");
+        ResultsConfig config = new ResultsConfig();
         SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWrongProperties() {
-        UniProtKBIdMappingResultsConfig config = new UniProtKBIdMappingResultsConfig();
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
+        ResultsConfig config = new ResultsConfig();
         assertThrows(
                 BeanCreationException.class,
                 () -> config.uniProtKBSolrClient(httpClient, configProps));

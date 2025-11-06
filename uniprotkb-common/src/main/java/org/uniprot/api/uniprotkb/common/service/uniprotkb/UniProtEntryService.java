@@ -186,7 +186,8 @@ public class UniProtEntryService
         return solrQuery;
     }
 
-    public List<FacetField> getFacets(String query, Map<String, String> facetFields, List<String> ids) {
+    public List<FacetField> getFacets(
+            String query, Map<String, String> facetFields, List<String> ids) {
         SolrQuery solrQuery = getGroupByFacetSolrQuery(query, facetFields);
         String idsTermQuery = BasicRequestConverter.getIdsTermQuery(ids, getSolrIdField());
         solrQuery.add(FILTER_QUERY, idsTermQuery);
