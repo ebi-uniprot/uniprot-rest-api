@@ -8,7 +8,9 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 
 @Service
 public class UniProtKBIdGroupByTaxonomyService extends UniProtKBIdGroupByService<TaxonomyEntry> {
-    public UniProtKBIdGroupByTaxonomyService(GroupByTaxonomyService groupByTaxonomyService, UniProtEntryService uniProtEntryService) {
+    public UniProtKBIdGroupByTaxonomyService(
+            GroupByTaxonomyService groupByTaxonomyService,
+            UniProtEntryService uniProtEntryService) {
         super(groupByTaxonomyService, uniProtEntryService);
     }
 }

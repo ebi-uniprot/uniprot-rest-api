@@ -1,5 +1,12 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +36,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(controllers = IdMappingGroupByController.class)
@@ -56,8 +56,7 @@ public class IdMappingGroupByGOControllerIT extends IdMappingGroupByControllerIT
     private static final String GO_NAME_2 = "goName2";
     public static final String PATH = "/idmapping/%s/groups/go";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
-    @MockBean
-    private GOClient goClient;
+    @MockBean private GOClient goClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private UniprotQueryRepository repository;
 
@@ -108,7 +107,9 @@ public class IdMappingGroupByGOControllerIT extends IdMappingGroupByControllerIT
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", ORGANISM_ID_0))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", ORGANISM_ID_0))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_0)))
@@ -153,7 +154,9 @@ public class IdMappingGroupByGOControllerIT extends IdMappingGroupByControllerIT
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", ORGANISM_ID_2))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", ORGANISM_ID_2))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
@@ -204,7 +207,9 @@ public class IdMappingGroupByGOControllerIT extends IdMappingGroupByControllerIT
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", ORGANISM_ID_2))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", ORGANISM_ID_2))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))

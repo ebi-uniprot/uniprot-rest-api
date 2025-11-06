@@ -77,7 +77,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private UniprotKBMappingRepository repository;
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtStoreClient;
 
     @Qualifier("uniproKBfacetTupleStreamTemplate")
     @Autowired
@@ -144,7 +144,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @BeforeAll
     void saveEntriesStore() throws Exception {
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
-            saveEntry(i, cloudSolrClient, storeClient);
+            saveEntry(i, cloudSolrClient, uniProtStoreClient);
         }
 
         saveInactiveEntry(cloudSolrClient);

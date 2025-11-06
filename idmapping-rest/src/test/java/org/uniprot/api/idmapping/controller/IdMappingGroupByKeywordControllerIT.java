@@ -1,5 +1,10 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.core.Is.is;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,11 +36,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-
-import static org.hamcrest.core.Is.is;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
@@ -118,7 +118,9 @@ public class IdMappingGroupByKeywordControllerIT extends IdMappingGroupByControl
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", ORGANISM_ID_0))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", ORGANISM_ID_0))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(KEYWORD_ID_0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(KEYWORD_NAME_0)))
@@ -165,7 +167,9 @@ public class IdMappingGroupByKeywordControllerIT extends IdMappingGroupByControl
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", ORGANISM_ID_2))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", ORGANISM_ID_2))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
@@ -215,7 +219,9 @@ public class IdMappingGroupByKeywordControllerIT extends IdMappingGroupByControl
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", KEYWORD_ID_2))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", KEYWORD_ID_2))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))

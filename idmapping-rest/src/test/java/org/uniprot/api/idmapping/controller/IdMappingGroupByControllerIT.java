@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +17,11 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.Document;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-
 public abstract class IdMappingGroupByControllerIT {
     @Value("${mapping.max.to.ids.with.facets.count}")
     protected Integer maxToIdsWithFacetsAllowed;
-    @Autowired
-    protected JobOperation idMappingResultJobOp;
+
+    @Autowired protected JobOperation idMappingResultJobOp;
     @Autowired protected RequestMappingHandlerMapping requestMappingHandlerMapping;
     private static final String INVALID_ORGANISM_ID = "36";
     protected static final String CHEBI_ID = "12345678";
@@ -56,7 +56,9 @@ public abstract class IdMappingGroupByControllerIT {
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
         getMockMvc()
-                .perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", INVALID_ORGANISM_ID))
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", INVALID_ORGANISM_ID))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
@@ -85,9 +87,7 @@ public abstract class IdMappingGroupByControllerIT {
     @Test
     void getGroupBy_invalidJobId() throws Exception {
         getMockMvc()
-                .perform(
-                        MockMvcRequestBuilders.get(getUrlWithJobId("12345"))
-                                .param("query", "*"))
+                .perform(MockMvcRequestBuilders.get(getUrlWithJobId("12345")).param("query", "*"))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
@@ -130,7 +130,9 @@ public abstract class IdMappingGroupByControllerIT {
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
         getMockMvc()
-                .perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", "CHEBI:" + CHEBI_ID))
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", "CHEBI:" + CHEBI_ID))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));

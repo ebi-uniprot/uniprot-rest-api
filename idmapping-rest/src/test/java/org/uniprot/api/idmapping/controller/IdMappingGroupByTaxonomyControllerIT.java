@@ -1,5 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.core.Is.is;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +34,6 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.List;
-
-import static org.hamcrest.core.Is.is;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(controllers = IdMappingGroupByController.class)
@@ -53,10 +53,8 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
     public static final String PATH = "/idmapping/%s/groups/taxonomy";
-    @RegisterExtension
-    static DataStoreManager dataStoreManager = new DataStoreManager();
-    @Autowired
-    private MockMvc mockMvc;
+    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
+    @Autowired private MockMvc mockMvc;
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
     @Autowired private TaxonomyRepository taxonomyRepository;
 
@@ -84,7 +82,6 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
         dataStoreManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
         dataStoreManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
-
 
     @Test
     void getGroupByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
@@ -116,7 +113,9 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", TAX_ID_0_STRING))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", TAX_ID_0_STRING))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(
@@ -167,7 +166,9 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", TAX_ID_2_STRING))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", TAX_ID_2_STRING))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(
@@ -223,7 +224,9 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
         getMockMvc()
-                .perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", "CHEBI:1234"))
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", "CHEBI:1234"))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
@@ -238,7 +241,9 @@ public class IdMappingGroupByTaxonomyControllerIT extends IdMappingGroupByContro
                 idMappingResultJobOp.createAndPutJobInCache(
                         this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId())).param("query", TAX_ID_1_STRING))
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", TAX_ID_1_STRING))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(
