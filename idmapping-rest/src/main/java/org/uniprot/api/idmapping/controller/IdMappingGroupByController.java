@@ -1,12 +1,12 @@
 package org.uniprot.api.idmapping.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
+
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +26,13 @@ import org.uniprot.api.uniprotkb.common.service.groupby.model.GroupByResult;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import javax.validation.constraints.Pattern;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
@@ -46,7 +47,14 @@ public class IdMappingGroupByController {
     private final IdMappingJobCacheService cacheService;
     private final Integer maxIdMappingToIdsWithFacetsCount;
 
-    public IdMappingGroupByController(UniProtKBIdGroupByTaxonomyService uniProtKBIdGroupByTaxonomyService, UniProtKBIdGroupByKeywordService uniProtKBIdGroupByKeywordService, UniProtKBIdGroupByGOService uniProtKBIdGroupByGOService, UniProtKBIdGroupByECService uniProtKBIdGroupByECService, IdMappingJobCacheService cacheService, @Value("${mapping.max.to.ids.with.facets.count:#{null}}") Integer maxIdMappingToIdsWithFacetsCount) {
+    public IdMappingGroupByController(
+            UniProtKBIdGroupByTaxonomyService uniProtKBIdGroupByTaxonomyService,
+            UniProtKBIdGroupByKeywordService uniProtKBIdGroupByKeywordService,
+            UniProtKBIdGroupByGOService uniProtKBIdGroupByGOService,
+            UniProtKBIdGroupByECService uniProtKBIdGroupByECService,
+            IdMappingJobCacheService cacheService,
+            @Value("${mapping.max.to.ids.with.facets.count:#{null}}")
+                    Integer maxIdMappingToIdsWithFacetsCount) {
         this.uniProtKBIdGroupByTaxonomyService = uniProtKBIdGroupByTaxonomyService;
         this.uniProtKBIdGroupByKeywordService = uniProtKBIdGroupByKeywordService;
         this.uniProtKBIdGroupByGOService = uniProtKBIdGroupByGOService;
@@ -62,40 +70,43 @@ public class IdMappingGroupByController {
             summary = ID_MAPPING_RESULT_OPERATION,
             description = SEARCH_OPERATION_DESC,
             responses = {
-                    @ApiResponse(
-                            description = "group by results",
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema =
-                                            @Schema(
-                                                    implementation =
-                                                            GroupByResult.class))
-                            })
+                @ApiResponse(
+                        description = "group by results",
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = GroupByResult.class))
+                        })
             })
     public ResponseEntity<GroupByResult> resultsByTaxonomy(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Parameter(description = QUERY_UNIPROTKB_TAXONOMY_DESCRIPTION)
-            @RequestParam(value = "query", required = false, defaultValue = "*:*")
-            String query,
+                    @RequestParam(value = "query", required = false, defaultValue = "*:*")
+                    String query,
             @Parameter(description = GROUP_PARENT_DESCRIPTION)
-            @Pattern(
-                    regexp = FieldRegexConstants.TAXONOMY_ID_REGEX,
-                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    message = "{groupby.taxonomy.invalid.id}")
-            @RequestParam(value = "parent", required = false)
-            String parent) {
+                    @Pattern(
+                            regexp = FieldRegexConstants.TAXONOMY_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{groupby.taxonomy.invalid.id}")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByTaxonomyService);
     }
 
-    private ResponseEntity<GroupByResult> getGroupByResult(String jobId, String query, String parent, UniProtKBIdGroupByService<?> idGroupByService) {
+    private ResponseEntity<GroupByResult> getGroupByResult(
+            String jobId,
+            String query,
+            String parent,
+            UniProtKBIdGroupByService<?> idGroupByService) {
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
         // validate the mapped ids size
         validatedMappedIdsLimit(completedJob.getIdMappingResult());
 
-        UniProtKBIdMappingGroupByRequest idMappingGroupByRequest = new UniProtKBIdMappingGroupByRequest(query, parent);
+        UniProtKBIdMappingGroupByRequest idMappingGroupByRequest =
+                new UniProtKBIdMappingGroupByRequest(query, parent);
         return new ResponseEntity<>(
-                idGroupByService.getGroupByResult(completedJob, idMappingGroupByRequest), HttpStatus.OK);
+                idGroupByService.getGroupByResult(completedJob, idMappingGroupByRequest),
+                HttpStatus.OK);
     }
 
     @GetMapping(
@@ -105,29 +116,26 @@ public class IdMappingGroupByController {
             summary = ID_MAPPING_RESULT_OPERATION,
             description = SEARCH_OPERATION_DESC,
             responses = {
-                    @ApiResponse(
-                            description = "group by results",
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema =
-                                            @Schema(
-                                                    implementation =
-                                                            GroupByResult.class))
-                            })
+                @ApiResponse(
+                        description = "group by results",
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = GroupByResult.class))
+                        })
             })
     public ResponseEntity<GroupByResult> resultsByKeyword(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Parameter(description = QUERY_UNIPROTKB_KEYWORD_DESCRIPTION)
-            @RequestParam(value = "query", required = false, defaultValue = "*:*")
-            String query,
+                    @RequestParam(value = "query", required = false, defaultValue = "*:*")
+                    String query,
             @Parameter(description = GROUP_PARENT_DESCRIPTION)
-            @Pattern(
-                    regexp = FieldRegexConstants.KEYWORD_ID_REGEX,
-                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    message = "{groupby.keyword.invalid.id}")
-            @RequestParam(value = "parent", required = false)
-            String parent) {
+                    @Pattern(
+                            regexp = FieldRegexConstants.KEYWORD_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{groupby.keyword.invalid.id}")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByKeywordService);
     }
 
@@ -138,29 +146,26 @@ public class IdMappingGroupByController {
             summary = ID_MAPPING_RESULT_OPERATION,
             description = SEARCH_OPERATION_DESC,
             responses = {
-                    @ApiResponse(
-                            description = "group by results",
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema =
-                                            @Schema(
-                                                    implementation =
-                                                            GroupByResult.class))
-                            })
+                @ApiResponse(
+                        description = "group by results",
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = GroupByResult.class))
+                        })
             })
     public ResponseEntity<GroupByResult> resultsByGO(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Parameter(description = QUERY_UNIPROTKB_GO_DESCRIPTION)
-            @RequestParam(value = "query", required = false, defaultValue = "*:*")
-            String query,
+                    @RequestParam(value = "query", required = false, defaultValue = "*:*")
+                    String query,
             @Parameter(description = GROUP_PARENT_DESCRIPTION)
-            @Pattern(
-                    regexp = FieldRegexConstants.GO_ID_REGEX,
-                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    message = "{groupby.go.invalid.id}")
-            @RequestParam(value = "parent", required = false)
-            String parent) {
+                    @Pattern(
+                            regexp = FieldRegexConstants.GO_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{groupby.go.invalid.id}")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByGOService);
     }
 
@@ -171,29 +176,26 @@ public class IdMappingGroupByController {
             summary = ID_MAPPING_RESULT_OPERATION,
             description = SEARCH_OPERATION_DESC,
             responses = {
-                    @ApiResponse(
-                            description = "group by results",
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema =
-                                            @Schema(
-                                                    implementation =
-                                                            GroupByResult.class))
-                            })
+                @ApiResponse(
+                        description = "group by results",
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = GroupByResult.class))
+                        })
             })
     public ResponseEntity<GroupByResult> resultsByEC(
             @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Parameter(description = QUERY_UNIPROTKB_EC_DESCRIPTION)
-            @RequestParam(value = "query", required = false, defaultValue = "*:*")
-            String query,
+                    @RequestParam(value = "query", required = false, defaultValue = "*:*")
+                    String query,
             @Parameter(description = GROUP_PARENT_DESCRIPTION)
-            @Pattern(
-                    regexp = FieldRegexConstants.EC_ID_REGEX,
-                    flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    message = "{groupby.ec.invalid.id}")
-            @RequestParam(value = "parent", required = false)
-            String parent) {
+                    @Pattern(
+                            regexp = FieldRegexConstants.EC_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{groupby.ec.invalid.id}")
+                    @RequestParam(value = "parent", required = false)
+                    String parent) {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByECService);
     }
 
