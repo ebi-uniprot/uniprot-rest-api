@@ -23,15 +23,15 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 
 public abstract class UniProtKBIdGroupByServiceTest<T> {
-    public static final String QUERY = "query";
-    public static final String FACET_NAME = "facetName";
-    public static final String GROUP_0 = "group0";
-    public static final int COUNT_0 = 12;
-    public static final String PARENT = "parent";
-    public static final String GROUP_1 = "group1";
-    public static final int COUNT_1 = 99;
-    public static final String GROUP_2 = "group2";
-    public static final int COUNT_2 = 500;
+    protected static final String QUERY = "query";
+    protected static final String FACET_NAME = "facetName";
+    protected static final String GROUP_0 = "group0";
+    protected static final int COUNT_0 = 12;
+    protected static final String PARENT = "parent";
+    protected static final String GROUP_1 = "group1";
+    protected static final int COUNT_1 = 99;
+    protected static final String GROUP_2 = "group2";
+    protected static final int COUNT_2 = 500;
     protected GroupByService<T> groupByService;
     @Mock protected UniProtEntryService uniProtEntryService;
     @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;

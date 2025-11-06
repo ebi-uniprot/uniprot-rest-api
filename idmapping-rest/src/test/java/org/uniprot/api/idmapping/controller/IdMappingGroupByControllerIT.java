@@ -18,6 +18,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.Document;
 
 public abstract class IdMappingGroupByControllerIT {
+    protected static final String FREE_FORM_QUERY = "free-form-query";
+
     @Value("${mapping.max.to.ids.with.facets.count}")
     protected Integer maxToIdsWithFacetsAllowed;
 
@@ -58,7 +60,23 @@ public abstract class IdMappingGroupByControllerIT {
         getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
-                                .param("query", INVALID_ORGANISM_ID))
+                                .param("query", FREE_FORM_QUERY))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(0)));
+    }
+
+    @Test
+    void getGroupBy_withEmpyListOfToIds() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
+        IdMappingJob job = idMappingResultJobOp.createAndPutJobInCache(0, JobStatus.FINISHED);
+
+        getMockMvc()
+                .perform(
+                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
+                                .param("query", FREE_FORM_QUERY))
                 .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
