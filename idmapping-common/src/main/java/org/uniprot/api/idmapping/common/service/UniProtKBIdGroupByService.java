@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.response.FacetField;
-import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingGroupByRequest;
+import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdGroupByRequest;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.GroupByResult;
@@ -24,7 +24,7 @@ public abstract class UniProtKBIdGroupByService<T> {
         this.uniProtEntryService = uniProtEntryService;
     }
 
-    public GroupByResult getGroupByResult(UniProtKBIdMappingGroupByRequest groupByRequest) {
+    public GroupByResult getGroupByResult(UniProtKBIdGroupByRequest groupByRequest) {
         String givenParent = groupByRequest.getParent();
         // initial graph (or tree) nodes for which we should be searching for
         List<T> lastChildEntries = groupByService.getInitialEntries(givenParent);
@@ -75,12 +75,12 @@ public abstract class UniProtKBIdGroupByService<T> {
     }
 
     protected List<FacetField.Count> getInitialFacetCounts(
-            UniProtKBIdMappingGroupByRequest groupByRequest, List<T> entries) {
+            UniProtKBIdGroupByRequest groupByRequest, List<T> entries) {
         return getFacetCounts(groupByRequest, entries);
     }
 
     protected List<FacetField.Count> getFacetCounts(
-            UniProtKBIdMappingGroupByRequest groupByRequest, List<T> entries) {
+            UniProtKBIdGroupByRequest groupByRequest, List<T> entries) {
         String query = groupByRequest.getQuery();
         String processedQuery =
                 UniProtQueryProcessor.newInstance(uniProtEntryService.getQueryProcessorConfig())

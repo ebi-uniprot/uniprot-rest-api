@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
-import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingGroupByRequest;
+import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdGroupByRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByService;
@@ -37,7 +37,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
     @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
     protected UniProtKBIdGroupByService<T> idGroupByService;
     @Mock private IdMappingJob idMappingJob;
-    @Mock private UniProtKBIdMappingGroupByRequest groupByRequest;
+    @Mock private UniProtKBIdGroupByRequest groupByRequest;
     @Mock private IdMappingResult idMappingResult;
     private final IdMappingStringPair idMappingPair0 = new IdMappingStringPair("f0", "t0");
     private final IdMappingStringPair idMappingPair1 = new IdMappingStringPair("f1", "t1");

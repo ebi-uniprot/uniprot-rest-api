@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @ParameterObject
-public class UniProtKBIdMappingGroupByRequest {
+public class UniProtKBIdGroupByRequest {
     private final String query;
     private final String parent;
     private final List<String> ids;

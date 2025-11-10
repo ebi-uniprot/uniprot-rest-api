@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingGroupByRequest;
+import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdGroupByRequest;
 import org.uniprot.api.idmapping.common.service.UniProtKBIdGroupByService;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByKeywordService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
@@ -22,7 +22,7 @@ public class UniProtKBIdGroupByKeywordService extends UniProtKBIdGroupByService<
 
     @Override
     protected List<FacetField.Count> getFacetCounts(
-            UniProtKBIdMappingGroupByRequest groupByRequest, List<KeywordEntry> entries) {
+            UniProtKBIdGroupByRequest groupByRequest, List<KeywordEntry> entries) {
         List<FacetField.Count> facetCounts = super.getFacetCounts(groupByRequest, entries);
         return groupByKeywordService.getKeywordFacetCounts(facetCounts);
     }
