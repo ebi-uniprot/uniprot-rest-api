@@ -12,10 +12,7 @@ import java.util.Map;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.uniprot.api.idmapping.common.model.IdMappingJob;
-import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdGroupByRequest;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.GroupByResult;
@@ -36,12 +33,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
     @Mock protected UniProtEntryService uniProtEntryService;
     @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
     protected UniProtKBIdGroupByService<T> idGroupByService;
-    @Mock private IdMappingJob idMappingJob;
     @Mock private UniProtKBIdGroupByRequest groupByRequest;
-    @Mock private IdMappingResult idMappingResult;
-    private final IdMappingStringPair idMappingPair0 = new IdMappingStringPair("f0", "t0");
-    private final IdMappingStringPair idMappingPair1 = new IdMappingStringPair("f1", "t1");
-    private final IdMappingStringPair idMappingPair2 = new IdMappingStringPair("f2", "t2");
     @Mock private Map<String, String> facetParams0;
     @Mock private Map<String, String> facetParams1;
     private final List<FacetField> facetFieldsSingle =
@@ -71,9 +63,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
         when(uniProtEntryService.getQueryProcessorConfig())
                 .thenReturn(uniProtKBQueryProcessorConfig);
         when(uniProtKBQueryProcessorConfig.getSearchFieldConfig()).thenReturn(searchFieldConfig);
-        when(idMappingJob.getIdMappingResult()).thenReturn(idMappingResult);
-        when(idMappingResult.getMappedIds())
-                .thenReturn(List.of(idMappingPair0, idMappingPair1, idMappingPair2));
+        when(groupByRequest.getIds()).thenReturn(List.of("id0", "id1", "id2"));
     }
 
     @Test
