@@ -89,6 +89,10 @@ public abstract class UniProtKBIdGroupByService<T> {
         List<String> ids = groupByRequest.getIds();
         List<FacetField> facetFields =
                 uniProtEntryService.getFacets(processedQuery, facetParams, ids);
+        return getFacetCounts(facetFields);
+    }
+
+    private static List<FacetField.Count> getFacetCounts(List<FacetField> facetFields) {
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
                     .filter(count -> count.getCount() > 0)
