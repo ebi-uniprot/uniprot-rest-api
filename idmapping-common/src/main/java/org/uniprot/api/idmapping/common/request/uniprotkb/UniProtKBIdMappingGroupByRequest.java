@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.common.request.uniprotkb;
 
+import java.util.List;
+
 import org.springdoc.api.annotations.ParameterObject;
 
 import lombok.Data;
@@ -8,6 +10,6 @@ import lombok.Data;
 @ParameterObject
 public class UniProtKBIdMappingGroupByRequest {
     private final String query;
-
-    private final String parentId;
+    private final String parent;
+    private final List<String> ids;
 }

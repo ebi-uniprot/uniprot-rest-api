@@ -5,6 +5,9 @@ import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAP
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +19,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingGroupByRequest;
+import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.UniProtKBIdGroupByService;
 import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdGroupByECService;
@@ -67,8 +71,9 @@ public class IdMappingGroupByController {
             value = "/{jobId}/groups/taxonomy",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = ID_MAPPING_RESULT_OPERATION,
-            description = SEARCH_OPERATION_DESC,
+            hidden = true,
+            summary = ID_MAPPING_GROUP_BY_TAXONOMY_RESULT_OPERATION,
+            description = GROUP_TAXONOMY_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         description = "group by results",
@@ -93,28 +98,13 @@ public class IdMappingGroupByController {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByTaxonomyService);
     }
 
-    private ResponseEntity<GroupByResult> getGroupByResult(
-            String jobId,
-            String query,
-            String parent,
-            UniProtKBIdGroupByService<?> idGroupByService) {
-        IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
-        // validate the mapped ids size
-        validatedMappedIdsLimit(completedJob.getIdMappingResult());
-
-        UniProtKBIdMappingGroupByRequest idMappingGroupByRequest =
-                new UniProtKBIdMappingGroupByRequest(query, parent);
-        return new ResponseEntity<>(
-                idGroupByService.getGroupByResult(completedJob, idMappingGroupByRequest),
-                HttpStatus.OK);
-    }
-
     @GetMapping(
             value = "/{jobId}/groups/keyword",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = ID_MAPPING_RESULT_OPERATION,
-            description = SEARCH_OPERATION_DESC,
+            hidden = true,
+            summary = ID_MAPPING_GROUP_BY_KEYWORD_RESULT_OPERATION,
+            description = GROUP_KEYWORD_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         description = "group by results",
@@ -143,8 +133,9 @@ public class IdMappingGroupByController {
             value = "/{jobId}/groups/go",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = ID_MAPPING_RESULT_OPERATION,
-            description = SEARCH_OPERATION_DESC,
+            hidden = true,
+            summary = ID_MAPPING_GROUP_BY_GO_RESULT_OPERATION,
+            description = GROUP_GO_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         description = "group by results",
@@ -173,8 +164,9 @@ public class IdMappingGroupByController {
             value = "/{jobId}/groups/ec",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = ID_MAPPING_RESULT_OPERATION,
-            description = SEARCH_OPERATION_DESC,
+            hidden = true,
+            summary = ID_MAPPING_GROUP_BY_EC_RESULT_OPERATION,
+            description = GROUP_EC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         description = "group by results",
@@ -197,6 +189,27 @@ public class IdMappingGroupByController {
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return getGroupByResult(jobId, query, parent, uniProtKBIdGroupByECService);
+    }
+
+    private ResponseEntity<GroupByResult> getGroupByResult(
+            String jobId,
+            String query,
+            String parent,
+            UniProtKBIdGroupByService<?> idGroupByService) {
+        IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
+        // validate the mapped ids size
+        validatedMappedIdsLimit(completedJob.getIdMappingResult());
+
+        UniProtKBIdMappingGroupByRequest idMappingGroupByRequest =
+                new UniProtKBIdMappingGroupByRequest(query, parent, getToIds(completedJob));
+        GroupByResult groupByResult = idGroupByService.getGroupByResult(idMappingGroupByRequest);
+        return new ResponseEntity<>(groupByResult, HttpStatus.OK);
+    }
+
+    private static List<String> getToIds(IdMappingJob completedJob) {
+        return completedJob.getIdMappingResult().getMappedIds().stream()
+                .map(IdMappingStringPair::getTo)
+                .collect(Collectors.toList());
     }
 
     private void validatedMappedIdsLimit(IdMappingResult result) {

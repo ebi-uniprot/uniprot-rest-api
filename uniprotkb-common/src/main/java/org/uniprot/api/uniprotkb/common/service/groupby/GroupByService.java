@@ -49,7 +49,7 @@ public abstract class GroupByService<T> {
                 query);
     }
 
-    public static boolean isTopLevelSearch(String parent) {
+    public static boolean isEmptyParent(String parent) {
         return StringUtils.isEmpty(parent);
     }
 
@@ -72,7 +72,7 @@ public abstract class GroupByService<T> {
     }
 
     public List<T> getInitialEntries(String parentId) {
-        if (!isTopLevelSearch(parentId)) {
+        if (!isEmptyParent(parentId)) {
             return List.of(getEntryById(parentId));
         }
         return getChildEntries(parentId);
@@ -133,7 +133,7 @@ public abstract class GroupByService<T> {
     private Parent getParentInfo(String parentId, List<FacetField.Count> parentFacetCounts) {
         long count = parentFacetCounts.stream().mapToLong(FacetField.Count::getCount).sum();
         return ParentImpl.builder()
-                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntryById(parentId)))
+                .label(isEmptyParent(parentId) ? null : getLabel(getEntryById(parentId)))
                 .count(count)
                 .build();
     }

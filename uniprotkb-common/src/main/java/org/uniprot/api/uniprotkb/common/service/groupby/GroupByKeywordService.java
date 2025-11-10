@@ -29,7 +29,7 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     public List<KeywordEntry> getChildEntries(String parent) {
         KeywordStreamRequest taxonomyStreamRequest = new KeywordStreamRequest();
         taxonomyStreamRequest.setQuery(
-                isTopLevelSearch(parent) ? TOP_LEVEL_KEYWORD_PARENT_QUERY : "parent:" + parent);
+                isEmptyParent(parent) ? TOP_LEVEL_KEYWORD_PARENT_QUERY : "parent:" + parent);
         return keywordService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 

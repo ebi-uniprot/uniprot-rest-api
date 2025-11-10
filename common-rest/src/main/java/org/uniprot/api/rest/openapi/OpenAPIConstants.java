@@ -152,6 +152,14 @@ public class OpenAPIConstants {
     public static final String TAG_IDMAPPING_RESULT_DESC =
             "API calls to retrieve the results of a submitted ID Mapping job.";
     public static final String ID_MAPPING_RESULT_OPERATION = "Search result by a submitted job id.";
+    public static final String ID_MAPPING_GROUP_BY_TAXONOMY_RESULT_OPERATION =
+            "Get group by taxonomy results for a submitted job id.";
+    public static final String ID_MAPPING_GROUP_BY_KEYWORD_RESULT_OPERATION =
+            "Get group by keyword results for a submitted job id.";
+    public static final String ID_MAPPING_GROUP_BY_EC_RESULT_OPERATION =
+            "Get group by enzyme class  results for a submitted job id.";
+    public static final String ID_MAPPING_GROUP_BY_GO_RESULT_OPERATION =
+            "Get group by gene ontology results for a submitted job id.";
     public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
     public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION =
             "Submit ID Mapping asynchronous download job.";

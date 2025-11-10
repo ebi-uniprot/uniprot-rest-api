@@ -29,7 +29,7 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
     public List<TaxonomyEntry> getChildEntries(String parent) {
         TaxonomyStreamRequest taxonomyStreamRequest = new TaxonomyStreamRequest();
         taxonomyStreamRequest.setQuery(
-                isTopLevelSearch(parent) ? TOP_LEVEL_TAXONOMY_PARENT_QUERY : "parent:" + parent);
+                isEmptyParent(parent) ? TOP_LEVEL_TAXONOMY_PARENT_QUERY : "parent:" + parent);
         return taxonomyService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 

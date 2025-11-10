@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.response.FacetField;
-import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.request.uniprotkb.UniProtKBIdMappingGroupByRequest;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByService;
 import org.uniprot.api.uniprotkb.common.service.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class UniProtKBIdGroupByService<T> {
     private final GroupByService<T> groupByService;
     private final UniProtEntryService uniProtEntryService;
@@ -23,25 +24,36 @@ public abstract class UniProtKBIdGroupByService<T> {
         this.uniProtEntryService = uniProtEntryService;
     }
 
-    public GroupByResult getGroupByResult(
-            IdMappingJob idMappingJob, UniProtKBIdMappingGroupByRequest groupByRequest) {
-        String parentId = groupByRequest.getParentId();
-        List<T> lastChildEntries = groupByService.getInitialEntries(parentId);
-        String query = groupByRequest.getQuery();
+    public GroupByResult getGroupByResult(UniProtKBIdMappingGroupByRequest groupByRequest) {
+        String givenParent = groupByRequest.getParent();
+        // initial graph (or tree) nodes for which we should be searching for
+        List<T> lastChildEntries = groupByService.getInitialEntries(givenParent);
+        // facet results for above nodes
         List<FacetField.Count> parentFacetCounts =
-                getInitialFacetCounts(parentId, query, idMappingJob, lastChildEntries);
+                getInitialFacetCounts(groupByRequest, lastChildEntries);
         List<FacetField.Count> lastChildFacetCounts = parentFacetCounts;
         List<T> ancestors = new LinkedList<>();
+        log.debug(
+                "For parent %s, number of  group by results got:%d"
+                        .formatted(givenParent, parentFacetCounts.size()));
 
+        // now we should see whether we have results such that, we have only one node, and it is
+        // expandable further
+        // in such cases we have to expand as long as possible such that we don't have such as final
+        // results
         while (lastChildFacetCounts.size() == 1) {
-            String currentId = lastChildFacetCounts.get(0).getName();
-            List<T> childEntries = groupByService.getChildEntries(currentId);
-            List<FacetField.Count> childFacetCounts =
-                    getFacetCounts(query, idMappingJob, childEntries);
+            String currentParent = lastChildFacetCounts.get(0).getName();
+            List<T> childEntries = groupByService.getChildEntries(currentParent);
+            List<FacetField.Count> childFacetCounts = getFacetCounts(groupByRequest, childEntries);
 
-            if (!childFacetCounts.isEmpty()) {
+            // it can be drilled down further
+            if (isExpandable(childFacetCounts)) {
+                // add previous results
+                log.debug(
+                        "Group by results with parent %s is just a single node and expandable"
+                                .formatted(currentParent));
                 groupByService.addToAncestors(
-                        ancestors, lastChildEntries, parentId, lastChildFacetCounts);
+                        ancestors, lastChildEntries, givenParent, lastChildFacetCounts);
                 lastChildFacetCounts = childFacetCounts;
                 lastChildEntries = childEntries;
             } else {
@@ -53,28 +65,30 @@ public abstract class UniProtKBIdGroupByService<T> {
                 lastChildFacetCounts,
                 lastChildEntries,
                 ancestors,
-                parentId,
+                givenParent,
                 parentFacetCounts,
-                query);
+                groupByRequest.getQuery());
+    }
+
+    private boolean isExpandable(List<FacetField.Count> childFacetCounts) {
+        return !childFacetCounts.isEmpty();
     }
 
     protected List<FacetField.Count> getInitialFacetCounts(
-            String parentId, String query, IdMappingJob idMappingJob, List<T> entries) {
-        return getFacetCounts(query, idMappingJob, entries);
+            UniProtKBIdMappingGroupByRequest groupByRequest, List<T> entries) {
+        return getFacetCounts(groupByRequest, entries);
     }
 
     protected List<FacetField.Count> getFacetCounts(
-            String query, IdMappingJob idMappingJob, List<T> entries) {
+            UniProtKBIdMappingGroupByRequest groupByRequest, List<T> entries) {
+        String query = groupByRequest.getQuery();
         String processedQuery =
                 UniProtQueryProcessor.newInstance(uniProtEntryService.getQueryProcessorConfig())
                         .processQuery(query);
-        List<String> toIds =
-                idMappingJob.getIdMappingResult().getMappedIds().stream()
-                        .map(IdMappingStringPair::getTo)
-                        .toList();
         Map<String, String> facetParams = groupByService.getFacetParams(entries);
+        List<String> ids = groupByRequest.getIds();
         List<FacetField> facetFields =
-                uniProtEntryService.getFacets(processedQuery, facetParams, toIds);
+                uniProtEntryService.getFacets(processedQuery, facetParams, ids);
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
                     .filter(count -> count.getCount() > 0)

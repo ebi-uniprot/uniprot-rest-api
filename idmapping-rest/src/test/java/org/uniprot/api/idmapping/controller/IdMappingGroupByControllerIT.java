@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -24,7 +23,6 @@ public abstract class IdMappingGroupByControllerIT {
     protected Integer maxToIdsWithFacetsAllowed;
 
     @Autowired protected JobOperation idMappingResultJobOp;
-    @Autowired protected RequestMappingHandlerMapping requestMappingHandlerMapping;
     private static final String INVALID_ORGANISM_ID = "36";
     protected static final String CHEBI_ID = "12345678";
 
@@ -69,7 +67,7 @@ public abstract class IdMappingGroupByControllerIT {
     }
 
     @Test
-    void getGroupBy_withEmpyListOfToIds() throws Exception {
+    void getGroupBy_withEmptyListOfToIds() throws Exception {
         prepareSingleRootNodeWithNoChildren();
         IdMappingJob job = idMappingResultJobOp.createAndPutJobInCache(0, JobStatus.FINISHED);
 

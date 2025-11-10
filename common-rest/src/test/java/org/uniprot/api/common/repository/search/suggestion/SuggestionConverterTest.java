@@ -3,7 +3,6 @@ package org.uniprot.api.common.repository.search.suggestion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -117,7 +116,8 @@ class SuggestionConverterTest {
         when(spellCheckResponse.getCollatedResults()).thenReturn(List.of());
         NamedList<Object> alternatives = new NamedList<>();
         alternatives.add("suggestion", List.of("correct"));
-        SpellCheckResponse.Suggestion suggestion = new SpellCheckResponse.Suggestion("incorrect", alternatives);
+        SpellCheckResponse.Suggestion suggestion =
+                new SpellCheckResponse.Suggestion("incorrect", alternatives);
         List<SpellCheckResponse.Suggestion> spellCheckSuggestions = List.of(suggestion);
         when(spellCheckResponse.getSuggestions()).thenReturn(spellCheckSuggestions);
         when(queryResponse.getSpellCheckResponse()).thenReturn(spellCheckResponse);
@@ -126,7 +126,6 @@ class SuggestionConverterTest {
         headers.add("params", params);
         params.add("q", "incorrect");
         when(queryResponse.getHeader()).thenReturn(headers);
-
 
         // when --------------------------------------------------------------
         List<Suggestion> suggestions = converter.convert(queryResponse);

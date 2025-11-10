@@ -196,31 +196,6 @@ public class IdMappingGroupByECControllerIT extends IdMappingGroupByControllerIT
     }
 
     @Test
-    void getGroupByEC_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
-        prepareSingleRootWithTwoLevelsOfChildren();
-        IdMappingJob job =
-                idMappingResultJobOp.createAndPutJobInCache(
-                        this.maxToIdsWithFacetsAllowed - 1, JobStatus.FINISHED);
-
-        mockMvc.perform(
-                        MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
-                                .param("query", ORGANISM_ID_2))
-                .andDo(MockMvcResultHandlers.log())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(EC_LABEL_2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(EC_ID_0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(EC_ID_1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
-    }
-
-    @Test
     void getGroupByEC_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
         IdMappingJob job =

@@ -87,7 +87,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
                         anyList(), anyList(), anyList(), eq(null), anyList(), eq(QUERY)))
                 .thenReturn(groupByResult0);
 
-        GroupByResult test = idGroupByService.getGroupByResult(idMappingJob, groupByRequest);
+        GroupByResult test = idGroupByService.getGroupByResult(groupByRequest);
 
         assertSame(groupByResult0, test);
     }
@@ -97,14 +97,14 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
         prepareWithParent();
         when(groupByService.getFacetParams(getInitialEntries())).thenReturn(facetParams0);
         when(groupByRequest.getQuery()).thenReturn(QUERY);
-        when(groupByRequest.getParentId()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
+        when(groupByRequest.getParent()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
         when(uniProtEntryService.getFacets(eq(QUERY), eq(facetParams0), anyList()))
                 .thenReturn(facetFieldsMultiple);
         when(groupByService.getGroupByResult(
                         anyList(), anyList(), anyList(), eq(PARENT), anyList(), eq(QUERY)))
                 .thenReturn(groupByResult0);
 
-        GroupByResult test = idGroupByService.getGroupByResult(idMappingJob, groupByRequest);
+        GroupByResult test = idGroupByService.getGroupByResult(groupByRequest);
 
         assertSame(groupByResult0, test);
     }
@@ -114,14 +114,14 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
         prepareWithParent();
         when(groupByService.getFacetParams(getInitialEntries())).thenReturn(facetParams0);
         when(groupByRequest.getQuery()).thenReturn(QUERY);
-        when(groupByRequest.getParentId()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
+        when(groupByRequest.getParent()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
         when(uniProtEntryService.getFacets(eq(QUERY), eq(facetParams0), anyList()))
                 .thenReturn(facetFieldsSingle);
         when(groupByService.getGroupByResult(
                         anyList(), anyList(), anyList(), eq(PARENT), anyList(), eq(QUERY)))
                 .thenReturn(groupByResult0);
 
-        GroupByResult test = idGroupByService.getGroupByResult(idMappingJob, groupByRequest);
+        GroupByResult test = idGroupByService.getGroupByResult(groupByRequest);
 
         assertSame(groupByResult0, test);
     }
@@ -132,7 +132,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
         when(groupByService.getFacetParams(getInitialEntries())).thenReturn(facetParams0);
         lenient().when(groupByService.getFacetParams(getChildEntries())).thenReturn(facetParams1);
         when(groupByRequest.getQuery()).thenReturn(QUERY);
-        when(groupByRequest.getParentId()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
+        when(groupByRequest.getParent()).thenReturn(UniProtKBIdGroupByServiceTest.PARENT);
         when(uniProtEntryService.getFacets(eq(QUERY), eq(facetParams0), anyList()))
                 .thenReturn(facetFieldsSingle);
         lenient()
@@ -143,7 +143,7 @@ public abstract class UniProtKBIdGroupByServiceTest<T> {
                 .thenReturn(groupByResult1);
         lenient().when(groupByService.getChildEntries(GROUP_0)).thenReturn(getChildEntries());
 
-        GroupByResult test = idGroupByService.getGroupByResult(idMappingJob, groupByRequest);
+        GroupByResult test = idGroupByService.getGroupByResult(groupByRequest);
 
         assertSame(groupByResult1, test);
     }

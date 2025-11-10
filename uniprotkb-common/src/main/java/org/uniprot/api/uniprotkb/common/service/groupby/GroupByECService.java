@@ -30,7 +30,7 @@ public class GroupByECService extends GroupByService<String> {
 
     @Override
     public List<String> getInitialEntries(String parentId) {
-        if (!isTopLevelSearch(parentId)) {
+        if (!isEmptyParent(parentId)) {
             String shortFormParent = getShortFormEc(parentId);
             return shortFormParent.contains(TOKEN)
                     ? List.of(shortFormParent.split(TOKEN_REGEX)[0])
@@ -42,7 +42,7 @@ public class GroupByECService extends GroupByService<String> {
     @Override
     List<FacetField.Count> getInitialFacetCounts(
             String parentId, String query, List<String> entries) {
-        if (isTopLevelSearch(parentId)) {
+        if (isEmptyParent(parentId)) {
             return getFacetCounts(query, entries);
         }
         String shortFormParent = getShortFormEc(parentId);
@@ -56,7 +56,7 @@ public class GroupByECService extends GroupByService<String> {
     public List<String> getChildEntries(String parent) {
         List<String> children = new LinkedList<>();
         String parentEC = parent;
-        if (!isTopLevelSearch(parentEC)) {
+        if (!isEmptyParent(parentEC)) {
             parentEC = getShortFormEc(parentEC);
             String[] tokens = parentEC.split(TOKEN_REGEX);
             children.addAll(Arrays.asList(tokens));
