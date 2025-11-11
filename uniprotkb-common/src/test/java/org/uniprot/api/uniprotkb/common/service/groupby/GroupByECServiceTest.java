@@ -236,6 +236,28 @@ class GroupByECServiceTest {
     }
 
     @Test
+    void getGroupByResults_whenParentIsInTheMiddleOfTheGraph() {
+        ecIdB = "1.-.-.-";
+        ecIdD = "1.1.-.-";
+        ecIdA = "1.1.1.-";
+        ecIdC = "1.1.2.-";
+        ecIdE = "1.1.1.1";
+
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1.1"))))
+                .thenReturn(getMultipleFacetFields());
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1", "1"))))
+                .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
+        mockLabels();
+
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, ecIdA);
+
+        assertGroupByResultE(
+                groupByResult,
+                emptyIterable(),
+                is(ParentImpl.builder().label(LABEL + ecIdA).count(EC_COUNT_A).build()));
+    }
+
+    @Test
     void getGroupByResult_whenNoParentSpecifiedAndOnlyOneChildExistsInFacets() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
@@ -336,12 +358,25 @@ class GroupByECServiceTest {
         assertThat(groupByResult.getParent(), matcherParent);
     }
 
+    private static void assertGroupByResultE(
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcher,
+            Matcher<? super Parent> matcherParent) {
+        assertThat(groupByResult.getGroups(), contains(getGroupByResultE()));
+        assertThat(groupByResult.getAncestors(), matcher);
+        assertThat(groupByResult.getParent(), matcherParent);
+    }
+
     private static Group getGroupByResultA() {
         return getGroupByResult(ecIdA, getLabel(ecIdA), EC_COUNT_A, true);
     }
 
     private static Group getGroupByResultC() {
         return getGroupByResult(ecIdC, getLabel(ecIdC), EC_COUNT_C, false);
+    }
+
+    private static Group getGroupByResultE() {
+        return getGroupByResult(ecIdE, getLabel(ecIdE), EC_COUNT_E, false);
     }
 
     private static Group getGroupByResult(
