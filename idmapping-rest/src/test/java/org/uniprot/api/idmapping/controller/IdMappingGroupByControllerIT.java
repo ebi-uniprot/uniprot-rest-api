@@ -149,7 +149,7 @@ public abstract class IdMappingGroupByControllerIT {
                 .perform(
                         MockMvcRequestBuilders.get(getUrlWithJobId(job.getJobId()))
                                 .param("query", "CHEBI:" + CHEBI_ID))
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
