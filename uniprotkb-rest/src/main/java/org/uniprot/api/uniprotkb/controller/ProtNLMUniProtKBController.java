@@ -27,6 +27,7 @@ import org.uniprot.api.uniprotkb.common.service.protnlm.ProtNLMUniProtKBEntrySer
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
@@ -55,6 +56,7 @@ public class ProtNLMUniProtKBController extends BasicSearchController<UniProtKBE
     @GetMapping(
             value = "/protnlm/{accession}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(hidden = true)
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getGoogleProtNLMEntryByAccession(
             @Parameter(
                             description = ACCESSION_UNIPROTKB_DESCRIPTION,

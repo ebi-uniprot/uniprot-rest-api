@@ -33,10 +33,14 @@ public class GroupByECService extends GroupByService<String> {
         if (!isEmptyParent(parentId)) {
             String shortFormParent = getShortFormEc(parentId);
             return shortFormParent.contains(TOKEN)
-                    ? List.of(shortFormParent.split(TOKEN_REGEX)[0])
+                    ? List.of(getInitialEntry(shortFormParent))
                     : List.of();
         }
         return getChildEntries(parentId);
+    }
+
+    private String getInitialEntry(String shortFormParent) {
+        return shortFormParent.substring(0, shortFormParent.lastIndexOf('.'));
     }
 
     @Override
