@@ -54,7 +54,7 @@ public class IdMappingDataStoreTestConfig {
     }
 
     @Bean("uniprotKBStoreClient")
-    @Profile("offline")
+    @Profile("idmapping")
     public UniProtKBStoreClient uniprotKBStoreClient() {
         return new UniProtKBStoreClient(
                 VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));

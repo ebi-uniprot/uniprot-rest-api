@@ -7,6 +7,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.idmapping.common.response.IdMappingMessageConverterConfig;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.UniProtKBIdGroupByService;
 import org.uniprot.api.idmapping.common.service.config.IdMappingConfig;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
@@ -19,8 +20,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.common.service.ec.ECService;
 import org.uniprot.api.uniprotkb.common.service.go.GOService;
 import org.uniprot.api.uniprotkb.common.service.go.client.GOClientImpl;
-import org.uniprot.api.uniprotkb.common.service.groupby.GroupByECService;
-import org.uniprot.api.uniprotkb.common.service.groupby.GroupByGOService;
+import org.uniprot.api.uniprotkb.common.service.groupby.GroupByService;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryVersionService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
@@ -64,8 +64,8 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                         ECService.class,
                         GOService.class,
                         GOClientImpl.class,
-                        GroupByECService.class,
-                        GroupByGOService.class,
+                        GroupByService.class,
+                        UniProtKBIdGroupByService.class,
                         GroupByServiceConfig.class,
                         IdMappingJobCacheService.class,
                         IdMappingConfig.class,
