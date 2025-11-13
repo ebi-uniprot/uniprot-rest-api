@@ -71,7 +71,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtStoreClient;
 
     @Qualifier("uniproKBfacetTupleStreamTemplate")
     @Autowired
@@ -142,7 +142,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     @BeforeAll
     void saveEntriesStore() throws Exception {
         for (int i = 1; i <= 20; i++) {
-            saveEntry(i, cloudSolrClient, storeClient);
+            saveEntry(i, cloudSolrClient, uniProtStoreClient);
         }
         saveInactiveEntry(cloudSolrClient);
         ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);

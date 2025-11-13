@@ -49,11 +49,11 @@ public abstract class GroupByService<T> {
                 query);
     }
 
-    protected static boolean isTopLevelSearch(String parent) {
+    public static boolean isEmptyParent(String parent) {
         return StringUtils.isEmpty(parent);
     }
 
-    protected void addToAncestors(
+    public void addToAncestors(
             List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
         if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
@@ -71,8 +71,8 @@ public abstract class GroupByService<T> {
         return Objects.equals(parent, facetId);
     }
 
-    List<T> getInitialEntries(String parentId) {
-        if (!isTopLevelSearch(parentId)) {
+    public List<T> getInitialEntries(String parentId) {
+        if (!isEmptyParent(parentId)) {
             return List.of(getEntryById(parentId));
         }
         return getChildEntries(parentId);
@@ -103,7 +103,7 @@ public abstract class GroupByService<T> {
         return !getFacetCounts(queryStr, children).isEmpty();
     }
 
-    protected abstract GroupByResult getGroupByResult(
+    public abstract GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<T> entries,
             List<T> ancestorEntries,
@@ -133,7 +133,7 @@ public abstract class GroupByService<T> {
     private Parent getParentInfo(String parentId, List<FacetField.Count> parentFacetCounts) {
         long count = parentFacetCounts.stream().mapToLong(FacetField.Count::getCount).sum();
         return ParentImpl.builder()
-                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntryById(parentId)))
+                .label(isEmptyParent(parentId) ? null : getLabel(getEntryById(parentId)))
                 .count(count)
                 .build();
     }
@@ -161,7 +161,7 @@ public abstract class GroupByService<T> {
 
     protected abstract String getLabel(T entry);
 
-    protected abstract List<T> getChildEntries(String parent);
+    public abstract List<T> getChildEntries(String parent);
 
-    protected abstract Map<String, String> getFacetParams(List<T> entries);
+    public abstract Map<String, String> getFacetParams(List<T> entries);
 }

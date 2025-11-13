@@ -26,15 +26,15 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     }
 
     @Override
-    protected List<KeywordEntry> getChildEntries(String parent) {
+    public List<KeywordEntry> getChildEntries(String parent) {
         KeywordStreamRequest taxonomyStreamRequest = new KeywordStreamRequest();
         taxonomyStreamRequest.setQuery(
-                isTopLevelSearch(parent) ? TOP_LEVEL_KEYWORD_PARENT_QUERY : "parent:" + parent);
+                isEmptyParent(parent) ? TOP_LEVEL_KEYWORD_PARENT_QUERY : "parent:" + parent);
         return keywordService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 
     @Override
-    protected Map<String, String> getFacetParams(List<KeywordEntry> entries) {
+    public Map<String, String> getFacetParams(List<KeywordEntry> entries) {
         String keywordIds =
                 entries.stream()
                         .map(KeywordEntry::getAccession)
@@ -44,7 +44,7 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     }
 
     @Override
-    protected GroupByResult getGroupByResult(
+    public GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<KeywordEntry> keywordEntries,
             List<KeywordEntry> ancestorEntries,
@@ -60,6 +60,10 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     @Override
     protected List<FacetField.Count> getFacetCounts(String query, List<KeywordEntry> entries) {
         List<FacetField.Count> result = super.getFacetCounts(query, entries);
+        return getKeywordFacetCounts(result);
+    }
+
+    public List<FacetField.Count> getKeywordFacetCounts(List<FacetField.Count> result) {
         return result.stream()
                 .map(
                         c -> {

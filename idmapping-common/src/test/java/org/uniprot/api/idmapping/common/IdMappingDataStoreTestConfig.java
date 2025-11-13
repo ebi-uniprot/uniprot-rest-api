@@ -2,8 +2,6 @@ package org.uniprot.api.idmapping.common;
 
 import static org.mockito.Mockito.mock;
 
-import java.net.URISyntaxException;
-
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -19,6 +17,7 @@ import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.service.IdMappingPIRService;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -43,7 +42,7 @@ public class IdMappingDataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public SolrClient idMappingSolrClient() throws URISyntaxException {
+    public SolrClient idMappingSolrClient() {
         return mock(SolrClient.class);
     }
 
@@ -51,6 +50,13 @@ public class IdMappingDataStoreTestConfig {
     @Profile("offline")
     public UniProtStoreClient<UniProtKBEntry> uniProtStoreClient() {
         return new UniProtStoreClient<>(
+                VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
+    }
+
+    @Bean("uniprotKBStoreClient")
+    @Profile("idmapping")
+    public UniProtKBStoreClient uniprotKBStoreClient() {
+        return new UniProtKBStoreClient(
                 VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
     }
 
@@ -108,8 +114,7 @@ public class IdMappingDataStoreTestConfig {
     @Bean
     @Profile("offline")
     public IdMappingRepository idMappingRepo(
-            @Qualifier("uniProtKBSolrClient") SolrClient uniProtKBSolrClient)
-            throws URISyntaxException {
+            @Qualifier("uniProtKBSolrClient") SolrClient uniProtKBSolrClient) {
         return new IdMappingRepository(uniProtKBSolrClient, idMappingSolrClient());
     }
 }

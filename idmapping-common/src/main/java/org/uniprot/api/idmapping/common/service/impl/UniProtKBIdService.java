@@ -51,7 +51,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     public static final String IS_ISOFORM = "is_isoform";
     public static final String SUB_SEQUENCE_PATTERN = ".*\\[\\d{1,5}-\\d{1,5}]";
 
-    private final UniProtStoreClient<UniProtKBEntry> storeClient;
+    private final UniProtStoreClient<UniProtKBEntry> uniProtStoreClient;
 
     private final RetryPolicy<Object> storeFetchRetryPolicy;
 
@@ -71,7 +71,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
             RdfStreamer idMappingRdfStreamer,
-            UniProtStoreClient<UniProtKBEntry> storeClient,
+            UniProtStoreClient<UniProtKBEntry> uniProtStoreClient,
             TaxonomyLineageService lineageService,
             UniProtKBIdMappingRequestConverter uniProtKBIdMappingRequestConverter) {
         super(
@@ -81,7 +81,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 idMappingRdfStreamer,
                 uniProtKBIdMappingRequestConverter);
         this.streamConfig = streamConfig;
-        this.storeClient = storeClient;
+        this.uniProtStoreClient = uniProtStoreClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
         this.repository = repository;
         this.lineageService = lineageService;
@@ -146,7 +146,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 new UniProtKBBatchStoreEntryPairIterable(
                         mappedIds,
                         streamConfig.getStoreBatchSize(),
-                        storeClient,
+                        uniProtStoreClient,
                         storeFetchRetryPolicy,
                         lineageService,
                         repository,

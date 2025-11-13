@@ -6,12 +6,11 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.uniprot.api.idmapping.common.service.UniProtKBIdGroupByService;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniRefIdMappingResultsConfig;
-import org.uniprot.api.idmapping.common.service.impl.UniParcLightIdService;
-import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
-import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
+import org.uniprot.api.idmapping.common.service.impl.*;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.uniprotkb.common.service.ec.ECService;
@@ -67,7 +66,8 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                         GOClientImpl.class,
                         GroupByECService.class,
                         GroupByGOService.class,
-                        GroupByServiceConfig.class
+                        GroupByServiceConfig.class,
+                        UniProtKBIdGroupByService.class
                     })
         })
 public class AsyncDownloadRestApp {

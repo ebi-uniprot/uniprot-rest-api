@@ -70,9 +70,9 @@ public class ResultsConfig {
 
     @Bean
     public StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer(
-            StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
+            StoreStreamerConfig<UniProtKBEntry> uniProtKBStoreStreamerConfig,
             TaxonomyLineageService taxonomyLineageService) {
-        return new UniProtKBStoreStreamer(storeStreamerConfig, taxonomyLineageService);
+        return new UniProtKBStoreStreamer(uniProtKBStoreStreamerConfig, taxonomyLineageService);
     }
 
     @Bean

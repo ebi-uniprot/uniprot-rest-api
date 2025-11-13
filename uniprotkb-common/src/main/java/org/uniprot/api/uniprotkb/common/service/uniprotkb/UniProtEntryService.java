@@ -34,6 +34,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.request.BasicRequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverter;
@@ -169,15 +170,32 @@ public class UniProtEntryService
     }
 
     public List<FacetField> getFacets(String query, Map<String, String> facetFields) {
+        SolrQuery solrQuery = getGroupByFacetSolrQuery(query, facetFields);
+        return repository.query(solrQuery).getFacetFields();
+    }
+
+    private SolrQuery getGroupByFacetSolrQuery(String query, Map<String, String> facetFields) {
         SolrQuery solrQuery = new SolrQuery(query);
         facetFields.forEach(solrQuery::set);
         solrQuery.set(FacetParams.FACET, true);
         solrQuery.set(DEF_TYPE, "edismax");
         solrQuery.add(QUERY_FIELDS, uniProtKBRequestConverter.getQueryFields(query));
         if (UniProtKBRequestUtil.needsToFilterIsoform(ACCESSION, IS_ISOFORM, query, false)) {
-            solrQuery.add(FILTER_QUERY, getQueryFieldName(IS_ISOFORM) + ":" + false);
+            solrQuery.add(FILTER_QUERY, getIsoformFilterQuery());
         }
+        return solrQuery;
+    }
+
+    public List<FacetField> getFacets(
+            String query, Map<String, String> facetFields, List<String> ids) {
+        SolrQuery solrQuery = getGroupByFacetSolrQuery(query, facetFields);
+        String idsTermQuery = BasicRequestConverter.getIdsTermQuery(ids, getSolrIdField());
+        solrQuery.add(FILTER_QUERY, idsTermQuery);
         return repository.query(solrQuery).getFacetFields();
+    }
+
+    private String getIsoformFilterQuery() {
+        return getQueryFieldName(IS_ISOFORM) + ":" + false;
     }
 
     public String findAccessionByProteinId(String proteinId) {

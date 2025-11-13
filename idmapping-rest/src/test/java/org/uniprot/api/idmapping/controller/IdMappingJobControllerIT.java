@@ -59,7 +59,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author sahmad
  * @created 22/02/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {IdMappingREST.class})
 @WebMvcTest(IdMappingJobController.class)
 @AutoConfigureWebClient
