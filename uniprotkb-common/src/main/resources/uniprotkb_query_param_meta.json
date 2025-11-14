@@ -492,6 +492,10 @@
     "type": "String"
   },
   {
+    "name": "checksum",
+    "type": "String"
+  },
+  {
     "name": "precursor",
     "type": "String"
   },

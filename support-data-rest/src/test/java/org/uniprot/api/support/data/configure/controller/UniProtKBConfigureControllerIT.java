@@ -75,7 +75,9 @@ class UniProtKBConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.[?(@.id=='cross_references')].items.*.items.*.label",
-                                everyItem(not(is(in(internalCrossRefs))))));
+                                everyItem(not(is(in(internalCrossRefs))))))
+                .andExpect(jsonPath("$.[?(@.id=='sequence')].items.size()", contains(19)))
+                .andExpect(jsonPath("$.[?(@.id=='sequence')].items[1].id", contains("checksum")));
     }
 
     @Test
