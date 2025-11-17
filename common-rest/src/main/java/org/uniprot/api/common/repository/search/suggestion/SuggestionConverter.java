@@ -11,6 +11,8 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.util.NamedList;
 import org.springframework.core.convert.converter.Converter;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * Converts a {@link QueryResponse}'s spellcheck component to a list of {@link Suggestion}s. Created
@@ -20,6 +22,12 @@ import org.uniprot.core.util.Utils;
  * @author Edd
  */
 public class SuggestionConverter implements Converter<QueryResponse, List<Suggestion>> {
+
+    private SolrCollection collection;
+
+    public SuggestionConverter(SolrCollection collection) {
+        this.collection = collection;
+    }
 
     @Override
     public List<Suggestion> convert(QueryResponse queryResponse) {
@@ -46,6 +54,13 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
                             .map(this::getSuggestion)
                             .toList();
                 }
+            } else if (this.collection == SolrCollection.uniref) {
+                String query =
+                        (String) ((NamedList<?>) queryResponse.getHeader().get("params")).get("q");
+                if (query.matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX)) {
+                    List<Suggestion> suggestions = getUniRefSolrSuggestion(query);
+                    return suggestions;
+                }
             }
         }
 
@@ -63,5 +78,50 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
                 .query(collation.getCollationQueryString().replace(" AND ", " "))
                 .hits(collation.getNumberOfHits())
                 .build();
+    }
+
+    private List<Suggestion> getUniRefSolrSuggestion(String query) {
+        try {
+            String[] tokens = query.split("_");
+            String uniRefPrefix = tokens[0];
+            String identityQuery = getIdentityQuery(uniRefPrefix);
+            String uniRefSuffix = tokens[1];
+            String idQuery = getUniProtKBOrUniParcIdQuery(uniRefSuffix);
+            String suggestionQuery = identityQuery + " AND " + idQuery;
+            return List.of(Suggestion.builder().query(suggestionQuery).build());
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+        return emptyList();
+    }
+
+    private String getIdentityQuery(String uniRefPrefix) {
+        // take out digits after "UniRef"
+        String numberStr = uniRefPrefix.substring("UniRef".length());
+        int value = Integer.parseInt(numberStr);
+        double identity;
+        switch (value) {
+            case 100:
+                identity = 1.0;
+                break;
+            case 90:
+                identity = 0.9;
+                break;
+            case 50:
+                identity = 0.5;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid UniRef identity: " + uniRefPrefix);
+        }
+        return "(identity:" + identity + ")";
+    }
+
+    private String getUniProtKBOrUniParcIdQuery(String uniRefSuffix) {
+        if (uniRefSuffix.matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX)) {
+            return "(uniprotkb:" + uniRefSuffix + ")";
+        } else if (uniRefSuffix.matches(FieldRegexConstants.UNIPARC_UPI_REGEX)) {
+            return "(uniparc:" + uniRefSuffix + ")";
+        }
+        throw new IllegalArgumentException("Expected UniProtKB or UniParc Id: " + uniRefSuffix);
     }
 }
