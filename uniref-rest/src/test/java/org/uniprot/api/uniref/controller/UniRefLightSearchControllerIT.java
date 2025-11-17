@@ -1,22 +1,12 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -278,6 +268,30 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                 .andExpect(
                         jsonPath("$.results[*].id", contains("UniRef50_P03911", "UniRef50_P03920")))
                 .andExpect(jsonPath("$.results[*].updated", contains("2019-08-27", "2019-08-27")));
+    }
+
+    @Test
+    void searchByMissingUniRefIdSuggestion() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+        String missingId = "UniRef50_Q00000";
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=" + missingId)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", hasSize(0)))
+                .andExpect(
+                        jsonPath(
+                                "$.suggestions[0].query",
+                                is("(identity:0.5) AND (uniprotkb:Q00000)")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(0)));
     }
 
     @Override
