@@ -10,8 +10,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
-import org.uniprot.api.rest.service.request.RequestConverterImpl;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
+import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyTermsConfig;
+import org.uniprot.api.support.data.common.taxonomy.request.TaxonomyRequestConverterImpl;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -53,13 +54,15 @@ public class TaxonomySolrQueryConfig {
             TaxonomySortClause taxonomySolrClause,
             UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
             RequestConverterConfigProperties uniProtRequestConverterConfigProperties,
-            FacetConfig taxonomyFacetConfig) {
-        return new RequestConverterImpl(
+            FacetConfig taxonomyFacetConfig,
+            TaxonomyTermsConfig taxonomyTermsConfig) {
+        return new TaxonomyRequestConverterImpl(
                 taxonomySolrQueryConf,
                 taxonomySolrClause,
                 taxonomyQueryProcessorConfig,
                 uniProtRequestConverterConfigProperties,
-                taxonomyFacetConfig);
+                taxonomyFacetConfig,
+                taxonomyTermsConfig);
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

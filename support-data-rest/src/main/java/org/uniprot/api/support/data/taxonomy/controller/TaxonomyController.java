@@ -152,7 +152,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             @Valid @ModelAttribute GetByTaxonIdsRequest getByTaxonIdsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<TaxonomyEntry> result = this.taxonomyService.search(getByTaxonIdsRequest);
+        QueryResult<TaxonomyEntry> result = this.taxonomyService.searchByIds(getByTaxonIdsRequest);
         return super.getSearchResponse(
                 result,
                 getByTaxonIdsRequest.getFields(),
