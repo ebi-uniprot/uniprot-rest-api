@@ -89,7 +89,7 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
             String idQuery = getUniProtKBOrUniParcIdQuery(uniRefSuffix);
             String suggestionQuery = identityQuery + " AND " + idQuery;
             return List.of(Suggestion.builder().query(suggestionQuery).build());
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             // do nothing
         }
         return emptyList();
