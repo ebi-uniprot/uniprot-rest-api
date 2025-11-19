@@ -193,6 +193,26 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                 .andExpect(jsonPath("$.results[1].active", is(true)));
     }
 
+    @Test
+    void defaultSearchCanFindSynonym() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when accession field returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=synonym10")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].taxonId", is(10)))
+                .andExpect(jsonPath("$.results[0].active", is(true)))
+                .andExpect(jsonPath("$.results[0].synonyms", hasItem("synonym10")));
+    }
+
     static class TaxonomySearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override
