@@ -15,9 +15,12 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.search.SolrCollection;
 
 class SuggestionConverterTest {
 
@@ -29,7 +32,7 @@ class SuggestionConverterTest {
 
     @BeforeEach
     void setUp() {
-        converter = new SuggestionConverter();
+        converter = new SuggestionConverter(SolrCollection.uniprot);
         mockQueryResponse = mock(QueryResponse.class);
         mockSpellCheckResponse = mock(SpellCheckResponse.class);
         mockSolrDocList = mock(SolrDocumentList.class);
@@ -133,6 +136,58 @@ class SuggestionConverterTest {
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(1));
         assertThat(suggestions.get(0).getQuery(), is("correct"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "UniRef100_A0A001, (identity:1.0) AND (uniprotkb:A0A001)",
+        "UniRef90_UPI003EBF2438, (identity:0.9) AND (uniparc:UPI003EBF2438)",
+        "UniRef50_A0A009H2L0, (identity:0.5) AND (uniprotkb:A0A009H2L0)"
+    })
+    void suggestionsForUniRefIdSearch(String uniRefId, String suggestedQuery) {
+        SuggestionConverter suggestionConverter = new SuggestionConverter(SolrCollection.uniref);
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(0L);
+        when(queryResponse.getResults()).thenReturn(results);
+
+        SpellCheckResponse spellCheckResponse = mock(SpellCheckResponse.class);
+        when(queryResponse.getSpellCheckResponse()).thenReturn(spellCheckResponse);
+        NamedList<Object> headers = new NamedList<>();
+        NamedList<Object> params = new NamedList<>();
+        headers.add("params", params);
+        params.add("q", uniRefId);
+        when(queryResponse.getHeader()).thenReturn(headers);
+
+        // when --------------------------------------------------------------
+        List<Suggestion> suggestions = suggestionConverter.convert(queryResponse);
+
+        // then --------------------------------------------------------------
+        assertThat(suggestions, hasSize(1));
+        assertThat(suggestions.get(0).getQuery(), is(suggestedQuery));
+    }
+
+    @Test
+    void suggestionsForInvalidUniRefIdSearch() {
+        SuggestionConverter suggestionConverter = new SuggestionConverter(SolrCollection.uniref);
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        SolrDocumentList results = mock(SolrDocumentList.class);
+        when(results.getNumFound()).thenReturn(0L);
+        when(queryResponse.getResults()).thenReturn(results);
+
+        SpellCheckResponse spellCheckResponse = mock(SpellCheckResponse.class);
+        when(queryResponse.getSpellCheckResponse()).thenReturn(spellCheckResponse);
+        NamedList<Object> headers = new NamedList<>();
+        NamedList<Object> params = new NamedList<>();
+        headers.add("params", params);
+        params.add("q", "UniRef100_PPPPP");
+        when(queryResponse.getHeader()).thenReturn(headers);
+
+        // when --------------------------------------------------------------
+        List<Suggestion> suggestions = suggestionConverter.convert(queryResponse);
+
+        // then --------------------------------------------------------------
+        assertThat(suggestions, hasSize(0));
     }
 
     @SuppressWarnings("unchecked")

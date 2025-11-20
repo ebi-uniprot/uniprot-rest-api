@@ -205,12 +205,55 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                 get(getSearchRequestPath() + "?query=synonym10")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
         response.andDo(log())
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].active", is(true)))
+                .andExpect(jsonPath("$.results[0].synonyms", hasItem("synonym10")));
+    }
+
+    @Test
+    void freeTextSearchTaxIdWithMatchedFields() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when showSingleTermMatchedFields=true returns matched fields
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath()
+                                                + "?query=10&showSingleTermMatchedFields=true")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results[0].taxonId", is(10)))
-                .andExpect(jsonPath("$.results[0].active", is(true)))
-                .andExpect(jsonPath("$.results[0].synonyms", hasItem("synonym10")));
+                .andExpect(jsonPath("$.matchedFields", notNullValue()))
+                .andExpect(jsonPath("$.matchedFields.size()", is(1)))
+                .andExpect(jsonPath("$.matchedFields[0].name", is("tax_id_str")))
+                .andExpect(jsonPath("$.matchedFields[0].hits", is(1)));
+    }
+
+    @Test
+    void freeTextSearchMnemonicWithMatchedFields() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when showSingleTermMatchedFields=true returns matched fields mnemonic
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath()
+                                                + "?query=mnemonic10&showSingleTermMatchedFields=true")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].taxonId", is(10)))
+                .andExpect(jsonPath("$.matchedFields", notNullValue()))
+                .andExpect(jsonPath("$.matchedFields.size()", is(1)))
+                .andExpect(jsonPath("$.matchedFields[0].name", is("mnemonic")))
+                .andExpect(jsonPath("$.matchedFields[0].hits", is(1)));
     }
 
     static class TaxonomySearchParameterResolver extends AbstractSearchParameterResolver {

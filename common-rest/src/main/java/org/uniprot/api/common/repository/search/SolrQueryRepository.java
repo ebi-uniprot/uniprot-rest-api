@@ -59,7 +59,7 @@ public abstract class SolrQueryRepository<T extends Document> {
         this.facetConfig = facetConfig;
         this.requestConverter = requestConverter;
         this.termInfoConverter = new TermInfoConverter();
-        this.suggestionConverter = new SuggestionConverter();
+        this.suggestionConverter = new SuggestionConverter(collection);
     }
 
     public QueryResult<T> searchPage(SolrRequest request, String cursor) {
