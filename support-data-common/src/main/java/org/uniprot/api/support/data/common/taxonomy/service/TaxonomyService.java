@@ -1,10 +1,5 @@
 package org.uniprot.api.support.data.common.taxonomy.service;
 
-import java.util.Set;
-import java.util.stream.Stream;
-
-import javax.validation.Valid;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -21,6 +16,10 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+
+import javax.validation.Valid;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Service
 @Import(TaxonomySolrQueryConfig.class)
