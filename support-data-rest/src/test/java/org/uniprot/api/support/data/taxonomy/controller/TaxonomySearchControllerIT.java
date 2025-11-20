@@ -194,6 +194,23 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
     }
 
     @Test
+    void defaultSearchCanFindSynonym() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when accession field returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=synonym10")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].active", is(true)))
+                .andExpect(jsonPath("$.results[0].synonyms", hasItem("synonym10")));
+    }
+
+    @Test
     void freeTextSearchTaxIdWithMatchedFields() throws Exception {
         // given
         saveEntry(SaveScenario.SEARCH_SUCCESS);
