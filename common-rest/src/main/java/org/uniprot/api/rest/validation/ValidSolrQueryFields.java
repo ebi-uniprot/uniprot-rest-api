@@ -19,6 +19,7 @@ import javax.validation.Payload;
 
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
@@ -98,10 +99,7 @@ public @interface ValidSolrQueryFields {
             boolean isValid = true;
             if (Utils.notNullNotEmpty(queryString)) {
                 try {
-                    QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
-                    qp.setAllowLeadingWildcard(true);
-                    queryString = escapeSpecialCharacters(queryString);
-                    Query query = qp.parse(queryString);
+                    Query query = getParsedQuery(queryString);
 
                     if (!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidQueryField(query, context);
@@ -246,6 +244,17 @@ public @interface ValidSolrQueryFields {
 
         private SearchFieldItem getFieldByName(String fieldName) {
             return this.searchFieldConfig.getSearchFieldItemByName(fieldName);
+        }
+
+        public static Query getParsedQuery(String queryString) {
+            try {
+                QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
+                qp.setAllowLeadingWildcard(true);
+                queryString = escapeSpecialCharacters(queryString);
+                return qp.parse(queryString);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e);
+            }
         }
     }
 }
