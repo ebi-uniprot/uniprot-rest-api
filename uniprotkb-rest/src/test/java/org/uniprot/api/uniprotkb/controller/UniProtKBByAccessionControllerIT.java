@@ -361,8 +361,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                        "$.extraAttributes.uniParcId", is("UPI000012CEBD")))
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBD")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("MERGED")))
