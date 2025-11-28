@@ -361,11 +361,14 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.extraAttributes.uniParcId")
-                                .doesNotExist())
+                MockMvcResultMatchers.jsonPath(
+                        "$.extraAttributes.uniParcId", is("UPI000012CEBD")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("MERGED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBD")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.mergeDemergeTo", contains("P21802")));
@@ -490,8 +493,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("Q00007")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.extraAttributes.uniParcId")
-                                .doesNotExist())
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBF")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.inactiveReason.inactiveReasonType", is("DEMERGED")))
