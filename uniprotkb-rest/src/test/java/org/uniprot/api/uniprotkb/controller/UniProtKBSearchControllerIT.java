@@ -1119,8 +1119,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].uniProtkbId", is("Q14301_FGFR2")))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.results[0].extraAttributes.uniParcId")
-                                .doesNotExist())
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBC")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
@@ -1181,8 +1181,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.entryType", contains("Inactive")))
                 .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.results.*.extraAttributes.uniParcId")
-                                .doesNotExist())
+                        MockMvcResultMatchers.jsonPath(
+                                "$.extraAttributes.uniParcId", is("UPI000012CEBF")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
