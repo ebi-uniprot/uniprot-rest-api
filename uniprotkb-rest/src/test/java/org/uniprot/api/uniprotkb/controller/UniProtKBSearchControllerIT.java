@@ -1120,7 +1120,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.results[0].uniProtkbId", is("Q14301_FGFR2")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.extraAttributes.uniParcId", is("UPI000012CEBC")))
+                                "$.results[0].extraAttributes.uniParcId", is("UPI000012CEBC")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
@@ -1182,7 +1182,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 "$.results.*.entryType", contains("Inactive")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.extraAttributes.uniParcId", is("UPI000012CEBF")))
+                                "$.results.*.extraAttributes.uniParcId", contains("UPI000012CEBF")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
