@@ -34,11 +34,11 @@ public class UniParcConfigureService {
 
         for (int i = 0; i < result.size(); i++) {
             AdvancedSearchTerm searchTerm = result.get(i);
-            if (searchTerm.getTerm().equalsIgnoreCase(DATABASE)) {
+            if (DATABASE.equalsIgnoreCase(searchTerm.getTerm())) {
                 AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
                 builder.values(databases);
                 result.set(i, builder.build());
-            } else if (searchTerm.getTerm().equalsIgnoreCase(ACTIVE)) {
+            } else if (ACTIVE.equalsIgnoreCase(searchTerm.getTerm())) {
                 AdvancedSearchTerm.AdvancedSearchTermBuilder builder = searchTerm.toBuilder();
                 builder.values(aliveDabases);
                 result.set(i, builder.build());
