@@ -1,5 +1,9 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -7,21 +11,13 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyTermsConfig;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class TaxonomyRequestConverterImplTest {
-
 
     @Test
     void testCreateSearchSolrRequestWithMatchedTerms() {
         String query = "12345";
-        List<String> termFields = List.of("field1","field2","field3");
+        List<String> termFields = List.of("field1", "field2", "field3");
 
         SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
 
@@ -49,7 +45,7 @@ class TaxonomyRequestConverterImplTest {
     @Test
     void testCreateSearchSolrRequestWithoutMatchedTerms() {
         String query = "12345";
-        List<String> termFields = List.of("field1","field2","field3");
+        List<String> termFields = List.of("field1", "field2", "field3");
 
         SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
 
@@ -77,7 +73,7 @@ class TaxonomyRequestConverterImplTest {
     @Test
     void testCreateSearchIdsSolrRequest() {
         String query = "12345";
-        List<String> termFields = List.of("field1","field2","field3");
+        List<String> termFields = List.of("field1", "field2", "field3");
 
         SolrQueryConfig queryConfig = Mockito.mock(SolrQueryConfig.class);
 

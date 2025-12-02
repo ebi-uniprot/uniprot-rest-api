@@ -55,7 +55,7 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
     private static final String TEST_IDS =
             "p00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009";

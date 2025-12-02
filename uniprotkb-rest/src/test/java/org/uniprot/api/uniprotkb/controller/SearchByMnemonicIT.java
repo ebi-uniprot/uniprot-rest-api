@@ -68,7 +68,7 @@ class SearchByMnemonicIT {
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
         storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
 
