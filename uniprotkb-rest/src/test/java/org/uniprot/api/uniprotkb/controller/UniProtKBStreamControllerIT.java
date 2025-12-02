@@ -101,7 +101,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
     @Autowired UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
     @Autowired private MockMvc mockMvc;
 

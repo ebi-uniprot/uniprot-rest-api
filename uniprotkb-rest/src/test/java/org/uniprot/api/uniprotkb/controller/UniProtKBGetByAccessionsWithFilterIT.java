@@ -67,7 +67,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
