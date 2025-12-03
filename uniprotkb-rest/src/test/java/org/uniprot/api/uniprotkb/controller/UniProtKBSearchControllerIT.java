@@ -135,7 +135,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     void initUniprotKbDataStore() {
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(
-                DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(new HashMap<>(), new HashMap<>()));
+                DataStoreManager.StoreType.UNIPROT,
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>()));
         dsm.addDocConverter(
                 DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
@@ -2388,7 +2389,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
-        UniProtEntryConverter converter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
+        UniProtEntryConverter converter =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
         UniProtKBEntry entry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); // P21802
         UniProtDocument document = converter.convert(entry);

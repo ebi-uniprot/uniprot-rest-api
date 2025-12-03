@@ -73,7 +73,8 @@ class UniProtKBInteractionControllerIT {
 
     @BeforeAll
     void initUniprotKbDataStore() {
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
         STORE_MANAGER.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
         STORE_MANAGER.addDocConverter(

@@ -62,7 +62,7 @@ public class IdMappingUniProtKBITUtils {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
 
     private static final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
     public static String getUniProtKbFieldValueForValidatedField(String searchField) {
         String value = "";

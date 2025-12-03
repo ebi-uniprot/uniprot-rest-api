@@ -198,7 +198,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     void initUniProtKbDataStore() {
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
@@ -788,7 +789,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     void searchWithObsoleteIDRedirectToAccession() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
         UniProtDocument doc = uniProtEntryConverter.convert(entry);
         doc.id.add("OBS_ID"); // first id is primary, all the others added are obsolete.
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
@@ -820,7 +822,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     @Tag("TRM-29946")
     void searchWithDemergedObsoleteIDReturnsBadRequest() throws Exception {
         // given
-        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         UniProtDocument doc1 = uniProtEntryConverter.convert(entry);
         doc1.id.add("YK29_YEAST"); // adding obsolete id.

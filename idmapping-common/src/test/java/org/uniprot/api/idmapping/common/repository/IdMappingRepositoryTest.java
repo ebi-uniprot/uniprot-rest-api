@@ -38,7 +38,7 @@ class IdMappingRepositoryTest {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>(), new HashMap<>());
 
     @BeforeAll
     void beforeAll() throws Exception {
