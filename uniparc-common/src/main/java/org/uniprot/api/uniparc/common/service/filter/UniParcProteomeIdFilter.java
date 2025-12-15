@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 
 import org.uniprot.core.Property;
-import org.uniprot.core.uniparc.ProteomeIdComponent;
+import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.util.Utils;
 
@@ -29,9 +29,9 @@ public class UniParcProteomeIdFilter implements BiPredicate<UniParcCrossReferenc
     }
 
     private boolean hasProteomeId(UniParcCrossReference xref, String proteomeId) {
-        List<ProteomeIdComponent> proteomeIdComponents = xref.getProteomeIdComponents();
+        List<Proteome> proteomeIdComponents = xref.getProteomes();
         return proteomeIdComponents.stream()
-                .map(ProteomeIdComponent::getProteomeId)
+                .map(Proteome::getId)
                 .anyMatch(proteomeId::equalsIgnoreCase);
     }
 }

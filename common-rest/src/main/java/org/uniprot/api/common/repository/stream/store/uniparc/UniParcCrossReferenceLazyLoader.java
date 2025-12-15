@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.core.uniparc.Proteome;
-import org.uniprot.core.uniparc.ProteomeIdComponent;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.ProteomeBuilder;
@@ -94,11 +93,11 @@ public class UniParcCrossReferenceLazyLoader {
                 builder.geneNamesAdd(xref.getGeneName());
             }
             if (lazyFields.contains(LAZY_FIELD_LIST.get(4))
-                    && notNullNotEmpty(xref.getProteomeIdComponents())) {
-                List<ProteomeIdComponent> proteomeIdComponents = xref.getProteomeIdComponents();
+                    && notNullNotEmpty(xref.getProteomes())) {
+                List<Proteome> proteomeIdComponents = xref.getProteomes();
 
-                for (ProteomeIdComponent proteomeIdComponentPair : proteomeIdComponents) {
-                    String proteomeId = proteomeIdComponentPair.getProteomeId();
+                for (Proteome proteomeIdComponentPair : proteomeIdComponents) {
+                    String proteomeId = proteomeIdComponentPair.getId();
                     String proteomeComponent = proteomeIdComponentPair.getComponent();
                     Proteome proteome =
                             new ProteomeBuilder()
