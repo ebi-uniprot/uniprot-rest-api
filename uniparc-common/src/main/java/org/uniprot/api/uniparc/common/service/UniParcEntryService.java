@@ -186,15 +186,45 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
         if (optLightEntry.isEmpty()) {
             throw new ResourceNotFoundException("Unable to find UniParc by id " + uniParcId);
         }
-        UniParcEntryBuilder builder = new UniParcEntryBuilder();
-        builder.uniParcId(uniParcId).sequence(optLightEntry.get().getSequence());
-        builder.sequenceFeaturesSet(optLightEntry.get().getSequenceFeatures());
         // populate cross-references from its own store
         Stream<UniParcCrossReference> crossReferences =
                 this.uniParcCrossReferenceService.getCrossReferences(
                         optLightEntry.get(), proteomeId != null);
         crossReferences = filterUniParcCrossReferenceStream(crossReferences, request, proteomeId);
-        builder.uniParcCrossReferencesSet(crossReferences.toList());
+        return getUniParcEntry(optLightEntry.get(), crossReferences.toList());
+    }
+
+    public UniParcEntry getUniParcEntry(String uniParcId, String crossReferenceId) {
+        UniParcEntryLight uniParcLight =
+                this.uniParcLightStoreClient
+                        .getEntry(uniParcId)
+                        .orElseThrow(
+                                () ->
+                                        new ResourceNotFoundException(
+                                                "Unable to find UniParc by id " + uniParcId));
+
+        List<UniParcCrossReference> crossReferences =
+                this.uniParcCrossReferenceService
+                        .getCrossReferences(uniParcLight, true)
+                        .filter(cr -> crossReferenceId.equals(cr.getId()))
+                        .toList();
+        if (crossReferences.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Unable to find UniParc Cross Reference by id " + crossReferenceId);
+        }
+        if (crossReferences.size() > 1) {
+            crossReferences =
+                    crossReferences.stream().filter(UniParcCrossReference::isActive).toList();
+        }
+        return getUniParcEntry(uniParcLight, crossReferences);
+    }
+
+    private UniParcEntry getUniParcEntry(
+            UniParcEntryLight uniParcLight, List<UniParcCrossReference> crossReferences) {
+        UniParcEntryBuilder builder = new UniParcEntryBuilder();
+        builder.uniParcId(uniParcLight.getUniParcId()).sequence(uniParcLight.getSequence());
+        builder.sequenceFeaturesSet(uniParcLight.getSequenceFeatures());
+        builder.uniParcCrossReferencesSet(crossReferences);
         return builder.build();
     }
 

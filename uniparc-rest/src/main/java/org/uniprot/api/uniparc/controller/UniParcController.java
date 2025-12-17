@@ -7,6 +7,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,11 +28,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniparc.common.service.UniParcBestGuessService;
 import org.uniprot.api.uniparc.common.service.UniParcEntryService;
-import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByProteomeIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.common.service.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.common.service.request.*;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdStreamRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -251,6 +248,26 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
         return super.getSearchResponse(
                 results, getByUpIdRequest.getFields(), false, false, null, request, response);
+    }
+
+    @SuppressWarnings("squid:S6856")
+    @GetMapping(
+            value = "/{upi}/xrefs/{crossReferenceId}",
+            produces = {FASTA_MEDIA_TYPE_VALUE})
+    @Operation(
+            summary = PROTEOME_UPID_FASTA_UNIPARC_OPERATION,
+            responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getUniParcFastaByCrossReference(
+            @Valid @ModelAttribute UniParcGetByProteomeIdAndCrossReferenceIdRequest request,
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse) {
+        UniParcEntry uniParcEntry =
+                queryService.getUniParcEntry(request.getUpi(), request.getCrossReferenceId());
+        QueryResult<UniParcEntry> result =
+                QueryResult.<UniParcEntry>builder().content(Stream.of(uniParcEntry)).build();
+
+        return super.getSearchResponse(
+                result, null, false, false, null, httpServletRequest, httpServletResponse);
     }
 
     @SuppressWarnings("squid:S6856")

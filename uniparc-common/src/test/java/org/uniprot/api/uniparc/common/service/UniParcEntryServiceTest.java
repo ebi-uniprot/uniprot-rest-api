@@ -1,6 +1,11 @@
 package org.uniprot.api.uniparc.common.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
@@ -21,7 +27,11 @@ import org.uniprot.api.uniparc.common.repository.store.light.UniParcLightStoreCl
 import org.uniprot.api.uniparc.common.service.light.UniParcCrossReferenceService;
 import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.core.Sequence;
+import org.uniprot.core.uniparc.SequenceFeature;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 
 /**
@@ -30,6 +40,8 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
  */
 @ExtendWith(MockitoExtension.class)
 class UniParcEntryServiceTest {
+    private static final String UPI = "upi";
+    private static final String X_REF_ID = "xRefId";
     @Mock private UniParcQueryRepository repository;
     @Mock private UniParcFacetConfig facetConfig;
     @Mock private SolrQueryConfig uniParcSolrQueryConf;
@@ -43,6 +55,11 @@ class UniParcEntryServiceTest {
     @Mock private RequestConverter uniParcRequestConverter;
     @Mock private StoreStreamer<UniParcEntry> uniParcFastaStoreStreamer;
     private UniParcEntryService service;
+    @Mock private UniParcEntryLight uniParcLight;
+    @Mock private Sequence sequence;
+    private final List<SequenceFeature> sequenceFeatures = List.of();
+    @Mock private UniParcCrossReference xRef0;
+    @Mock private UniParcCrossReference xRef1;
 
     @BeforeEach
     void init() {
@@ -78,5 +95,59 @@ class UniParcEntryServiceTest {
         request.setQuery("field:value");
         request.setFormat(UniProtMediaType.LIST_MEDIA_TYPE_VALUE);
         assertThrows(UnsupportedOperationException.class, () -> service.stream(request));
+    }
+
+    @Test
+    void getUniParcEntryByUpiAndXrefId() {
+        when(uniParcLightStoreClient.getEntry(UPI)).thenReturn(Optional.of(uniParcLight));
+        when(uniParcLight.getUniParcId()).thenReturn(UPI);
+        when(uniParcLight.getSequence()).thenReturn(sequence);
+        when(uniParcLight.getSequenceFeatures()).thenReturn(sequenceFeatures);
+        when(uniParcCrossReferenceService.getCrossReferences(uniParcLight, true))
+                .thenReturn(Stream.of(xRef0));
+        when(xRef0.getId()).thenReturn(X_REF_ID);
+
+        UniParcEntry uniParcEntry = service.getUniParcEntry(UPI, X_REF_ID);
+
+        assertSame(UPI, uniParcEntry.getUniParcId().getValue());
+        assertSame(sequence, uniParcEntry.getSequence());
+        assertEquals(sequenceFeatures, uniParcEntry.getSequenceFeatures());
+        assertEquals(List.of(xRef0), uniParcEntry.getUniParcCrossReferences());
+    }
+
+    @Test
+    void getUniParcEntryByUpiAndXrefId_whenMoreThanOneXref() {
+        when(uniParcLightStoreClient.getEntry(UPI)).thenReturn(Optional.of(uniParcLight));
+        when(uniParcLight.getUniParcId()).thenReturn(UPI);
+        when(uniParcLight.getSequence()).thenReturn(sequence);
+        when(uniParcLight.getSequenceFeatures()).thenReturn(sequenceFeatures);
+        when(uniParcCrossReferenceService.getCrossReferences(uniParcLight, true))
+                .thenReturn(Stream.of(xRef0, xRef1));
+        when(xRef0.getId()).thenReturn(X_REF_ID);
+        when(xRef0.isActive()).thenReturn(true);
+        when(xRef1.getId()).thenReturn(X_REF_ID);
+
+        UniParcEntry uniParcEntry = service.getUniParcEntry(UPI, X_REF_ID);
+
+        assertSame(UPI, uniParcEntry.getUniParcId().getValue());
+        assertSame(sequence, uniParcEntry.getSequence());
+        assertEquals(sequenceFeatures, uniParcEntry.getSequenceFeatures());
+        assertEquals(List.of(xRef0), uniParcEntry.getUniParcCrossReferences());
+    }
+
+    @Test
+    void getUniParcEntryByUpiAndXrefId_invalidUpi() {
+        when(uniParcLightStoreClient.getEntry(UPI)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.getUniParcEntry(UPI, X_REF_ID));
+    }
+
+    @Test
+    void getUniParcEntryByUpiAndXrefId_invalidXref() {
+        when(uniParcLightStoreClient.getEntry(UPI)).thenReturn(Optional.of(uniParcLight));
+        when(uniParcCrossReferenceService.getCrossReferences(uniParcLight, true))
+                .thenReturn(Stream.of());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.getUniParcEntry(UPI, X_REF_ID));
     }
 }
