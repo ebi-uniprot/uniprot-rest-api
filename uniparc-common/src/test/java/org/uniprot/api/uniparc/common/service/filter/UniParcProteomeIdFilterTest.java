@@ -1,12 +1,12 @@
 package org.uniprot.api.uniparc.common.service.filter;
 
-import static org.uniprot.core.uniparc.UniParcCrossReference.*;
+import static org.uniprot.core.uniparc.UniParcCrossReference.PROPERTY_SOURCES;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.uniparc.UniParcCrossReference;
-import org.uniprot.core.uniparc.impl.ProteomeIdComponentBuilder;
+import org.uniprot.core.uniparc.impl.ProteomeBuilder;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
 
 class UniParcProteomeIdFilterTest {
@@ -34,11 +34,8 @@ class UniParcProteomeIdFilterTest {
     void testFilterByProteomeIdParamNullReturnTrue() {
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
-                        .proteomeIdComponentsAdd(
-                                new ProteomeIdComponentBuilder()
-                                        .proteomeId("ANY_VALUE")
-                                        .component("ANY_COMP")
-                                        .build())
+                        .proteomesAdd(
+                                new ProteomeBuilder().id("ANY_VALUE").component("ANY_COMP").build())
                         .build();
         // filter by proteome id
         boolean result = uniParcProteomeFilter.test(xref, null);
@@ -50,11 +47,8 @@ class UniParcProteomeIdFilterTest {
         String proteomeId = "UP000001";
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
-                        .proteomeIdComponentsAdd(
-                                new ProteomeIdComponentBuilder()
-                                        .proteomeId(proteomeId)
-                                        .component("COMP")
-                                        .build())
+                        .proteomesAdd(
+                                new ProteomeBuilder().id(proteomeId).component("COMP").build())
                         .build();
         // filter by proteome id
         boolean result = uniParcProteomeFilter.test(xref, proteomeId);
@@ -66,11 +60,8 @@ class UniParcProteomeIdFilterTest {
         String proteomeId = "UP000001";
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
-                        .proteomeIdComponentsAdd(
-                                new ProteomeIdComponentBuilder()
-                                        .proteomeId(proteomeId)
-                                        .component("COMP")
-                                        .build())
+                        .proteomesAdd(
+                                new ProteomeBuilder().id(proteomeId).component("COMP").build())
                         .propertiesAdd(PROPERTY_SOURCES, "TEST:" + proteomeId)
                         .build();
         // filter by proteome id

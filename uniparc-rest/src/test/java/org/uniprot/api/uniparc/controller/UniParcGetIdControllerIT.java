@@ -128,23 +128,19 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .resultMatcher(jsonPath("$.uniParcCrossReferences", hasSize(25)))
                     .resultMatcher(
                             jsonPath(
-                                    "$.uniParcCrossReferences[*].proteomeIdComponents",
+                                    "$.uniParcCrossReferences[*].proteomes",
                                     everyItem(not(empty()))))
                     .resultMatcher(
+                            jsonPath("$.uniParcCrossReferences[*].proteomes[*].id", not(empty())))
+                    .resultMatcher(
                             jsonPath(
-                                    "$.uniParcCrossReferences[*].proteomeIdComponents[*].proteomeId",
+                                    "$.uniParcCrossReferences[*].proteomes[*].component",
                                     not(empty())))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.uniParcCrossReferences[*].proteomeIdComponents[*].component",
-                                    not(empty())))
+                            jsonPath("$.uniParcCrossReferences[*].proteomes[*].id", notNullValue()))
                     .resultMatcher(
                             jsonPath(
-                                    "$.uniParcCrossReferences[*].proteomeIdComponents[*].proteomeId",
-                                    notNullValue()))
-                    .resultMatcher(
-                            jsonPath(
-                                    "$.uniParcCrossReferences[*].proteomeIdComponents[*].component",
+                                    "$.uniParcCrossReferences[*].proteomes[*].component",
                                     notNullValue()))
                     .build();
         }
