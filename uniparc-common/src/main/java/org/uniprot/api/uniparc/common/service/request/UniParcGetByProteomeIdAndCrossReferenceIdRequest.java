@@ -23,5 +23,6 @@ public class UniParcGetByProteomeIdAndCrossReferenceIdRequest {
     @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
     private String upi;
 
-    private String crossReferenceId;
+    @NotNull(message = "{search.required}")
+    private String xrefId;
 }

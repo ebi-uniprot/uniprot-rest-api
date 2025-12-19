@@ -35,8 +35,8 @@ import org.uniprot.store.indexer.DataStoreManager;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author sahmad
- * @since 2020-08-11
+ * @author supun
+ * @since 2025-12-17
  */
 @Slf4j
 @ContextConfiguration(classes = {UniParcDataStoreTestConfig.class, UniParcRestApplication.class})

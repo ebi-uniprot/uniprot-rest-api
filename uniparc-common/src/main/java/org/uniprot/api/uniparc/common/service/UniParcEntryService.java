@@ -1,9 +1,6 @@
 package org.uniprot.api.uniparc.common.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -208,13 +205,16 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
                         .getCrossReferences(uniParcLight, true)
                         .filter(cr -> crossReferenceId.equals(cr.getId()))
                         .toList();
-        if (crossReferences.isEmpty()) {
-            throw new ResourceNotFoundException(
-                    "Unable to find UniParc Cross Reference by id " + crossReferenceId);
-        }
-        if (crossReferences.size() > 1) {
-            crossReferences =
-                    crossReferences.stream().filter(UniParcCrossReference::isActive).toList();
+        if (crossReferences.size() != 1) {
+            UniParcCrossReference crossReference =
+                    crossReferences.stream()
+                            .max(Comparator.comparing(UniParcCrossReference::getLastUpdated))
+                            .orElseThrow(
+                                    () ->
+                                            new ResourceNotFoundException(
+                                                    "Unable to find UniParc Cross Reference by id "
+                                                            + crossReferenceId));
+            crossReferences = List.of(crossReference);
         }
         return getUniParcEntry(uniParcLight, crossReferences);
     }

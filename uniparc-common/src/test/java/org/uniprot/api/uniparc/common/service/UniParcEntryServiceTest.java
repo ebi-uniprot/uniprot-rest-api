@@ -3,6 +3,7 @@ package org.uniprot.api.uniparc.common.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -124,8 +125,9 @@ class UniParcEntryServiceTest {
         when(uniParcCrossReferenceService.getCrossReferences(uniParcLight, true))
                 .thenReturn(Stream.of(xRef0, xRef1));
         when(xRef0.getId()).thenReturn(X_REF_ID);
-        when(xRef0.isActive()).thenReturn(true);
+        when(xRef0.getLastUpdated()).thenReturn(LocalDate.MAX);
         when(xRef1.getId()).thenReturn(X_REF_ID);
+        when(xRef1.getLastUpdated()).thenReturn(LocalDate.MIN);
 
         UniParcEntry uniParcEntry = service.getUniParcEntry(UPI, X_REF_ID);
 

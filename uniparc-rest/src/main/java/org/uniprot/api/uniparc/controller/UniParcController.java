@@ -33,6 +33,7 @@ import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdStreamRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -251,18 +252,19 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     }
 
     @SuppressWarnings("squid:S6856")
+    @Hidden
     @GetMapping(
-            value = "/{upi}/xrefs/{crossReferenceId}",
+            value = "/{upi}/xrefs/{xrefId}",
             produces = {FASTA_MEDIA_TYPE_VALUE})
     @Operation(
-            summary = PROTEOME_UPID_FASTA_UNIPARC_OPERATION,
+            summary = CROSS_REFERENCE_FASTA_UNIPARC_OPERATION,
             responses = {@ApiResponse(content = {@Content(mediaType = FASTA_MEDIA_TYPE_VALUE)})})
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getUniParcFastaByCrossReference(
             @Valid @ModelAttribute UniParcGetByProteomeIdAndCrossReferenceIdRequest request,
             HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) {
         UniParcEntry uniParcEntry =
-                queryService.getUniParcEntry(request.getUpi(), request.getCrossReferenceId());
+                queryService.getUniParcEntry(request.getUpi(), request.getXrefId());
         QueryResult<UniParcEntry> result =
                 QueryResult.<UniParcEntry>builder().content(Stream.of(uniParcEntry)).build();
 
