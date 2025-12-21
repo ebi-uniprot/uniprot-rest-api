@@ -1,20 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.common.IdMappingUniProtKBITUtils.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-
-import java.util.List;
-
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,16 +31,40 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageR
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
+import org.uniprot.api.idmapping.common.UniProtKBIdMappingResultsJobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
+import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.core.uniprotkb.DeletedReason;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniProtKBITUtils.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 /**
  * @author sahmad
@@ -722,6 +731,61 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
                 .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")))
                 .andExpect(content().string(containsString(">tr|Q00001|15-20\nMATLSL")));
+    }
+
+    @Test
+    void testIdMappingFromProteomeToUniProtKB() throws Exception {
+        // given
+        UniProtKBIdMappingResultsJobOperation jobOperation =
+                (UniProtKBIdMappingResultsJobOperation) getJobOperation();
+        List<IdMappingStringPair> pairs = new ArrayList<>();
+        List<String> proteomeIds = new ArrayList<>();
+        for (int i = 1; i < 10; i++) {
+            String proteomeId = String.format("UP%09d", i);
+            String uniProtKBAccession1 = String.format("Q%05d", i);
+            String uniProtKBAccession2 = String.format("Q%05d", i + 1);
+            pairs.add(new IdMappingStringPair(proteomeId, uniProtKBAccession1));
+            pairs.add(new IdMappingStringPair(proteomeId, uniProtKBAccession2));
+            proteomeIds.add(proteomeId);
+        }
+        String jobId = UUID.randomUUID().toString();
+        IdMappingJobRequest request =
+                jobOperation.createRequest(
+                        IdMappingFieldConfig.PROTEOME_STR,
+                        IdMappingFieldConfig.UNIPROTKB_AC_ID_STR,
+                        String.join(",", proteomeIds));
+        IdMappingResult result = IdMappingResult.builder().mappedIds(pairs).build();
+        JobStatus jobStatus = JobStatus.FINISHED;
+        IdMappingJob job = jobOperation.createJob(jobId, request, result, jobStatus);
+        IdMappingJobCacheService cacheService = jobOperation.getIdMappingJobCacheService();
+
+        if (!cacheService.exists(jobId)) {
+            cacheService.put(jobId, job); // put the finished job in cache
+        }
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), jobId)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                containsInAnyOrder(
+                                        "UP000000001",
+                                        "UP000000001",
+                                        "UP000000002",
+                                        "UP000000002",
+                                        "UP000000003")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder(
+                                        "Q00001", "Q00002", "Q00002", "Q00003", "Q00003")));
     }
 
     @Override

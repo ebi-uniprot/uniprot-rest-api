@@ -1,11 +1,11 @@
 package org.uniprot.api.idmapping.common.service.job;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -27,7 +27,9 @@ class SolrJobTaskTest {
             new SolrJobTask(
                     mock(IdMappingJob.class),
                     mock(IdMappingJobCacheService.class),
-                    mock(IdMappingRepository.class));
+                    mock(IdMappingRepository.class),
+                    10,
+                    12);
 
     @Test
     void taskProcessingWillGetRequestFromJobObject() {
@@ -63,7 +65,8 @@ class SolrJobTaskTest {
     @Test
     void solrRepoThrowException() throws SolrServerException, IOException {
         IdMappingRepository repo = mockRepo();
-        when(repo.getAllMappingIds(any(), any())).thenThrow(new SolrServerException("solr error"));
+        when(repo.getAllMappingIds(any(), any(), any(), any()))
+                .thenThrow(new SolrServerException("solr error"));
 
         var idMappingResult = solrJobTask.processTask(mappingJob("db", "UniRef50"));
 
@@ -82,7 +85,12 @@ class SolrJobTaskTest {
 
             solrJobTask.processTask(mappingJob(db, db));
 
-            verify(repo, atLeastOnce()).getAllMappingIds(SolrCollection.uniref, List.of("Ids"));
+            verify(repo, atLeastOnce())
+                    .getAllMappingIds(
+                            SolrCollection.uniref,
+                            List.of("Ids"),
+                            JobTask.FROM_SEARCH_FIELD_MAP.get(UNIREF100_STR),
+                            JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniref));
         }
 
         @ParameterizedTest
@@ -92,7 +100,12 @@ class SolrJobTaskTest {
 
             solrJobTask.processTask(mappingJob(db, db));
 
-            verify(repo, atLeastOnce()).getAllMappingIds(SolrCollection.uniprot, List.of("Ids"));
+            verify(repo, atLeastOnce())
+                    .getAllMappingIds(
+                            SolrCollection.uniprot,
+                            List.of("Ids"),
+                            JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                            JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot));
         }
 
         @Test
@@ -101,14 +114,19 @@ class SolrJobTaskTest {
 
             solrJobTask.processTask(mappingJob("UniParc", "UniParc"));
 
-            verify(repo, atLeastOnce()).getAllMappingIds(SolrCollection.uniparc, List.of("Ids"));
+            verify(repo, atLeastOnce())
+                    .getAllMappingIds(
+                            SolrCollection.uniparc,
+                            List.of("Ids"),
+                            JobTask.FROM_SEARCH_FIELD_MAP.get(UPARC_STR),
+                            JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniparc));
         }
     }
 
     @Test
     void allIdsMatched() throws SolrServerException, IOException {
         IdMappingRepository repo = mockRepo();
-        when(repo.getAllMappingIds(any(), any()))
+        when(repo.getAllMappingIds(any(), any(), any(), any()))
                 .thenReturn(List.of(new IdMappingStringPair("from", "to")));
 
         var idMappingResult =
@@ -123,7 +141,7 @@ class SolrJobTaskTest {
     @Test
     void noIdsMatched() throws SolrServerException, IOException {
         IdMappingRepository repo = mockRepo();
-        when(repo.getAllMappingIds(any(), any())).thenReturn(List.of());
+        when(repo.getAllMappingIds(any(), any(), any(), any())).thenReturn(List.of());
 
         var idMappingResult =
                 solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
@@ -137,7 +155,7 @@ class SolrJobTaskTest {
     @Test
     void someIdsMatched() throws SolrServerException, IOException {
         IdMappingRepository repo = mockRepo();
-        when(repo.getAllMappingIds(any(), any()))
+        when(repo.getAllMappingIds(any(), any(), any(), any()))
                 .thenReturn(List.of(new IdMappingStringPair("2", "2")));
 
         var idMappingResult =
@@ -149,6 +167,81 @@ class SolrJobTaskTest {
         assertFalse(idMappingResult.getUnmappedIds().isEmpty());
         assertEquals("1", idMappingResult.getUnmappedIds().get(0));
         assertEquals("3", idMappingResult.getUnmappedIds().get(1));
+    }
+
+    @Test
+    void testLimitExceedError() throws SolrServerException, IOException {
+        // when
+        // create more than allowed idmapping
+        List<IdMappingStringPair> pairs = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            pairs.add(new IdMappingStringPair("from" + i, "to" + i));
+        }
+        IdMappingRepository repo = mockRepo();
+        when(repo.getAllMappingIds(any(), any(), any(), any())).thenReturn(pairs);
+
+        var idMappingResult =
+                solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
+
+        assertFalse(idMappingResult.getErrors().isEmpty());
+        assertEquals(1, idMappingResult.getErrors().size());
+        assertEquals(40, idMappingResult.getErrors().get(0).getCode());
+        assertFalse(idMappingResult.getUnmappedIds().isEmpty());
+        assertTrue(idMappingResult.getMappedIds().isEmpty());
+    }
+
+    @Test
+    void testEnrichmentWarning() throws SolrServerException, IOException {
+        // when
+        // create more than allowed idmapping enrichment
+        List<IdMappingStringPair> pairs = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            pairs.add(new IdMappingStringPair("from" + i, "to" + i));
+        }
+        IdMappingRepository repo = mockRepo();
+        when(repo.getAllMappingIds(any(), any(), any(), any())).thenReturn(pairs);
+
+        var idMappingResult =
+                solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
+
+        assertTrue(idMappingResult.getErrors().isEmpty());
+        assertFalse(idMappingResult.getWarnings().isEmpty());
+        assertEquals(1, idMappingResult.getWarnings().size());
+        assertEquals(21, idMappingResult.getWarnings().get(0).getCode());
+        assertFalse(idMappingResult.getUnmappedIds().isEmpty());
+        assertFalse(idMappingResult.getMappedIds().isEmpty());
+        assertEquals(11, idMappingResult.getMappedIds().size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"UniProtKB_AC-ID", "UniProtKB-Swiss-Prot", "UniProtKB", "UniParc"})
+    void testMapFromProteome(String toDB) throws SolrServerException, IOException {
+        IdMappingRepository repo = mockRepo();
+        when(repo.getAllMappingIds(any(), any(), any(), any()))
+                .thenReturn(List.of(new IdMappingStringPair("from", "to")));
+
+        var idMappingResult = solrJobTask.processTask(mappingJob(PROTEOME_STR, toDB));
+
+        assertTrue(idMappingResult.getErrors().isEmpty());
+        assertTrue(idMappingResult.getUnmappedIds().isEmpty());
+        assertFalse(idMappingResult.getMappedIds().isEmpty());
+        assertEquals("to", idMappingResult.getMappedIds().get(0).getTo());
+    }
+
+    @Test
+    void testMapFromProteomeToWrongDB() throws SolrServerException, IOException {
+        IdMappingRepository repo = mockRepo();
+        when(repo.getAllMappingIds(any(), any(), any(), any()))
+                .thenReturn(List.of(new IdMappingStringPair("from", "to")));
+
+        var idMappingResult = solrJobTask.processTask(mappingJob(PROTEOME_STR, "randomdb"));
+
+        assertFalse(idMappingResult.getErrors().isEmpty());
+        assertEquals(1, idMappingResult.getErrors().size());
+        assertEquals(50, idMappingResult.getErrors().get(0).getCode());
+        assertEquals("unsupported collection", idMappingResult.getErrors().get(0).getMessage());
+        assertTrue(idMappingResult.getUnmappedIds().isEmpty());
+        assertTrue(idMappingResult.getMappedIds().isEmpty());
     }
 
     private IdMappingJob mappingJob(String from, String to) {
@@ -170,7 +263,11 @@ class SolrJobTaskTest {
         IdMappingRepository repo = mock(IdMappingRepository.class);
         solrJobTask =
                 new SolrJobTask(
-                        mock(IdMappingJob.class), mock(IdMappingJobCacheService.class), repo);
+                        mock(IdMappingJob.class),
+                        mock(IdMappingJobCacheService.class),
+                        repo,
+                        10,
+                        12);
         return repo;
     }
 }
