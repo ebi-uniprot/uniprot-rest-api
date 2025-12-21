@@ -1,13 +1,6 @@
 package org.uniprot.api.support.data.configure.service;
 
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENE_NAME_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPARC_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_SWISS_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_100_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_50_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_90_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -166,6 +159,8 @@ public class IdMappingConfigureService {
         } else if (UNIPROTKB_SWISS_STR.equals(detail.getDisplayName())
                 || UNIPROTKB_STR.equals(detail.getDisplayName())) {
             fieldBuilder.from(false);
+        } else if (PROTEOME_ID_STR.equals(detail.getDisplayName())) {
+            fieldBuilder.to(false);
         }
 
         if (Utils.notNullNotEmpty(detail.getUriLink())) {
@@ -182,6 +177,7 @@ public class IdMappingConfigureService {
                 ruleId = 1;
                 break;
             case UNIPARC_STR:
+            case PROTEOME_ID_STR:
                 ruleId = 2;
                 break;
             case UNIREF_50_STR:

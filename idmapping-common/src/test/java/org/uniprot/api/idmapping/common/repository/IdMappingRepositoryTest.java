@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.common.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.common.service.job.JobTask;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -81,7 +83,10 @@ class IdMappingRepositoryTest {
         IdMappingRepository idMappingRepository =
                 new IdMappingRepository(
                         new MockSearchableSolrClient(), new MockSearchableSolrClient());
-        assertTrue(idMappingRepository.getAllMappingIds(collection, new ArrayList<>()).isEmpty());
+        assertTrue(
+                idMappingRepository
+                        .getAllMappingIds(collection, new ArrayList<>(), null, null)
+                        .isEmpty());
     }
 
     @Test
@@ -92,7 +97,10 @@ class IdMappingRepositoryTest {
 
         var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniparc, List.of(id1, id50, id91));
+                        SolrCollection.uniparc,
+                        List.of(id1, id50, id91),
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(UPARC_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniparc));
 
         assertAll(
                 () -> assertEquals(3, mappedIdsPairs.size()),
@@ -112,7 +120,10 @@ class IdMappingRepositoryTest {
 
         var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniref, List.of(id100, id99, id98));
+                        SolrCollection.uniref,
+                        List.of(id100, id99, id98),
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(UNIREF100_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniref));
 
         assertAll(
                 () -> assertEquals(3, mappedIdsPairs.size()),
@@ -130,7 +141,10 @@ class IdMappingRepositoryTest {
 
         var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniparc, List.of(id50, id50, id50));
+                        SolrCollection.uniparc,
+                        List.of(id50, id50, id50),
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(UPARC_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniparc));
 
         assertAll(
                 () -> assertEquals(1, mappedIdsPairs.size()),
@@ -145,7 +159,10 @@ class IdMappingRepositoryTest {
 
         var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniparc, List.of(nonExist, existId));
+                        SolrCollection.uniparc,
+                        List.of(nonExist, existId),
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(UPARC_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniparc));
 
         assertAll(
                 () -> assertEquals(1, mappedIdsPairs.size()),
@@ -162,7 +179,11 @@ class IdMappingRepositoryTest {
         String query = "active:false";
         List<IdMappingStringPair> inactiveEntries =
                 idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniprot, searchAccessions, query);
+                        SolrCollection.uniprot,
+                        searchAccessions,
+                        query,
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot));
         assertEquals(5, inactiveEntries.size());
         List<String> returnedInactiveAccessions =
                 inactiveEntries.stream()
@@ -171,6 +192,32 @@ class IdMappingRepositoryTest {
         assertEquals(
                 List.of("P00011", "P00012", "P00013", "P00014", "P00015"),
                 returnedInactiveAccessions);
+    }
+
+    @Test
+    void canGetProteomeToUniProtKBMapping() throws SolrServerException, IOException {
+        // a proteome can be part many uniprotkb entry
+        // UP000 ---> P12345
+        // UP000 ----> Q12345
+        // a uniprotkb entry can have more than one proteomes
+        // UP000 ---> P12345
+        // UP001 ----> P12345
+        // a proteome can have only one uniprotkb entry
+        // UP000 ---> Q01234
+        String id1 = "up000000001";
+        String id0 = "up000000000";
+        var mappedIdsPairs =
+                idMappingRepository.getAllMappingIds(
+                        SolrCollection.uniprot,
+                        List.of(id1, id0),
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(PROTEOME_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot));
+
+        assertEquals(29, mappedIdsPairs.size());
+        for (IdMappingStringPair pair : mappedIdsPairs) {
+            assertTrue(
+                    id1.equalsIgnoreCase(pair.getFrom()) || id0.equalsIgnoreCase(pair.getFrom()));
+        }
     }
 
     private void addUniProtKBDataSolr(SolrClient kbClient) throws Exception {
@@ -194,6 +241,10 @@ class IdMappingRepositoryTest {
         entryBuilder.primaryAccession(acc);
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
+        for (int s = 0; s < i; s++) {
+            String proteomeId = String.format("UP%09d", s);
+            doc.proteomes.add(proteomeId);
+        }
         kbClient.addBean(SolrCollection.uniprot.name(), doc);
         // update the inactive flag and update solr doc
         if (inactive) {

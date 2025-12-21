@@ -68,6 +68,8 @@ public class PIRResponseConverter {
         if (statusCode.equals(HttpStatus.OK)) {
             if (response.hasBody()) {
                 Map<String, Set<String>> mappedRequestIds = getMappedRequestIds(request);
+                IdMappingResult.IdMappingResultBuilder finalIdMappingResultBuilder =
+                        idMappingResultBuilder;
                 response.getBody()
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
@@ -78,31 +80,43 @@ public class PIRResponseConverter {
                                                 line,
                                                 request,
                                                 mappedRequestIds,
-                                                idMappingResultBuilder));
-                // populate  error  if needed
-                Optional<ProblemPair> optError =
-                        getOptionalLimitError(maxToIdsAllowed, idMappingResultBuilder.build());
-                if (optError.isPresent()) {
-                    idMappingResultBuilder.clearMappedIds();
-                    idMappingResultBuilder.clearUnmappedIds();
-                    idMappingResultBuilder.error(optError.get());
-                } else {
-                    // populate warning if needed
-                    Optional<ProblemPair> optWarning =
-                            getOptionalEnrichmentWarning(
-                                    request,
-                                    maxToUniProtIdsAllowed,
-                                    idMappingResultBuilder.build());
-                    if (optWarning.isPresent()) {
-                        idMappingResultBuilder.warning(optWarning.get());
-                    }
-                }
+                                                finalIdMappingResultBuilder));
+                idMappingResultBuilder =
+                        populateErrorOrWarning(
+                                request,
+                                idMappingResultBuilder,
+                                maxToUniProtIdsAllowed,
+                                maxToIdsAllowed);
             }
         } else {
             throw new HttpServerErrorException(statusCode, "PIR id-mapping service error");
         }
 
         return idMappingResultBuilder.build();
+    }
+
+    public IdMappingResult.IdMappingResultBuilder populateErrorOrWarning(
+            IdMappingJobRequest request,
+            IdMappingResult.IdMappingResultBuilder idMappingResultBuilder,
+            Integer maxToIdsEnriched,
+            Integer maxToIdsAllowed) {
+        // populate  error  if needed
+        Optional<ProblemPair> optError =
+                getOptionalLimitError(maxToIdsAllowed, idMappingResultBuilder.build());
+        if (optError.isPresent()) {
+            idMappingResultBuilder.clearMappedIds();
+            idMappingResultBuilder.clearUnmappedIds();
+            idMappingResultBuilder.error(optError.get());
+        } else {
+            // populate warning if needed
+            Optional<ProblemPair> optWarning =
+                    getOptionalEnrichmentWarning(
+                            request, maxToIdsEnriched, idMappingResultBuilder.build());
+            if (optWarning.isPresent()) {
+                idMappingResultBuilder.warning(optWarning.get());
+            }
+        }
+        return idMappingResultBuilder;
     }
 
     private void convertLine(

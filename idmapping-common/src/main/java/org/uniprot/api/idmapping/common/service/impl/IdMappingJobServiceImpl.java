@@ -36,10 +36,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final String RESULTS_SUBPATH = "results/";
     public static final Set<String> UNIREF_SET;
     public static final String UNIPARC;
+    public static final String PROTEOME;
     public static final Set<String> UNIPROTKB_SET;
 
     static {
         UNIPARC = IdMappingFieldConfig.UPARC_STR;
+        PROTEOME = IdMappingFieldConfig.PROTEOME_STR;
 
         UNIREF_SET =
                 Set.of(
@@ -62,6 +64,9 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
     @Value("${mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
+
+    @Value("${mapping.max.to.ids.count:#{null}}")
+    Integer maxIdMappingToIdsCount;
 
     private static final String SALT_STR = "UNIPROT_IDMAPPING_SALT";
 
@@ -94,7 +99,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             // create task and submit
             JobTask jobTask =
                     canHandleInternally(request)
-                            ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
+                            ? new SolrJobTask(
+                                    idMappingJob,
+                                    cacheService,
+                                    idMappingRepository,
+                                    maxIdMappingToIdsCountEnriched,
+                                    maxIdMappingToIdsCount)
                             : new PIRJobTask(
                                     idMappingJob, cacheService, pirService, idMappingRepository);
             jobTaskExecutor.execute(jobTask);
@@ -111,8 +121,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
     private boolean canHandleInternally(IdMappingJobRequest request) {
         String toDb = request.getTo();
-        return request.getFrom().equals(toDb)
-                && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb));
+        return (request.getFrom().equals(toDb)
+                        && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb)))
+                ||
+                // proteome to uniprot or uniparc then handle internally
+                (PROTEOME.equals(request.getFrom())
+                        && (UNIPROTKB_SET.contains(toDb) || UNIPARC.equals(toDb)));
     }
 
     @Override

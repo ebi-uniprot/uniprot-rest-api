@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.common.service.job;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -10,6 +11,8 @@ import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import org.uniprot.store.search.SolrCollection;
 
 import com.google.common.base.Stopwatch;
 
@@ -23,6 +26,26 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class JobTask implements Runnable {
     private final IdMappingJob job;
     private final IdMappingJobCacheService cacheService;
+    public static final Map<SolrCollection, String> COLLECTION_ID_MAP;
+    public static final Map<String, String> FROM_SEARCH_FIELD_MAP;
+
+    static {
+        COLLECTION_ID_MAP =
+                Map.of(
+                        SolrCollection.uniprot, "accession_id",
+                        SolrCollection.uniparc, "upi",
+                        SolrCollection.uniref, "id");
+        FROM_SEARCH_FIELD_MAP =
+                Map.of(
+                        IdMappingFieldConfig.PROTEOME_STR, "proteome",
+                        IdMappingFieldConfig.UPARC_STR, "upi",
+                        IdMappingFieldConfig.ACC_ID_STR, "accession_id",
+                        IdMappingFieldConfig.ACC_STR, "accession_id",
+                        IdMappingFieldConfig.SWISSPROT_STR, "accession_id",
+                        IdMappingFieldConfig.UNIREF50_STR, "id",
+                        IdMappingFieldConfig.UNIREF_90_STR, "id",
+                        IdMappingFieldConfig.UNIREF_100_STR, "id");
+    }
 
     public JobTask(IdMappingJob job, IdMappingJobCacheService cacheService) {
         this.job = job;

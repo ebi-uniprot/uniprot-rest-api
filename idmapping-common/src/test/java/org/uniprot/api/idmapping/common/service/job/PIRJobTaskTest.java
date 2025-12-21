@@ -89,7 +89,9 @@ class PIRJobTaskTest {
         when(repo.getAllMappingIds(
                         SolrCollection.uniprot,
                         List.of("P12345", "Q12345", "P05067"),
-                        "active:false"))
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(obsoletePairs);
         // then
         IdMappingResult idmappingResult = pirJobTask.processTask(job);
@@ -120,12 +122,25 @@ class PIRJobTaskTest {
         List<IdMappingStringPair> obsoletePairs2 =
                 List.of(new IdMappingStringPair("P00004", "P00004"));
         when(repo.getAllMappingIds(
-                        SolrCollection.uniprot, List.of("P00000", "P00001"), "active:false"))
+                        SolrCollection.uniprot,
+                        List.of("P00000", "P00001"),
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(obsoletePairs1);
         when(repo.getAllMappingIds(
-                        SolrCollection.uniprot, List.of("P00002", "P00003"), "active:false"))
+                        SolrCollection.uniprot,
+                        List.of("P00002", "P00003"),
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(List.of());
-        when(repo.getAllMappingIds(SolrCollection.uniprot, List.of("P00004"), "active:false"))
+        when(repo.getAllMappingIds(
+                        SolrCollection.uniprot,
+                        List.of("P00004"),
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(obsoletePairs2);
         resultBuilder.mappedIds(allPairs);
         IdMappingResult result = resultBuilder.build();
@@ -153,10 +168,18 @@ class PIRJobTaskTest {
                         new IdMappingStringPair("P00000", "P00000"),
                         new IdMappingStringPair("P00001", "P00001"));
         when(repo.getAllMappingIds(
-                        SolrCollection.uniprot, List.of("P00000", "P00001"), "active:false"))
+                        SolrCollection.uniprot,
+                        List.of("P00000", "P00001"),
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(obsoletePairs1);
         when(repo.getAllMappingIds(
-                        SolrCollection.uniprot, List.of("P00002", "P00003"), "active:false"))
+                        SolrCollection.uniprot,
+                        List.of("P00002", "P00003"),
+                        "active:false",
+                        JobTask.FROM_SEARCH_FIELD_MAP.get(ACC_ID_STR),
+                        JobTask.COLLECTION_ID_MAP.get(SolrCollection.uniprot)))
                 .thenReturn(List.of(new IdMappingStringPair("P00003", "P00003")));
         resultBuilder.mappedIds(allPairs);
         IdMappingResult result = resultBuilder.build();

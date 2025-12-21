@@ -93,7 +93,7 @@ public abstract class AbstractJobOperation implements JobOperation {
         return job;
     }
 
-    protected IdMappingJobRequest createRequest(String from, String to, String fromIds) {
+    public IdMappingJobRequest createRequest(String from, String to, String fromIds) {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(from);
         request.setTo(to);
@@ -120,7 +120,7 @@ public abstract class AbstractJobOperation implements JobOperation {
         return IdMappingResult.builder().mappedIds(ids).build();
     }
 
-    private IdMappingJob createJob(
+    public IdMappingJob createJob(
             String jobId,
             IdMappingJobRequest request,
             IdMappingResult result,
