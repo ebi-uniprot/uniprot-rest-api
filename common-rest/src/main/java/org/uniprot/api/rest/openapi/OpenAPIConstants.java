@@ -621,6 +621,8 @@ public class OpenAPIConstants {
             "Get UniParc fasta by Proteome UPID";
     public static final String PROTEOME_UPID_UNIPARC_STREAM_OPERATION =
             "Download UniParc entries by Proteome UPID";
+    public static final String CROSS_REFERENCE_FASTA_UNIPARC_OPERATION =
+            "Get UniParc Cross Reference fasta by UPI and Cross Reference ID";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION_DESC =
             "Search UniParc entries by proteome id(upid) to return all data associated with these entries. "
                     + FIELDS_OPERATION_DESC;

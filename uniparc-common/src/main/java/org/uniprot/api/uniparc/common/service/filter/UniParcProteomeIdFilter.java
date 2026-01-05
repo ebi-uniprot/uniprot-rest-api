@@ -2,10 +2,12 @@ package org.uniprot.api.uniparc.common.service.filter;
 
 import static org.uniprot.core.uniparc.UniParcCrossReference.PROPERTY_SOURCES;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 
 import org.uniprot.core.Property;
+import org.uniprot.core.uniparc.Proteome;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.util.Utils;
 
@@ -27,6 +29,9 @@ public class UniParcProteomeIdFilter implements BiPredicate<UniParcCrossReferenc
     }
 
     private boolean hasProteomeId(UniParcCrossReference xref, String proteomeId) {
-        return proteomeId.equalsIgnoreCase(xref.getProteomeId());
+        List<Proteome> proteomeIdComponents = xref.getProteomes();
+        return proteomeIdComponents.stream()
+                .map(Proteome::getId)
+                .anyMatch(proteomeId::equalsIgnoreCase);
     }
 }

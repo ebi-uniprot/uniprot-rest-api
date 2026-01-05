@@ -1,11 +1,12 @@
 package org.uniprot.api.uniparc.common.service.filter;
 
-import static org.uniprot.core.uniparc.UniParcCrossReference.*;
+import static org.uniprot.core.uniparc.UniParcCrossReference.PROPERTY_SOURCES;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.uniparc.UniParcCrossReference;
+import org.uniprot.core.uniparc.impl.ProteomeBuilder;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
 
 class UniParcProteomeIdFilterTest {
@@ -32,7 +33,10 @@ class UniParcProteomeIdFilterTest {
     @Test
     void testFilterByProteomeIdParamNullReturnTrue() {
         UniParcCrossReference xref =
-                new UniParcCrossReferenceBuilder().proteomeId("ANY_VALUE").build();
+                new UniParcCrossReferenceBuilder()
+                        .proteomesAdd(
+                                new ProteomeBuilder().id("ANY_VALUE").component("ANY_COMP").build())
+                        .build();
         // filter by proteome id
         boolean result = uniParcProteomeFilter.test(xref, null);
         Assertions.assertTrue(result);
@@ -42,7 +46,10 @@ class UniParcProteomeIdFilterTest {
     void testFilterByProteomeIdXrefFoundReturnTrue() {
         String proteomeId = "UP000001";
         UniParcCrossReference xref =
-                new UniParcCrossReferenceBuilder().proteomeId(proteomeId).build();
+                new UniParcCrossReferenceBuilder()
+                        .proteomesAdd(
+                                new ProteomeBuilder().id(proteomeId).component("COMP").build())
+                        .build();
         // filter by proteome id
         boolean result = uniParcProteomeFilter.test(xref, proteomeId);
         Assertions.assertTrue(result);
@@ -53,7 +60,8 @@ class UniParcProteomeIdFilterTest {
         String proteomeId = "UP000001";
         UniParcCrossReference xref =
                 new UniParcCrossReferenceBuilder()
-                        .proteomeId(proteomeId)
+                        .proteomesAdd(
+                                new ProteomeBuilder().id(proteomeId).component("COMP").build())
                         .propertiesAdd(PROPERTY_SOURCES, "TEST:" + proteomeId)
                         .build();
         // filter by proteome id
