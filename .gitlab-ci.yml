@@ -75,7 +75,7 @@ api:test:
 
 api:sonar:
   stage: quality
-  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(pwd)/jacoco-report/jacoco.xml sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
+  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(pwd)/jacoco-report/jacoco.xml -X org.sonarsource.scanner.maven:sonar-maven-plugin:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api -Dsonar.exclusions=**/formatCodeSpotless.yml
   dependencies:
     - api:test
     - api:settings
