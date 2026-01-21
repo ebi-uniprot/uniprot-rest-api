@@ -12,7 +12,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>1.0.39-SNAPSHOT</version>
+	<version>1.0.40-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
