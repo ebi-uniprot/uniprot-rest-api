@@ -93,13 +93,19 @@ public class UniParcCrossReferenceLazyLoader {
                 builder.geneNamesAdd(xref.getGeneName());
             }
             if (lazyFields.contains(LAZY_FIELD_LIST.get(4))
-                    && notNullNotEmpty(xref.getProteomeId())) {
-                Proteome proteome =
-                        new ProteomeBuilder()
-                                .id(xref.getProteomeId())
-                                .component(xref.getComponent())
-                                .build();
-                builder.proteomesAdd(proteome);
+                    && notNullNotEmpty(xref.getProteomes())) {
+                List<Proteome> proteomeIdComponents = xref.getProteomes();
+
+                for (Proteome proteomeIdComponentPair : proteomeIdComponents) {
+                    String proteomeId = proteomeIdComponentPair.getId();
+                    String proteomeComponent = proteomeIdComponentPair.getComponent();
+                    Proteome proteome =
+                            new ProteomeBuilder()
+                                    .id(proteomeId)
+                                    .component(proteomeComponent)
+                                    .build();
+                    builder.proteomesAdd(proteome);
+                }
             }
         }
     }

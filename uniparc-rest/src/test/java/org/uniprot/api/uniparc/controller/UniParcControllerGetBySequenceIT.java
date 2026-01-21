@@ -229,7 +229,14 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(jsonPath("uniParcCrossReferences[*].lastUpdated", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].proteomeId", notNullValue()))
-                .andExpect(jsonPath("uniParcCrossReferences[*].proteomeId", hasItem("UP123456701")))
+                .andExpect(
+                        jsonPath(
+                                "uniParcCrossReferences[*].proteomes[*].id",
+                                hasItem("UP123456701")))
+                .andExpect(
+                        jsonPath(
+                                "uniParcCrossReferences[*].proteomes[*].component",
+                                hasItem("component01")))
                 .andExpect(jsonPath("uniParcCrossReferences[*].organism", notNullValue()))
                 .andExpect(
                         jsonPath(
