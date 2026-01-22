@@ -42,8 +42,11 @@ class UniProtKBConfigureServiceTest {
 
         List<AdvancedSearchTerm> crossRefCat = crossRefGroup.getItems();
         assertTrue(crossRefCat.stream().anyMatch(e -> !e.getId().equals("xref_group_ontologies")));
-        assertEquals(20, crossRefCat.size());
-        AdvancedSearchTerm anyGroup = crossRefCat.get(0);
+        assertEquals(21, crossRefCat.size());
+        AdvancedSearchTerm sourceItem = crossRefCat.get(0);
+        assertEquals("xref_source", sourceItem.getId());
+        assertEquals("source", sourceItem.getTerm());
+        AdvancedSearchTerm anyGroup = crossRefCat.get(1);
         assertEquals("xref_group_any", anyGroup.getId());
         assertEquals(1, anyGroup.getItems().size());
         assertEquals("xref_any", anyGroup.getItems().get(0).getId());
