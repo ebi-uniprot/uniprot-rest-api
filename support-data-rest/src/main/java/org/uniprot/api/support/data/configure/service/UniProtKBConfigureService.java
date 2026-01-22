@@ -56,7 +56,7 @@ public class UniProtKBConfigureService {
                                 () ->
                                         new ServiceException(
                                                 "Unable to find cross_references for advanced search"));
-        xRef.getItems().addAll(0, getCrossReferencesSearchItem());
+        xRef.getItems().addAll(1, getCrossReferencesSearchItem());
         return result;
     }
 
