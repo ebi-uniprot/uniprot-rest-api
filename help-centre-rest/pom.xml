@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
-		<version>1.0.40.0</version>
+		<version>1.0.40.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
