@@ -97,10 +97,6 @@ public @interface ValidFromAndTo {
                 isValid = isUniProtKBOrSwissProt(to);
             }
 
-            if (PROTEOME_STR.equals(from)) {
-                isValid = isUniProtKBOrSwissProtOrUniParc(to);
-            }
-
             // From types (except UniProtKB AC/ID) of UniProt group can be mapped to Trembl,
             // SwissProt or self type
             if (UNIPROT_GROUP_TYPES_MINUS_UNIPROTKB.contains(from)) {
@@ -120,10 +116,6 @@ public @interface ValidFromAndTo {
         private boolean isUniProtKBOrSwissProt(String to) {
             return IdMappingFieldConfig.ACC_STR.equals(to)
                     || IdMappingFieldConfig.SWISSPROT_STR.equals(to);
-        }
-
-        private boolean isUniProtKBOrSwissProtOrUniParc(String to) {
-            return isUniProtKBOrSwissProt(to) || UNIPARC_STR.equals(to);
         }
     }
 }

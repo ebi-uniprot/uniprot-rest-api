@@ -96,10 +96,7 @@ class ValidFromAndToTest {
                 Arguments.of("UniParc", "UniParc"),
                 Arguments.of("UniProtKB_AC-ID", "DMDM"),
                 Arguments.of("Gene_Name", "UniProtKB"),
-                Arguments.of("UniRef50", "UniProtKB-Swiss-Prot"),
-                Arguments.of("Proteome_ID", "UniProtKB-Swiss-Prot"),
-                Arguments.of("Proteome_ID", "UniProtKB"),
-                Arguments.of("Proteome_ID", "UniParc"));
+                Arguments.of("UniRef50", "UniProtKB-Swiss-Prot"));
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {
