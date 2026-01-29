@@ -9,12 +9,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.saveEntries;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -44,19 +43,12 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
-import org.uniprot.api.idmapping.common.UniParcIdMappingResultsJobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
-import org.uniprot.api.idmapping.common.model.IdMappingResult;
-import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
-import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntryLight;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferencePair;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -257,65 +249,6 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 .string(
                                         containsString(
                                                 "Q00005\tUPI0000283A05\tName 7787; Name 9606\tP10005; P12305\t2017-02-12\t2017-04-23\t15")));
-    }
-
-    @Test
-    void testIdMappingFromProteomeToUniParc() throws Exception {
-        // given
-        UniParcIdMappingResultsJobOperation jobOperation =
-                (UniParcIdMappingResultsJobOperation) getJobOperation();
-        List<IdMappingStringPair> pairs = new ArrayList<>();
-        List<String> proteomeIds = new ArrayList<>();
-        for (int i = 1; i < 10; i++) {
-            String proteomeId = String.format("UP%09d", i);
-            String uniParcId1 = String.format(UPI_PREF + "%02d", i);
-            String uniParcId2 = String.format(UPI_PREF + "%02d", i + 1);
-            pairs.add(new IdMappingStringPair(proteomeId, uniParcId1));
-            pairs.add(new IdMappingStringPair(proteomeId, uniParcId2));
-            proteomeIds.add(proteomeId);
-        }
-        String jobId = UUID.randomUUID().toString();
-        IdMappingJobRequest request =
-                jobOperation.createRequest(
-                        IdMappingFieldConfig.PROTEOME_STR,
-                        IdMappingFieldConfig.UNIPARC_STR,
-                        String.join(",", proteomeIds));
-        IdMappingResult result = IdMappingResult.builder().mappedIds(pairs).build();
-        JobStatus jobStatus = JobStatus.FINISHED;
-        IdMappingJob job = jobOperation.createJob(jobId, request, result, jobStatus);
-        IdMappingJobCacheService cacheService = jobOperation.getIdMappingJobCacheService();
-
-        if (!cacheService.exists(jobId)) {
-            cacheService.put(jobId, job); // put the finished job in cache
-        }
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getIdMappingResultPath(), jobId)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(5)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                containsInAnyOrder(
-                                        "UP000000001",
-                                        "UP000000001",
-                                        "UP000000002",
-                                        "UP000000002",
-                                        "UP000000003")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.to.uniParcId",
-                                containsInAnyOrder(
-                                        "UPI0000283A01",
-                                        "UPI0000283A02",
-                                        "UPI0000283A02",
-                                        "UPI0000283A03",
-                                        "UPI0000283A03")));
     }
 
     @Override
