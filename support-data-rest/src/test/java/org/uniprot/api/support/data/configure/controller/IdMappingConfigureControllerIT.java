@@ -191,7 +191,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(88)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=8)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(96)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(94)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(95)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
