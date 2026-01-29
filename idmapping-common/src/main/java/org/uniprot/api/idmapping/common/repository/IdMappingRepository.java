@@ -36,16 +36,16 @@ public class IdMappingRepository {
             SolrCollection collection,
             List<String> searchIds,
             String query,
-            String fromIdField,
-            String toIdField)
+            String searchField,
+            String idField)
             throws SolrServerException, IOException {
         switch (collection) {
             case uniprot:
                 return getAllMatchingIds(
-                        uniProtKBSolrClient, collection, fromIdField, toIdField, searchIds, query);
+                        uniProtKBSolrClient, collection, searchField, idField, searchIds, query);
             case uniparc:
                 return getAllMatchingIds(
-                        solrClient, collection, fromIdField, toIdField, searchIds, query);
+                        solrClient, collection, searchField, idField, searchIds, query);
             case uniref:
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
@@ -54,8 +54,8 @@ public class IdMappingRepository {
                         getAllMatchingIds(
                                 solrClient,
                                 collection,
-                                fromIdField,
-                                toIdField,
+                                searchField,
+                                idField,
                                 searchIds.subList(0, sublistSize),
                                 query);
                 if (searchIds.size() > sublistSize) {
@@ -63,8 +63,8 @@ public class IdMappingRepository {
                             getAllMatchingIds(
                                     solrClient,
                                     collection,
-                                    fromIdField,
-                                    toIdField,
+                                    searchField,
+                                    idField,
                                     searchIds.subList(sublistSize, searchIds.size()),
                                     query));
                 }
@@ -77,17 +77,17 @@ public class IdMappingRepository {
     private List<IdMappingStringPair> getAllMatchingIds(
             SolrClient client,
             SolrCollection collection,
-            String fromIdField,
-            String toIdField,
+            String searchField,
+            String idField,
             List<String> searchIds,
             String query)
             throws SolrServerException, IOException {
 
         var filteredTermQueryWithIds =
-                String.format("({!terms f=%s}%s)", fromIdField, String.join(",", searchIds));
+                String.format("({!terms f=%s}%s)", searchField, String.join(",", searchIds));
         var queryParamsMap = new HashMap<String, String>();
         queryParamsMap.put("q", query);
-        queryParamsMap.put("fl", fromIdField + "," + toIdField);
+        queryParamsMap.put("fl", searchField + "," + idField);
         queryParamsMap.put("start", "0");
         queryParamsMap.put("rows", "500010");
         queryParamsMap.put("fq", filteredTermQueryWithIds);
@@ -98,29 +98,26 @@ public class IdMappingRepository {
         // entries
         if (JobTask.FROM_SEARCH_FIELD_MAP
                 .get(IdMappingFieldConfig.PROTEOME_STR)
-                .equalsIgnoreCase(fromIdField)) {
-            return getIdMappingStringPairs(fromIdField, toIdField, searchIds, results);
+                .equalsIgnoreCase(searchField)) {
+            return getIdMappingStringPairs(searchField, idField, searchIds, results);
         }
 
         return results.stream()
                 .map(
                         document ->
                                 new IdMappingStringPair(
-                                        (String) document.getFirstValue(fromIdField),
-                                        (String) document.getFirstValue(toIdField)))
+                                        (String) document.getFirstValue(searchField),
+                                        (String) document.getFirstValue(idField)))
                 .collect(Collectors.toList());
     }
 
     private static List<IdMappingStringPair> getIdMappingStringPairs(
-            String fromIdField,
-            String toIdField,
-            List<String> searchIds,
-            SolrDocumentList results) {
+            String searchField, String idField, List<String> searchIds, SolrDocumentList results) {
         Set<String> searchIdSet = new HashSet<>(searchIds);
         List<IdMappingStringPair> idMappingStringPairs = new ArrayList<>();
         for (SolrDocument doc : results) {
-            List<String> proteomeIds = (List<String>) doc.get(fromIdField);
-            String idValue = (String) doc.getFirstValue(toIdField);
+            List<String> proteomeIds = (List<String>) doc.get(searchField);
+            String idValue = (String) doc.getFirstValue(idField);
             for (String proteomeId : proteomeIds) {
                 if (searchIdSet.contains(proteomeId.toLowerCase())) {
                     idMappingStringPairs.add(new IdMappingStringPair(proteomeId, idValue));
