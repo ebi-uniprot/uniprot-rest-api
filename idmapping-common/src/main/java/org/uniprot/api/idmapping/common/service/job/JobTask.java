@@ -1,7 +1,5 @@
 package org.uniprot.api.idmapping.common.service.job;
 
-import static org.uniprot.store.search.SolrCollection.*;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +32,9 @@ public abstract class JobTask implements Runnable {
     static {
         COLLECTION_ID_MAP =
                 Map.of(
-                        uniprot, "accession_id",
-                        uniparc, "upi",
-                        uniref, "id");
+                        SolrCollection.uniprot, "accession_id",
+                        SolrCollection.uniparc, "upi",
+                        SolrCollection.uniref, "id");
         FROM_SEARCH_FIELD_MAP =
                 Map.of(
                         IdMappingFieldConfig.PROTEOME_STR, "proteome",
