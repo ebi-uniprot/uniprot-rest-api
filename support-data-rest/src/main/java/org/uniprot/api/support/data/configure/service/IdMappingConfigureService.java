@@ -159,8 +159,6 @@ public class IdMappingConfigureService {
         } else if (UNIPROTKB_SWISS_STR.equals(detail.getDisplayName())
                 || UNIPROTKB_STR.equals(detail.getDisplayName())) {
             fieldBuilder.from(false);
-        } else if (PROTEOME_ID_STR.equals(detail.getDisplayName())) {
-            fieldBuilder.to(false);
         }
 
         if (Utils.notNullNotEmpty(detail.getUriLink())) {
@@ -177,7 +175,6 @@ public class IdMappingConfigureService {
                 ruleId = 1;
                 break;
             case UNIPARC_STR:
-            case PROTEOME_ID_STR:
                 ruleId = 2;
                 break;
             case UNIREF_50_STR:

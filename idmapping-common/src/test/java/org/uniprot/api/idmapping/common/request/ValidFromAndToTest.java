@@ -80,6 +80,20 @@ class ValidFromAndToTest {
         Assertions.assertTrue(isValid);
     }
 
+    @Test
+    void testFromProteomeToAnyFailure() {
+        String from = "Proteome_ID";
+        String to = "UniProtKB-Swiss-Prot";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertFalse(isValid);
+    }
+
     private static Stream<Arguments> provideInvalidFromTo() {
         return Stream.of(
                 Arguments.of("INVALID", "UniProtKB-Swiss-Prot"),
@@ -96,10 +110,7 @@ class ValidFromAndToTest {
                 Arguments.of("UniParc", "UniParc"),
                 Arguments.of("UniProtKB_AC-ID", "DMDM"),
                 Arguments.of("Gene_Name", "UniProtKB"),
-                Arguments.of("UniRef50", "UniProtKB-Swiss-Prot"),
-                Arguments.of("Proteome_ID", "UniProtKB-Swiss-Prot"),
-                Arguments.of("Proteome_ID", "UniProtKB"),
-                Arguments.of("Proteome_ID", "UniParc"));
+                Arguments.of("UniRef50", "UniProtKB-Swiss-Prot"));
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {

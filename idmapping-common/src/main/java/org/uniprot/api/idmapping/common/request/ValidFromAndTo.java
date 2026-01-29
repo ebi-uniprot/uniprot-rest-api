@@ -91,14 +91,14 @@ public @interface ValidFromAndTo {
         private boolean isValidPair(String from, String to) {
             boolean isValid = true;
 
+            if (PROTEOME_STR.equals(from)) {
+                return false;
+            }
+
             // Non-UniProt from types (e.g. PIR, PDB etc) can only be mapped to either Trembl or
             // Swissprot type
             if (!UNIPROT_GROUP_TYPES.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to);
-            }
-
-            if (PROTEOME_STR.equals(from)) {
-                isValid = isUniProtKBOrSwissProtOrUniParc(to);
             }
 
             // From types (except UniProtKB AC/ID) of UniProt group can be mapped to Trembl,
