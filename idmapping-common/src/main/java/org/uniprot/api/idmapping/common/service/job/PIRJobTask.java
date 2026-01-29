@@ -84,11 +84,7 @@ public class PIRJobTask extends JobTask {
             List<String> batch = accessions.subList(i, Math.min(i + batchSize, accessions.size()));
             obsoleteIdPairs.addAll(
                     this.idMappingRepository.getAllMappingIds(
-                            SolrCollection.uniprot,
-                            batch,
-                            "active:false",
-                            "accession_id",
-                            COLLECTION_ID_MAP.get(SolrCollection.uniprot)));
+                            SolrCollection.uniprot, batch, "active:false"));
         }
 
         return obsoleteIdPairs.size();

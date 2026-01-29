@@ -1,18 +1,15 @@
 package org.uniprot.api.idmapping.common.repository;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.MapSolrParams;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.common.service.job.JobTask;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.AllArgsConstructor;
@@ -26,36 +23,37 @@ public class IdMappingRepository {
     private final SolrClient solrClient;
 
     public List<IdMappingStringPair> getAllMappingIds(
-            SolrCollection collection, List<String> searchIds, String searchField, String idField)
+            SolrCollection collection, List<String> searchIds)
             throws SolrServerException, IOException {
         String starQuery = "*:*";
-        return getAllMappingIds(collection, searchIds, starQuery, searchField, idField);
+        return getAllMappingIds(collection, searchIds, starQuery);
     }
 
     public List<IdMappingStringPair> getAllMappingIds(
-            SolrCollection collection,
-            List<String> searchIds,
-            String query,
-            String searchField,
-            String idField)
+            SolrCollection collection, List<String> searchIds, String query)
             throws SolrServerException, IOException {
         switch (collection) {
             case uniprot:
                 return getAllMatchingIds(
-                        uniProtKBSolrClient, collection, searchField, idField, searchIds, query);
+                        uniProtKBSolrClient,
+                        collection,
+                        "accession_id",
+                        "accession_id",
+                        searchIds,
+                        query);
             case uniparc:
-                return getAllMatchingIds(
-                        solrClient, collection, searchField, idField, searchIds, query);
+                return getAllMatchingIds(solrClient, collection, "upi", "upi", searchIds, query);
             case uniref:
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
                 int sublistSize = Math.min(searchIds.size(), MAX_ID_MAPPINGS_ALLOWED / 2);
+                var unirefSolrIdField = "id";
                 var unirefSolrMappingList =
                         getAllMatchingIds(
                                 solrClient,
                                 collection,
-                                searchField,
-                                idField,
+                                unirefSolrIdField,
+                                unirefSolrIdField,
                                 searchIds.subList(0, sublistSize),
                                 query);
                 if (searchIds.size() > sublistSize) {
@@ -63,8 +61,8 @@ public class IdMappingRepository {
                             getAllMatchingIds(
                                     solrClient,
                                     collection,
-                                    searchField,
-                                    idField,
+                                    unirefSolrIdField,
+                                    unirefSolrIdField,
                                     searchIds.subList(sublistSize, searchIds.size()),
                                     query));
                 }
@@ -89,41 +87,16 @@ public class IdMappingRepository {
         queryParamsMap.put("q", query);
         queryParamsMap.put("fl", searchField + "," + idField);
         queryParamsMap.put("start", "0");
-        queryParamsMap.put("rows", "500010");
+        queryParamsMap.put("rows", String.valueOf(searchIds.size()));
         queryParamsMap.put("fq", filteredTermQueryWithIds);
         MapSolrParams queryParams = new MapSolrParams(queryParamsMap);
-        var results = client.query(collection.name(), queryParams).getResults();
 
-        // special handling for search by proteome id. one proteome can have many uniparc/uniprot
-        // entries
-        if (JobTask.FROM_SEARCH_FIELD_MAP
-                .get(IdMappingFieldConfig.PROTEOME_STR)
-                .equalsIgnoreCase(searchField)) {
-            return getIdMappingStringPairs(searchField, idField, searchIds, results);
-        }
-
-        return results.stream()
+        return client.query(collection.name(), queryParams).getResults().stream()
                 .map(
                         document ->
                                 new IdMappingStringPair(
                                         (String) document.getFirstValue(searchField),
                                         (String) document.getFirstValue(idField)))
                 .collect(Collectors.toList());
-    }
-
-    private static List<IdMappingStringPair> getIdMappingStringPairs(
-            String searchField, String idField, List<String> searchIds, SolrDocumentList results) {
-        Set<String> searchIdSet = new HashSet<>(searchIds);
-        List<IdMappingStringPair> idMappingStringPairs = new ArrayList<>();
-        for (SolrDocument doc : results) {
-            List<String> proteomeIds = (List<String>) doc.get(searchField);
-            String idValue = (String) doc.getFirstValue(idField);
-            for (String proteomeId : proteomeIds) {
-                if (searchIdSet.contains(proteomeId.toLowerCase())) {
-                    idMappingStringPairs.add(new IdMappingStringPair(proteomeId, idValue));
-                }
-            }
-        }
-        return idMappingStringPairs;
     }
 }
