@@ -1,0 +1,23 @@
+AC   UPI0000001866-61156;
+DE   RecName: Full=ADP/ATP translocase {ECO:0000256|RuleBase:RU368008};
+DE   AltName: Full=ADP,ATP carrier protein {ECO:0000256|RuleBase:RU368008};
+CC   -!- FUNCTION: Catalyzes the exchange of ADP and ATP across the membrane.
+CC       {ECO:0000256|RuleBase:RU368008}.
+CC   -!- SUBUNIT: Monomer. {ECO:0000256|RuleBase:RU368008}.
+CC   -!- SUBCELLULAR LOCATION: Membrane {ECO:0000256|RuleBase:RU368008}; Multi-
+CC       pass membrane protein {ECO:0000256|RuleBase:RU368008}.
+CC   -!- SUBCELLULAR LOCATION: Mitochondrion inner membrane
+CC       {ECO:0000256|ARBA:ARBA00004448}; Multi-pass membrane protein
+CC       {ECO:0000256|ARBA:ARBA00004448}.
+CC   -!- SIMILARITY: Belongs to the mitochondrial carrier (TC 2.A.29) family.
+CC       {ECO:0000256|ARBA:ARBA00006375, ECO:0000256|RuleBase:RU000488}.
+KW   Antiport {ECO:0000256|ARBA:ARBA00022449};
+KW   ATP-binding {ECO:0000256|ARBA:ARBA00022840};
+KW   Membrane {ECO:0000256|ARBA:ARBA00023136, ECO:0000256|PROSITE-
+KW   ProRule:PRU00282}; Mitochondrion {ECO:0000256|ARBA:ARBA00023128};
+KW   Mitochondrion inner membrane {ECO:0000256|ARBA:ARBA00022792};
+KW   Repeat {ECO:0000256|ARBA:ARBA00022737};
+KW   Transmembrane {ECO:0000256|ARBA:ARBA00022692, ECO:0000256|PROSITE-
+KW   ProRule:PRU00282}; Transmembrane helix {ECO:0000256|ARBA:ARBA00022989};
+KW   Transport {ECO:0000256|ARBA:ARBA00022448, ECO:0000256|RuleBase:RU000488}.
+//
