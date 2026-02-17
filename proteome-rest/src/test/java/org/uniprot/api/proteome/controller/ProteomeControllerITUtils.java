@@ -52,7 +52,6 @@ class ProteomeControllerITUtils {
                 new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         ProteomeDocument document = documentConverter.convert(proteome);
         document.proteomeStored = documentConverter.getBinaryObject(entry);
-        document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
         document.isExcluded = false;
         return document;
@@ -155,8 +154,7 @@ class ProteomeControllerITUtils {
                         .description(description)
                         .taxonomy(taxonomy)
                         .modified(modified)
-                        .proteomeType(ProteomeType.NORMAL)
-                        .redundantTo(new ProteomeIdBuilder("UP000000001").build())
+                        .proteomeType(ProteomeType.REFERENCE)
                         .strain("strain value")
                         .isolate("isolate value")
                         .citationsAdd(
@@ -164,9 +162,6 @@ class ProteomeControllerITUtils {
                                         .title("citation title")
                                         .journalName("journalName value")
                                         .build())
-                        .redundantProteomesAdd(
-                                new RedundantProteomeBuilder().proteomeId("UP0000000002").build())
-                        .panproteome(new ProteomeIdBuilder("UP000000003").build())
                         .componentsSet(components)
                         .taxonLineagesAdd(new TaxonomyLineageBuilder().taxonId(10L).build())
                         .superkingdom(Superkingdom.EUKARYOTA)
