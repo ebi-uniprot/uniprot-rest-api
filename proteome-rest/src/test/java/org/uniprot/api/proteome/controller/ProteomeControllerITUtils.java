@@ -67,8 +67,6 @@ class ProteomeControllerITUtils {
                         .mnemonic("HUMAN")
                         .build();
         LocalDate modified = LocalDate.of(2015, 11, 5);
-        //	String reId = "UP000005641";
-        //	ProteomeId redId = new ProteomeIdBuilder (reId).build();
         List<CrossReference<ProteomeDatabase>> xrefs = new ArrayList<>();
         CrossReference<ProteomeDatabase> xref =
                 new CrossReferenceBuilder<ProteomeDatabase>()
@@ -147,6 +145,42 @@ class ProteomeControllerITUtils {
                         .level(GenomeAssemblyLevel.PARTIAL)
                         .build();
 
+        Taxonomy panproteomeTaxon =
+                new TaxonomyBuilder()
+                        .taxonId(9600)
+                        .scientificName("test scientific name")
+                        .mnemonic("test mnemonic")
+                        .build();
+        List<RelatedProteome> relatedProteomes = new ArrayList<>();
+        ProteomeId proteomeId1 = new ProteomeIdBuilder("UP000000625").build();
+        Taxonomy taxon1 =
+                new TaxonomyBuilder()
+                        .taxonId(9601)
+                        .scientificName("test scientific name1")
+                        .mnemonic("test mnemonic1")
+                        .build();
+        RelatedProteome relatedProteome1 =
+                new RelatedProteomeBuilder()
+                        .proteomeId(proteomeId1)
+                        .similarity(0.98f)
+                        .taxonomy(taxon1)
+                        .build();
+        relatedProteomes.add(relatedProteome1);
+        ProteomeId proteomeId2 = new ProteomeIdBuilder("UP000000625").build();
+        Taxonomy taxon2 =
+                new TaxonomyBuilder()
+                        .taxonId(9602)
+                        .scientificName("test scientific name2")
+                        .mnemonic("test mnemonic2")
+                        .build();
+        RelatedProteome relatedProteome2 =
+                new RelatedProteomeBuilder()
+                        .proteomeId(proteomeId2)
+                        .similarity(0.08f)
+                        .taxonomy(taxon2)
+                        .build();
+        relatedProteomes.add(relatedProteome2);
+
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
@@ -169,7 +203,9 @@ class ProteomeControllerITUtils {
                         .genomeAnnotation(genomeAnnotation)
                         .proteomeCompletenessReport(completenessReport)
                         .exclusionReasonsAdd(ExclusionReason.MIXED_CULTURE)
-                        .annotationScore(15);
+                        .annotationScore(15)
+                        .panproteomeTaxon(panproteomeTaxon)
+                        .relatedProteomesSet(relatedProteomes);
 
         return builder.build();
     }

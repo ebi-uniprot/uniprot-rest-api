@@ -1,23 +1,12 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.UPID_PREF;
-import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
-import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getProteomeDocument;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -199,7 +188,29 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].id", is("up000005001".toUpperCase())));
+                .andExpect(jsonPath("$.results[0].id", is("up000005001".toUpperCase())))
+                .andExpect(jsonPath("$.results[0].panproteomeTaxon").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].panproteomeTaxon.scientificName",
+                                is("test scientific name")))
+                .andExpect(jsonPath("$.results[0].panproteomeTaxon.taxonId", is(9600)))
+                .andExpect(jsonPath("$.results[0].panproteomeTaxon.mnemonic", is("test mnemonic")))
+                .andExpect(jsonPath("$.results[0].relatedProteomes").exists())
+                .andExpect(jsonPath("$.results[0].relatedProteomes.size()", is(2)))
+                .andExpect(
+                        jsonPath("$.results[0].relatedProteomes[0].proteomeId", is("UP000000625")))
+                .andExpect(jsonPath("$.results[0].relatedProteomes[0].similarity", is(0.98)))
+                .andExpect(jsonPath("$.results[0].relatedProteomes.*.taxonomy").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].relatedProteomes[0].taxonomy.scientificName",
+                                is("test scientific name1")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].relatedProteomes[0].taxonomy.mnemonic",
+                                is("test mnemonic1")))
+                .andExpect(jsonPath("$.results[0].relatedProteomes[0].taxonomy.taxonId", is(9601)));
     }
 
     @Override

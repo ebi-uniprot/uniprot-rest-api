@@ -7,7 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_N_TRIPLES;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_TTL;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import org.uniprot.core.proteome.*;
 import org.uniprot.core.proteome.impl.ComponentBuilder;
 import org.uniprot.core.proteome.impl.ProteomeEntryBuilder;
 import org.uniprot.core.proteome.impl.ProteomeIdBuilder;
+import org.uniprot.core.proteome.impl.RelatedProteomeBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -165,6 +167,41 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         components.add(component1);
         components.add(component2);
         List<Citation> citations = new ArrayList<>();
+        Taxonomy panproteomeTaxon =
+                new TaxonomyBuilder()
+                        .taxonId(9600)
+                        .scientificName("test scientific name")
+                        .mnemonic("test mnemonic")
+                        .build();
+        List<RelatedProteome> relatedProteomes = new ArrayList<>();
+        ProteomeId proteomeId1 = new ProteomeIdBuilder("UP000000625").build();
+        Taxonomy taxon1 =
+                new TaxonomyBuilder()
+                        .taxonId(9601)
+                        .scientificName("test scientific name1")
+                        .mnemonic("test mnemonic1")
+                        .build();
+        RelatedProteome relatedProteome1 =
+                new RelatedProteomeBuilder()
+                        .proteomeId(proteomeId1)
+                        .similarity(0.98f)
+                        .taxonomy(taxon1)
+                        .build();
+        relatedProteomes.add(relatedProteome1);
+        ProteomeId proteomeId2 = new ProteomeIdBuilder("UP000000625").build();
+        Taxonomy taxon2 =
+                new TaxonomyBuilder()
+                        .taxonId(9602)
+                        .scientificName("test scientific name2")
+                        .mnemonic("test mnemonic2")
+                        .build();
+        RelatedProteome relatedProteome2 =
+                new RelatedProteomeBuilder()
+                        .proteomeId(proteomeId2)
+                        .similarity(0.08f)
+                        .taxonomy(taxon2)
+                        .build();
+        relatedProteomes.add(relatedProteome2);
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
@@ -176,7 +213,9 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .componentsSet(components)
                         .superkingdom(Superkingdom.EUKARYOTA)
                         .citationsSet(citations)
-                        .annotationScore(15);
+                        .annotationScore(15)
+                        .panproteomeTaxon(panproteomeTaxon)
+                        .relatedProteomesSet(relatedProteomes);
 
         return builder.build();
     }

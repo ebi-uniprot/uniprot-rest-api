@@ -133,7 +133,10 @@ class ProteomeStreamControllerIT extends AbstractRdfStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].id", is("UP000005010")));
+                .andExpect(jsonPath("$.results[0].id", is("UP000005010")))
+                .andExpect(jsonPath("$.results[0].panproteomeTaxon").exists())
+                .andExpect(jsonPath("$.results[0].relatedProteomes").exists())
+                .andExpect(jsonPath("$.results[0].relatedProteomes.size()", is(2)));
     }
 
     @Test
