@@ -109,10 +109,11 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .map(SolrQuery.SortClause::getItem)
                             .filter(o -> !o.equalsIgnoreCase("score"))
                             .collect(Collectors.joining(","));
-            return idField
-                    + (Utils.nullOrEmpty(sortFields) || idField.equals(sortFields)
-                            ? ""
-                            : "," + sortFields);
+            return idField + (sortFieldsIncluded(idField, sortFields) ? "" : "," + sortFields);
+        }
+
+        private static boolean sortFieldsIncluded(String idField, String sortFields) {
+            return Utils.nullOrEmpty(sortFields) || idField.equals(sortFields);
         }
 
         static String sortToString(List<SolrQuery.SortClause> order) {

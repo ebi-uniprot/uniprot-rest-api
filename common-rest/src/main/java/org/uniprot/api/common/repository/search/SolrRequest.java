@@ -20,6 +20,7 @@ import lombok.*;
 public class SolrRequest {
     public static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
     public static final String DEF_TYPE_VALUE = "edismax";
+    public static final String CONTENT_VALUE = "content";
     private String query;
 
     private QueryOperator defaultQueryOperator;
@@ -59,7 +60,7 @@ public class SolrRequest {
     public static class SolrRequestBuilder {
         private QueryOperator defaultQueryOperator = DEFAULT_OPERATOR;
         private String defaultDefType = DEF_TYPE_VALUE;
-        private String defaultField = "content";
+        private String defaultField = CONTENT_VALUE;
 
         public String getQuery() {
             return query;
