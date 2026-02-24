@@ -19,6 +19,7 @@ import lombok.*;
 @EqualsAndHashCode
 public class SolrRequest {
     public static final QueryOperator DEFAULT_OPERATOR = QueryOperator.AND;
+    public static final String DEF_TYPE_VALUE = "edismax";
     private String query;
 
     private QueryOperator defaultQueryOperator;
@@ -43,6 +44,8 @@ public class SolrRequest {
     private String fields;
 
     private String boostFunctions;
+    private String defaultDefType;
+
     @Singular private List<String> fieldBoosts = new ArrayList<>();
     @Singular private List<String> staticBoosts = new ArrayList<>();
 
@@ -55,6 +58,8 @@ public class SolrRequest {
     // https://www.baeldung.com/lombok-builder-default-value
     public static class SolrRequestBuilder {
         private QueryOperator defaultQueryOperator = DEFAULT_OPERATOR;
+        private String defaultDefType = DEF_TYPE_VALUE;
+        private String defaultField = "content";
 
         public String getQuery() {
             return query;

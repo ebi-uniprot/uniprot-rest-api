@@ -127,8 +127,9 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
 
     public Stream<UniParcEntry> streamByProteomeId(StreamRequest streamRequest, String proteomeId) {
         SolrRequest solrRequest = getRequestConverter().createStreamSolrRequest(streamRequest);
+        SolrRequest optimisedRequest = removeDefaultQuerySettings(solrRequest);
         StoreRequest storeRequest = StoreRequest.builder().proteomeId(proteomeId).build();
-        return this.storeStreamer.idsToStoreStream(solrRequest, storeRequest);
+        return this.storeStreamer.idsToStoreStream(optimisedRequest, storeRequest);
     }
 
     @Override
@@ -248,5 +249,14 @@ public class UniParcEntryService extends StoreStreamerSearchService<UniParcDocum
             String message = "Could not get entity for id: [" + value + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    private SolrRequest removeDefaultQuerySettings(SolrRequest solrRequest) {
+        return solrRequest.toBuilder()
+                .defaultQueryOperator(null)
+                .defaultField(null)
+                .defaultDefType(null)
+                .queryField(null)
+                .build();
     }
 }
