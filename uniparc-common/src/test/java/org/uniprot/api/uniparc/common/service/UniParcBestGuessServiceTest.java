@@ -23,6 +23,7 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
+import org.uniprot.core.uniparc.impl.ProteomeBuilder;
 import org.uniprot.core.uniparc.impl.UniParcCrossReferenceBuilder;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
@@ -308,8 +309,7 @@ class UniParcBestGuessServiceTest {
                 .organism(taxonomy)
                 .proteinName("Gelsolin, isoform J")
                 .geneName("Gel")
-                .proteomeId("UPI")
-                .component("CompValue")
+                .proteomesAdd(new ProteomeBuilder().id("UPI").component("CompValue").build())
                 .build();
     }
 }
