@@ -15,4 +15,5 @@ public class UniParcCrossReferenceStoreConfigProperties {
     private int fetchMaxRetries;
     private int fetchRetryDelayMillis;
     private int groupSize;
+    private int fetchBatchSize;
 }
