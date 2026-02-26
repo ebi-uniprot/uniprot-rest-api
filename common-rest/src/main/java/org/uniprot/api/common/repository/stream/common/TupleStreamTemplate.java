@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Slf4j
 public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
-    private static final String DEF_TYPE_VALUE = "edismax";
+
     private final StreamerConfigProperties streamConfig;
     private final SolrClient solrClient;
     private final SolrRequestConverter solrRequestConverter;
@@ -109,7 +109,11 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .map(SolrQuery.SortClause::getItem)
                             .filter(o -> !o.equalsIgnoreCase("score"))
                             .collect(Collectors.joining(","));
-            return idField + (Utils.nullOrEmpty(sortFields) ? "" : "," + sortFields);
+            return idField + (sortFieldsIncluded(idField, sortFields) ? "" : "," + sortFields);
+        }
+
+        private static boolean sortFieldsIncluded(String idField, String sortFields) {
+            return Utils.nullOrEmpty(sortFields) || idField.equals(sortFields);
         }
 
         static String sortToString(List<SolrQuery.SortClause> order) {
@@ -126,9 +130,11 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                         new StreamExpressionValue(streamFactory.getDefaultCollection()));
                 requestExpression.addParameter(
                         new StreamExpressionNamedParameter("q", request.getQuery()));
-                requestExpression.addParameter(
-                        new StreamExpressionNamedParameter(
-                                "q.op", request.getDefaultQueryOperator().name()));
+                if (request.getDefaultQueryOperator() != null) {
+                    requestExpression.addParameter(
+                            new StreamExpressionNamedParameter(
+                                    "q.op", request.getDefaultQueryOperator().name()));
+                }
                 if (!request.getFilterQueries().isEmpty()) {
                     String filterQuery =
                             request.getFilterQueries().stream()
@@ -145,14 +151,18 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                 requestExpression.addParameter(
                         new StreamExpressionNamedParameter("qt", requestHandler));
 
-                requestExpression.addParameter(
-                        new StreamExpressionNamedParameter("defType", DEF_TYPE_VALUE));
+                if (Utils.notNullNotEmpty(request.getDefaultDefType())) {
+                    requestExpression.addParameter(
+                            new StreamExpressionNamedParameter(
+                                    "defType", request.getDefaultDefType()));
+                }
+
                 if (Utils.notNullNotEmpty(request.getQueryField())) {
                     requestExpression.addParameter(
                             new StreamExpressionNamedParameter("qf", request.getQueryField()));
-                } else {
+                } else if (Utils.notNullNotEmpty(request.getDefaultField())) {
                     requestExpression.addParameter(
-                            new StreamExpressionNamedParameter("df", "content"));
+                            new StreamExpressionNamedParameter("df", request.getDefaultField()));
                 }
 
                 TupleStream tupleStream = streamFactory.constructStream(requestExpression);
