@@ -177,4 +177,12 @@ class TupleStreamTemplateTest {
         assertThrows(
                 ForbiddenRequestException.class, () -> streamTemplate.validateResponse(request));
     }
+
+    @Test
+    void givenSameFieldAndSingleSort_whenFindFieldsToReturn_thenSingleFieldReturned() {
+        String field1 = "field1";
+        List<SolrQuery.SortClause> order = new ArrayList<>();
+        order.add(new SolrQuery.SortClause(field1, SolrQuery.ORDER.asc));
+        assertThat(fieldsToReturn(field1, order), is(field1));
+    }
 }
