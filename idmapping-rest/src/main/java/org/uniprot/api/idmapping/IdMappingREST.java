@@ -47,7 +47,15 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
                         PublicationRepository.class,
                         PublicationSolrQueryConfig.class,
                         ProtNLMStoreConfig.class
-                    })
+                    }),
+            @ComponentScan.Filter(
+                    type = FilterType.REGEX,
+                    pattern =
+                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.service\\.precomputed\\..*"),
+            @ComponentScan.Filter(
+                    type = FilterType.REGEX,
+                    pattern =
+                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.precomputed\\..*")
         })
 public class IdMappingREST {
     public static void main(String[] args) {
