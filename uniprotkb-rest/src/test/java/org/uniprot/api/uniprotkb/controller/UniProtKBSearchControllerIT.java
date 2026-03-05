@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.time.Instant;
@@ -2277,8 +2276,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].primaryAccession", is("P00001")));
-        // then
-
     }
 
     @Test
@@ -2328,6 +2325,57 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.sequence.md5", contains(md5)));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"is_gene_centric:true", "is_gene_centric:false", "*:*"})
+    void searchWithIsGeneCentric(String queryParam) throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
+
+        int expectedSize = 3;
+        List<String> expectedAccessions = List.of("P21802", "Q8DIA7", "P00001");
+        if (queryParam.equals("is_gene_centric:true")) {
+            expectedSize = 1;
+            expectedAccessions = List.of("P00001");
+        } else if (queryParam.equals("is_gene_centric:false")) {
+            expectedSize = 2;
+            expectedAccessions = List.of("P21802", "Q8DIA7");
+        }
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", queryParam)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession",
+                                containsInAnyOrder(expectedAccessions.toArray())))
+                .andExpect(jsonPath("$.results.size()", is(expectedSize)));
+    }
+
+    @Test
+    void searchWithIsGeneCentricInvalidValue() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "is_gene_centric:random")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log()).andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Override
@@ -2394,12 +2442,14 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         UniProtKBEntry entry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); // P21802
         UniProtDocument document = converter.convert(entry);
+        document.isGeneCentric = false;
         UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP); // Q8DIA7
         document = converter.convert(entry);
+        document.isGeneCentric = false;
         UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
         getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
@@ -2490,6 +2540,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.unirefCluster100 = "UniRef100_P00001";
             doc.computationalPubmedIds.add("890123456");
             doc.communityPubmedIds.add("1234567");
+            doc.isGeneCentric = true;
             UniProtDatabaseTypes.INSTANCE
                     .getUniProtKBDbTypes()
                     .forEach(
