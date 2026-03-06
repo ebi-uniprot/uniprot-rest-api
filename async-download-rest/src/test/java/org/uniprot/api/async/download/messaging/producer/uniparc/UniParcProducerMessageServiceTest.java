@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
+import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceTest;
 import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandler;
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
 import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
@@ -24,7 +24,7 @@ import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class UniParcProducerMessageServiceTest
-        extends ProducerMessageServiceTest<UniParcDownloadRequest, UniParcDownloadJob> {
+        extends SolrProducerMessageServiceTest<UniParcDownloadRequest, UniParcDownloadJob> {
     public static final String UNIPARC_FIELDS = "uniParcFields";
     public static final String UNIPARC_SORT = "uniParcSort";
     public static final String UNIPARC_FORMAT = "uniParcFormat";

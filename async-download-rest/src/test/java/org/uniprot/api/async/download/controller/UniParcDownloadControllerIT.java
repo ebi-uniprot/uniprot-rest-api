@@ -1,12 +1,18 @@
 package org.uniprot.api.async.download.controller;
 
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.io.IOException;
@@ -27,6 +33,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -46,8 +54,8 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
@@ -174,6 +182,31 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
                 resultsFasta.contains(
                         ">upi101 anotherProteinName01 OS=Name 9606 OX=9606 AC=P12301 SS=WP_168893201 PC=UP000005640:chromosome\n"
                                 + "MLMPKRTKYRA"));
+    }
+
+    @Test
+    protected void submitJobWithFastaXAndInvalidQueryFailure() throws Exception {
+        ResultActions resultActions =
+                callPostJobStatus(
+                        "P12345", null, null, FASTA_EXTENDED_MEDIA_TYPE.toString(), false, false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains(
+                                        "text/plain;format=fastaxis only supported for Uniparc search by valid proteome id")));
     }
 
     @Override
@@ -306,7 +339,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected MediaType getUnsupportedFormat() {
-        return UniProtMediaType.valueOf(OBO_MEDIA_TYPE_VALUE);
+        return valueOf(OBO_MEDIA_TYPE_VALUE);
     }
 
     @Override
