@@ -151,6 +151,31 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
         assertEquals(12, oldestCrossRefCreated.size());
     }
 
+    @Test
+    void runJobWithFastaXAndVerify() throws Exception {
+        // when
+        String query = "proteome:UP000005640";
+        String jobId = callRunAPIAndVerify(query, null, null, "text/plain;format=fastax", false);
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId);
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(getTestAsyncConfig().getResultFolder() + "/" + fileWithExt);
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        // uncompress the gz file
+        Path unzippedFile = Path.of(getTestAsyncConfig().getResultFolder() + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsFasta = Files.readString(unzippedFile);
+        int numberOfResults = resultsFasta.split(">upi", -1).length - 1;
+        assertEquals(12, numberOfResults);
+        assertTrue(
+                resultsFasta.contains(
+                        ">upi101 anotherProteinName01 OS=Name 9606 OX=9606 AC=P12301 SS=WP_168893201 PC=UP000005640:chromosome\n"
+                                + "MLMPKRTKYRA"));
+    }
+
     @Override
     protected MockMvc getMockMvcObject() {
         return this.mockMvc;

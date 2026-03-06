@@ -55,6 +55,7 @@ public class UniParcMessageConverterConfig {
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
 
                 converters.add(new UniParcFastaMessageConverter(downloadGatekeeper));
+                converters.add(new UniParcFastaExtendedMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniParcEntry.class,
@@ -140,6 +141,7 @@ public class UniParcMessageConverterConfig {
                         uniParcContext(MediaType.APPLICATION_XML),
                         uniParcContext(MediaType.APPLICATION_JSON),
                         uniParcContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.TSV_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.XLS_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.RDF_MEDIA_TYPE),
