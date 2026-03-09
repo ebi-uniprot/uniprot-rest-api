@@ -2665,7 +2665,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 Triple.of("cc_disease", "pfeifer", List.of("pfeiffer")),
                 Triple.of("accession_id", "p218o2", List.of("p21802")),
                 Triple.of("id", "p218o2", List.of("p21802")),
-                Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar")));
+                Triple.of("gene_exact", "fgfrq", List.of("fgfr2", "fgfr", "fgar")));
     }
 
     static class UniprotKBSearchParameterResolver extends AbstractSearchParameterResolver {
