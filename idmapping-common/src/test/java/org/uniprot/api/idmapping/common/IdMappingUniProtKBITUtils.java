@@ -239,6 +239,7 @@ public class IdMappingUniProtKBITUtils {
         doc.commentMap.put("cc_subcellular_location_exp", Collections.singleton("Search All"));
         doc.commentMap.put("cc_alternative_products_exp", Collections.singleton("Search All"));
         doc.commentMap.put("cc_webresource_exp", Collections.singleton("Search All"));
+        doc.isGeneCentric = true;
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }

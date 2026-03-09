@@ -1102,5 +1102,9 @@
   {
     "name": "uniref_cluster_100",
     "type": "String"
+  },
+  {
+    "name": "is_gene_centric",
+    "type": "String"
   }
 ]
