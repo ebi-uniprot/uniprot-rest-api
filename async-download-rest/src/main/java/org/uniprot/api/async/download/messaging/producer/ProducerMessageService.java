@@ -1,6 +1,7 @@
 package org.uniprot.api.async.download.messaging.producer;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ import org.uniprot.api.async.download.messaging.result.common.FileHandler;
 import org.uniprot.api.async.download.model.JobSubmitFeedback;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.DownloadRequest;
+import org.uniprot.api.async.download.model.request.uniparc.UniParcDownloadRequest;
 import org.uniprot.api.async.download.mq.MessagingService;
 import org.uniprot.api.async.download.service.JobService;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class ProducerMessageService<T extends DownloadRequest, R extends DownloadJob> {
     public static final String JOB_ID = "jobId";
+    public static final String UNIPARC_SEARCH_BY_PROTEOME = "^proteome:UP\\d{9}$";
     private final JobService<R> jobService;
     private final MessageConverter messageConverter;
     private final MessagingService messagingService;
@@ -45,6 +48,7 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     }
 
     public String sendMessage(T request) {
+        validate(request);
         preprocess(request);
 
         String jobId = this.hashGenerator.generateHash(request);
@@ -67,6 +71,26 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
         if (Objects.isNull(request.getFormat())) {
             request.setFormat(APPLICATION_JSON_VALUE);
         }
+    }
+
+    private void validate(T request) {
+        if (EXTENDED_FASTA_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            if (!(isUniParcDownloadRequest(request)
+                    && isUniParcSearchByProteome((UniParcDownloadRequest) request))) {
+                throw new IllegalArgumentException(
+                        EXTENDED_FASTA_MEDIA_TYPE_VALUE
+                                + " is only supported for UniParc search by valid proteome id");
+            }
+        }
+    }
+
+    private static <T extends DownloadRequest> boolean isUniParcSearchByProteome(
+            UniParcDownloadRequest request) {
+        return request.getQuery().matches(UNIPARC_SEARCH_BY_PROTEOME);
+    }
+
+    private static <T extends DownloadRequest> boolean isUniParcDownloadRequest(T request) {
+        return request instanceof UniParcDownloadRequest;
     }
 
     private void cleanIfNecessary(String jobId) {

@@ -4,7 +4,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniparc.UniParcSolrIdBatchResultStreamer;
+import org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniparc.UniParcExtendedSolrIdBatchResultStreamer;
 import org.uniprot.api.async.download.messaging.consumer.streamer.facade.SolrIdResultStreamerFacade;
 import org.uniprot.api.async.download.messaging.result.uniparc.UniParcFileHandler;
 import org.uniprot.api.async.download.model.job.uniparc.UniParcDownloadJob;
@@ -18,7 +18,7 @@ public class UniParcSolrIdResultStreamerFacade
                 UniParcDownloadRequest, UniParcDownloadJob, UniParcEntry> {
 
     public UniParcSolrIdResultStreamerFacade(
-            UniParcSolrIdBatchResultStreamer batchResultStreamer,
+            UniParcExtendedSolrIdBatchResultStreamer batchResultStreamer,
             MessageConverterContextFactory<UniParcEntry> converterContextFactory,
             UniParcFileHandler fileHandler) {
         super(null, null, batchResultStreamer, converterContextFactory, fileHandler);

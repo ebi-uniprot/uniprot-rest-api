@@ -26,6 +26,9 @@ public class UniProtMediaType {
     public static final MediaType XLS_MEDIA_TYPE = valueOf(XLS_MEDIA_TYPE_VALUE);
     public static final String FASTA_MEDIA_TYPE_VALUE = "text/plain;format=fasta";
     public static final MediaType FASTA_MEDIA_TYPE = valueOf(FASTA_MEDIA_TYPE_VALUE);
+    public static final String EXTENDED_FASTA_MEDIA_TYPE_VALUE = "text/plain;format=fastax";
+    public static final MediaType EXTENDED_FASTA_MEDIA_TYPE =
+            valueOf(EXTENDED_FASTA_MEDIA_TYPE_VALUE);
     public static final String GFF_MEDIA_TYPE_VALUE = "text/plain;format=gff";
     public static final MediaType GFF_MEDIA_TYPE = valueOf(GFF_MEDIA_TYPE_VALUE);
     public static final String OBO_MEDIA_TYPE_VALUE = "text/plain;format=obo";

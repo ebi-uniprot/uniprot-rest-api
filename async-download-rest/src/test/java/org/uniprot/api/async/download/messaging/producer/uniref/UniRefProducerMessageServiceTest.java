@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.uniprot.api.async.download.messaging.producer.ProducerMessageService;
-import org.uniprot.api.async.download.messaging.producer.ProducerMessageServiceTest;
+import org.uniprot.api.async.download.messaging.producer.SolrProducerMessageServiceTest;
 import org.uniprot.api.async.download.messaging.result.uniref.UniRefFileHandler;
 import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
@@ -24,7 +24,7 @@ import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class UniRefProducerMessageServiceTest
-        extends ProducerMessageServiceTest<UniRefDownloadRequest, UniRefDownloadJob> {
+        extends SolrProducerMessageServiceTest<UniRefDownloadRequest, UniRefDownloadJob> {
     public static final String UNIREF_FIELDS = "uniRefFields";
     public static final String UNIREF_SORT = "uniRefSort";
     public static final String UNIREF_FORMAT = "uniRefFormat";

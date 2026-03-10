@@ -35,10 +35,14 @@ public abstract class SolrIdBatchResultStreamerTest<
 
         Stream<S> result = solrIdBatchResultStreamer.stream(request, ids);
 
-        assertThat(result).hasSameElementsAs(getEntryList());
+        assertResults(result);
         InOrder inOrder = inOrder(heartbeatProducer);
         inOrder.verify(heartbeatProducer).generateForResults(job, 2);
         inOrder.verify(heartbeatProducer).generateForResults(job, 1);
+    }
+
+    protected void assertResults(Stream<S> result) {
+        assertThat(result).hasSameElementsAs(getEntryList());
     }
 
     @Test

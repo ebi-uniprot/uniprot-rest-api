@@ -20,11 +20,16 @@ public class UniParcRequestProcessorWrapper implements RequestProcessor<UniParcD
 
     @Override
     public void process(UniParcDownloadRequest request) {
-        MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        if (MediaType.APPLICATION_XML.equals(contentType)) {
+        if (isUniParcFullEntryNeeded(request)) {
             uniParcSolrIdResultRequestProcessor.process(request);
         } else {
             uniParcLightSolrIdResultRequestProcessor.process(request);
         }
+    }
+
+    private static boolean isUniParcFullEntryNeeded(UniParcDownloadRequest request) {
+        MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
+        return MediaType.APPLICATION_XML.equals(contentType)
+                || UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE.equals(contentType);
     }
 }
