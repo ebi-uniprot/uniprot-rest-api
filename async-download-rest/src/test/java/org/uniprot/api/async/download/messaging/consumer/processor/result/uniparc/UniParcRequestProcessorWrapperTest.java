@@ -39,7 +39,7 @@ class UniParcRequestProcessorWrapperTest {
 
     @Test
     void process_FastaX() {
-        when(request.getFormat()).thenReturn(UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE_VALUE);
+        when(request.getFormat()).thenReturn(UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE_VALUE);
 
         uniParcRequestProcessorWrapper.process(request);
 

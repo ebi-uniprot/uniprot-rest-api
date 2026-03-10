@@ -141,7 +141,7 @@ public class UniParcMessageConverterConfig {
                         uniParcContext(MediaType.APPLICATION_XML),
                         uniParcContext(MediaType.APPLICATION_JSON),
                         uniParcContext(UniProtMediaType.FASTA_MEDIA_TYPE),
-                        uniParcContext(UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE),
+                        uniParcContext(UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.TSV_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.XLS_MEDIA_TYPE),
                         uniParcContext(UniProtMediaType.RDF_MEDIA_TYPE),

@@ -1,6 +1,6 @@
 package org.uniprot.api.async.download.messaging.consumer.streamer.batch.uniparc;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE;
 
 import java.util.Iterator;
 
@@ -43,7 +43,7 @@ public class UniParcExtendedSolrIdBatchResultStreamer
     public BatchIterable<UniParcEntry> getBatchStoreIterable(
             Iterator<String> idsIterator, UniParcDownloadRequest request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        if (FASTA_EXTENDED_MEDIA_TYPE.equals(contentType)) {
+        if (EXTENDED_FASTA_MEDIA_TYPE.equals(contentType)) {
             return new UniParcFastaBatchStoreIterable(
                     () -> idsIterator,
                     this.storeStreamerConfig.getStoreClient(),

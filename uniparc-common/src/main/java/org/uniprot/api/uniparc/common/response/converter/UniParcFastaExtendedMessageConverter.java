@@ -12,21 +12,17 @@ import org.uniprot.core.parser.fasta.uniparc.UniParcProteomeFastaParser;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
 
-/**
- * @author jluo
- * @date: 25 Jun 2019
- */
 public class UniParcFastaExtendedMessageConverter
         extends AbstractEntityHttpMessageConverter<UniParcEntry> {
 
     private static final ThreadLocal<Boolean> TL_ENTITY_ONLY = new ThreadLocal<>();
 
     public UniParcFastaExtendedMessageConverter() {
-        super(UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE, UniParcEntry.class);
+        super(UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE, UniParcEntry.class);
     }
 
     public UniParcFastaExtendedMessageConverter(Gatekeeper downloadGatekeeper) {
-        super(UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE, UniParcEntry.class, downloadGatekeeper);
+        super(UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE, UniParcEntry.class, downloadGatekeeper);
     }
 
     @Override

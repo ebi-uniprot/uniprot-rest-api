@@ -30,6 +30,6 @@ public class UniParcRequestProcessorWrapper implements RequestProcessor<UniParcD
     private static boolean isUniParcFullEntryNeeded(UniParcDownloadRequest request) {
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         return MediaType.APPLICATION_XML.equals(contentType)
-                || UniProtMediaType.FASTA_EXTENDED_MEDIA_TYPE.equals(contentType);
+                || UniProtMediaType.EXTENDED_FASTA_MEDIA_TYPE.equals(contentType);
     }
 }

@@ -74,12 +74,12 @@ public abstract class ProducerMessageService<T extends DownloadRequest, R extend
     }
 
     private void validate(T request) {
-        if (FASTA_EXTENDED_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+        if (EXTENDED_FASTA_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
             if (!(isUniParcDownloadRequest(request)
                     && isUniParcSearchByProteome((UniParcDownloadRequest) request))) {
                 throw new IllegalArgumentException(
-                        FASTA_EXTENDED_MEDIA_TYPE_VALUE
-                                + "is only supported for Uniparc search by valid proteome id");
+                        EXTENDED_FASTA_MEDIA_TYPE_VALUE
+                                + " is only supported for UniParc search by valid proteome id");
             }
         }
     }

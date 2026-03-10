@@ -25,7 +25,7 @@ public class UniParcDownloadRequest extends UniParcStreamRequest
     @ValidAsyncDownloadFormats(
             formats = {
                 FASTA_MEDIA_TYPE_VALUE,
-                FASTA_EXTENDED_MEDIA_TYPE_VALUE,
+                EXTENDED_FASTA_MEDIA_TYPE_VALUE,
                 TSV_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,

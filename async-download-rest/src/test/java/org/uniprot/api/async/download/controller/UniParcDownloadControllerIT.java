@@ -188,7 +188,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
     protected void submitJobWithFastaXAndInvalidQueryFailure() throws Exception {
         ResultActions resultActions =
                 callPostJobStatus(
-                        "P12345", null, null, FASTA_EXTENDED_MEDIA_TYPE.toString(), false, false);
+                        "P12345", null, null, EXTENDED_FASTA_MEDIA_TYPE.toString(), false, false);
         resultActions
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -206,7 +206,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
                         jsonPath(
                                 "$.messages",
                                 contains(
-                                        "text/plain;format=fastaxis only supported for Uniparc search by valid proteome id")));
+                                        "text/plain;format=fastax is only supported for UniParc search by valid proteome id")));
     }
 
     @Override
