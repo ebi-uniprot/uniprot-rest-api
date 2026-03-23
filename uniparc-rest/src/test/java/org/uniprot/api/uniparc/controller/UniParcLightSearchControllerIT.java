@@ -153,7 +153,7 @@ class UniParcLightSearchControllerIT extends AbstractSearchWithSuggestionsContro
                 value = "UP000005640";
                 break;
             case "proteomecomponent":
-                value = "chromosome";
+                value = "\"UP000005640:chromosome\"";
                 break;
         }
         return value;
