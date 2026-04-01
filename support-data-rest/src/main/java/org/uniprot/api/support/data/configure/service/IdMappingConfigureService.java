@@ -1,13 +1,6 @@
 package org.uniprot.api.support.data.configure.service;
 
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENE_NAME_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPARC_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_SWISS_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_100_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_50_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF_90_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -79,6 +72,7 @@ public class IdMappingConfigureService {
         IdMappingField.Rule.RuleBuilder rule6Builder =
                 IdMappingField.Rule.builder().ruleId(6).taxonId(true);
         IdMappingField.Rule.RuleBuilder rule7Builder = IdMappingField.Rule.builder().ruleId(7);
+        IdMappingField.Rule.RuleBuilder rule8Builder = IdMappingField.Rule.builder().ruleId(8);
         for (UniProtDatabaseDetail detail : allIdMappingTypes) {
             switch (detail.getDisplayName()) {
                 case UNIPROTKB_AC_ID_STR:
@@ -86,6 +80,7 @@ public class IdMappingConfigureService {
                 case UNIPARC_STR:
                     rule1Builder.to(detail.getName());
                     rule2Builder.to(detail.getName());
+                    rule7Builder.to(detail.getName());
                     break;
                 case UNIREF_50_STR:
                     rule1Builder.to(detail.getName());
@@ -108,6 +103,7 @@ public class IdMappingConfigureService {
                     rule5Builder.to(detail.getName());
                     rule6Builder.to(detail.getName());
                     rule7Builder.to(detail.getName());
+                    rule8Builder.to(detail.getName());
                     break;
                 default:
                     rule1Builder.to(detail.getName());
@@ -120,7 +116,8 @@ public class IdMappingConfigureService {
                 rule4Builder.build(),
                 rule5Builder.build(),
                 rule6Builder.build(),
-                rule7Builder.build());
+                rule7Builder.build(),
+                rule8Builder.build());
     }
 
     private IdMappingField.Group getDatabaseGroup(
@@ -200,8 +197,11 @@ public class IdMappingConfigureService {
             case UNIPROTKB_STR:
                 ruleId = null;
                 break;
-            default:
+            case EMBL, REFSEQ_PROTEIN, GI_NUMBER:
                 ruleId = 7;
+                break;
+            default:
+                ruleId = 8;
         }
         return ruleId;
     }
