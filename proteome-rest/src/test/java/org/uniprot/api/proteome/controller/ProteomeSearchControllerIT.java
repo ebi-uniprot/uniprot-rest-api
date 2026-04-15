@@ -116,7 +116,7 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
                 value = "15";
                 break;
             case "proteome_type":
-                value = "1";
+                value = "REFERENCE";
                 break;
             case "busco":
                 value = "[0 TO *]";
