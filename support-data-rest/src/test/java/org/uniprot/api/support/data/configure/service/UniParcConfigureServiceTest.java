@@ -42,7 +42,7 @@ class UniParcConfigureServiceTest {
 
         AdvancedSearchTerm database =
                 result.stream()
-                        .filter(term -> term.getTerm().equalsIgnoreCase("database"))
+                        .filter(term -> "database".equalsIgnoreCase(term.getTerm()))
                         .findFirst()
                         .orElseThrow(AssertionFailedError::new);
         assertNotNull(database.getValues());
@@ -50,7 +50,7 @@ class UniParcConfigureServiceTest {
 
         AdvancedSearchTerm active =
                 result.stream()
-                        .filter(term -> term.getTerm().equalsIgnoreCase("active"))
+                        .filter(term -> "active".equalsIgnoreCase(term.getTerm()))
                         .findFirst()
                         .orElseThrow(AssertionFailedError::new);
         assertNotNull(active.getValues());
