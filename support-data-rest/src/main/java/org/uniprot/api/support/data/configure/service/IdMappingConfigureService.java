@@ -26,7 +26,8 @@ public class IdMappingConfigureService {
     // ruleIds = 2,3,4,5, from UniParc, UniRef50, UniRef90 or UniRef100 to
     // <UniProtKB, UniProtKB/Swiss-Prot, UniParc(2)/UniRef50(3)/UniRef90(4)/UniRef100(5)>
     // ruleId = 6, from Gene Name to UniProtKB, UniProtKB/Swiss-Prot and Organism
-    // rule Id = 7, from any other to UniProtKB, UniProtKB/Swiss-Prot
+    // rule Id = 7, from any other to UniProtKB, UniProtKB/Swiss-Prot, UniParc
+    // rule Id = 8, from any other to UniProtKB, UniProtKB/Swiss-Prot
     public IdMappingField getIdMappingFields() {
         List<UniProtDatabaseDetail> allIdMappingTypes = IdMappingFieldConfig.getAllIdMappingTypes();
         IdMappingField.IdMappingFieldBuilder builder = IdMappingField.builder();
