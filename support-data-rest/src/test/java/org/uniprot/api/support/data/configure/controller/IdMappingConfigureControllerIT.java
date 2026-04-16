@@ -188,17 +188,19 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==4)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(88)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=8)]", iterableWithSize(0)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(3)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==8)]", iterableWithSize(85)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=9)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(94)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(95)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.rules.length()", is(7)))
-                .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(6)))
+                .andExpect(jsonPath("$.rules.length()", is(8)))
+                .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(7)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==true)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.rules.[?(@.defaultTo=='UniProtKB')]", iterableWithSize(7)))
-                .andExpect(jsonPath("$.rules.*.ruleId", containsInAnyOrder(1, 2, 3, 4, 5, 6, 7)));
+                .andExpect(jsonPath("$.rules.[?(@.defaultTo=='UniProtKB')]", iterableWithSize(8)))
+                .andExpect(
+                        jsonPath("$.rules.*.ruleId", containsInAnyOrder(1, 2, 3, 4, 5, 6, 7, 8)));
     }
 }
