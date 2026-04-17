@@ -532,6 +532,42 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
+    void searchFreeTextReviewedResultGetsPrecedence() throws Exception {
+        // given
+        UniProtKBEntry entry =
+                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP, List.of("PIK3R1", "GRB1"));
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR, List.of("PIK3R1"));
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=PIK3R1 human")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].entryType",
+                                contains("UniProtKB reviewed (Swiss-Prot)")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[1].entryType",
+                                contains("UniProtKB unreviewed (TrEMBL)")));
+    }
+
+    @Test
     void searchCanonicalOnly() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
