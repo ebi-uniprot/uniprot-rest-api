@@ -1,7 +1,5 @@
 package org.uniprot.api.uniprotkb.common.service.publication;
 
-import static org.uniprot.core.util.Utils.addOrIgnoreNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,7 @@ public class PublicationConverter
                 mappedPubs -> {
                     List<MappedReference> mappedRefs = new ArrayList<>();
 
-                    addOrIgnoreNull(mappedPubs.getUniProtKBMappedReference(), mappedRefs);
+                    addIfPresent(mappedPubs.getUniProtKBMappedReferences(), mappedRefs);
 
                     addIfPresent(mappedPubs.getComputationallyMappedReferences(), mappedRefs);
                     addIfPresent(mappedPubs.getCommunityMappedReferences(), mappedRefs);

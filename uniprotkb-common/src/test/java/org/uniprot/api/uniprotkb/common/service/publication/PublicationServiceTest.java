@@ -82,7 +82,7 @@ class PublicationServiceTest {
                         .build();
 
         MappedPublications mappedPublications =
-                new MappedPublicationsBuilder().uniProtKBMappedReference(ref).build();
+                new MappedPublicationsBuilder().uniProtKBMappedReferencesAdd(ref).build();
 
         PublicationDocument publicationDocument =
                 PublicationDocument.builder()
