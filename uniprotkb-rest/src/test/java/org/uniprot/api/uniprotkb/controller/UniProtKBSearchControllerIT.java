@@ -559,12 +559,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results[0].entryType",
-                                contains("UniProtKB reviewed (Swiss-Prot)")))
+                                "$.results[0].entryType", is("UniProtKB reviewed (Swiss-Prot)")))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
-                                "$.results[1].entryType",
-                                contains("UniProtKB unreviewed (TrEMBL)")));
+                                "$.results[1].entryType", is("UniProtKB unreviewed (TrEMBL)")));
     }
 
     @Test
