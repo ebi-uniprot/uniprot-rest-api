@@ -80,6 +80,54 @@ class ValidFromAndToTest {
         Assertions.assertTrue(isValid);
     }
 
+    @Test
+    void testValidFromEMBLToUniParc() {
+        String from = "EMBL-GenBank-DDBJ";
+        String to = "UniParc";
+        String taxId = "taxId";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        request.setTaxId(taxId);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    void testValidFromGINumberToUniParc() {
+        String from = "GI_number";
+        String to = "UniParc";
+        String taxId = "taxId";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        request.setTaxId(taxId);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    void testValidFromRefSeqToUniParc() {
+        String from = "RefSeq_Protein";
+        String to = "UniParc";
+        String taxId = "taxId";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        request.setTaxId(taxId);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
     private static Stream<Arguments> provideInvalidFromTo() {
         return Stream.of(
                 Arguments.of("INVALID", "UniProtKB-Swiss-Prot"),

@@ -296,7 +296,7 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("from", "ChEMBL")
                                 .param("to", "UniParc")
                                 .param("ids", "Q00001,Q00002"));
         // then
@@ -309,7 +309,7 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.messages[*]",
                                 contains(
-                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid")));
+                                        "The combination of 'from=ChEMBL' and 'to=UniParc' parameters is invalid")));
     }
 
     @Test
@@ -319,7 +319,7 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("from", "ChEMBL")
                                 .param("to", "UniParc")
                                 .param("taxId", "taxId")
                                 .param("ids", "Q00001,Q00002"));
@@ -333,7 +333,25 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid")));
+                                        "The combination of 'from=ChEMBL' and 'to=UniParc' parameters is invalid")));
+    }
+
+    @Test
+    void submittingJobWithValidFromEMBLToUniParcWithTaxIdCausesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("to", "UniParc")
+                                .param("taxId", "taxId")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", notNullValue()));
     }
 
     @Test
