@@ -50,12 +50,14 @@ public @interface ValidFromAndTo {
                 Set.of(ACC_ID_STR, UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
         private static final Set<String> UNIPROT_GROUP_TYPES_MINUS_UNIPROTKB =
                 Set.of(UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
+        private static final Set<String> REFSEQ_EMBL_GI =
+                Set.of(convertDisplayNameToName(REFSEQ_PROTEIN), convertDisplayNameToName(EMBL), convertDisplayNameToName(GI_NUMBER));
 
         @Override
         public void initialize(ValidFromAndTo constraintAnnotation) {
             this.fromFieldName = constraintAnnotation.from();
             this.toFieldName = constraintAnnotation.to();
-            this.dbDetails = IdMappingFieldConfig.getAllIdMappingTypes();
+            this.dbDetails = getAllIdMappingTypes();
         }
 
         @Override
@@ -110,12 +112,21 @@ public @interface ValidFromAndTo {
                                 .anyMatch(db -> db.getName().equals(to) && !ACC_ID_STR.equals(to));
             }
 
+            //Ref Seq, EMBL, GI Number now supported with UniParc
+            if (REFSEQ_EMBL_GI.contains(from)) {
+                isValid = isUniProtKBOrSwissProtOrUniParc(to);
+            }
+
             return isValid;
         }
 
         private boolean isUniProtKBOrSwissProt(String to) {
-            return IdMappingFieldConfig.ACC_STR.equals(to)
-                    || IdMappingFieldConfig.SWISSPROT_STR.equals(to);
+            return ACC_STR.equals(to)
+                    || SWISSPROT_STR.equals(to);
+        }
+
+        private boolean isUniProtKBOrSwissProtOrUniParc(String to) {
+            return isUniProtKBOrSwissProt(to) || UNIPARC_STR.equals(to);
         }
     }
 }
