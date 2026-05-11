@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.TAXONOMY_ID_REGEX;
 
@@ -55,7 +56,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
 
     @GetMapping(
             value = "/precomputed/{upi}/{taxonId}",
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE})
     @Operation(hidden = true)
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getPrecomputedUniProtKBEntry(
             @PathVariable("upi")

@@ -1,10 +1,13 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.startsWith;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
@@ -35,7 +38,11 @@ import org.uniprot.api.uniprotkb.common.repository.store.precomputed.Precomputed
 import org.uniprot.core.flatfile.parser.UniProtParser;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.flatfile.parser.impl.aaentry.AAUniProtParser;
+import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.impl.EntryAuditBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 
@@ -71,7 +78,22 @@ class PrecomputedUniProtKBControllerIT {
         UniProtParser parser = new AAUniProtParser(new SupportingDataMapImpl(), true);
         UniProtKBEntry entry =
                 parser.parse(IOUtils.toString(inputStream, Charset.defaultCharset()));
-        return entry;
+        return UniProtKBEntryBuilder.from(entry)
+                .entryAudit(
+                        new EntryAuditBuilder()
+                                .firstPublic(LocalDate.of(2020, 1, 1))
+                                .lastAnnotationUpdate(LocalDate.of(2020, 1, 1))
+                                .lastSequenceUpdate(LocalDate.of(2020, 1, 1))
+                                .entryVersion(1)
+                                .sequenceVersion(1)
+                                .build())
+                .organism(
+                        new OrganismBuilder()
+                                .taxonId(61156)
+                                .scientificName("Caenorhabditis elegans")
+                                .build())
+                .sequence(new SequenceBuilder("MSQTP").build())
+                .build();
     }
 
     @Test
@@ -95,6 +117,27 @@ class PrecomputedUniProtKBControllerIT {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.primaryAccession", Matchers.is(precomputedEntryId)));
+    }
+
+    @Test
+    void testGetPrecomputedEntry_fastaSuccess() throws Exception {
+        // when
+        String[] tokens = precomputedEntryId.split("-");
+        String upiId = tokens[0];
+        String taxonId = tokens[1];
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get(
+                                        "/uniprotkb/precomputed/" + upiId + "/" + taxonId)
+                                .header(HttpHeaders.ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(MockMvcResultMatchers.content().string(startsWith(">")));
     }
 
     @Test
