@@ -40,7 +40,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.proteome.ProteomeType;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -201,7 +200,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
                 getMockMvc()
                         .perform(
                                 get(getSearchRequestPath())
-                                        .param("query", "proteome_type:" + REFERENCE.name().toLowerCase())
+                                        .param(
+                                                "query",
+                                                "proteome_type:" + REFERENCE.name().toLowerCase())
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
