@@ -2,7 +2,6 @@ package org.uniprot.api.unisave.repository.domain.impl;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Lob;
 
 import org.uniprot.api.unisave.repository.domain.ContentTypeEnum;
 import org.uniprot.api.unisave.repository.domain.EntryContent;
@@ -28,7 +27,6 @@ public class EntryContentImpl implements EntryContent {
     private Long referenceEntryId;
 
     /** The full content stored in a full content. */
-    @Lob
     @Column(name = "full_content", nullable = true)
     private String fullContent;
 
