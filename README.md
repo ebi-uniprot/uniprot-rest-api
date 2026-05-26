@@ -41,28 +41,58 @@ There is no Maven wrapper in this repository.
 
 ## Build And Test
 
-Build and test the whole project:
+Run unit tests only. This is the default fast local test path; integration tests named `*IT` are excluded:
 
 ```bash
 mvn test
 ```
 
-Build or test one module:
+Run unit tests for one module:
 
 ```bash
 mvn -pl uniprotkb-rest test
 ```
 
-Run one integration test class:
-
-```bash
-mvn -pl uniprotkb-rest -Dtest=PrecomputedUniProtKBControllerIT test
-```
-
-Build a module with dependencies from this reactor:
+Build a module with dependencies from this reactor and run its unit tests:
 
 ```bash
 mvn -pl uniprotkb-rest -am test
+```
+
+Run integration tests only. This skips unit tests and runs Failsafe against `*IT` and `*ITCase` classes:
+
+```bash
+mvn verify -Pintegration-tests-only
+```
+
+Run integration tests only for one module:
+
+```bash
+mvn -pl uniprotkb-rest verify -Pintegration-tests-only
+```
+
+Run the full validation suite: unit tests first, then integration tests:
+
+```bash
+mvn clean verify -Pintegration-tests
+```
+
+Use `install` only when another local project needs these artifacts from your local Maven repository:
+
+```bash
+mvn clean install -Pintegration-tests
+```
+
+Run one unit test class:
+
+```bash
+mvn -pl uniprotkb-rest -Dtest=ValidateFacetPropertiesAreSearchFieldsTest test
+```
+
+Run one integration test class:
+
+```bash
+mvn -pl uniprotkb-rest -Dit.test=PrecomputedUniProtKBControllerIT verify -Pintegration-tests-only
 ```
 
 Spotless formatting runs during the Maven lifecycle and may rewrite Java files.
@@ -138,4 +168,3 @@ When testing FASTA output for UniProtKB entries, make sure the test entry has en
 - entry audit with sequence version
 - organism with scientific name and taxon ID
 - sequence
-
