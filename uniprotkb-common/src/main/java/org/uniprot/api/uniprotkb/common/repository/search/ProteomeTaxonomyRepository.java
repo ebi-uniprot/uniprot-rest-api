@@ -34,14 +34,21 @@ public class ProteomeTaxonomyRepository extends SolrQueryRepository<ProteomeDocu
         SolrRequest request =
                 SolrRequest.builder().query(UPID_FIELD + ":" + escapedUpId).rows(1).build();
 
-        return getEntry(request).map(this::extractTaxonomyId);
+        return getEntry(request).flatMap(this::extractTaxonomyId);
     }
 
-    private String extractTaxonomyId(ProteomeDocument document) {
+    Optional<String> extractTaxonomyId(ProteomeDocument document) {
         try {
             ProteomeEntry entry =
                     objectMapper.readValue(document.proteomeStored, ProteomeEntry.class);
-            return String.valueOf(entry.getTaxonomy().getTaxonId());
+            if (entry.getTaxonomy() == null) {
+                return Optional.empty();
+            }
+            Long taxonId = entry.getTaxonomy().getTaxonId();
+            if (taxonId == null || taxonId == 0) {
+                return Optional.empty();
+            }
+            return Optional.of(String.valueOf(taxonId));
         } catch (Exception e) {
             throw new IllegalStateException(
                     "Unable to read proteome taxonomy from Solr document", e);
