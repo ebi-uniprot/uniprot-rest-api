@@ -20,15 +20,17 @@ import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocume
 public class PrecomputedUniProtKBEntryService {
     private final PrecomputedAnnotationStoreClient storeClient;
     private final PrecomputedAnnotationRepository repository;
+    private final ProteomeTaxonomyResolver proteomeTaxonomyResolver;
     private final RequestConverter requestConverter;
 
     public PrecomputedUniProtKBEntryService(
             PrecomputedAnnotationStoreClient storeClient,
             PrecomputedAnnotationRepository repository,
-            @Qualifier("precomputedAnnotationRequestConverter")
-                    RequestConverter requestConverter) {
+            ProteomeTaxonomyResolver proteomeTaxonomyResolver,
+            @Qualifier("precomputedAnnotationRequestConverter") RequestConverter requestConverter) {
         this.storeClient = storeClient;
         this.repository = repository;
+        this.proteomeTaxonomyResolver = proteomeTaxonomyResolver;
         this.requestConverter = requestConverter;
     }
 
@@ -43,16 +45,23 @@ public class PrecomputedUniProtKBEntryService {
                                                 + precomputedEntryId));
     }
 
-    public QueryResult<UniProtKBEntry> search(PrecomputedAnnotationSearchByProteomeRequest request) {
+    public QueryResult<UniProtKBEntry> search(
+            PrecomputedAnnotationSearchByProteomeRequest request) {
+        String taxonomyId = proteomeTaxonomyResolver.findTaxonomyIdByUpId(request.getUpId());
+        request.setTaxonomyId(taxonomyId);
 
         SolrRequest solrRequest = requestConverter.createSearchSolrRequest(request);
-        QueryResult<PrecomputedAnnotationDocument> results = repository.searchPage(solrRequest, request.getCursor());
-        List<String> accessions = results.getContent().map(PrecomputedAnnotationDocument::getAccession).toList();
+        QueryResult<PrecomputedAnnotationDocument> results =
+                repository.searchPage(solrRequest, request.getCursor());
+        List<String> accessions =
+                results.getContent().map(PrecomputedAnnotationDocument::getAccession).toList();
         List<UniProtKBEntry> entries = storeClient.getEntries(accessions);
 
         return QueryResult.<UniProtKBEntry>builder()
                 .content(entries.stream())
                 .page(results.getPage())
+                .suggestions(results.getSuggestions())
+                .warnings(results.getWarnings())
                 .build();
     }
 }

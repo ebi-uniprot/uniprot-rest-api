@@ -3,9 +3,7 @@ package org.uniprot.api.uniprotkb.common.service.precomputed;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
-import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.search.PrecomputedAnnotationRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.precomputed.PrecomputedAnnotationStoreClient;
@@ -34,37 +30,34 @@ import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocume
 class PrecomputedUniProtKBEntryServiceTest {
     @Mock private PrecomputedAnnotationStoreClient storeClient;
     @Mock private PrecomputedAnnotationRepository repository;
+    @Mock private ProteomeTaxonomyResolver proteomeTaxonomyResolver;
     @Mock private RequestConverter requestConverter;
 
     @Test
     void searchReturnsStoreEntriesForPrecomputedDocuments() {
         PrecomputedAnnotationSearchByProteomeRequest request =
                 new PrecomputedAnnotationSearchByProteomeRequest();
-        request.setUniparc("UPI0000001866");
+        request.setUpId("UP000000000");
         request.setCursor("cursor");
         request.setSize(2);
         PrecomputedAnnotationDocument document1 = document("P12345");
         PrecomputedAnnotationDocument document2 = document("Q12345");
         CursorPage page = CursorPage.of(null, 2);
-        List<Facet> facets = List.of(Facet.builder().name("uniparc").label("UniParc").build());
-        List<TermInfo> matchedFields = List.of(TermInfo.builder().name("uniparc").hits(2).build());
         List<Suggestion> suggestions =
-                List.of(Suggestion.builder().query("uniparc:UPI0000001866").hits(2).build());
+                List.of(Suggestion.builder().query("taxonomy_id:9606").hits(2).build());
         List<ProblemPair> warnings = List.of(new ProblemPair(20, "warning message"));
         QueryResult<PrecomputedAnnotationDocument> documents =
                 QueryResult.<PrecomputedAnnotationDocument>builder()
                         .content(Stream.of(document1, document2))
                         .page(page)
-                        .facets(facets)
-                        .matchedFields(matchedFields)
                         .suggestions(suggestions)
                         .warnings(warnings)
                         .build();
         UniProtKBEntry entry1 = entry("P12345");
         UniProtKBEntry entry2 = entry("Q12345");
-        SolrRequest solrRequest =
-                SolrRequest.builder().query("uniparc:UPI0000001866").rows(2).build();
+        SolrRequest solrRequest = SolrRequest.builder().query("taxonomy_id:9606").rows(2).build();
 
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId("UP000000000")).thenReturn("9606");
         when(requestConverter.createSearchSolrRequest(request)).thenReturn(solrRequest);
         when(repository.searchPage(solrRequest, "cursor")).thenReturn(documents);
         when(storeClient.getEntries(List.of("P12345", "Q12345")))
@@ -74,11 +67,10 @@ class PrecomputedUniProtKBEntryServiceTest {
 
         assertEquals(List.of(entry1, entry2), result.getContent().collect(Collectors.toList()));
         assertSame(page, result.getPage());
-        assertSame(facets, result.getFacets());
-        assertSame(matchedFields, result.getMatchedFields());
         assertSame(suggestions, result.getSuggestions());
         assertSame(warnings, result.getWarnings());
 
+        verify(proteomeTaxonomyResolver).findTaxonomyIdByUpId("UP000000000");
         verify(requestConverter).createSearchSolrRequest(request);
         verify(repository).searchPage(solrRequest, "cursor");
         verify(storeClient).getEntries(List.of("P12345", "Q12345"));
@@ -89,17 +81,17 @@ class PrecomputedUniProtKBEntryServiceTest {
     void searchReturnsEmptyResultWhenSolrDocumentsAreEmpty() {
         PrecomputedAnnotationSearchByProteomeRequest request =
                 new PrecomputedAnnotationSearchByProteomeRequest();
+        request.setUpId("UP000000000");
         request.setCursor("cursor");
         CursorPage page = CursorPage.of(null, 10);
-        List<Facet> facets = List.of(Facet.builder().name("uniparc").label("UniParc").build());
-        SolrRequest solrRequest = SolrRequest.builder().query("*:*").rows(10).build();
+        SolrRequest solrRequest = SolrRequest.builder().query("taxonomy_id:9606").rows(10).build();
         QueryResult<PrecomputedAnnotationDocument> documents =
                 QueryResult.<PrecomputedAnnotationDocument>builder()
                         .content(Stream.empty())
                         .page(page)
-                        .facets(facets)
                         .build();
 
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId("UP000000000")).thenReturn("9606");
         when(requestConverter.createSearchSolrRequest(request)).thenReturn(solrRequest);
         when(repository.searchPage(solrRequest, "cursor")).thenReturn(documents);
         when(storeClient.getEntries(List.of())).thenReturn(List.of());
@@ -108,7 +100,6 @@ class PrecomputedUniProtKBEntryServiceTest {
 
         assertEquals(List.of(), result.getContent().collect(Collectors.toList()));
         assertSame(page, result.getPage());
-        assertSame(facets, result.getFacets());
         verify(storeClient).getEntries(List.of());
     }
 
@@ -116,8 +107,8 @@ class PrecomputedUniProtKBEntryServiceTest {
     void searchReturnsOnlyEntriesAvailableFromStoreClient() {
         PrecomputedAnnotationSearchByProteomeRequest request =
                 new PrecomputedAnnotationSearchByProteomeRequest();
-        request.setAccession("P12345");
-        SolrRequest solrRequest = SolrRequest.builder().query("accession:P12345").rows(25).build();
+        request.setUpId("UP000000000");
+        SolrRequest solrRequest = SolrRequest.builder().query("taxonomy_id:9606").rows(25).build();
         QueryResult<PrecomputedAnnotationDocument> documents =
                 QueryResult.<PrecomputedAnnotationDocument>builder()
                         .content(Stream.of(document("P12345")))
@@ -125,6 +116,7 @@ class PrecomputedUniProtKBEntryServiceTest {
                         .build();
         UniProtKBEntry entry = entry("P12345");
 
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId("UP000000000")).thenReturn("9606");
         when(requestConverter.createSearchSolrRequest(request)).thenReturn(solrRequest);
         when(repository.searchPage(solrRequest, null)).thenReturn(documents);
         when(storeClient.getEntries(List.of("P12345"))).thenReturn(List.of(entry));
@@ -136,7 +128,8 @@ class PrecomputedUniProtKBEntryServiceTest {
     }
 
     private PrecomputedUniProtKBEntryService service() {
-        return new PrecomputedUniProtKBEntryService(storeClient, repository, requestConverter);
+        return new PrecomputedUniProtKBEntryService(
+                storeClient, repository, proteomeTaxonomyResolver, requestConverter);
     }
 
     private static PrecomputedAnnotationDocument document(String accession) {
