@@ -22,6 +22,7 @@ import lombok.Data;
 @ParameterObject
 public class PrecomputedAnnotationSearchByProteomeRequest implements SearchRequest {
     private static final String TAXONOMY_ID_STR = "taxonomy_id";
+
     @Parameter(
             description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
             example = PROTEOME_UPID_UNIPARC_EXAMPLE)

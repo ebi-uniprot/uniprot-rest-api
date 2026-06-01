@@ -1,8 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -41,6 +43,7 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.common.repository.search.PrecomputedAnnotationRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.precomputed.PrecomputedAnnotationStoreClient;
+import org.uniprot.api.uniprotkb.common.service.precomputed.ProteomeTaxonomyResolver;
 import org.uniprot.core.flatfile.parser.UniProtParser;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.flatfile.parser.impl.aaentry.AAUniProtParser;
@@ -61,6 +64,7 @@ class PrecomputedUniProtKBControllerIT {
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
     private static final String ACCESSION = "P12345";
+    private static final String LINK_HEADER = "Link";
     private static final String PRECOMPUTED_SEARCH_PATH = "/uniprotkb/precomputed/search";
     private static final String UNIPARC_ID = "UPI0000001866";
     private static final String TAXONOMY_ID = "61156";
@@ -72,6 +76,7 @@ class PrecomputedUniProtKBControllerIT {
 
     @Autowired private MockMvc mockMvc;
     @MockBean private PrecomputedAnnotationRepository repository;
+    @MockBean private ProteomeTaxonomyResolver proteomeTaxonomyResolver;
 
     @BeforeAll
     void init() throws IOException {
@@ -192,18 +197,15 @@ class PrecomputedUniProtKBControllerIT {
     }
 
     @Test
-    void testSearchPrecomputedEntriesByUniparc() throws Exception {
-        when(repository.searchPage(
-                        argThat(
-                                solrRequest ->
-                                        solrRequest.getQuery().equals("uniparc:" + UNIPARC_ID)),
-                        isNull()))
-                .thenReturn(queryResult(document(precomputedEntryId, UNIPARC_ID, TAXONOMY_ID)));
+    void searchByProteomeIdSuccess() throws Exception {
+        String upId = "UP000000000";
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId(upId)).thenReturn(TAXONOMY_ID);
+        when(repository.searchPage(any(), eq(null)))
+                .thenReturn(queryResult(document(ACCESSION, UNIPARC_ID, TAXONOMY_ID)));
 
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(PRECOMPUTED_SEARCH_PATH)
-                                .param("uniparc", UNIPARC_ID)
+                        MockMvcRequestBuilders.get("/uniprotkb/precomputed/proteome/" + upId)
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         response.andDo(MockMvcResultHandlers.log())
@@ -211,65 +213,57 @@ class PrecomputedUniProtKBControllerIT {
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", Matchers.is(1)))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath(
-                                "$.results[0].primaryAccession", Matchers.is(precomputedEntryId)));
-    }
-
-    @Test
-    void testSearchPrecomputedEntriesByAccession() throws Exception {
-        when(repository.searchPage(
-                        argThat(
-                                solrRequest ->
-                                        solrRequest.getQuery().equals("accession:" + ACCESSION)),
-                        isNull()))
-                .thenReturn(queryResult(document(ACCESSION, "UPI0000000001", "9606")));
-
-        ResultActions response =
-                mockMvc.perform(
-                        MockMvcRequestBuilders.get(PRECOMPUTED_SEARCH_PATH)
-                                .param("accession", ACCESSION)
-                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
-
-        response.andDo(MockMvcResultHandlers.log())
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
-                .andExpect(
-                        MockMvcResultMatchers.header()
-                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", Matchers.is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.length()").value(1))
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results[0].primaryAccession", Matchers.is(ACCESSION)));
+
+        verify(proteomeTaxonomyResolver).findTaxonomyIdByUpId(upId);
+        verify(repository)
+                .searchPage(
+                        argThat(solrRequest -> "taxonomy_id:61156".equals(solrRequest.getQuery())),
+                        eq(null));
     }
 
     @Test
-    void testSearchPrecomputedEntriesNotFound() throws Exception {
-        when(repository.searchPage(
-                        argThat(solrRequest -> solrRequest.getQuery().equals("taxonomy_id:999999")),
-                        isNull()))
-                .thenReturn(queryResult());
+    void searchByProteomeIdHasNextPageLink() throws Exception {
+        String upId = "UP000097203";
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId(upId)).thenReturn(TAXONOMY_ID);
+        when(repository.searchPage(any(), eq(null)))
+                .thenReturn(pagedQueryResult(document(ACCESSION, UNIPARC_ID, TAXONOMY_ID)));
 
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(PRECOMPUTED_SEARCH_PATH)
-                                .param("taxonomyId", "999999")
+                        MockMvcRequestBuilders.get("/uniprotkb/precomputed/proteome/" + upId)
+                                .param("size", "25")
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         response.andDo(MockMvcResultHandlers.log())
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
+                        MockMvcResultMatchers.header().string(LINK_HEADER, Matchers.notNullValue()))
+                .andExpect(
                         MockMvcResultMatchers.header()
-                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", Matchers.is(0)));
+                                .string(LINK_HEADER, Matchers.containsString("size=25")))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(LINK_HEADER, Matchers.containsString("cursor=")))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
+                                        LINK_HEADER,
+                                        Matchers.containsString(
+                                                "/uniprotkb/precomputed/proteome/" + upId)))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(LINK_HEADER, Matchers.containsString("rel=\"next\"")));
     }
 
     @Test
-    void testSearchPrecomputedEntriesInvalidUniparc() throws Exception {
+    void searchByProteomeIdInvalidUpId() throws Exception {
         ResultActions response =
                 mockMvc.perform(
-                        MockMvcRequestBuilders.get(PRECOMPUTED_SEARCH_PATH)
-                                .param("uniparc", "INVALID")
+                        MockMvcRequestBuilders.get("/uniprotkb/precomputed/proteome/INVALID")
                                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         response.andDo(MockMvcResultHandlers.log())
@@ -278,7 +272,7 @@ class PrecomputedUniProtKBControllerIT {
                 .andExpect(
                         MockMvcResultMatchers.jsonPath("$.messages[0]")
                                 .value(
-                                        "The 'upi' value has invalid format. It should be a valid UniParc UPI"));
+                                        "The 'upid' value has invalid format. It should be a valid Proteome UPID"));
     }
 
     private static PrecomputedAnnotationDocument document(
@@ -295,6 +289,17 @@ class PrecomputedUniProtKBControllerIT {
         return QueryResult.<PrecomputedAnnotationDocument>builder()
                 .content(Stream.of(documents))
                 .page(CursorPage.of(null, 25, documents.length))
+                .build();
+    }
+
+    private static QueryResult<PrecomputedAnnotationDocument> pagedQueryResult(
+            PrecomputedAnnotationDocument... documents) {
+        CursorPage page = CursorPage.of(null, 25);
+        page.setNextCursor("nextCursor");
+        page.setTotalElements(50L);
+        return QueryResult.<PrecomputedAnnotationDocument>builder()
+                .content(Stream.of(documents))
+                .page(page)
                 .build();
     }
 

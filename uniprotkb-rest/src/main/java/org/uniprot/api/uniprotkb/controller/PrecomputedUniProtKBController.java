@@ -89,7 +89,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
             value = "/proteome/{upId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(hidden = true)
-    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> search(
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchByProteomeId(
             @Valid @ModelAttribute PrecomputedAnnotationSearchByProteomeRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

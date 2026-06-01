@@ -12,7 +12,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
-import org.uniprot.api.rest.service.request.RequestConverterImpl;
+import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotationRequestConverterImpl;
 import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotationSortClause;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -53,10 +53,10 @@ public class PrecomputedAnnotationSolrQueryConfig {
             @Qualifier("precomputedAnnotationQueryProcessorConfig")
                     UniProtQueryProcessorConfig precomputedAnnotationQueryProcessorConfig,
             RequestConverterConfigProperties requestConverterConfigProperties) {
-        return new RequestConverterImpl(
+        return new PrecomputedAnnotationRequestConverterImpl(
                 precomputedAnnotationSolrQueryConf,
                 precomputedAnnotationSortClause,
                 precomputedAnnotationQueryProcessorConfig,
-                requestConverterConfigProperties, null);
+                requestConverterConfigProperties);
     }
 }
