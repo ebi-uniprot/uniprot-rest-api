@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -273,6 +274,21 @@ class PrecomputedUniProtKBControllerIT {
                         MockMvcResultMatchers.jsonPath("$.messages[0]")
                                 .value(
                                         "The 'upid' value has invalid format. It should be a valid Proteome UPID"));
+    }
+
+    @Test
+    void searchByProteomeIdTaxonomyNotFound() throws Exception {
+        String upId = "UP000097203";
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId(upId))
+                .thenThrow(new ResourceNotFoundException("No proteome found for id: " + upId));
+
+        ResultActions response =
+                mockMvc.perform(
+                        MockMvcRequestBuilders.get("/uniprotkb/precomputed/proteome/" + upId)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
+
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     private static PrecomputedAnnotationDocument document(
