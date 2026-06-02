@@ -90,9 +90,20 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
             produces = {APPLICATION_JSON_VALUE})
     @Operation(hidden = true)
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchByProteomeId(
+            @PathVariable("upId")
+                    @Pattern(
+                            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.upid.value}")
+                    @Parameter(
+                            description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
+                            example = PROTEOME_UPID_UNIPARC_EXAMPLE,
+                            required = true)
+                    String upId,
             @Valid @ModelAttribute PrecomputedAnnotationSearchByProteomeRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
+        searchRequest.setUpId(upId);
         setBasicRequestFormat(searchRequest, request);
         QueryResult<UniProtKBEntry> results =
                 precomputedUniProtKBEntryService.search(searchRequest);
