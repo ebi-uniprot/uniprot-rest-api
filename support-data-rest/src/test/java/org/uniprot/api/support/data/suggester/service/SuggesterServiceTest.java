@@ -44,6 +44,13 @@ class SuggesterServiceTest {
     }
 
     @Test
+    void queryStringEscapesUserQueryMetacharacters() {
+        String actual = service.createQueryString(SuggestDictionary.TAXONOMY, "human\" OR *:*");
+
+        assertThat(actual, is("\"human\\\"\\ OR\\ \\*\\:\\*\" +(dict:TAXONOMY)"));
+    }
+
+    @Test
     void emptyDocsConvertsToEmptySuggestions() {
         assertThat(service.convertDocs(emptyList()), is(emptyList()));
     }

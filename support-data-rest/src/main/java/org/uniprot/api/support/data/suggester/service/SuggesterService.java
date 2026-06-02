@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.support.data.suggester.response.Suggestion;
@@ -95,9 +96,9 @@ public class SuggesterService {
                 .collect(Collectors.toList());
     }
 
-    private String createQueryString(SuggestDictionary dict, String query) {
+    String createQueryString(SuggestDictionary dict, String query) {
         return "\""
-                + query
+                + ClientUtils.escapeQueryChars(query)
                 + "\""
                 + " +"
                 + QueryBuilder.query(
