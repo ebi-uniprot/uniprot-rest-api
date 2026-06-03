@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.common.repository.search;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -12,7 +13,8 @@ public class PrecomputedAnnotationRepository
         extends SolrQueryRepository<PrecomputedAnnotationDocument> {
 
     protected PrecomputedAnnotationRepository(
-            SolrClient solrClient, SolrRequestConverter requestConverter) {
+            @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
         super(
                 solrClient,
                 SolrCollection.precomputedannotation,
