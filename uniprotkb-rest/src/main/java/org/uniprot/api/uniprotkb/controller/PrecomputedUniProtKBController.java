@@ -2,7 +2,7 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.uniprotkb.controller.PrecomputedUniProtKBController.*;
+import static org.uniprot.api.uniprotkb.controller.PrecomputedUniProtKBController.PRECOMPUTED_ANNOTATION_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.TAXONOMY_ID_REGEX;
 
@@ -20,12 +20,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotationSearchByProteomeRequest;
+import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotationStreamByProteomeRequest;
 import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedUniProtKBEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -37,6 +39,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RequestMapping(value = PRECOMPUTED_ANNOTATION_RESOURCE)
 @Validated
 public class PrecomputedUniProtKBController extends BasicSearchController<UniProtKBEntry> {
+    private static final String DATA_TYPE = "uniprotkb";
     static final String PRECOMPUTED_ANNOTATION_RESOURCE = UNIPROTKB_RESOURCE + "/precomputed";
 
     private final PrecomputedUniProtKBEntryService precomputedUniProtKBEntryService;
@@ -108,6 +111,47 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
         QueryResult<UniProtKBEntry> results =
                 precomputedUniProtKBEntryService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/proteome/{upId}/stream",
+            produces = {APPLICATION_JSON_VALUE})
+    @Operation(hidden = true)
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
+            @PathVariable("upId")
+                    @Pattern(
+                            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.upid.value}")
+                    @Parameter(
+                            description = PROTEOME_UPID_UNIPARC_DESCRIPTION,
+                            example = PROTEOME_UPID_UNIPARC_EXAMPLE,
+                            required = true)
+                    String upId,
+            @Valid @ModelAttribute PrecomputedAnnotationStreamByProteomeRequest streamRequest,
+            HttpServletRequest request) {
+
+        streamRequest.setUpId(upId);
+        MediaType contentType = getAcceptHeader(request);
+        setBasicRequestFormat(streamRequest, request);
+
+        //        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        //        if (acceptedRdfContentType.isPresent()) {
+        //            return super.streamRdf(
+        //                    () ->
+        //                            precomputedUniProtKBEntryService.streamRdf(
+        //                                    streamRequest, DATA_TYPE,
+        // acceptedRdfContentType.get()),
+        //                    streamRequest,
+        //                    contentType,
+        //                    request);
+        //        } else {}
+
+        return super.stream(
+                () -> precomputedUniProtKBEntryService.stream(streamRequest),
+                streamRequest,
+                contentType,
+                request);
     }
 
     @Override

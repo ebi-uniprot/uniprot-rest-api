@@ -3,6 +3,7 @@ package org.uniprot.api.uniprotkb.common.service.precomputed;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.BasicRequestConverter;
@@ -47,7 +48,24 @@ public class PrecomputedAnnotationRequestConverterImpl extends RequestConverterI
         return builder.build();
     }
 
+    @Override
+    public SolrRequest createStreamSolrRequest(StreamRequest request) {
+        PrecomputedAnnotationStreamByProteomeRequest precomputedAnnotationStreamByProteomeRequest =
+                (PrecomputedAnnotationStreamByProteomeRequest) request;
+        SolrRequest.SolrRequestBuilder builder =
+                basicConverter.createStreamSolrRequest(
+                        precomputedAnnotationStreamByProteomeRequest);
+        builder.query(createQuery(precomputedAnnotationStreamByProteomeRequest));
+        return builder.build();
+    }
+
     private String createQuery(PrecomputedAnnotationSearchByProteomeRequest request) {
+        String escapedTaxonomyId =
+                SolrQueryUtil.escapeSpecialCharacters(request.getTaxonomyId().strip());
+        return TAXONOMY_ID + ":" + escapedTaxonomyId;
+    }
+
+    private String createQuery(PrecomputedAnnotationStreamByProteomeRequest request) {
         String escapedTaxonomyId =
                 SolrQueryUtil.escapeSpecialCharacters(request.getTaxonomyId().strip());
         return TAXONOMY_ID + ":" + escapedTaxonomyId;

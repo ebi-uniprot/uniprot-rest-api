@@ -18,6 +18,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.search.PrecomputedAnnotationRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.precomputed.PrecomputedAnnotationStoreClient;
@@ -32,6 +34,8 @@ class PrecomputedUniProtKBEntryServiceTest {
     @Mock private PrecomputedAnnotationRepository repository;
     @Mock private ProteomeTaxonomyResolver proteomeTaxonomyResolver;
     @Mock private RequestConverter requestConverter;
+    @Mock private StoreStreamer<UniProtKBEntry> storeStreamer;
+    @Mock private TupleStreamDocumentIdStream solrIdStreamer;
 
     @Test
     void searchReturnsStoreEntriesForPrecomputedDocuments() {
@@ -129,7 +133,12 @@ class PrecomputedUniProtKBEntryServiceTest {
 
     private PrecomputedUniProtKBEntryService service() {
         return new PrecomputedUniProtKBEntryService(
-                storeClient, repository, proteomeTaxonomyResolver, requestConverter);
+                storeClient,
+                repository,
+                proteomeTaxonomyResolver,
+                requestConverter,
+                storeStreamer,
+                solrIdStreamer);
     }
 
     private static PrecomputedAnnotationDocument document(String accession) {
