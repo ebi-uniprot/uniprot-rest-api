@@ -28,6 +28,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocument;
 
+// TODO
 @ExtendWith(MockitoExtension.class)
 class PrecomputedUniProtKBEntryServiceTest {
     @Mock private PrecomputedAnnotationStoreClient storeClient;

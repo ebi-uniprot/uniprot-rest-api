@@ -117,7 +117,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
             value = "/proteome/{upId}/stream",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(hidden = true)
-    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> streamByProteomeId(
             @PathVariable("upId")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
@@ -135,6 +135,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
         MediaType contentType = getAcceptHeader(request);
         setBasicRequestFormat(streamRequest, request);
 
+        // TODO cleanup later
         //        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         //        if (acceptedRdfContentType.isPresent()) {
         //            return super.streamRdf(
@@ -148,7 +149,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
         //        } else {}
 
         return super.stream(
-                () -> precomputedUniProtKBEntryService.stream(streamRequest),
+                () -> precomputedUniProtKBEntryService.streamByProteomeId(streamRequest),
                 streamRequest,
                 contentType,
                 request);

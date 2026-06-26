@@ -48,9 +48,6 @@ public class PrecomputedAnnotationStreamConfig {
     @Bean(name = "precomputedAnnotationStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.precomputedannotation")
     public StreamerConfigProperties resultsConfigProperties() {
-        //        TODO why do we have to expand like this?
-        //        StreamerConfigProperties b = new StreamerConfigProperties();
-        //        return b;
         return new StreamerConfigProperties();
     }
 

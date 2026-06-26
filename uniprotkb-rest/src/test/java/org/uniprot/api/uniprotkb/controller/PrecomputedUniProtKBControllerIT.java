@@ -55,6 +55,7 @@ import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEnt
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocument;
 
+// TODO
 @ContextConfiguration(classes = {UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
