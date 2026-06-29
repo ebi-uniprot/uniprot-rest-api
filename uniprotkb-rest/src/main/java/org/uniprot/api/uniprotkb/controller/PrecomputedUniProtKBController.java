@@ -39,7 +39,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 @RequestMapping(value = PRECOMPUTED_ANNOTATION_RESOURCE)
 @Validated
 public class PrecomputedUniProtKBController extends BasicSearchController<UniProtKBEntry> {
-    private static final String DATA_TYPE = "uniprotkb";
     static final String PRECOMPUTED_ANNOTATION_RESOURCE = UNIPROTKB_RESOURCE + "/precomputed";
 
     private final PrecomputedUniProtKBEntryService precomputedUniProtKBEntryService;
@@ -134,20 +133,6 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
         streamRequest.setUpId(upId);
         MediaType contentType = getAcceptHeader(request);
         setBasicRequestFormat(streamRequest, request);
-
-        // TODO cleanup later
-        //        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
-        //        if (acceptedRdfContentType.isPresent()) {
-        //            return super.streamRdf(
-        //                    () ->
-        //                            precomputedUniProtKBEntryService.streamRdf(
-        //                                    streamRequest, DATA_TYPE,
-        // acceptedRdfContentType.get()),
-        //                    streamRequest,
-        //                    contentType,
-        //                    request);
-        //        } else {}
-
         return super.stream(
                 () -> precomputedUniProtKBEntryService.streamByProteomeId(streamRequest),
                 streamRequest,
