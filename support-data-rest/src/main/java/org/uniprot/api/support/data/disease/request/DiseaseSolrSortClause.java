@@ -1,11 +1,11 @@
 package org.uniprot.api.support.data.disease.request;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class DiseaseSolrSortClause extends AbstractSolrSortClause {
