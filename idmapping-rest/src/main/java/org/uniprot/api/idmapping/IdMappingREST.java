@@ -55,7 +55,11 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
             @ComponentScan.Filter(
                     type = FilterType.REGEX,
                     pattern =
-                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.precomputed\\..*")
+                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.store\\.precomputed\\..*"),
+            @ComponentScan.Filter(
+                    type = FilterType.REGEX,
+                    pattern =
+                            "org\\.uniprot\\.api\\.uniprotkb\\.common\\.repository\\.search\\.PrecomputedAnnotation.*")
         })
 public class IdMappingREST {
     public static void main(String[] args) {

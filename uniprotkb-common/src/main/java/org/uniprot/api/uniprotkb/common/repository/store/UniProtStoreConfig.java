@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
@@ -37,7 +38,7 @@ public class UniProtStoreConfig {
 
     @Bean
     public FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties) {
+            UniProtKBRepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())

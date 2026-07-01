@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.common.repository.search;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -12,7 +13,7 @@ import org.uniprot.store.search.document.publication.PublicationDocument;
 public class PublicationRepository extends SolrQueryRepository<PublicationDocument> {
 
     protected PublicationRepository(
-            SolrClient solrClient,
+            @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             PublicationFacetConfig facetConfig2,
             SolrRequestConverter requestConverter) {
         super(

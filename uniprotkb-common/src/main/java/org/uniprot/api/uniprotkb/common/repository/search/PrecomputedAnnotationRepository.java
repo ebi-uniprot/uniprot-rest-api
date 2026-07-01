@@ -6,22 +6,19 @@ import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.literature.LiteratureDocument;
+import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocument;
 
-/**
- * @author lgonzales
- * @since 2019-12-09
- */
 @Repository
-public class LiteratureRepository extends SolrQueryRepository<LiteratureDocument> {
+public class PrecomputedAnnotationRepository
+        extends SolrQueryRepository<PrecomputedAnnotationDocument> {
 
-    protected LiteratureRepository(
+    protected PrecomputedAnnotationRepository(
             @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         super(
                 solrClient,
-                SolrCollection.literature,
-                LiteratureDocument.class,
+                SolrCollection.precomputedannotation,
+                PrecomputedAnnotationDocument.class,
                 null,
                 requestConverter);
     }
