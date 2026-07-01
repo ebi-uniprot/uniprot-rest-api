@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
-		<version>2026.3</version>
+		<version>2026.3.1</version>
 	</parent>
 
 	<artifactId>mapto-rest</artifactId>
