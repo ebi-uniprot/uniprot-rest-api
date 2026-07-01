@@ -5,12 +5,12 @@ import static org.uniprot.api.rest.search.SortUtils.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * @author jluo
