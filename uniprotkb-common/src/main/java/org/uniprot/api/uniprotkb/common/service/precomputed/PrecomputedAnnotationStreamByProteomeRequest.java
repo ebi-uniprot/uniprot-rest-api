@@ -38,20 +38,6 @@ public class PrecomputedAnnotationStreamByProteomeRequest implements StreamReque
             message = "{search.invalid.upid.value}")
     private String upId;
 
-    @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
-    @Pattern(
-            regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
-            flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message = "{search.invalid.accession.value}")
-    private String accession;
-
-    @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
-    @Pattern(
-            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
-            flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message = "{search.invalid.upi.value}")
-    private String uniparc;
-
     @Parameter(description = ID_TAX_DESCRIPTION, example = ID_TAX_EXAMPLE)
     @Pattern(
             regexp = FieldRegexConstants.TAXONOMY_ID_REGEX,
