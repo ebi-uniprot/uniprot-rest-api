@@ -1,18 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
-import static org.uniprot.api.uniprotkb.controller.PrecomputedUniProtKBController.PRECOMPUTED_ANNOTATION_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.search.field.validator.FieldRegexConstants.TAXONOMY_ID_REGEX;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -30,10 +22,22 @@ import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotatio
 import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedAnnotationStreamByProteomeRequest;
 import org.uniprot.api.uniprotkb.common.service.precomputed.PrecomputedUniProtKBEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.uniprotkb.controller.PrecomputedUniProtKBController.PRECOMPUTED_ANNOTATION_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.TAXONOMY_ID_REGEX;
 
 @RestController
 @RequestMapping(value = PRECOMPUTED_ANNOTATION_RESOURCE)
@@ -61,8 +65,35 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
 
     @GetMapping(
             value = "/{upi}/{taxonId}",
-            produces = {MediaType.APPLICATION_JSON_VALUE})
-    @Operation(hidden = true)
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            hidden = true,
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniProtKBEntry.class)),
+                            @Content(
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getPrecomputedUniProtKBEntry(
             @PathVariable("upi")
                     @Pattern(
