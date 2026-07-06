@@ -9,11 +9,8 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.service.request.BasicRequestConverter;
 import org.uniprot.api.rest.service.request.RequestConverterConfigProperties;
 import org.uniprot.api.rest.service.request.RequestConverterImpl;
-import org.uniprot.store.search.SolrQueryUtil;
 
 public class PrecomputedAnnotationRequestConverterImpl extends RequestConverterImpl {
-    private static final String TAXONOMY_ID = "taxonomy_id";
-
     private final BasicRequestConverter basicConverter;
 
     public PrecomputedAnnotationRequestConverterImpl(
@@ -44,7 +41,6 @@ public class PrecomputedAnnotationRequestConverterImpl extends RequestConverterI
         SolrRequest.SolrRequestBuilder builder =
                 basicConverter.createSearchSolrRequest(
                         precomputedAnnotationSearchByProteomeRequest);
-        builder.query(createQuery(precomputedAnnotationSearchByProteomeRequest));
         return builder.build();
     }
 
@@ -56,11 +52,5 @@ public class PrecomputedAnnotationRequestConverterImpl extends RequestConverterI
                 basicConverter.createStreamSolrRequest(
                         precomputedAnnotationStreamByProteomeRequest);
         return builder.build();
-    }
-
-    private String createQuery(PrecomputedAnnotationSearchByProteomeRequest request) {
-        String escapedTaxonomyId =
-                SolrQueryUtil.escapeSpecialCharacters(request.getTaxonomyId().strip());
-        return TAXONOMY_ID + ":" + escapedTaxonomyId;
     }
 }

@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.precomputed;
 
+import static org.apache.commons.lang3.Validate.validState;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
@@ -57,10 +58,8 @@ public class PrecomputedAnnotationStreamByProteomeRequest implements StreamReque
 
     @Override
     public String getQuery() {
-        if (Utils.nullOrEmpty(taxonomyId)) {
-            throw new IllegalStateException("Taxonomy Id should not be null or empty");
-        }
-        return TAXONOMY_ID_STR + ":" + this.taxonomyId;
+        validState(Utils.notNullNotEmpty(taxonomyId), "Taxonomy Id should not be null or empty");
+        return TAXONOMY_ID_STR + ":" + taxonomyId;
     }
 
     public void setFormat(String format) {

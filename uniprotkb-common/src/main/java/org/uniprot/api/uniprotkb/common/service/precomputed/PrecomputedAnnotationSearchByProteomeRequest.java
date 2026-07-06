@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.precomputed;
 
+import static org.apache.commons.lang3.Validate.validState;
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.Max;
@@ -12,6 +13,7 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -77,7 +79,8 @@ public class PrecomputedAnnotationSearchByProteomeRequest implements SearchReque
 
     @Override
     public String getQuery() {
-        return TAXONOMY_ID_STR + ":" + this.upId;
+        validState(Utils.notNullNotEmpty(taxonomyId), "Taxonomy Id should not be null or empty");
+        return TAXONOMY_ID_STR + ":" + taxonomyId;
     }
 
     public void setFormat(String format) {
