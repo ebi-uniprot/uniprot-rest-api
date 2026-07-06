@@ -1,12 +1,15 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -15,6 +18,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -131,12 +136,11 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void streamCanReturnSuccess() throws Exception {
+    void streamByProteomeIdCanReturnSuccess() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.get(streamRequestPath, "UP000000002")
-                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", "content:*");
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -160,6 +164,10 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
                                         "UP000000008-992",
                                         "UP000000009-992",
                                         "UP000000010-992")))
+                // To test that the whole entry is present in the response
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.annotationScore", everyItem(is(0.0))))
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CACHE_CONTROL, ControllerITUtils.CACHE_VALUE))
@@ -174,7 +182,43 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void streamDownloadCompressedFile() throws Exception {
+    void streamByProteomeIdCanReturnSuccessForListContentType() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.get(streamRequestPath, "UP000000002")
+                        .header(HttpHeaders.ACCEPT, LIST_MEDIA_TYPE_VALUE);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        String content =
+                mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                        .andExpect(MockMvcResultMatchers.status().isOk())
+                        .andExpect(
+                                MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                        .andExpect(
+                                MockMvcResultMatchers.header()
+                                        .string(
+                                                HttpHeaders.CACHE_CONTROL,
+                                                ControllerITUtils.CACHE_VALUE))
+                        .andExpect(
+                                MockMvcResultMatchers.header()
+                                        .stringValues(
+                                                HttpHeaders.VARY,
+                                                HttpHeaders.ACCEPT,
+                                                HttpHeaders.ACCEPT_ENCODING,
+                                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        IntStream.rangeClosed(1, 10)
+                .mapToObj(i -> String.format("UP%09d-992", i))
+                .forEach(id -> assertThat(content, containsString(id)));
+    }
+
+    @Test
+    void streamByProteomeIdDownloadCompressedFile() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.get(streamRequestPath, "UP000000002")
@@ -194,6 +238,38 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
                                         startsWith(
                                                 "form-data; name=\"attachment\"; filename=\"uniprotkb_")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)));
+    }
+
+    @Test
+    void streamByProteomeIdTaxonomyNotFound() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.get(streamRequestPath, "UP000000111")
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                MediaType.APPLICATION_XML_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
+            })
+    void streamByProteomeIdUnsupportedAcceptContentTypes(String mediaType) throws Exception {
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(streamRequestPath, "UP000000002")
+                                .header(HttpHeaders.ACCEPT, mediaType))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     private void saveEntries() throws Exception {

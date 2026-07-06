@@ -147,7 +147,7 @@ public class PrecomputedUniProtKBController extends BasicSearchController<UniPro
 
     @GetMapping(
             value = "/proteome/{upId}/stream",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, LIST_MEDIA_TYPE_VALUE})
     @Operation(hidden = true)
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>>
             streamByProteomeId(
