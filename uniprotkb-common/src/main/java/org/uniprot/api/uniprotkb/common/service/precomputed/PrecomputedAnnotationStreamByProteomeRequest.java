@@ -6,11 +6,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springdoc.api.annotations.ParameterObject;
-import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ParameterObject
-public class PrecomputedAnnotationStreamByProteomeRequest implements StreamRequest, BasicRequest {
+public class PrecomputedAnnotationStreamByProteomeRequest implements StreamRequest {
     private static final String TAXONOMY_ID_STR = "taxonomy_id";
 
     @Parameter(description = DOWNLOAD_DESCRIPTION)
@@ -57,7 +57,10 @@ public class PrecomputedAnnotationStreamByProteomeRequest implements StreamReque
 
     @Override
     public String getQuery() {
-        return TAXONOMY_ID_STR + ":" + this.upId;
+        if (Utils.nullOrEmpty(taxonomyId)) {
+            throw new IllegalStateException("Taxonomy Id should not be null or empty");
+        }
+        return TAXONOMY_ID_STR + ":" + this.taxonomyId;
     }
 
     public void setFormat(String format) {

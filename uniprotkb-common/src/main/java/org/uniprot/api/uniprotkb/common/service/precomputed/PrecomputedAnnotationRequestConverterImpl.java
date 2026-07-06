@@ -55,17 +55,10 @@ public class PrecomputedAnnotationRequestConverterImpl extends RequestConverterI
         SolrRequest.SolrRequestBuilder builder =
                 basicConverter.createStreamSolrRequest(
                         precomputedAnnotationStreamByProteomeRequest);
-        builder.query(createQuery(precomputedAnnotationStreamByProteomeRequest));
         return builder.build();
     }
 
     private String createQuery(PrecomputedAnnotationSearchByProteomeRequest request) {
-        String escapedTaxonomyId =
-                SolrQueryUtil.escapeSpecialCharacters(request.getTaxonomyId().strip());
-        return TAXONOMY_ID + ":" + escapedTaxonomyId;
-    }
-
-    private String createQuery(PrecomputedAnnotationStreamByProteomeRequest request) {
         String escapedTaxonomyId =
                 SolrQueryUtil.escapeSpecialCharacters(request.getTaxonomyId().strip());
         return TAXONOMY_ID + ":" + escapedTaxonomyId;
