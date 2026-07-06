@@ -153,7 +153,7 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
                 .andExpect(
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
-                                containsInAnyOrder(
+                                contains(
                                         "UP000000001-992",
                                         "UP000000002-992",
                                         "UP000000003-992",
@@ -179,6 +179,38 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
                                         HttpHeaders.ACCEPT_ENCODING,
                                         HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
                                         HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
+    }
+
+    @Test
+    void streamByProteomeIdCanReturnSuccessWithSortAccessionDesc() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                MockMvcRequestBuilders.get(streamRequestPath, "UP000000002")
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+                        .queryParam("sort", "accession desc");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession",
+                                contains(
+                                        "UP000000010-992",
+                                        "UP000000009-992",
+                                        "UP000000008-992",
+                                        "UP000000007-992",
+                                        "UP000000006-992",
+                                        "UP000000005-992",
+                                        "UP000000004-992",
+                                        "UP000000003-992",
+                                        "UP000000002-992",
+                                        "UP000000001-992")));
     }
 
     @Test
