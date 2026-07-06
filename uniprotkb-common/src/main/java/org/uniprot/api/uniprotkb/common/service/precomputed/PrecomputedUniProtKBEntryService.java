@@ -82,7 +82,8 @@ public class PrecomputedUniProtKBEntryService {
                 .build();
     }
 
-    public Stream<UniProtKBEntry> streamByProteomeId(PrecomputedAnnotationStreamByProteomeRequest request) {
+    public Stream<UniProtKBEntry> streamByProteomeId(
+            PrecomputedAnnotationStreamByProteomeRequest request) {
         String taxonomyId = proteomeTaxonomyResolver.findTaxonomyIdByUpId(request.getUpId());
         request.setTaxonomyId(taxonomyId);
 

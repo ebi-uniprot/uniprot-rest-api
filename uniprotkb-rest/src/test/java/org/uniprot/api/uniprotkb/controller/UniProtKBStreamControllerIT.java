@@ -113,8 +113,11 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     private SolrClient solrClient;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
     @Qualifier("uniProtKBTupleStream")
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
     @Autowired private TaxonomyLineageRepository taxRepository;
 
     @BeforeAll

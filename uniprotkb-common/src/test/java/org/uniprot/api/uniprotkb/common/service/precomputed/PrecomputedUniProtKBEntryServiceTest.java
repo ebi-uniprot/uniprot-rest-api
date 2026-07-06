@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.common.service.precomputed;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -18,17 +29,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.search.document.precomputed.PrecomputedAnnotationDocument;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 @ExtendWith(MockitoExtension.class)
 class PrecomputedUniProtKBEntryServiceTest {
@@ -136,9 +136,11 @@ class PrecomputedUniProtKBEntryServiceTest {
     @Test
     void streamInNonListFormatWithStoreStreamerBeingCalled() {
         String acc1 = "P56789";
-        UniProtKBEntry entry1 = new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
 
-        PrecomputedAnnotationStreamByProteomeRequest request = new PrecomputedAnnotationStreamByProteomeRequest();
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
         request.setFormat(APPLICATION_JSON_VALUE);
         request.setUpId("UP000000000");
 
@@ -167,7 +169,8 @@ class PrecomputedUniProtKBEntryServiceTest {
         UniProtKBEntry entry2 =
                 new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
 
-        PrecomputedAnnotationStreamByProteomeRequest request = new PrecomputedAnnotationStreamByProteomeRequest();
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
         request.setFormat(LIST_MEDIA_TYPE_VALUE);
         request.setUpId("UP000000000");
 

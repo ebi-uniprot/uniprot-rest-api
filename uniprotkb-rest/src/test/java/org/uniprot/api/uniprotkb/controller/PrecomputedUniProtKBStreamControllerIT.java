@@ -150,9 +150,16 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
                         MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder(
-                                        "UP000000001-992", "UP000000002-992", "UP000000003-992", "UP000000004-992",
-                                        "UP000000005-992", "UP000000006-992", "UP000000007-992", "UP000000008-992",
-                                        "UP000000009-992", "UP000000010-992")))
+                                        "UP000000001-992",
+                                        "UP000000002-992",
+                                        "UP000000003-992",
+                                        "UP000000004-992",
+                                        "UP000000005-992",
+                                        "UP000000006-992",
+                                        "UP000000007-992",
+                                        "UP000000008-992",
+                                        "UP000000009-992",
+                                        "UP000000010-992")))
                 .andExpect(
                         MockMvcResultMatchers.header()
                                 .string(HttpHeaders.CACHE_CONTROL, ControllerITUtils.CACHE_VALUE))

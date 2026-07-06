@@ -33,7 +33,8 @@ class PrecomputedAnnotationRequestConverterImplTest {
     @Test
     void createsStreamSolrQueryFromResolvedTaxonomyId() {
         PrecomputedAnnotationRequestConverterImpl converter = converter();
-        PrecomputedAnnotationStreamByProteomeRequest request = new PrecomputedAnnotationStreamByProteomeRequest();
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
         request.setTaxonomyId("9606");
         request.setSort("accession desc");
 
