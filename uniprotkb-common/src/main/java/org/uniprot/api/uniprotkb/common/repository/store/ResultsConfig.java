@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,13 +47,37 @@ public class ResultsConfig {
     @Bean("uniProtKBSolrClient")
     @Profile("live")
     public SolrClient uniProtKBSolrClient(
-            HttpClient httpClient, UniProtKBRepositoryConfigProperties config) {
+            HttpClient httpClient,
+            @Qualifier("uniProtKBRepositoryConfigProperties")
+                    UniProtKBRepositoryConfigProperties config) {
         return buildSolrClient(
                 httpClient,
                 config.getZkHost(),
                 config.getConnectionTimeout(),
                 config.getSocketTimeout(),
                 config.getHttphost());
+    }
+
+    @Bean("uniProtKBSolr9Client")
+    @Profile("live")
+    @ConditionalOnExpression(
+            "'${spring.data.solr.kb.solr9.zkHost:}' != ''")
+    public SolrClient uniProtKBSolr9Client(
+            HttpClient httpClient,
+            @Qualifier("uniProtKBSolr9ConfigProperties")
+                    UniProtKBRepositoryConfigProperties config) {
+        return buildSolrClient(
+                httpClient,
+                config.getZkHost(),
+                config.getConnectionTimeout(),
+                config.getSocketTimeout(),
+                config.getHttphost());
+    }
+
+    @Bean("uniProtKBSolr9ConfigProperties")
+    @ConfigurationProperties(prefix = "spring.data.solr.kb.solr9")
+    public UniProtKBRepositoryConfigProperties uniProtKBSolr9ConfigProperties() {
+        return new UniProtKBRepositoryConfigProperties();
     }
 
     @Bean("uniProtKBTupleStream")
