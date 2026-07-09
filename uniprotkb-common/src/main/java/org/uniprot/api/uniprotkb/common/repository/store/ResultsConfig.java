@@ -60,8 +60,7 @@ public class ResultsConfig {
 
     @Bean("uniProtKBSolr9Client")
     @Profile("live")
-    @ConditionalOnExpression(
-            "'${spring.data.solr.kb.solr9.zkHost:}' != ''")
+    @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
     public SolrClient uniProtKBSolr9Client(
             HttpClient httpClient,
             @Qualifier("uniProtKBSolr9ConfigProperties")

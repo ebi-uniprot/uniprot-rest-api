@@ -23,6 +23,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
@@ -82,7 +83,11 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         try {
             CURRENT_SHADOW_ID.set(shadowId);
             QueryResult<UniProtDocument> result = super.searchPage(request, cursor);
-            shadowSearchPage(shadowId, request, cursor);
+            shadowSearchPage(
+                    shadowId,
+                    request,
+                    cursor,
+                    CursorPage.of(cursor, request.getRows()).getCursor());
             return result;
         } finally {
             CURRENT_SHADOW_ID.remove();
@@ -120,7 +125,8 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         }
     }
 
-    private void shadowSearchPage(long shadowId, SolrRequest request, String cursor) {
+    private void shadowSearchPage(
+            long shadowId, SolrRequest request, String cursor, String solrCursor) {
         if (solr9Client == null) {
             return;
         }
@@ -132,8 +138,8 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
                                     requestConverter.toJsonQueryRequest(request);
                             ModifiableSolrParams params =
                                     (ModifiableSolrParams) solrQuery.getParams();
-                            if (cursor != null && !cursor.isEmpty()) {
-                                params.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+                            if (solrCursor != null && !solrCursor.isEmpty()) {
+                                params.set(CursorMarkParams.CURSOR_MARK_PARAM, solrCursor);
                             } else {
                                 params.set(
                                                 CursorMarkParams.CURSOR_MARK_PARAM,
