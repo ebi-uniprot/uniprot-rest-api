@@ -153,6 +153,31 @@ class UniSaveRepositoryIT {
     }
 
     @Test
+    void getEntryInfosForDeleteEntryInfoWithProteomeRedundancyReason() {
+        // given
+        EntryImpl entry = createEntry(1);
+        testEntityManager.persist(entry);
+
+        IdentifierStatus identifierStatus =
+                mockIdentifierStatus(
+                        EventTypeEnum.DELETED, entry.getAccession(), "does not matter", 13);
+        testEntityManager.persist(identifierStatus);
+
+        // when
+        EntryInfo entryInfo =
+                repository.retrieveEntryInfos(entry.getAccession()).stream()
+                        .filter(EntryInfo::isDeleted)
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
+
+        // then
+        assertThat(entryInfo.isDeleted(), is(true));
+        assertThat(
+                entryInfo.getDeletionReason(),
+                is(DeletedReason.PROTEOME_REDUNDANCY.getName()));
+    }
+
+    @Test
     void getEntryInfosForDeleteEntryInfoWithoutDeletedReason() {
         // given
         EntryImpl entry = createEntry(1);
