@@ -172,9 +172,7 @@ class UniSaveRepositoryIT {
 
         // then
         assertThat(entryInfo.isDeleted(), is(true));
-        assertThat(
-                entryInfo.getDeletionReason(),
-                is(DeletedReason.PROTEOME_REDUNDANCY.getName()));
+        assertThat(entryInfo.getDeletionReason(), is(DeletedReason.PROTEOME_REDUNDANCY.getName()));
     }
 
     @Test
