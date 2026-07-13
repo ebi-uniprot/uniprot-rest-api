@@ -1,16 +1,10 @@
 package org.uniprot.api.uniprotkb.common.repository.store;
 
-import static java.util.Arrays.asList;
-
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,7 +23,6 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBStoreSt
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.util.Utils;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
@@ -51,11 +44,12 @@ public class ResultsConfig {
             @Qualifier("uniProtKBRepositoryConfigProperties")
                     UniProtKBRepositoryConfigProperties config) {
         return buildSolrClient(
-                httpClient,
                 config.getZkHost(),
                 config.getConnectionTimeout(),
                 config.getSocketTimeout(),
-                config.getHttphost());
+                config.getHttphost(),
+                config.getUsername(),
+                config.getPassword());
     }
 
     @Bean("uniProtKBSolr9Client")
@@ -140,23 +134,13 @@ public class ResultsConfig {
     }
 
     private SolrClient buildSolrClient(
-            HttpClient httpClient,
             String zkHost,
             int connTimeout,
             int sockTimeout,
-            String httpHost) {
-        if (Utils.notNullNotEmpty(zkHost)) {
-            String[] zookeeperHosts = zkHost.split(",");
-            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
-                    .withConnectionTimeout(connTimeout)
-                    .withHttpClient(httpClient)
-                    .withSocketTimeout(sockTimeout)
-                    .build();
-        } else if (Utils.notNullNotEmpty(httpHost)) {
-            return new HttpSolrClient.Builder().withBaseSolrUrl(httpHost).build();
-        } else {
-            throw new BeanCreationException(
-                    "make sure your application.properties has right solr zookeeperhost or httphost properties");
-        }
+            String httpHost,
+            String username,
+            String password) {
+        return RepositoryConfig.buildSolrClient(
+                zkHost, connTimeout, sockTimeout, httpHost, username, password);
     }
 }
