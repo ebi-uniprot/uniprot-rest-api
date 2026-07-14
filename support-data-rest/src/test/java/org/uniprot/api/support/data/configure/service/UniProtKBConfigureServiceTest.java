@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
-
-import junit.framework.AssertionFailedError;
 
 class UniProtKBConfigureServiceTest {
     private static UniProtKBConfigureService service;
