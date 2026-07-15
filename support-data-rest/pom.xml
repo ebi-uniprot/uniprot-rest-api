@@ -11,11 +11,6 @@
 	<artifactId>support-data-rest</artifactId>
 	<description>UniProt Rest API for support data</description>
 
-	<properties>
-		<testcontainers.postgres.version>1.17.3</testcontainers.postgres.version>
-	</properties>
-
-
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
@@ -116,14 +111,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${testcontainers.postgres.version}</version>
+			<artifactId>testcontainers-postgresql</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
-			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -134,8 +127,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${testcontainers.version}</version>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
