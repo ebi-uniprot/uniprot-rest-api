@@ -34,6 +34,7 @@
 		<jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</jacoco.reportPath>
 		<jacoco.version>0.8.8</jacoco.version>
 		<jackson-bom.version>2.15.4</jackson-bom.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
 		<testcontainers-bom.version>2.0.5</testcontainers-bom.version>
 		<jayway.version>2.4.0</jayway.version>
 		<jna.version>5.8.0</jna.version>
