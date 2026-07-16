@@ -8,26 +8,36 @@ import static org.uniprot.api.common.repository.search.SolrQueryConverterUtils.F
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -71,6 +81,15 @@ class UniProtEntryServiceTest {
     @Mock private TupleStreamDocumentIdStream documentIdStream;
     @Mock private UniProtKBRequestConverter uniProtKBRequestConverter;
     private UniProtEntryService entryService;
+    @Mock private ObjectProvider<SolrClient> solr9ClientProvider;
+    @Mock private UniProtKBFacetConfig facetConfig;
+    @Mock private SolrRequestConverter requestConverter;
+    @Mock private SolrClient solrClient;
+    @Mock private SolrClient solr9Client;
+    @Mock private SolrRequest solrRequest;
+    @Mock private JsonQueryRequest jsonQueryRequest;
+    @Mock private QueryResponse solr8Response;
+    @Mock private QueryResponse solr9Response;
 
     @BeforeEach
     void init() {
@@ -357,5 +376,90 @@ class UniProtEntryServiceTest {
         assertThrows(
                 ResourceNotFoundException.class,
                 () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
+    }
+
+    @Test
+    void shadowSearchPage_whenSolr9ClientNull_doesNotInvokeConverter() {
+        when(solr9ClientProvider.getIfAvailable()).thenReturn(null);
+
+        UniprotQueryRepository repository =
+                new UniprotQueryRepository(
+                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+
+        repository.shadowSearchPage(1L, solrRequest, "*", null);
+
+        verifyNoInteractions(requestConverter);
+    }
+
+    @Test
+    void shadowSearchPage_whenSolr9ClientPresent_firesAsyncShadowQuery() throws Exception {
+        when(solr9ClientProvider.getIfAvailable()).thenReturn(solr9Client);
+        when(requestConverter.toJsonQueryRequest(any(SolrRequest.class)))
+                .thenReturn(jsonQueryRequest);
+
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        when(jsonQueryRequest.getParams()).thenReturn(params);
+        when(jsonQueryRequest.process(eq(solr9Client), anyString())).thenReturn(solr9Response);
+
+        SolrDocumentList emptyList = new SolrDocumentList();
+        emptyList.setNumFound(0);
+        when(solr9Response.getResults()).thenReturn(emptyList);
+        when(solr9Response.getQTime()).thenReturn(5);
+        when(solr9Response.getBeans(UniProtDocument.class)).thenReturn(Collections.emptyList());
+
+        UniprotQueryRepository repository =
+                new UniprotQueryRepository(
+                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+
+        repository.shadowSearchPage(1L, solrRequest, "*", null);
+
+        verify(jsonQueryRequest, timeout(2000).times(1)).process(eq(solr9Client), anyString());
+    }
+
+    @Test
+    void shadowSearchPage_withNonEmptySolrCursor_setsCursorMarkParam() throws Exception {
+        when(solr9ClientProvider.getIfAvailable()).thenReturn(solr9Client);
+        when(requestConverter.toJsonQueryRequest(any(SolrRequest.class)))
+                .thenReturn(jsonQueryRequest);
+
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        when(jsonQueryRequest.getParams()).thenReturn(params);
+        when(jsonQueryRequest.process(eq(solr9Client), anyString())).thenReturn(solr9Response);
+
+        SolrDocumentList emptyList = new SolrDocumentList();
+        emptyList.setNumFound(0);
+        when(solr9Response.getResults()).thenReturn(emptyList);
+        when(solr9Response.getQTime()).thenReturn(5);
+        when(solr9Response.getBeans(UniProtDocument.class)).thenReturn(Collections.emptyList());
+
+        UniprotQueryRepository repository =
+                new UniprotQueryRepository(
+                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+
+        repository.shadowSearchPage(3L, solrRequest, "*", "AoEjRGVmYXVsdA==");
+
+        verify(jsonQueryRequest, timeout(2000).times(1)).process(eq(solr9Client), anyString());
+    }
+
+    @Test
+    void shadowSearchPage_whenSolr9QueryThrows_logsWarningAndDoesNotPropagate()
+            throws SolrServerException, IOException {
+        when(solr9ClientProvider.getIfAvailable()).thenReturn(solr9Client);
+        when(requestConverter.toJsonQueryRequest(any(SolrRequest.class)))
+                .thenReturn(jsonQueryRequest);
+
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        when(jsonQueryRequest.getParams()).thenReturn(params);
+        when(jsonQueryRequest.process(eq(solr9Client), anyString()))
+                .thenThrow(new RuntimeException("solr9 down"));
+
+        UniprotQueryRepository repository =
+                new UniprotQueryRepository(
+                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+
+        // should not throw - exception is caught and logged inside the async task
+        repository.shadowSearchPage(2L, solrRequest, "*", "someCursor");
+
+        verify(jsonQueryRequest, timeout(2000).times(1)).process(eq(solr9Client), anyString());
     }
 }
