@@ -41,6 +41,7 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -80,6 +81,7 @@ class UniProtEntryServiceTest {
     @Mock private RdfStreamer uniProtRdfStreamer;
     @Mock private TupleStreamDocumentIdStream documentIdStream;
     @Mock private UniProtKBRequestConverter uniProtKBRequestConverter;
+    @Mock private ObjectProvider<TupleStreamTemplate> solr9TupleStreamTemplateProvider;
     private UniProtEntryService entryService;
     @Mock private ObjectProvider<SolrClient> solr9ClientProvider;
     @Mock private UniProtKBFacetConfig facetConfig;
@@ -384,7 +386,11 @@ class UniProtEntryServiceTest {
 
         UniprotQueryRepository repository =
                 new UniprotQueryRepository(
-                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+                        solrClient,
+                        solr9ClientProvider,
+                        solr9TupleStreamTemplateProvider,
+                        facetConfig,
+                        requestConverter);
 
         repository.shadowSearchPage(1L, solrRequest, "*", null);
 
@@ -409,7 +415,11 @@ class UniProtEntryServiceTest {
 
         UniprotQueryRepository repository =
                 new UniprotQueryRepository(
-                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+                        solrClient,
+                        solr9ClientProvider,
+                        solr9TupleStreamTemplateProvider,
+                        facetConfig,
+                        requestConverter);
 
         repository.shadowSearchPage(1L, solrRequest, "*", null);
 
@@ -434,7 +444,11 @@ class UniProtEntryServiceTest {
 
         UniprotQueryRepository repository =
                 new UniprotQueryRepository(
-                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+                        solrClient,
+                        solr9ClientProvider,
+                        solr9TupleStreamTemplateProvider,
+                        facetConfig,
+                        requestConverter);
 
         repository.shadowSearchPage(3L, solrRequest, "*", "AoEjRGVmYXVsdA==");
 
@@ -455,11 +469,94 @@ class UniProtEntryServiceTest {
 
         UniprotQueryRepository repository =
                 new UniprotQueryRepository(
-                        solrClient, solr9ClientProvider, facetConfig, requestConverter);
+                        solrClient,
+                        solr9ClientProvider,
+                        solr9TupleStreamTemplateProvider,
+                        facetConfig,
+                        requestConverter);
 
         // should not throw - exception is caught and logged inside the async task
         repository.shadowSearchPage(2L, solrRequest, "*", "someCursor");
 
         verify(jsonQueryRequest, timeout(2000).times(1)).process(eq(solr9Client), anyString());
+    }
+
+    @Test
+    void streamSampledWithExceptionStillLogsSolr8() {
+        // given
+        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
+        when(repository.isSampled()).thenReturn(true);
+        long shadowId = 123L;
+        when(repository.getShadowId()).thenReturn(shadowId);
+        SolrRequest solrRequest = mock(SolrRequest.class);
+        when(uniProtKBRequestConverter.createStreamSolrRequest(request)).thenReturn(solrRequest);
+
+        UniProtKBEntry entry =
+                new UniProtKBEntryBuilder("P12345", "ID", UniProtKBEntryType.SWISSPROT).build();
+        Stream<UniProtKBEntry> entryStream = Stream.of(entry);
+        when(uniProtEntryStoreStreamer.idsToStoreStream(eq(solrRequest), any()))
+                .thenReturn(entryStream);
+
+        // when
+        Stream<UniProtKBEntry> result = entryService.stream(request);
+
+        // consume stream and throw exception
+        assertThrows(
+                RuntimeException.class,
+                () -> {
+                    result.forEach(
+                            e -> {
+                                throw new RuntimeException("Oops");
+                            });
+                });
+
+        // then onClose should NOT have been called yet because forEach doesn't close the stream
+        verify(repository, times(0))
+                .logSolr8Stream(anyLong(), any(), anyLong(), anyList(), anyList());
+
+        // but if we close it (as the controller does in finally block)
+        result.close();
+
+        // then it should log
+        verify(repository)
+                .logSolr8Stream(
+                        eq(shadowId),
+                        eq(solrRequest),
+                        eq(1L),
+                        anyList(),
+                        anyList()); // 1 because it reached peek before throwing exception
+    }
+
+    @Test
+    void streamSampledSuccessLogsSolr8() {
+        // given
+        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
+        when(repository.isSampled()).thenReturn(true);
+        long shadowId = 123L;
+        when(repository.getShadowId()).thenReturn(shadowId);
+        SolrRequest solrRequest = mock(SolrRequest.class);
+        when(uniProtKBRequestConverter.createStreamSolrRequest(request)).thenReturn(solrRequest);
+
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder("P12345", "ID1", UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry2 =
+                new UniProtKBEntryBuilder("P12346", "ID2", UniProtKBEntryType.SWISSPROT).build();
+        Stream<UniProtKBEntry> entryStream = Stream.of(entry1, entry2);
+        when(uniProtEntryStoreStreamer.idsToStoreStream(eq(solrRequest), any()))
+                .thenReturn(entryStream);
+
+        // when
+        Stream<UniProtKBEntry> result = entryService.stream(request);
+        result.forEach(e -> {}); // consume
+        result.close();
+
+        // then
+        verify(repository)
+                .logSolr8Stream(
+                        eq(shadowId),
+                        eq(solrRequest),
+                        eq(2L),
+                        eq(List.of("P12345", "P12346")),
+                        eq(List.of("P12345", "P12346")));
     }
 }

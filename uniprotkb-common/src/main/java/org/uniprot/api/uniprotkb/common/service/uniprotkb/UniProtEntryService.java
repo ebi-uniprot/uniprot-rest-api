@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.request.UniProtKBRequestUtil.DASH;
 import static org.uniprot.api.uniprotkb.common.service.request.UniProtKBRequestConverterImpl.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -158,14 +159,48 @@ public class UniProtEntryService
     @Override
     public Stream<UniProtKBEntry> stream(StreamRequest request) {
         SolrRequest query = uniProtKBRequestConverter.createStreamSolrRequest(request);
+
+        boolean sampled = true;//repository.isSampled();
+        long shadowId = sampled ? repository.getShadowId() : -1L;
+        if (sampled) {
+            repository.shadowStream(shadowId, query);
+        }
+
+        Stream<UniProtKBEntry> resultStream;
         if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
-            return this.solrIdStreamer
-                    .fetchIds(query)
-                    .map(this::mapToThinEntry)
-                    .filter(Objects::nonNull);
+            resultStream =
+                    this.solrIdStreamer
+                            .fetchIds(query)
+                            .map(this::mapToThinEntry)
+                            .filter(Objects::nonNull);
         } else {
             StoreRequest storeRequest = getStoreRequest(request);
-            return super.storeStreamer.idsToStoreStream(query, storeRequest);
+            resultStream = super.storeStreamer.idsToStoreStream(query, storeRequest);
+        }
+
+        if (sampled) {
+            AtomicLong count = new AtomicLong();
+            List<String> firstIds = new ArrayList<>();
+            LinkedList<String> lastIds = new LinkedList<>();
+            return resultStream
+                    .peek(
+                            entry -> {
+                                count.incrementAndGet();
+                                String id = entry.getPrimaryAccession().getValue();
+                                if (firstIds.size() < 10) {
+                                    firstIds.add(id);
+                                }
+                                lastIds.add(id);
+                                if (lastIds.size() > 10) {
+                                    lastIds.removeFirst();
+                                }
+                            })
+                    .onClose(
+                            () ->
+                                    repository.logSolr8Stream(
+                                            shadowId, query, count.get(), firstIds, lastIds));
+        } else {
+            return resultStream;
         }
     }
 

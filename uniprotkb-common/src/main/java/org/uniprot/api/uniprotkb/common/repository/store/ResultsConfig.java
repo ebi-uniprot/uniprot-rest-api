@@ -92,6 +92,26 @@ public class ResultsConfig {
                 .build();
     }
 
+    @Bean("uniProtKBSolr9TupleStream")
+    @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
+    public TupleStreamTemplate uniProtKBSolr9TupleStream(
+            @Qualifier("uniProtKBSolr9StreamerConfigProperties")
+                    StreamerConfigProperties configProperties,
+            @Qualifier("uniProtKBSolr9Client") SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
+        return TupleStreamTemplate.builder()
+                .streamConfig(configProperties)
+                .solrClient(solrClient)
+                .solrRequestConverter(requestConverter)
+                .build();
+    }
+
+    @Bean("uniProtKBSolr9StreamerConfigProperties")
+    @ConfigurationProperties(prefix = "streamer.uniprot.solr9")
+    public StreamerConfigProperties solr9ResultsConfigProperties() {
+        return new StreamerConfigProperties();
+    }
+
     @Bean
     public StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer(
             StoreStreamerConfig<UniProtKBEntry> uniProtKBStoreStreamerConfig,
