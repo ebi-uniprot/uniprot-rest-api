@@ -13,10 +13,20 @@ import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertiesPropertySource;
 import org.testcontainers.solr.SolrContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+/**
+ * Follow <a
+ * href="https://java.testcontainers.org/supported_docker_environment/#rancher-desktop">this
+ * steps</a> if you are running with Rancher Desktop
+ *
+ * <pre>
+ * {@code export TESTCONTAINERS_HOST_OVERRIDE=$(rdctl shell ip a show vznat | awk '/inet / {sub("/.*",""); print $2}')}
+ * </pre>
+ */
 public class SolrTestContainerSetup implements EnvironmentPostProcessor {
     private static final Logger LOGGER = getLogger(SolrTestContainerSetup.class);
 
@@ -48,7 +58,7 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
                     containerEnabled);
         }
 
-        String containerImageName = System.getProperty(IT_SOLR_CONTAINER_IMAGE_NAME, "solr:8.11.3");
+        String containerImageName = System.getProperty(IT_SOLR_CONTAINER_IMAGE_NAME, "solr:9.10.1");
 
         solr =
                 new SolrContainer(DockerImageName.parse(containerImageName))
@@ -80,9 +90,14 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
                         IT_SOLR_CONTAINER_COMMA_SEPARATED_ZK_HOST_PROPERTIES,
                         "spring.data.solr.zkHost");
         Arrays.stream(commaSeparatedZkHostProperties.split(","))
-                .forEach(it -> properties.put(it, getZkHost()));
-
-        System.setProperties(properties);
+                .forEach(
+                        it -> {
+                            properties.put(it, getZkHost());
+                            System.setProperty(it, getZkHost());
+                        });
+        environment
+                .getPropertySources()
+                .addFirst(new PropertiesPropertySource("overrideProps", properties));
     }
 
     private @NotNull String getZkHost() {
