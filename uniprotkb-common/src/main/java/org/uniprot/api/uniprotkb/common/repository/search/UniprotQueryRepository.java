@@ -217,16 +217,12 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
     }
 
     private @NonNull JsonQueryRequest getJsonQueryRequest(SolrRequest request, String solrCursor) {
-        JsonQueryRequest solrQuery =
-                requestConverter.toJsonQueryRequest(request);
-        ModifiableSolrParams params =
-                (ModifiableSolrParams) solrQuery.getParams();
+        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
+        ModifiableSolrParams params = (ModifiableSolrParams) solrQuery.getParams();
         if (solrCursor != null && !solrCursor.isEmpty()) {
             params.set(CursorMarkParams.CURSOR_MARK_PARAM, solrCursor);
         } else {
-            params.set(
-                            CursorMarkParams.CURSOR_MARK_PARAM,
-                            CursorMarkParams.CURSOR_MARK_START)
+            params.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
                     .set(SPELLCHECK_PARAM, true);
         }
         return solrQuery;

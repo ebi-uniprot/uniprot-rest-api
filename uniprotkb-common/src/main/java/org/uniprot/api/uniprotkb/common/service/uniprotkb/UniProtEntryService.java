@@ -160,7 +160,7 @@ public class UniProtEntryService
     public Stream<UniProtKBEntry> stream(StreamRequest request) {
         SolrRequest query = uniProtKBRequestConverter.createStreamSolrRequest(request);
 
-        boolean sampled = true;//repository.isSampled();
+        boolean sampled = repository.isSampled();
         long shadowId = sampled ? repository.getShadowId() : -1L;
         if (sampled) {
             repository.shadowStream(shadowId, query);
