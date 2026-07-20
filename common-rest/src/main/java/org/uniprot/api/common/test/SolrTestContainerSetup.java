@@ -17,6 +17,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 import org.testcontainers.solr.SolrContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
+import org.uniprot.core.util.Utils;
 
 /**
  * Follow <a
@@ -40,32 +41,33 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
     private static final String IT_SOLR_CONTAINER_COMMA_SEPARATED_ZK_HOST_PROPERTIES =
             "it.solr-container.comma-separated.zk-host-properties";
 
+    private static final String SOLR_HOST_OVERRIDE_ENV = "TESTCONTAINERS_HOST_OVERRIDE";
+    private static final int FIXED_SOLR_PORT = 8983;
+    private static final int FIXED_ZK_PORT = 9983;
+
     @Override
     public void postProcessEnvironment(
             ConfigurableEnvironment environment, SpringApplication application) {
-        String containerEnabled =
-                System.getProperty(IT_SOLR_CONTAINER_ENABLED, String.valueOf(false));
-        if (containerEnabled.trim().isEmpty() || !containerEnabled.equalsIgnoreCase("true")) {
-            LOGGER.info(
-                    "Solr test container is not enabled. {}: {}",
-                    IT_SOLR_CONTAINER_ENABLED,
-                    containerEnabled);
-            return;
-        } else {
-            LOGGER.info(
-                    "Solr test container is enabled. {}: {}",
-                    IT_SOLR_CONTAINER_ENABLED,
-                    containerEnabled);
-        }
+        if (isContainerDisabled()) return;
 
         String containerImageName = System.getProperty(IT_SOLR_CONTAINER_IMAGE_NAME, "solr:9.10.1");
 
+        String hostOverride = System.getenv(SOLR_HOST_OVERRIDE_ENV);
+        if (Utils.nullOrEmpty(hostOverride)) {
+            hostOverride = "localhost";
+        }
+
         solr =
-                new SolrContainer(DockerImageName.parse(containerImageName))
+                new HostAwareSolrContainer(
+                                DockerImageName.parse(containerImageName),
+                                hostOverride,
+                                FIXED_SOLR_PORT,
+                                FIXED_ZK_PORT)
                         .withEnv(
                                 "SOLR_AUTHENTICATION_OPTS",
                                 "-Dbasicauth=" + SOLR_USER + ":" + SOLR_PASS)
                         .withZookeeper(true);
+
         solr.start();
 
         solr.withCopyFileToContainer(
@@ -84,7 +86,6 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
         }
 
         Properties properties = new Properties();
-
         String commaSeparatedZkHostProperties =
                 System.getProperty(
                         IT_SOLR_CONTAINER_COMMA_SEPARATED_ZK_HOST_PROPERTIES,
@@ -98,6 +99,23 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
         environment
                 .getPropertySources()
                 .addFirst(new PropertiesPropertySource("overrideProps", properties));
+    }
+
+    private static boolean isContainerDisabled() {
+        String containerEnabledPropertyValue =
+                System.getProperty(IT_SOLR_CONTAINER_ENABLED, String.valueOf(false));
+
+        boolean isSolrTestContainerDisabled =
+                containerEnabledPropertyValue.trim().isEmpty()
+                        || !containerEnabledPropertyValue.equalsIgnoreCase("true");
+
+        LOGGER.info(
+                "Solr test container is {}. {}: {}",
+                (isSolrTestContainerDisabled) ? "disabled" : "enabled",
+                IT_SOLR_CONTAINER_ENABLED,
+                containerEnabledPropertyValue);
+
+        return isSolrTestContainerDisabled;
     }
 
     private @NotNull String getZkHost() {
