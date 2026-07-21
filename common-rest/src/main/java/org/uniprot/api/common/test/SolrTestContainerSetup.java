@@ -1,14 +1,5 @@
 package org.uniprot.api.common.test;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Properties;
-
-import javax.annotation.PreDestroy;
-
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
@@ -18,6 +9,12 @@ import org.testcontainers.solr.SolrContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 import org.uniprot.core.util.Utils;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Properties;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Follow <a
@@ -31,7 +28,8 @@ import org.uniprot.core.util.Utils;
 public class SolrTestContainerSetup implements EnvironmentPostProcessor {
     private static final Logger LOGGER = getLogger(SolrTestContainerSetup.class);
 
-    private SolrContainer solr;
+    private static volatile SolrContainer solr;
+    private static final Object LOCK = new Object();
 
     private static final String SOLR_USER = "solr_admin";
     private static final String SOLR_PASS = "nimda";
@@ -50,27 +48,63 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
             ConfigurableEnvironment environment, SpringApplication application) {
         if (isContainerDisabled()) return;
 
-        String containerImageName = System.getProperty(IT_SOLR_CONTAINER_IMAGE_NAME, "solr:9.10.1");
+        startContainerOnce();
+        applySecurityJson();
+        configureSystemProperties(environment, getZkHost());
+    }
 
-        String hostOverride = System.getenv(SOLR_HOST_OVERRIDE_ENV);
-        if (Utils.nullOrEmpty(hostOverride)) {
-            hostOverride = "localhost";
+    private static void configureSystemProperties(
+            ConfigurableEnvironment environment, String zkHost) {
+        Properties properties = new Properties();
+        String commaSeparatedZkHostProperties =
+                System.getProperty(
+                        IT_SOLR_CONTAINER_COMMA_SEPARATED_ZK_HOST_PROPERTIES,
+                        "spring.data.solr.zkHost");
+        Arrays.stream(commaSeparatedZkHostProperties.split(","))
+                .forEach(
+                        it -> {
+                            properties.put(it, zkHost);
+                            System.setProperty(it, zkHost);
+                        });
+        environment
+                .getPropertySources()
+                .addFirst(new PropertiesPropertySource("overrideProps", properties));
+    }
+
+    private static void startContainerOnce() {
+        if (solr == null) {
+            synchronized (LOCK) {
+                if (solr == null) {
+                    String containerImageName =
+                            System.getProperty(IT_SOLR_CONTAINER_IMAGE_NAME, "solr:8.11.2");
+
+                    String hostOverride = System.getenv(SOLR_HOST_OVERRIDE_ENV);
+                    if (Utils.nullOrEmpty(hostOverride)) {
+                        hostOverride = "localhost";
+                    }
+
+                    //noinspection resource
+                    SolrContainer container =
+                            new HostAwareSolrContainer(
+                                            DockerImageName.parse(containerImageName),
+                                            hostOverride,
+                                            FIXED_SOLR_PORT,
+                                            FIXED_ZK_PORT)
+                                    .withEnv(
+                                            "SOLR_AUTHENTICATION_OPTS",
+                                            "-Dbasicauth=" + SOLR_USER + ":" + SOLR_PASS)
+                                    .withEnv("SOLR_OPTS", "-Dsolr.data.home=/var/solr/data")
+                                    .withZookeeper(true);
+
+                    container.start();
+                    solr = container;
+                    LOGGER.info("Started shared Solr test container: {}", getZkHost());
+                }
+            }
         }
+    }
 
-        solr =
-                new HostAwareSolrContainer(
-                                DockerImageName.parse(containerImageName),
-                                hostOverride,
-                                FIXED_SOLR_PORT,
-                                FIXED_ZK_PORT)
-                        .withEnv(
-                                "SOLR_AUTHENTICATION_OPTS",
-                                "-Dbasicauth=" + SOLR_USER + ":" + SOLR_PASS)
-                        .withEnv("SOLR_OPTS", "-Dsolr.data.home=/var/solr/data")
-                        .withZookeeper(true);
-
-        solr.start();
-
+    private static void applySecurityJson() {
         solr.withCopyFileToContainer(
                 MountableFile.forClasspathResource("security.json"), "/tmp/security.json");
         try {
@@ -82,24 +116,13 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
                     "zk:/security.json",
                     "-z",
                     getZkHost());
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            LOGGER.error("IOException while applying security.json", e);
             throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            LOGGER.error("InterruptedException while applying security.json", e);
+            Thread.currentThread().interrupt();
         }
-
-        Properties properties = new Properties();
-        String commaSeparatedZkHostProperties =
-                System.getProperty(
-                        IT_SOLR_CONTAINER_COMMA_SEPARATED_ZK_HOST_PROPERTIES,
-                        "spring.data.solr.zkHost");
-        Arrays.stream(commaSeparatedZkHostProperties.split(","))
-                .forEach(
-                        it -> {
-                            properties.put(it, getZkHost());
-                            System.setProperty(it, getZkHost());
-                        });
-        environment
-                .getPropertySources()
-                .addFirst(new PropertiesPropertySource("overrideProps", properties));
     }
 
     private static boolean isContainerDisabled() {
@@ -119,12 +142,7 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
         return isSolrTestContainerDisabled;
     }
 
-    private @NotNull String getZkHost() {
+    private static String getZkHost() {
         return solr.getHost() + ":" + solr.getZookeeperPort();
-    }
-
-    @PreDestroy
-    public void stop() {
-        solr.stop();
     }
 }
