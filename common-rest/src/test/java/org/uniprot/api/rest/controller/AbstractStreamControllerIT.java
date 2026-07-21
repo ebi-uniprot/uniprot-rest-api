@@ -3,24 +3,24 @@ package org.uniprot.api.rest.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import org.apache.solr.client.solrj.embedded.JettyConfig;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
-import org.apache.solr.cloud.MiniSolrCloudCluster;
-import org.junit.jupiter.api.AfterAll;
+import org.apache.solr.cloud.AbstractZkTestCase;
+import org.apache.solr.common.cloud.SolrZkClient;
+import org.apache.solr.common.cloud.ZkConfigManager;
+import org.apache.zookeeper.KeeperException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -66,42 +66,64 @@ public abstract class AbstractStreamControllerIT {
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    private MiniSolrCloudCluster cluster;
+    private static final Object LOCK = new Object();
 
-    private Path tempClusterDir;
-
+    // TODO to be removed
     protected CloudSolrClient cloudSolrClient;
 
     @BeforeAll
-    public void startCluster() throws Exception {
+    public void initializeSolrCluster() throws Exception {
         Properties solrProperties = loadSolrProperties();
         String solrHome = solrProperties.getProperty("solr.home");
-        tempClusterDir = Files.createTempDirectory("MiniSolrCloudCluster");
-        System.setProperty(
-                "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
+        String zkHost = System.getProperty("spring.data.solr.zkHost");
 
-        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
         try {
-            cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
-            getTupleStreamTemplate()
-                    .getStreamConfig()
-                    .setZkHost(cluster.getZkServer().getZkAddress());
-            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamFactory", null);
-            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamContext", null);
-            cloudSolrClient = cluster.getSolrClient();
-            ReflectionTestUtils.setField(getTupleStreamTemplate(), "solrClient", cloudSolrClient);
-            updateFacetTupleStreamTemplate();
-
             for (SolrCollection solrCollection : getSolrCollections()) {
                 String collection = solrCollection.name();
                 Path configPath = Paths.get(solrHome + File.separator + collection + "/conf");
-                cluster.uploadConfigSet(configPath, collection);
-                CollectionAdminRequest.createCollection(collection, collection, 1, 1)
-                        .process(cloudSolrClient);
+
+                uploadConfigs(zkHost, configPath, collection);
+                synchronized (LOCK) {
+                    setupCollection(collection);
+                }
             }
-        } catch (Exception exc) {
-            log.error("Failed to initialize a MiniSolrCloudCluster due to: " + exc, exc);
-            throw exc;
+        } catch (Exception e) {
+            log.error("Failed to initialize collections for testcontainer based solr", e);
+            throw e;
+        }
+    }
+
+    private void setupCollection(String collection) throws SolrServerException, IOException {
+        deleteCollectionIfExists(collection);
+        CollectionAdminRequest.createCollection(collection, collection, 1, 1)
+                .process(getSolrClient());
+    }
+
+    private static void uploadConfigs(String zkHost, Path configPath, String collection)
+            throws KeeperException, InterruptedException, IOException {
+        try (SolrZkClient zkClient =
+                new SolrZkClient(
+                        zkHost, AbstractZkTestCase.TIMEOUT, AbstractZkTestCase.TIMEOUT, null)) {
+
+            /*
+                This is live nodes logging is purely for debugging purposes. Could be removed one itests with
+                solr testcontainers are stable.
+            */
+            List<String> liveNodes = zkClient.getChildren("/live_nodes", null, true);
+            liveNodes.forEach(n -> log.info("live_node: {}", n));
+
+            ZkConfigManager manager = new ZkConfigManager(zkClient);
+            manager.uploadConfigDir(configPath, collection);
+        }
+    }
+
+    private void deleteCollectionIfExists(String collection) {
+        try {
+            CollectionAdminRequest.deleteCollection(collection).process(getSolrClient());
+            log.info("Deleted existing collection '{}'", collection);
+        } catch (Exception e) {
+            // Solr throws if the collection doesn't exist yet
+            log.debug("Collection '{}' did not exist, nothing to delete", collection);
         }
     }
 
@@ -111,24 +133,17 @@ public abstract class AbstractStreamControllerIT {
 
     protected abstract FacetTupleStreamTemplate getFacetTupleStreamTemplate();
 
+    protected SolrClient getSolrClient() {
+        /*
+            TODO keeping default implementation to return null to prevent compile errors for other backends
+             as only uniprotkb-rest is updated so far. This can later be converted to an abstract method.
+         */
+        return null;
+    }
+
     protected Stream<Arguments> getContentTypes(String requestPath) {
         return ControllerITUtils.getContentTypes(requestPath, requestMappingHandlerMapping).stream()
                 .map(Arguments::of);
-    }
-
-    @AfterAll
-    public void stopCluster() throws Exception {
-        if (cloudSolrClient != null) {
-            cloudSolrClient.close();
-            cloudSolrClient = null;
-        }
-        if (cluster != null) {
-            cluster.shutdown();
-            cluster = null;
-        }
-
-        // Delete tempDir content
-        FileSystemUtils.deleteRecursively(tempClusterDir);
     }
 
     private Properties loadSolrProperties() throws IOException {
@@ -139,15 +154,5 @@ public abstract class AbstractStreamControllerIT {
                         .getResourceAsStream(SOLR_SYSTEM_PROPERTIES);
         properties.load(propertiesStream);
         return properties;
-    }
-
-    private void updateFacetTupleStreamTemplate() {
-        // update facet tuple for fields value for testing
-        ReflectionTestUtils.setField(
-                getFacetTupleStreamTemplate(),
-                "zookeeperHost",
-                cluster.getZkServer().getZkAddress());
-        ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamFactory", null);
-        ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamContext", null);
     }
 }
