@@ -66,6 +66,7 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
                         .withEnv(
                                 "SOLR_AUTHENTICATION_OPTS",
                                 "-Dbasicauth=" + SOLR_USER + ":" + SOLR_PASS)
+                        .withEnv("SOLR_OPTS", "-Dsolr.data.home=/var/solr/data")
                         .withZookeeper(true);
 
         solr.start();
