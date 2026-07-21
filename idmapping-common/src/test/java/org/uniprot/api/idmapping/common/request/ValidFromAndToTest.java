@@ -81,6 +81,34 @@ class ValidFromAndToTest {
     }
 
     @Test
+    void testValidFromMd5ToSwiss() {
+        String from = "MD5";
+        String to = "UniProtKB-Swiss-Prot";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    void testValidFromMd5ToUniProtKb() {
+        String from = "MD5";
+        String to = "UniProtKB";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
     void testValidFromEMBLToUniParc() {
         String from = "EMBL-GenBank-DDBJ";
         String to = "UniParc";

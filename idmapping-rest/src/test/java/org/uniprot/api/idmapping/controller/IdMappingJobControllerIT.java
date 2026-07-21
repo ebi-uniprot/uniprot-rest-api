@@ -110,6 +110,33 @@ class IdMappingJobControllerIT {
     }
 
     @Test
+    void md5JobSubmittedSuccessfully() throws Exception {
+        // when
+        IdMappingJobRequest basicRequest = new IdMappingJobRequest();
+        basicRequest.setFrom("MD5");
+        basicRequest.setTo("UniProtKB");
+        basicRequest.setIds("Q1,Q2");
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", basicRequest.getFrom())
+                                .param("to", basicRequest.getTo())
+                                .param("ids", basicRequest.getIds()));
+        // then
+        response.andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
+
+        String jobId = extractJobId(response);
+
+        ArgumentCaptor<IdMappingJob> jobCaptor = ArgumentCaptor.forClass(IdMappingJob.class);
+        verify(cacheService, atLeastOnce()).put(eq(jobId), jobCaptor.capture());
+        assertThat(jobCaptor.getValue().getIdMappingRequest(), is(basicRequest));
+    }
+
+    @Test
     void finishedJobShowsFinishedStatusWithCorrectRedirect() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
