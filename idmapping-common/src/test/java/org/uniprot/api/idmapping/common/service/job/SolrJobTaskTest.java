@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.MD5;
 
 import java.io.IOException;
 import java.util.List;
@@ -75,6 +76,33 @@ class SolrJobTaskTest {
 
     @Nested
     class RepoWillGetCorrectCollectionTest {
+        @Test
+        void repoWillSearchUniprotKBChecksumForMd5ToUniProtKB()
+                throws SolrServerException, IOException {
+            IdMappingRepository repo = mockRepo();
+            when(repo.getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids")))
+                    .thenReturn(List.of(new IdMappingStringPair("Ids", "P12345")));
+
+            solrJobTask.processTask(mappingJob(MD5, "UniProtKB"));
+
+            verify(repo)
+                    .getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids"), "*:*");
+        }
+
+        @Test
+        void repoWillSearchUniprotKBChecksumForMd5ToSwissProt()
+                throws SolrServerException, IOException {
+            IdMappingRepository repo = mockRepo();
+            when(repo.getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids")))
+                    .thenReturn(List.of(new IdMappingStringPair("Ids", "P12345")));
+
+            solrJobTask.processTask(mappingJob(MD5, "UniProtKB-Swiss-Prot"));
+
+            verify(repo)
+                    .getAllMappingIds(
+                            SolrCollection.uniprot, "checksum", List.of("ids"), "reviewed:true");
+        }
+
         @ParameterizedTest
         @ValueSource(strings = {"UniRef50", "UniRef90", "UniRef100"})
         void repoWillAskedToLookIntoUniref(String db) throws SolrServerException, IOException {
