@@ -434,6 +434,9 @@
 	<profiles>
 		<profile>
 			<id>integration-tests</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<properties>
 				<skipITs>false</skipITs>
 			</properties>
