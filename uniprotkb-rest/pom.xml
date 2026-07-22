@@ -148,6 +148,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<it.solr-container.enabled>true</it.solr-container.enabled>
+						<it.solr-container.image-name>solr:8.11.3</it.solr-container.image-name>
+						<it.solr-container.comma-separated.zk-host-properties>spring.data.solr.zkHost,streamer.uniprot.zkHost,streamer.precomputedannotation.zkHost,spring.data.solr.kb.zkHost</it.solr-container.comma-separated.zk-host-properties>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
