@@ -35,8 +35,6 @@ public class HostAwareSolrContainer extends SolrContainer {
         if (advertisedHost.isBlank()) {
             throw new IllegalArgumentException("advertisedHost must not be blank");
         }
-        validatePort(fixedSolrPort, "fixedSolrPort");
-        validatePort(fixedZookeeperPort, "fixedZookeeperPort");
 
         this.fixedSolrPort = fixedSolrPort;
         this.fixedZookeeperPort = fixedZookeeperPort;
@@ -66,11 +64,5 @@ public class HostAwareSolrContainer extends SolrContainer {
         }
 
         setCommandParts(commandParts);
-    }
-
-    private static void validatePort(int port, String name) {
-        if (port < 1 || port > 65535) {
-            throw new IllegalArgumentException(name + " must be between 1 and 65535");
-        }
     }
 }
