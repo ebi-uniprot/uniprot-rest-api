@@ -2,7 +2,7 @@
   "authentication": {
     "class": "solr.BasicAuthPlugin",
     "credentials": {
-      "solr_admin": "91lpd3fqp6djwomBcyFCSIt2iao4tqGIxbRZWZVOFsU= cTRveDZqaGlvand1em5wZA=="
+      "solr_admin": "AwedE5lprvQ1kcVnDKFxTmLGlYNjO/w5GEbX0lLRa1A= ZGRzMHE1ejRzcTB2Yzdwcg=="
     },
     "blockUnknown": true
   },

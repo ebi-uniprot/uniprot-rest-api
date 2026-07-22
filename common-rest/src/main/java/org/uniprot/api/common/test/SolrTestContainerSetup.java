@@ -31,8 +31,9 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
     private static volatile SolrContainer solr;
     private static final Object LOCK = new Object();
 
+    // https://clemente-biondo.github.io/ can be used to generate hash for security.json
     private static final String SOLR_USER = "solr_admin";
-    private static final String SOLR_PASS = "nimda";
+    private static final String SOLR_PASS = "ajjar";
 
     private static final String IT_SOLR_CONTAINER_IMAGE_NAME = "it.solr-container.image-name";
     private static final String IT_SOLR_CONTAINER_ENABLED = "it.solr-container.enabled";
