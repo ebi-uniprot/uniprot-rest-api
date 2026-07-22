@@ -69,7 +69,7 @@ public class SolrTestContainerSetup implements EnvironmentPostProcessor {
                         });
         environment
                 .getPropertySources()
-                .addFirst(new PropertiesPropertySource("overrideProps", properties));
+                .addFirst(new PropertiesPropertySource("it.solr-container.props", properties));
     }
 
     private static void startContainerOnce() {
