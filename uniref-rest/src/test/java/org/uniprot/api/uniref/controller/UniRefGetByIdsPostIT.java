@@ -9,10 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -70,6 +72,10 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniRefFacetConfig facetConfig;
 
+    @Autowired
+    @Qualifier("solrClient")
+    private SolrClient solrClient;
+
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
@@ -81,7 +87,7 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
             saveEntry(i, UniRefType.UniRef90);
             saveEntry(i, UniRefType.UniRef100);
         }
-        cloudSolrClient.commit(SolrCollection.uniref.name());
+        solrClient.commit(SolrCollection.uniref.name());
     }
 
     private void saveEntry(int i, UniRefType type) throws Exception {
@@ -91,7 +97,7 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
         UniRefEntryLight entryLight = unirefLightConverter.fromXml(xmlEntry);
         UniRefDocument doc = documentConverter.convert(xmlEntry);
-        cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
+        solrClient.addBean(SolrCollection.uniref.name(), doc);
         storeClient.saveEntry(entryLight);
     }
 
@@ -108,6 +114,11 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
