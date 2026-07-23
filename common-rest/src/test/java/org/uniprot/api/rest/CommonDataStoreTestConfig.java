@@ -1,5 +1,7 @@
 package org.uniprot.api.rest;
 
+import static org.mockito.Mockito.mock;
+
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -8,8 +10,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-
-import static org.mockito.Mockito.mock;
 
 @TestConfiguration
 public class CommonDataStoreTestConfig {

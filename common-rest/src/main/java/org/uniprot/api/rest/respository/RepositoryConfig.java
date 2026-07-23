@@ -42,7 +42,6 @@ public class RepositoryConfig {
     }
 
     @Bean
-    @Profile("live")
     public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         return buildSolrClient(
                 httpClient,

@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.cloud.AbstractZkTestCase;
 import org.apache.solr.common.cloud.SolrZkClient;
@@ -67,9 +66,6 @@ public abstract class AbstractStreamControllerIT {
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     private static final Object LOCK = new Object();
-
-    // TODO to be removed
-    protected CloudSolrClient cloudSolrClient;
 
     @BeforeAll
     public void initializeSolrCluster() throws Exception {
@@ -133,13 +129,7 @@ public abstract class AbstractStreamControllerIT {
 
     protected abstract FacetTupleStreamTemplate getFacetTupleStreamTemplate();
 
-    protected SolrClient getSolrClient() {
-        /*
-            TODO keeping default implementation to return null to prevent compile errors for other backends
-             as only uniprotkb-rest is updated so far. This can later be converted to an abstract method.
-         */
-        return null;
-    }
+    protected abstract SolrClient getSolrClient();
 
     protected Stream<Arguments> getContentTypes(String requestPath) {
         return ControllerITUtils.getContentTypes(requestPath, requestMappingHandlerMapping).stream()

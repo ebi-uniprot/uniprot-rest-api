@@ -1,10 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,8 +13,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -98,18 +92,7 @@ public class UniParcGetFastaByProteomeIdStreamIT extends AbstractStreamControlle
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
-        saveStreamEntries(xrefGroupSize, cloudSolrClient, storeClient, xRefStoreClient);
-
-        // for the following tests, ensure the number of hits
-        // for each query is less than the maximum number allowed
-        // to be streamed (configured in {@link
-        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
-        long queryHits = 100L;
-        QueryResponse response = mock(QueryResponse.class);
-        SolrDocumentList results = mock(SolrDocumentList.class);
-        when(results.getNumFound()).thenReturn(queryHits);
-        when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
+        saveStreamEntries(xrefGroupSize, this.solrClient, storeClient, xRefStoreClient);
     }
 
     @Test
@@ -227,6 +210,11 @@ public class UniParcGetFastaByProteomeIdStreamIT extends AbstractStreamControlle
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     private Stream<Arguments> getAllSortFields() {

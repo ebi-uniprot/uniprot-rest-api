@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -75,6 +77,10 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private UniParcFacetConfig facetConfig;
 
+    @Autowired
+    @Qualifier("solrClient")
+    private SolrClient solrClient;
+
     @Value("${voldemort.uniparc.cross.reference.groupSize:#{null}}")
     private Integer xrefGroupSize;
 
@@ -96,6 +102,11 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
@@ -221,7 +232,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         for (int i = 1; i <= 10; i++) {
             saveEntry(i);
         }
-        cloudSolrClient.commit(SolrCollection.uniparc.name());
+        solrClient.commit(SolrCollection.uniparc.name());
     }
 
     private void saveEntry(int qualifier) throws Exception {
@@ -230,7 +241,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);
-        cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
+        solrClient.addBean(SolrCollection.uniparc.name(), doc);
         UniParcEntryLight uniParcEntryLight =
                 UniParcEntryMocker.createUniParcEntryLight(qualifier, UPI_PREF, xrefCount);
         storeClient.saveEntry(uniParcEntryLight);
