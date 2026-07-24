@@ -29,9 +29,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.async.download.controller.IdMappingAsyncConfig;
@@ -279,8 +279,6 @@ public abstract class AbstractIdMappingIT {
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRejectedQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getDownloadQueue(), true);
         this.amqpAdmin.purgeQueue(idMappingAsyncConfig.getRetryQueue(), true);
-        this.rabbitMQContainer.stop();
-        this.redisContainer.stop();
     }
 
     private void cleanUpFolder(String folder) throws IOException {

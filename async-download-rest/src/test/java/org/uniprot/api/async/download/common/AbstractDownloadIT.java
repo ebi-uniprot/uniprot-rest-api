@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.async.download.controller.TestAsyncConfig;
@@ -51,6 +51,7 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
         assertTrue(rabbitMQContainer.isRunning());
         assertTrue(redisContainer.isRunning());
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
+        propertyRegistry.add("qpid.amqp_port", rabbitMQContainer::getFirstMappedPort);
         propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
         System.setProperty("uniprot.redis.host", redisContainer.getHost());
         System.setProperty(
@@ -104,8 +105,6 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
         this.amqpAdmin.purgeQueue(getTestAsyncConfig().getRejectedQueue(), true);
         this.amqpAdmin.purgeQueue(getTestAsyncConfig().getDownloadQueue(), true);
         this.amqpAdmin.purgeQueue(getTestAsyncConfig().getRetryQueue(), true);
-        rabbitMQContainer.stop();
-        redisContainer.stop();
     }
 
     protected abstract TestAsyncConfig getTestAsyncConfig();
