@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,6 +93,10 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
 
     @Autowired private UniprotKBMappingRepository repository;
 
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @Override
     protected String getIdMappingResultPath() {
         return UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH;
@@ -132,6 +137,11 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
         return facetTupleStreamTemplate;
     }
 
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         when(idMappingRdfRestTemplate.getUriTemplateHandler())
@@ -142,15 +152,15 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     @BeforeAll
     void saveEntriesStore() throws Exception {
         for (int i = 1; i <= 20; i++) {
-            saveEntry(i, cloudSolrClient, uniProtStoreClient);
+            saveEntry(i, solrClient, uniProtStoreClient);
         }
-        saveInactiveEntry(cloudSolrClient);
-        ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+        saveInactiveEntry(solrClient);
+        ReflectionTestUtils.setField(repository, "solrClient", solrClient);
+        ReflectionTestUtils.setField(taxRepository, "solrClient", solrClient);
 
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
-        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
-        cloudSolrClient.commit(SolrCollection.taxonomy.name());
+        solrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
+        solrClient.commit(SolrCollection.taxonomy.name());
     }
 
     @Test
