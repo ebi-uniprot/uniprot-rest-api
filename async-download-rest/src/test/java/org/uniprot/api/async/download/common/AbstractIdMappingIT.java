@@ -101,6 +101,7 @@ public abstract class AbstractIdMappingIT {
         assertTrue(rabbitMQContainer.isRunning());
         assertTrue(redisContainer.isRunning());
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
+        propertyRegistry.add("qpid.amqp_port", rabbitMQContainer::getFirstMappedPort);
         propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
         System.setProperty("uniprot.redis.host", redisContainer.getHost());
         System.setProperty(

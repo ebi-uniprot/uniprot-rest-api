@@ -113,8 +113,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, storeClient);
     }
 
     @BeforeEach
@@ -447,6 +446,11 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     protected String getDownloadAPIsBasePath() {
