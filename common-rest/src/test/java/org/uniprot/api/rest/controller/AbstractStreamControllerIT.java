@@ -21,8 +21,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
 
 import lombok.extern.slf4j.Slf4j;
@@ -124,10 +122,6 @@ public abstract class AbstractStreamControllerIT {
     }
 
     protected abstract List<SolrCollection> getSolrCollections();
-
-    protected abstract TupleStreamTemplate getTupleStreamTemplate();
-
-    protected abstract FacetTupleStreamTemplate getFacetTupleStreamTemplate();
 
     protected abstract SolrClient getSolrClient();
 

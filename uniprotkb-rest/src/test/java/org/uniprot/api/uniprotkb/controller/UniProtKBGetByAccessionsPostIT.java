@@ -217,16 +217,6 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
-    }
-
-    @Override
     protected SolrClient getSolrClient() {
         return solrClient;
     }

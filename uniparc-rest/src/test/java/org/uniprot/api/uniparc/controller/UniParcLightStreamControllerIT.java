@@ -361,16 +361,6 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
-    }
-
-    @Override
     protected @NonNull SolrClient getSolrClient() {
         return solrClient;
     }
