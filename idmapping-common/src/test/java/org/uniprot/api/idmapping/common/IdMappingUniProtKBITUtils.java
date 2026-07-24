@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
@@ -95,7 +94,7 @@ public class IdMappingUniProtKBITUtils {
         return value;
     }
 
-    public static void saveInactiveEntry(CloudSolrClient cloudSolrClient)
+    public static void saveInactiveEntry(SolrClient cloudSolrClient)
             throws IOException, SolrServerException {
         UniProtDocument inactiveDoc = new UniProtDocument();
         inactiveDoc.accession = "I8FBX0";

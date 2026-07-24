@@ -2,7 +2,7 @@ package org.uniprot.api.idmapping.common;
 
 import java.util.HashMap;
 
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.UniParcEntryLight;
@@ -53,7 +53,7 @@ public class IdMappingUniParcITUtils {
     }
 
     public static void saveEntries(
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniParcEntryLight> storeClient,
             UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {
@@ -65,7 +65,7 @@ public class IdMappingUniParcITUtils {
 
     private static void saveEntry(
             int i,
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniParcEntryLight> storeClient,
             UniProtStoreClient<UniParcCrossReferencePair> xrefStoreClient)
             throws Exception {

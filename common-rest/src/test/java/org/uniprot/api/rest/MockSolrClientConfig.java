@@ -23,13 +23,7 @@ import org.springframework.context.annotation.Primary;
  */
 public class MockSolrClientConfig {
 
-    @Bean("uniProtKBSolrClient")
-    @Primary
-    public SolrClient uniProtKBSolrClient() throws URISyntaxException {
-        return mock(SolrClient.class);
-    }
-
-    @Bean
+    @Bean(value = {"uniProtKBSolrClient", "solrClient"})
     @Primary
     public SolrClient solrClient() throws URISyntaxException {
         return mock(SolrClient.class);
