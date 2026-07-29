@@ -1,12 +1,5 @@
 package org.uniprot.api.uniprotkb.common.repository.search;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -31,6 +24,13 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Repository responsible to query SolrCollection.uniprot
  *
@@ -45,7 +45,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
     // The solr=8 log line is ONLY emitted when this sampling decision is "in" -
     // so every solr=8 line in the log is guaranteed to have a solr=9 counterpart
     // (success, failed, or skipped=true reason=queue_full).
-    private static final int SHADOW_SAMPLE_PERCENT = 10;
+    private static final int SHADOW_SAMPLE_PERCENT = 1;
 
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger();
     private static final AtomicLong SHADOW_ID_COUNTER = new AtomicLong();
