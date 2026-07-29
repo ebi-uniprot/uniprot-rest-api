@@ -109,6 +109,20 @@ class ValidFromAndToTest {
     }
 
     @Test
+    void testInvalidFromMd5ToUniParc() {
+        String from = "MD5";
+        String to = "UniParc";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertFalse(isValid);
+    }
+
+    @Test
     void testValidFromEMBLToUniParc() {
         String from = "EMBL-GenBank-DDBJ";
         String to = "UniParc";

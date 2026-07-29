@@ -68,7 +68,6 @@ public class SolrJobTask extends JobTask {
             } else {
                 mappedIdsFromSolr = repo.getAllMappingIds(collection, inputJobIds);
             }
-
         } catch (SolrServerException | IOException e) {
             return IdMappingResult.builder()
                     .error(

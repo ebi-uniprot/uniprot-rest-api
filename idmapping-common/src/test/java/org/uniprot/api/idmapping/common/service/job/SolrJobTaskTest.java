@@ -80,8 +80,6 @@ class SolrJobTaskTest {
         void repoWillSearchUniprotKBChecksumForMd5ToUniProtKB()
                 throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
-            when(repo.getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids")))
-                    .thenReturn(List.of(new IdMappingStringPair("Ids", "P12345")));
 
             solrJobTask.processTask(mappingJob(MD5, "UniProtKB"));
 
@@ -93,8 +91,6 @@ class SolrJobTaskTest {
         void repoWillSearchUniprotKBChecksumForMd5ToSwissProt()
                 throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
-            when(repo.getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids")))
-                    .thenReturn(List.of(new IdMappingStringPair("Ids", "P12345")));
 
             solrJobTask.processTask(mappingJob(MD5, "UniProtKB-Swiss-Prot"));
 
