@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,6 +38,7 @@ import org.uniprot.api.async.download.model.job.uniref.UniRefDownloadJob;
 import org.uniprot.api.async.download.model.request.uniref.UniRefDownloadRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
@@ -51,6 +53,7 @@ import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
 
+@SpringBootTest
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(
         classes = {
@@ -65,6 +68,8 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniRefDownloadRequest, UniRefDownloadJob> {
+    @MockBean private IdMappingJobCacheService idMappingJobCacheService;
+
     @Autowired private UniRefMessageConsumer uniRefMessageConsumer;
     @Autowired private UniRefQueryRepository uniRefQueryRepository;
     @Autowired private SolrClient solrClient;
