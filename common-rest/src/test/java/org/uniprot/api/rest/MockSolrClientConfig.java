@@ -3,8 +3,8 @@ package org.uniprot.api.rest;
 import static org.mockito.Mockito.mock;
 
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
 
+import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
