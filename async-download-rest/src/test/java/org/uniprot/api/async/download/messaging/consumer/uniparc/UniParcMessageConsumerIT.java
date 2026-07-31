@@ -96,11 +96,7 @@ class UniParcMessageConsumerIT
     void beforeAll() throws Exception {
         prepareDownloadFolders();
         UniParcAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniParcQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                uniParcLightStoreClient,
-                xrefStoreClient);
+                solrClient, uniParcLightStoreClient, xrefStoreClient);
     }
 
     @BeforeEach
@@ -128,13 +124,8 @@ class UniParcMessageConsumerIT
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override

@@ -92,8 +92,7 @@ class UniRefMessageConsumerIT
     @BeforeAll
     void beforeAll() throws Exception {
         prepareDownloadFolders();
-        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient, 4);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, storeClient, 4);
     }
 
     @BeforeEach
@@ -120,13 +119,8 @@ class UniRefMessageConsumerIT
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override

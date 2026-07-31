@@ -240,16 +240,6 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return this.tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return this.facetTupleStreamTemplate;
-    }
-
-    @Override
     protected SolrClient getSolrClient() {
         return solrClient;
     }

@@ -101,8 +101,7 @@ class UniProtKBMessageConsumerIT
     @BeforeAll
     void beforeAll() throws Exception {
         prepareDownloadFolders();
-        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniProtKBQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, storeClient);
     }
 
     @BeforeEach
@@ -187,13 +186,8 @@ class UniProtKBMessageConsumerIT
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
