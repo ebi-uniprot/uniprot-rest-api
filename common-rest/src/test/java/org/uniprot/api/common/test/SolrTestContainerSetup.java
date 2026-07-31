@@ -1,5 +1,11 @@
 package org.uniprot.api.common.test;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
@@ -9,12 +15,6 @@ import org.testcontainers.solr.SolrContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 import org.uniprot.core.util.Utils;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Properties;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Follow <a

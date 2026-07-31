@@ -135,9 +135,9 @@ public abstract class AbstractStreamControllerIT {
 
     protected SolrClient getSolrClient() {
         /*
-            TODO keeping default implementation to return null to prevent compile errors for other backends
-             as only uniprotkb-rest is updated so far. This can later be converted to an abstract method.
-         */
+           TODO keeping default implementation to return null to prevent compile errors for other backends
+            as only uniprotkb-rest is updated so far. This can later be converted to an abstract method.
+        */
         return null;
     }
 
