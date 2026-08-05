@@ -2439,7 +2439,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         case "sec_acc" -> "B4DFC2";
                         case "organism_id", "virus_host_id", "taxonomy_id" -> "9606";
                         case "length", "mass" -> "[* TO *]";
-                        case "proteome" -> "UP000000000";
+                        case "proteome", "proteome_canonical" -> "UP000000000";
                         case "annotation_score" -> "5";
                         case "uniref_cluster_50" -> "UniRef50_P00001";
                         case "uniref_cluster_90" -> "UniRef90_P00001";
@@ -2568,6 +2568,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.seqCautionMisc.add("Search All");
             doc.commentMap.put("cc_sc_misc_exp", Collections.singleton("Search All"));
             doc.proteomes.add("UP000000000");
+            doc.proteomeCanonicals.add("UP000000000");
             doc.uniparc = "UPI0000000001";
             doc.unirefCluster50 = "UniRef50_P00001";
             doc.unirefCluster90 = "UniRef90_P00001";
