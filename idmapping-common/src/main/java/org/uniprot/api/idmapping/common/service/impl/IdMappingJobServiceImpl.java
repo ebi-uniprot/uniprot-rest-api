@@ -1,6 +1,5 @@
 package org.uniprot.api.idmapping.common.service.impl;
 
-import java.util.Date;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -84,27 +83,18 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         jobId = this.hashGenerator.generateHash(request);
 
         IdMappingJob idMappingJob = createJob(jobId, request);
-
-        if (needToRunJob(jobId)) {
-            this.cacheService.put(jobId, idMappingJob);
-            log.debug(
-                    "Put into cache, {} ids: {}...",
-                    idMappingJob.getIdMappingRequest().getIds().split(",").length,
-                    idsForLog(idMappingJob.getIdMappingRequest().getIds()));
-            // create task and submit
-            JobTask jobTask =
-                    canHandleInternally(request)
-                            ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
-                            : new PIRJobTask(
-                                    idMappingJob, cacheService, pirService, idMappingRepository);
-            jobTaskExecutor.execute(jobTask);
-        } else {
-            IdMappingJob job = this.cacheService.get(jobId);
-
-            // update expiry time
-            job.setUpdated(new Date());
-            this.cacheService.put(jobId, job);
-        }
+        this.cacheService.put(jobId, idMappingJob);
+        log.debug(
+                "Put into cache, {} ids: {}...",
+                idMappingJob.getIdMappingRequest().getIds().split(",").length,
+                idsForLog(idMappingJob.getIdMappingRequest().getIds()));
+        // create task and submit
+        JobTask jobTask =
+                canHandleInternally(request)
+                        ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
+                        : new PIRJobTask(
+                                idMappingJob, cacheService, pirService, idMappingRepository);
+        jobTaskExecutor.execute(jobTask);
 
         return new JobSubmitResponse(jobId);
     }

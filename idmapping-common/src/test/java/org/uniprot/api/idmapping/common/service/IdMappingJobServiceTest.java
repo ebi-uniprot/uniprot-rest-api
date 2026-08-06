@@ -255,7 +255,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(response2);
         Assertions.assertEquals(response.getJobId(), response2.getJobId());
         IdMappingJob updatedJob = this.cacheService.get(response.getJobId());
-        Assertions.assertEquals(updatedJob.getCreated(), created);
+        Assertions.assertNotEquals(updatedJob.getCreated(), created);
         Assertions.assertNotEquals(updated, updatedJob.getUpdated());
         Assertions.assertTrue((updatedJob.getUpdated().getTime() - updated.getTime()) > 0);
     }
