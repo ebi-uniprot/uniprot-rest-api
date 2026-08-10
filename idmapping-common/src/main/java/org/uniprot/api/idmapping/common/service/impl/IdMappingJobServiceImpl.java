@@ -96,7 +96,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                     canHandleInternally(request)
                             ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
                             : new PIRJobTask(
-                                    idMappingJob, cacheService, pirService, idMappingRepository);
+                            idMappingJob, cacheService, pirService, idMappingRepository);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);
@@ -146,11 +146,15 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             if (job.getJobStatus().equals(JobStatus.ERROR)) {
                 return true;
             } else {
-                return false;
+                return job.getJobStatus().equals(JobStatus.FINISHED) && isResultSizeLessThanSubmitted(job);
             }
         } else {
             return true;
         }
+    }
+
+    private static boolean isResultSizeLessThanSubmitted(IdMappingJob job) {
+        return job.getIdMappingResult().getMappedIds().size() < job.getIdMappingRequest().getIds().strip().split(",").length;
     }
 
     private String idsForLog(String logIds) {

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
@@ -260,12 +261,48 @@ class IdMappingJobServiceTest {
         Assertions.assertTrue((updatedJob.getUpdated().getTime() - updated.getTime()) > 0);
     }
 
+    @Test
+    void testSubmitSameJobTwiceWithIncompleteResultsOnTheFirstAttempt()
+            throws InterruptedException {
+        IdMappingJobRequest request = createIdMappingRequestWithLessResultSize();
+        JobSubmitResponse response = this.jobService.submitJob(request);
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getJobId());
+        IdMappingJob job = this.cacheService.get(response.getJobId());
+        Date created = job.getCreated();
+        Assertions.assertNotNull(created);
+        Date updated = job.getUpdated();
+        Assertions.assertNotNull(updated);
+        String random = UUID.randomUUID().toString();
+        job.setIdMappingResult(IdMappingResult.builder().mappedIds(List.of(IdMappingStringPair.builder().from(random).to(random).build())).build());
+        job.setJobStatus(JobStatus.FINISHED);
+        cacheService.put(job.getJobId(), job);
+        // submit the same job
+        Thread.sleep(1);
+        JobSubmitResponse response2 = this.jobService.submitJob(request);
+        Assertions.assertNotNull(response2);
+        Assertions.assertEquals(response.getJobId(), response2.getJobId());
+        IdMappingJob updatedJob = this.cacheService.get(response.getJobId());
+        Assertions.assertNotEquals(updatedJob.getCreated(), created);
+        Assertions.assertNotEquals(updated, updatedJob.getUpdated());
+        Assertions.assertTrue((updatedJob.getUpdated().getTime() - updated.getTime()) > 0);
+    }
+
     private IdMappingJobRequest createIdMappingRequest() {
         String random = UUID.randomUUID().toString();
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom("from" + random);
         request.setTo("to" + random);
         request.setIds("ids" + random);
+        return request;
+    }
+
+    private IdMappingJobRequest createIdMappingRequestWithLessResultSize() {
+        String random = UUID.randomUUID().toString();
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom("from1" + random + " " + "from2" + random);
+        request.setTo("to" + random);
+        request.setIds("from1" + random + "," + "from2" + random);
         return request;
     }
 }
