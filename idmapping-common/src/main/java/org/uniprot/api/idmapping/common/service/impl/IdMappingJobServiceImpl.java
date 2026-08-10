@@ -154,7 +154,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     private static boolean isResultSizeLessThanSubmitted(IdMappingJob job) {
-        return job.getIdMappingResult().getMappedIds().size() < job.getIdMappingRequest().getFrom().strip().split(",").length;
+        return job.getIdMappingResult().getMappedIds().size() < job.getIdMappingRequest().getIds().strip().split(",").length;
     }
 
     private String idsForLog(String logIds) {

@@ -300,9 +300,9 @@ class IdMappingJobServiceTest {
     private IdMappingJobRequest createIdMappingRequestWithLessResultSize() {
         String random = UUID.randomUUID().toString();
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setFrom("from1" + random + "," + "from2" +random);
+        request.setFrom("from1" + random + " " + "from2" + random);
         request.setTo("to" + random);
-        request.setIds("ids" + random);
+        request.setIds("from1" + random + "," + "from2" + random);
         return request;
     }
 }
