@@ -36,6 +36,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final String RESULTS_SUBPATH = "results/";
     public static final Set<String> UNIREF_SET;
     public static final String UNIPARC;
+    public static final String MD5;
     public static final Set<String> UNIPROTKB_SET;
 
     static {
@@ -52,6 +53,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                         IdMappingFieldConfig.ACC_ID_STR,
                         IdMappingFieldConfig.ACC_STR,
                         IdMappingFieldConfig.SWISSPROT_STR);
+        MD5 = IdMappingFieldConfig.MD5;
     }
 
     private final IdMappingJobCacheService cacheService;
@@ -110,9 +112,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     private boolean canHandleInternally(IdMappingJobRequest request) {
+        String fromDb = request.getFrom();
+        if (fromDb.equals(MD5)) {
+            return true;
+        }
         String toDb = request.getTo();
-        return request.getFrom().equals(toDb)
-                && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb));
+        return fromDb.equals(toDb) && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb));
     }
 
     @Override

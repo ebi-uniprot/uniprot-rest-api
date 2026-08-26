@@ -6,13 +6,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.util.MockSearchableSolrClient;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -173,32 +176,104 @@ class IdMappingRepositoryTest {
                 returnedInactiveAccessions);
     }
 
-    private void addUniProtKBDataSolr(SolrClient kbClient) throws Exception {
-        // create 10 active and 5 inactive kb entries in solr
-        saveEntries(kbClient, 1, 10, false);
-        saveEntries(kbClient, 11, 15, true);
+    @Test
+    void canGetUniProtKBMappingByChecksumSearchField() throws SolrServerException, IOException {
+        String checksum1 = checksum(1);
+        String checksum12 = checksum(12);
+        String checksum21 = checksum(21);
+
+        List<IdMappingStringPair> mappedIdsPairs =
+                idMappingRepository.getAllMappingIds(
+                        SolrCollection.uniprot,
+                        "checksum",
+                        Stream.of(checksum1, checksum12, checksum21)
+                                .map(String::toLowerCase)
+                                .toList(),
+                        "*:*");
+        var mappings =
+                mappedIdsPairs.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        IdMappingStringPair::getFrom, IdMappingStringPair::getTo));
+
+        assertAll(
+                () -> assertEquals(3, mappedIdsPairs.size()),
+                () -> assertEquals("P00001", mappings.get(checksum1)),
+                () -> assertEquals("P00012", mappings.get(checksum12)),
+                () -> assertEquals("P00021", mappings.get(checksum21)));
     }
 
-    private void saveEntries(SolrClient kbClient, int start, int end, boolean inactive)
+    @Test
+    void canGetUniProtKBMappingByChecksumSearchFieldAndSwissProt()
+            throws SolrServerException, IOException {
+        String checksum1 = checksum(1);
+        String checksum12 = checksum(12);
+        String checksum21 = checksum(21);
+
+        List<IdMappingStringPair> mappedIdsPairs =
+                idMappingRepository.getAllMappingIds(
+                        SolrCollection.uniprot,
+                        "checksum",
+                        Stream.of(checksum1, checksum12, checksum21)
+                                .map(String::toLowerCase)
+                                .toList(),
+                        "reviewed:true");
+        var mappings =
+                mappedIdsPairs.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        IdMappingStringPair::getFrom, IdMappingStringPair::getTo));
+
+        assertAll(
+                () -> assertEquals(2, mappedIdsPairs.size()),
+                () -> assertEquals("P00001", mappings.get(checksum1)),
+                () -> assertEquals("P00012", mappings.get(checksum12)));
+    }
+
+    private void addUniProtKBDataSolr(SolrClient kbClient) throws Exception {
+        // create 10 active and 5 inactive kb entries in solr
+        saveEntries(kbClient, 1, 10, false, true);
+        saveEntries(kbClient, 11, 15, true, true);
+        saveEntries(kbClient, 21, 21, true, false);
+    }
+
+    private void saveEntries(
+            SolrClient kbClient, int start, int end, boolean inactive, boolean reviewed)
             throws Exception {
         for (int i = start; i <= end; i++) {
-            saveEntry(kbClient, i, inactive);
+            saveEntry(kbClient, i, inactive, reviewed);
         }
         kbClient.commit(SolrCollection.uniprot.name());
     }
 
-    private void saveEntry(SolrClient kbClient, int i, boolean inactive)
+    private void saveEntry(SolrClient kbClient, int i, boolean inactive, boolean reviewed)
             throws SolrServerException, IOException {
+        UniProtDocument doc = getUniProtDocument(i);
+        doc.reviewed = reviewed;
+        save(kbClient, doc);
+        // update the inactive flag and update solr doc
+        if (inactive) {
+            doc.active = false;
+            save(kbClient, doc);
+        }
+    }
+
+    private static void save(SolrClient kbClient, UniProtDocument doc)
+            throws IOException, SolrServerException {
+        kbClient.addBean(SolrCollection.uniprot.name(), doc);
+    }
+
+    private @NotNull UniProtDocument getUniProtDocument(int i) {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("P%05d", i);
         entryBuilder.primaryAccession(acc);
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
-        kbClient.addBean(SolrCollection.uniprot.name(), doc);
-        // update the inactive flag and update solr doc
-        if (inactive) {
-            doc.active = false;
-            kbClient.addBean(SolrCollection.uniprot.name(), doc);
-        }
+        doc.sequenceChecksums = Set.of(checksum(i));
+        return doc;
+    }
+
+    private String checksum(int i) {
+        return String.format("MD5%05d", i);
     }
 }
