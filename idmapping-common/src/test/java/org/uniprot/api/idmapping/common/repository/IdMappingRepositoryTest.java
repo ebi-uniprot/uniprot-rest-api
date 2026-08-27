@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -269,7 +268,7 @@ class IdMappingRepositoryTest {
         entryBuilder.primaryAccession(acc);
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
-        doc.sequenceChecksums = Set.of(checksum(i));
+        doc.sequenceChecksums = List.of(checksum(i));
         return doc;
     }
 
