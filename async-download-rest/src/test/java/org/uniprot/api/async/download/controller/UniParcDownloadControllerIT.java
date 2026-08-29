@@ -114,11 +114,7 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
         UniParcAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniParcQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                uniParcLightStoreClient,
-                uniParcCrossReferenceStoreClient);
+                solrClient, uniParcLightStoreClient, uniParcCrossReferenceStoreClient);
     }
 
     @BeforeEach
@@ -291,13 +287,8 @@ class UniParcDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return this.tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return this.facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     protected String getDownloadAPIsBasePath() {

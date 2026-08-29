@@ -99,8 +99,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, storeClient, 4);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, storeClient, 4);
     }
 
     @BeforeEach
@@ -241,13 +240,8 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return this.tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return this.facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     protected String getDownloadAPIsBasePath() {

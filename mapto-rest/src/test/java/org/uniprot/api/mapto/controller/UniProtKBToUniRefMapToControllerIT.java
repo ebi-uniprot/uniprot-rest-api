@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.search.SolrCollection.*;
 
 import java.util.*;
@@ -94,7 +93,7 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
 
     @Autowired
     @Qualifier("uniProtKBSolrClient")
-    private SolrClient uniProtKBSolrClient;
+    private SolrClient solrClient;
 
     @Qualifier("uniProtStoreClient")
     @Autowired
@@ -116,15 +115,9 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
 
     @BeforeAll
     void runSaveEntriesInSolrAndStore() throws Exception {
-        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniprotQueryRepository,
-                cloudSolrClient,
-                uniProtKBSolrClient,
-                uniProtKBStoreClient,
-                taxRepository);
-        UniProtKBAsyncDownloadUtils.saveEntries(cloudSolrClient, uniProtKBStoreClient, 20);
-        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient, 20, "P");
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, uniProtKBStoreClient);
+        UniProtKBAsyncDownloadUtils.saveEntries(solrClient, uniProtKBStoreClient, 20);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, uniRefStoreClient, 20, "P");
     }
 
     @Test
@@ -410,8 +403,8 @@ class UniProtKBToUniRefMapToControllerIT extends AbstractMapToControllerIT {
     }
 
     @Override
-    protected Collection<TupleStreamTemplate> getTupleStreamTemplates() {
-        return List.of(uniProtKBTupleStreamTemplate, unirefTupleStreamTemplate);
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override

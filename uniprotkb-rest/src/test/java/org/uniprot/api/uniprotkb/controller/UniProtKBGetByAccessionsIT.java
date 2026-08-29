@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -117,6 +118,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Autowired private UniProtKBFacetConfig facetConfig;
 
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         char prefix = 'z';
@@ -163,14 +168,14 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                         .build();
         saveEntry(uniProtKBEntry);
 
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        solrClient.commit(SolrCollection.uniprot.name());
     }
 
     private void saveEntry(UniProtKBEntry uniProtKBEntry) throws IOException, SolrServerException {
         UniProtDocument document = documentConverter.convert(uniProtKBEntry);
         UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
 
-        cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
+        solrClient.addBean(SolrCollection.uniprot.name(), document);
         uniProtKBStoreClient.saveEntry(uniProtKBEntry);
     }
 
@@ -669,13 +674,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.common;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
 
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -55,7 +55,7 @@ public class IdMappingUniRefITUtils {
     }
 
     public static void saveEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
+            SolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
         for (int i = 1; i <= AbstractJobOperation.DEFAULT_IDS_COUNT; i++) {
             saveEntry(i, UniRefType.UniRef50, cloudSolrClient, storeClient);
@@ -68,7 +68,7 @@ public class IdMappingUniRefITUtils {
     private static void saveEntry(
             int i,
             UniRefType type,
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
         UniRefEntry entry = UniRefEntryMocker.createEntry(i, i, type);

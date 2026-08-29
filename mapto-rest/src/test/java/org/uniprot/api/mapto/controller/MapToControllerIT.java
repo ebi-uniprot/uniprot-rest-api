@@ -41,7 +41,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.mapto.MapToREST;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -77,7 +76,7 @@ class MapToControllerIT extends BaseMapToControllerIT {
 
     @Autowired
     @Qualifier("uniProtKBSolrClient")
-    private SolrClient uniProtKBSolrClient;
+    private SolrClient solrClient;
 
     @Qualifier("uniProtStoreClient")
     @Autowired
@@ -89,15 +88,9 @@ class MapToControllerIT extends BaseMapToControllerIT {
 
     @BeforeAll
     void runSaveEntriesInSolrAndStore() throws Exception {
-        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniprotQueryRepository,
-                cloudSolrClient,
-                uniProtKBSolrClient,
-                uniProtKBStoreClient,
-                taxRepository);
-        UniProtKBAsyncDownloadUtils.saveEntries(cloudSolrClient, uniProtKBStoreClient, 20);
-        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniRefQueryRepository, cloudSolrClient, solrClient, uniRefStoreClient, 20, "P");
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, uniProtKBStoreClient);
+        UniProtKBAsyncDownloadUtils.saveEntries(solrClient, uniProtKBStoreClient, 20);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, uniRefStoreClient, 20, "P");
     }
 
     @Test
@@ -456,6 +449,11 @@ class MapToControllerIT extends BaseMapToControllerIT {
     }
 
     @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
+    }
+
+    @Override
     protected String getQueryInLimits() {
         return "accession:(P00001  OR P00002 OR P00003 OR P00004)";
     }
@@ -468,11 +466,6 @@ class MapToControllerIT extends BaseMapToControllerIT {
     @Override
     protected String getDownloadAPIsBasePath() {
         return UniProtKBUniRefMapToController.RESOURCE_PATH;
-    }
-
-    @Override
-    protected Collection<TupleStreamTemplate> getTupleStreamTemplates() {
-        return List.of();
     }
 
     @Override
