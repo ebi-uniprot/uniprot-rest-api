@@ -2,10 +2,6 @@ package org.uniprot.api.rest;
 
 import static org.mockito.Mockito.mock;
 
-import java.net.URISyntaxException;
-
-import org.apache.http.client.HttpClient;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -17,24 +13,6 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 
 @TestConfiguration
 public class CommonDataStoreTestConfig {
-
-    @Bean
-    @Profile("offline")
-    public HttpClient httpClient() {
-        return mock(HttpClient.class);
-    }
-
-    @Bean
-    @Profile("offline")
-    public SolrClient solrClient() throws URISyntaxException {
-        return mock(SolrClient.class);
-    }
-
-    @Bean("uniProtKBSolrClient")
-    @Profile("offline")
-    public SolrClient uniProtKBSolrClient() throws URISyntaxException {
-        return mock(SolrClient.class);
-    }
 
     @Bean
     @Profile("offline")
