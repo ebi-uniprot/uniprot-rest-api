@@ -56,6 +56,7 @@ public class IdMappingUniProtKBITUtils {
 
     public static final String UNIPROTKB_AC_ID_STR = "UniProtKB_AC-ID";
     public static final String UNIPROTKB_STR = "UniProtKB";
+    public static final String MD5 = "MD5";
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private static final UniProtKBEntry TEMPLATE_ISOFORM_ENTRY =

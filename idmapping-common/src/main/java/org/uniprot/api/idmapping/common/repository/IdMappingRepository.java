@@ -32,27 +32,44 @@ public class IdMappingRepository {
     public List<IdMappingStringPair> getAllMappingIds(
             SolrCollection collection, List<String> searchIds, String query)
             throws SolrServerException, IOException {
+        return getAllMappingIds(collection, null, searchIds, query);
+    }
+
+    public List<IdMappingStringPair> getAllMappingIds(
+            SolrCollection collection, String searchField, List<String> searchIds)
+            throws SolrServerException, IOException {
+        String starQuery = "*:*";
+        return getAllMappingIds(collection, searchField, searchIds, starQuery);
+    }
+
+    public List<IdMappingStringPair> getAllMappingIds(
+            SolrCollection collection, String searchField, List<String> searchIds, String query)
+            throws SolrServerException, IOException {
         switch (collection) {
             case uniprot:
+                String uniprotSearchField = getSearchField(searchField, "accession_id");
                 return getAllMatchingIds(
                         uniProtKBSolrClient,
                         collection,
-                        "accession_id",
+                        uniprotSearchField,
                         "accession_id",
                         searchIds,
                         query);
             case uniparc:
-                return getAllMatchingIds(solrClient, collection, "upi", "upi", searchIds, query);
+                String uniparcSearchField = getSearchField(searchField, "upi");
+                return getAllMatchingIds(
+                        solrClient, collection, uniparcSearchField, "upi", searchIds, query);
             case uniref:
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
                 int sublistSize = Math.min(searchIds.size(), MAX_ID_MAPPINGS_ALLOWED / 2);
                 var unirefSolrIdField = "id";
+                String unirefSearchField = getSearchField(searchField, unirefSolrIdField);
                 var unirefSolrMappingList =
                         getAllMatchingIds(
                                 solrClient,
                                 collection,
-                                unirefSolrIdField,
+                                unirefSearchField,
                                 unirefSolrIdField,
                                 searchIds.subList(0, sublistSize),
                                 query);
@@ -61,7 +78,7 @@ public class IdMappingRepository {
                             getAllMatchingIds(
                                     solrClient,
                                     collection,
-                                    unirefSolrIdField,
+                                    unirefSearchField,
                                     unirefSolrIdField,
                                     searchIds.subList(sublistSize, searchIds.size()),
                                     query));
@@ -70,6 +87,10 @@ public class IdMappingRepository {
             default:
                 return List.of();
         }
+    }
+
+    private String getSearchField(String searchField, String defaultSearchField) {
+        return searchField == null ? defaultSearchField : searchField;
     }
 
     private List<IdMappingStringPair> getAllMatchingIds(

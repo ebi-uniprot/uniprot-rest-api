@@ -69,7 +69,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='UniProt')].items.*",
-                                iterableWithSize(9)))
+                                iterableWithSize(10)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='UniProt')].items.*.uriLink",
@@ -81,6 +81,7 @@ class IdMappingConfigureControllerIT {
                                         "https://www.uniprot.org/uniref/%id",
                                         "https://www.uniprot.org/uniref/%id",
                                         "https://www.uniprot.org/uniref/%id",
+                                        null,
                                         null,
                                         null)))
                 .andExpect(
@@ -189,12 +190,12 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(3)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==8)]", iterableWithSize(85)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==8)]", iterableWithSize(86)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=9)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(94)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(95)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(95)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(96)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.rules.length()", is(8)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(7)))
