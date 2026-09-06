@@ -31,14 +31,15 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.common.AbstractIdMappingIT;
+import org.uniprot.api.async.download.messaging.config.common.RedisConfiguration;
 import org.uniprot.api.async.download.messaging.config.idmapping.IdMappingDownloadConfigProperties;
 import org.uniprot.api.async.download.messaging.result.idmapping.IdMappingFileHandler;
 import org.uniprot.api.async.download.model.job.idmapping.IdMappingDownloadJob;
@@ -47,6 +48,9 @@ import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.uniparc.common.repository.UniParcDataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,10 +58,17 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
 @ActiveProfiles(profiles = {"offline", "idmapping"})
-@ContextConfiguration(classes = {AsyncDownloadRestApp.class})
+@SpringBootTest
 @ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@TestPropertySource("classpath:application.properties")
+@AutoConfigureWebClient
+@ContextConfiguration(
+        classes = {
+            UniParcDataStoreTestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadRestApp.class,
+            ErrorHandlerConfig.class,
+            RedisConfiguration.class
+        })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingMessageConsumerIT extends AbstractIdMappingIT {
     private static final String ID = "someId";

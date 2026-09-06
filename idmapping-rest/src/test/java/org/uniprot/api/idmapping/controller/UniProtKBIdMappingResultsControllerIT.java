@@ -15,6 +15,7 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_
 
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,19 +97,18 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
@@ -144,17 +144,17 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @BeforeAll
     void saveEntriesStore() throws Exception {
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
-            saveEntry(i, cloudSolrClient, uniProtStoreClient);
+            saveEntry(i, solrClient, uniProtStoreClient);
         }
 
-        saveInactiveEntry(cloudSolrClient);
-        ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
+        saveInactiveEntry(solrClient);
+        ReflectionTestUtils.setField(repository, "solrClient", solrClient);
 
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+        ReflectionTestUtils.setField(taxRepository, "solrClient", solrClient);
 
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
-        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
-        cloudSolrClient.commit(SolrCollection.taxonomy.name());
+        solrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
+        solrClient.commit(SolrCollection.taxonomy.name());
     }
 
     @BeforeEach

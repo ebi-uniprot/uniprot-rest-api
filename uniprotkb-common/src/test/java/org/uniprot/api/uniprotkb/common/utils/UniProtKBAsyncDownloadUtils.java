@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.common.utils;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
@@ -12,15 +11,9 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.mockito.Mockito;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
-import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
@@ -63,30 +56,13 @@ public class UniProtKBAsyncDownloadUtils {
     }
 
     public static void saveEntriesInSolrAndStore(
-            UniprotQueryRepository uniprotQueryRepository,
-            CloudSolrClient cloudSolrClient,
-            SolrClient solrClient,
-            UniProtStoreClient<UniProtKBEntry> storeClient,
-            TaxonomyLineageRepository taxRepository)
+            SolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
             throws Exception {
-        ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", cloudSolrClient);
         saveEntries(cloudSolrClient, storeClient);
-        // for the following tests, ensure the number of hits
-        // for each query is less than the maximum number allowed
-        // to be streamed (configured in {@link
-        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
-        long queryHits = 100L;
-        QueryResponse response = mock(QueryResponse.class);
-        SolrDocumentList results = mock(SolrDocumentList.class);
-        when(results.getNumFound()).thenReturn(queryHits);
-        when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
-
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
     private static void saveEntries(
-            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
+            SolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
             throws Exception {
         int i = 1;
         for (; i <= 10; i++) {
@@ -103,9 +79,7 @@ public class UniProtKBAsyncDownloadUtils {
     }
 
     public static void saveEntries(
-            CloudSolrClient cloudSolrClient,
-            UniProtStoreClient<UniProtKBEntry> storeClient,
-            int limit)
+            SolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient, int limit)
             throws Exception {
         for (int i = 1; i <= limit; i++) {
             saveEntry(cloudSolrClient, i, "", i % 2 == 0, storeClient);
@@ -118,7 +92,7 @@ public class UniProtKBAsyncDownloadUtils {
     static AtomicInteger c = new AtomicInteger(0);
 
     public static void saveEntry(
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             int i,
             String isoFormString,
             UniProtStoreClient<UniProtKBEntry> storeClient)
@@ -142,7 +116,7 @@ public class UniProtKBAsyncDownloadUtils {
     }
 
     public static void saveEntry(
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             int i,
             String isoFormString,
             boolean reviewed,
@@ -172,8 +146,7 @@ public class UniProtKBAsyncDownloadUtils {
         storeClient.saveEntry(uniProtKBEntry);
     }
 
-    public static void saveTaxonomyEntry(CloudSolrClient cloudSolrClient, long taxId)
-            throws Exception {
+    public static void saveTaxonomyEntry(SolrClient cloudSolrClient, long taxId) throws Exception {
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry =
                 entryBuilder

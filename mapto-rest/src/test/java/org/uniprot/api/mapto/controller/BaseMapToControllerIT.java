@@ -11,43 +11,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.embedded.JettyConfig;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.request.CollectionAdminRequest;
-import org.apache.solr.cloud.MiniSolrCloudCluster;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.service.PostgresTestContainer;
 import org.uniprot.api.mapto.common.repository.MapToJobRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
@@ -60,19 +43,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class BaseMapToControllerIT {
-    private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
+public abstract class BaseMapToControllerIT extends AbstractStreamControllerIT {
     protected static final String SERVER_ERROR = "There is an error from the server side";
     public static final ObjectMapper MAPPER = new ObjectMapper();
-    @Autowired protected SolrClient solrClient;
     @Autowired protected MapToJobRepository mapToJobRepository;
     @Autowired protected RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    private MiniSolrCloudCluster cluster;
-
-    private Path tempClusterDir;
-
-    protected CloudSolrClient cloudSolrClient;
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry registry) {
@@ -83,66 +58,12 @@ public abstract class BaseMapToControllerIT {
         registry.add("spring.datasource.password", postgresContainer::getPassword);
     }
 
-    @BeforeAll
-    public void startCluster() throws Exception {
-        Properties solrProperties = loadSolrProperties();
-        String solrHome = solrProperties.getProperty("solr.home");
-        tempClusterDir = Files.createTempDirectory("MiniSolrCloudCluster");
-        System.setProperty(
-                "solr.data.home", tempClusterDir.toString() + File.separator + "solrTestData");
-
-        JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
-        try {
-            cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
-            Collection<TupleStreamTemplate> tupleStreamTemplates = getTupleStreamTemplates();
-            cloudSolrClient = cluster.getSolrClient();
-            for (TupleStreamTemplate tupleStreamTemplate : tupleStreamTemplates) {
-                tupleStreamTemplate
-                        .getStreamConfig()
-                        .setZkHost(cluster.getZkServer().getZkAddress());
-                ReflectionTestUtils.setField(tupleStreamTemplate, "streamFactory", null);
-                ReflectionTestUtils.setField(tupleStreamTemplate, "streamContext", null);
-                ReflectionTestUtils.setField(tupleStreamTemplate, "solrClient", cloudSolrClient);
-            }
-            updateFacetTupleStreamTemplate();
-
-            for (SolrCollection solrCollection : getSolrCollections()) {
-                String collection = solrCollection.name();
-                Path configPath = Paths.get(solrHome + File.separator + collection + "/conf");
-                cluster.uploadConfigSet(configPath, collection);
-                CollectionAdminRequest.createCollection(collection, collection, 1, 1)
-                        .process(cloudSolrClient);
-            }
-        } catch (Exception exc) {
-            log.error("Failed to initialize a MiniSolrCloudCluster due to: " + exc, exc);
-            throw exc;
-        }
-    }
-
     @AfterEach
     void tearDown() {
         mapToJobRepository.deleteAll();
     }
 
-    @AfterAll
-    public void stopCluster() throws Exception {
-        if (cloudSolrClient != null) {
-            cloudSolrClient.close();
-            cloudSolrClient = null;
-        }
-        if (cluster != null) {
-            cluster.shutdown();
-            cluster = null;
-        }
-        mapToJobRepository.deleteAll();
-
-        // Delete tempDir content
-        FileSystemUtils.deleteRecursively(tempClusterDir);
-    }
-
     protected abstract Collection<FacetTupleStreamTemplate> getFacetTupleStreamTemplates();
-
-    protected abstract Collection<TupleStreamTemplate> getTupleStreamTemplates();
 
     protected abstract List<SolrCollection> getSolrCollections();
 
@@ -151,13 +72,6 @@ public abstract class BaseMapToControllerIT {
     protected String callRunAPIAndVerify(String query) throws Exception {
 
         ResultActions response = callRun(query);
-
-        return verifyRunResponseAndGetJobId(response);
-    }
-
-    protected String callRunAPIAndVerify(String query, boolean includeIsoform) throws Exception {
-
-        ResultActions response = callRun(query, includeIsoform);
 
         return verifyRunResponseAndGetJobId(response);
     }
@@ -180,15 +94,6 @@ public abstract class BaseMapToControllerIT {
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, APPLICATION_JSON)
                         .param("query", query);
-        return getMockMvc().perform(requestBuilder);
-    }
-
-    protected ResultActions callRun(String query, boolean includeIsoform) throws Exception {
-        MockHttpServletRequestBuilder requestBuilder =
-                post(getDownloadAPIsBasePath() + "/run")
-                        .header(ACCEPT, APPLICATION_JSON)
-                        .param("query", query)
-                        .param("includeIsoform", String.valueOf(includeIsoform));
         return getMockMvc().perform(requestBuilder);
     }
 
@@ -227,28 +132,4 @@ public abstract class BaseMapToControllerIT {
     }
 
     protected abstract String getDownloadAPIsBasePath();
-
-    private void updateFacetTupleStreamTemplate() {
-        // update facet tuple for fields value for testing
-        Collection<FacetTupleStreamTemplate> facetTupleStreamTemplates =
-                getFacetTupleStreamTemplates();
-        for (FacetTupleStreamTemplate facetTupleStreamTemplate : facetTupleStreamTemplates) {
-            ReflectionTestUtils.setField(
-                    facetTupleStreamTemplate,
-                    "zookeeperHost",
-                    cluster.getZkServer().getZkAddress());
-            ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamFactory", null);
-            ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamContext", null);
-        }
-    }
-
-    private Properties loadSolrProperties() throws IOException {
-        Properties properties = new Properties();
-        InputStream propertiesStream =
-                AbstractStreamControllerIT.class
-                        .getClassLoader()
-                        .getResourceAsStream(SOLR_SYSTEM_PROPERTIES);
-        properties.load(propertiesStream);
-        return properties;
-    }
 }

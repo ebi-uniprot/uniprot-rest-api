@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,19 +93,16 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate uniRefRestTemplate;
 
+    @Autowired private SolrClient solrClient;
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniref);
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
@@ -153,7 +151,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-        saveEntries(cloudSolrClient, storeClient);
+        saveEntries(solrClient, storeClient);
     }
 
     @BeforeEach

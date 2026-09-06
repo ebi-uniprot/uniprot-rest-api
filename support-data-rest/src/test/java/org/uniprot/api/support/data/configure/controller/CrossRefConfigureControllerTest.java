@@ -17,9 +17,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.rest.MockSolrClientConfig;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 
@@ -28,8 +30,14 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
  * @since 19/03/2021
  */
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            SupportDataRestApplication.class,
+            MockSolrClientConfig.class
+        })
 @WebMvcTest(CrossRefConfigureController.class)
+@TestPropertySource(properties = "spring.main.allow-bean-definition-overriding=true")
 class CrossRefConfigureControllerTest {
 
     private static final String CONFIGURE_RESOURCE = "/configure/database/";

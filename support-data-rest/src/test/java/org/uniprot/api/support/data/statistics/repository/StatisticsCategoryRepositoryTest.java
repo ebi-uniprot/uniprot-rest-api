@@ -16,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.rest.MockSolrClientConfig;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 
@@ -27,8 +29,10 @@ import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 @Import({
     HttpCommonHeaderConfig.class,
     RequestMappingHandlerMapping.class,
-    RequestMappingHandlerAdapter.class
+    RequestMappingHandlerAdapter.class,
+    MockSolrClientConfig.class
 })
+@TestPropertySource(properties = "spring.main.allow-bean-definition-overriding=true")
 class StatisticsCategoryRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 
