@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,6 +82,10 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Autowired private UniProtKBFacetConfig facetConfig;
 
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         for (int i = 1; i <= 10; i++) {
@@ -97,10 +102,10 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
 
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
-            cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
+            solrClient.addBean(SolrCollection.uniprot.name(), convert);
             uniProtKBStoreClient.saveEntry(uniProtKBEntry);
         }
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        solrClient.commit(SolrCollection.uniprot.name());
     }
 
     @Override
@@ -219,6 +224,11 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override
