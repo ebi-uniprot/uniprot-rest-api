@@ -1,7 +1,11 @@
 package org.uniprot.api.uniprotkb.common.repository.search;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -10,7 +14,6 @@ import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -98,10 +101,6 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         CURRENT_SOLR_PARAMS.set(String.valueOf(solrQuery.getParams()));
     }
 
-    @SuppressWarnings(
-            "javasecurity:S5145") // ignore it for now. logging is temporary and we validate the
-    // query
-    // first and other params anyway
     @Override
     protected void logSearchResponse(
             SolrRequest request,
@@ -110,7 +109,6 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
             List<UniProtDocument> documents) {
         Long shadowId = CURRENT_SHADOW_ID.get();
         if (shadowId != null) {
-            String sanitizedQuery = getSanitizedQuery(request);
             SHADOW_LOGGER.info(
                     "shadowId={} solr=8 collection=uniprot numFound={} qTime={} cursor={} ids={} params={} query={} filters={} sorts={} rows={} facets={}",
                     shadowId,
@@ -119,7 +117,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
                     cursor,
                     getDocumentIds(documents),
                     CURRENT_SOLR_PARAMS.get(),
-                    sanitizedQuery,
+                    request.getQuery(),
                     request.getFilterQueries(),
                     request.getSorts(),
                     request.getRows(),
@@ -127,9 +125,8 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         }
     }
 
-    public void shadowSearchPage(
+    private void shadowSearchPage(
             long shadowId, SolrRequest request, String cursor, String solrCursor) {
-        String sanitizedQuery = getSanitizedQuery(request);
         if (solr9Client == null) {
             return;
         }
@@ -160,7 +157,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
                                     cursor,
                                     getDocumentIds(response.getBeans(UniProtDocument.class)),
                                     solrQuery.getParams(),
-                                    sanitizedQuery,
+                                    request.getQuery(),
                                     request.getFilterQueries(),
                                     request.getSorts(),
                                     request.getRows(),
@@ -170,7 +167,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
                                     "shadowId={} solr=9 collection=uniprot failed cursor={} query={} filters={} sorts={} rows={} facets={}",
                                     shadowId,
                                     cursor,
-                                    sanitizedQuery,
+                                    request.getQuery(),
                                     request.getFilterQueries(),
                                     request.getSorts(),
                                     request.getRows(),
@@ -183,7 +180,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
                     "shadowId={} solr=9 collection=uniprot skipped=true reason=queue_full cursor={} query={} filters={} sorts={} rows={} facets={}",
                     shadowId,
                     cursor,
-                    sanitizedQuery,
+                    request.getQuery(),
                     request.getFilterQueries(),
                     request.getSorts(),
                     request.getRows(),
@@ -193,13 +190,5 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
 
     private List<String> getDocumentIds(List<? extends Document> documents) {
         return documents.stream().limit(IDS_TO_LOG).map(Document::getDocumentId).toList();
-    }
-
-    private static @NonNull String getSanitizedQuery(SolrRequest request) {
-        String sanitizedQuery =
-                request.getQuery() == null
-                        ? "null"
-                        : request.getQuery().replaceAll("[\r\n\t]", "_");
-        return sanitizedQuery;
     }
 }
