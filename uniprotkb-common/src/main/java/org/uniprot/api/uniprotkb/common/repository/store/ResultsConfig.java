@@ -5,7 +5,6 @@ import java.time.Duration;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,27 +47,6 @@ public class ResultsConfig {
                 config.getHttphost(),
                 config.getUsername(),
                 config.getPassword());
-    }
-
-    @Bean("uniProtKBSolr9Client")
-    @Profile("live")
-    @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
-    public SolrClient uniProtKBSolr9Client(
-            @Qualifier("uniProtKBSolr9ConfigProperties")
-                    UniProtKBRepositoryConfigProperties config) {
-        return buildSolrClient(
-                config.getZkHost(),
-                config.getConnectionTimeout(),
-                config.getSocketTimeout(),
-                config.getHttphost(),
-                config.getUsername(),
-                config.getPassword());
-    }
-
-    @Bean("uniProtKBSolr9ConfigProperties")
-    @ConfigurationProperties(prefix = "spring.data.solr.kb.solr9")
-    public UniProtKBRepositoryConfigProperties uniProtKBSolr9ConfigProperties() {
-        return new UniProtKBRepositoryConfigProperties();
     }
 
     @Bean("uniProtKBTupleStream")
