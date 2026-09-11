@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +20,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.service.request.RequestConverter;
 import org.uniprot.api.uniprotkb.common.repository.search.PrecomputedAnnotationRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.precomputed.PrecomputedAnnotationStoreClient;
@@ -32,6 +36,8 @@ class PrecomputedUniProtKBEntryServiceTest {
     @Mock private PrecomputedAnnotationRepository repository;
     @Mock private ProteomeTaxonomyResolver proteomeTaxonomyResolver;
     @Mock private RequestConverter requestConverter;
+    @Mock private StoreStreamer<UniProtKBEntry> storeStreamer;
+    @Mock private TupleStreamDocumentIdStream solrIdStreamer;
 
     @Test
     void searchReturnsStoreEntriesForPrecomputedDocuments() {
@@ -127,9 +133,72 @@ class PrecomputedUniProtKBEntryServiceTest {
         verify(storeClient).getEntries(List.of("P12345"));
     }
 
+    @Test
+    void streamInNonListFormatWithStoreStreamerBeingCalled() {
+        String acc1 = "P56789";
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
+        request.setFormat(APPLICATION_JSON_VALUE);
+        request.setUpId("UP000000000");
+
+        SolrRequest solrRequest = SolrRequest.builder().query("taxonomy_id:9606").rows(100).build();
+
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId("UP000000000")).thenReturn("9606");
+        when(requestConverter.createStreamSolrRequest(request)).thenReturn(solrRequest);
+        when(storeStreamer.idsToStoreStream(any(), any())).thenReturn(Stream.of(entry1));
+
+        Stream<UniProtKBEntry> result = service().streamByProteomeId(request);
+
+        List<UniProtKBEntry> entries = result.toList();
+        verify(proteomeTaxonomyResolver).findTaxonomyIdByUpId("UP000000000");
+        verify(requestConverter).createStreamSolrRequest(request);
+        verify(storeStreamer, times(1)).idsToStoreStream(any(), any());
+        assertEquals(1, entries.size());
+        assertEquals(entry1, entries.get(0));
+    }
+
+    @Test
+    void streamInListFormatWithSolrIdStreamerBeingCalled() {
+        String acc1 = "Q12345";
+        String acc2 = "Q54321";
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry2 =
+                new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
+
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
+        request.setFormat(LIST_MEDIA_TYPE_VALUE);
+        request.setUpId("UP000000000");
+
+        SolrRequest solrRequest = SolrRequest.builder().query("taxonomy_id:9606").rows(100).build();
+
+        when(proteomeTaxonomyResolver.findTaxonomyIdByUpId("UP000000000")).thenReturn("9606");
+        when(requestConverter.createStreamSolrRequest(request)).thenReturn(solrRequest);
+        when(solrIdStreamer.fetchIds(solrRequest)).thenReturn(Stream.of(acc1, acc2));
+
+        Stream<UniProtKBEntry> result = service().streamByProteomeId(request);
+
+        List<UniProtKBEntry> entries = result.toList();
+        verify(proteomeTaxonomyResolver).findTaxonomyIdByUpId("UP000000000");
+        verify(requestConverter).createStreamSolrRequest(request);
+        verify(solrIdStreamer, times(1)).fetchIds(any());
+        assertEquals(2, entries.size());
+        assertEquals(entry1, entries.get(0));
+        assertEquals(entry2, entries.get(1));
+    }
+
     private PrecomputedUniProtKBEntryService service() {
         return new PrecomputedUniProtKBEntryService(
-                storeClient, repository, proteomeTaxonomyResolver, requestConverter);
+                storeClient,
+                repository,
+                proteomeTaxonomyResolver,
+                requestConverter,
+                storeStreamer,
+                solrIdStreamer);
     }
 
     private static PrecomputedAnnotationDocument document(String accession) {

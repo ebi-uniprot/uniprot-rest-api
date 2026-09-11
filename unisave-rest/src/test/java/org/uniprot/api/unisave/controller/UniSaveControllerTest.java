@@ -601,6 +601,35 @@ class UniSaveControllerTest {
     }
 
     @Test
+    void canGetStatusForDeletedProteomeRedundancyEntries() throws Exception {
+        // given
+        AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+        status.setAccession(ACCESSION);
+        IdentifierStatus event = mockIdentifierStatus(EventTypeEnum.DELETED, ACCESSION, "", 13);
+        event.setEventRelease(mockRelease("1"));
+        status.setEvents(List.of(event));
+        when(uniSaveRepository.retrieveEntryStatusInfo(ACCESSION)).thenReturn(status);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION + STATUS)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.accession", is(ACCESSION)))
+                .andExpect(jsonPath("$.events.size()", is(1)))
+                .andExpect(jsonPath("$.events[0].eventType", is(EventTypeEnum.DELETED.toString())))
+                .andExpect(jsonPath("$.events[0].release", is("1")))
+                .andExpect(
+                        jsonPath(
+                                "$.events[0].deletedReason",
+                                is(DeletedReason.PROTEOME_REDUNDANCY.getName())));
+    }
+
+    @Test
     void canGetStatusForUnknownDeletedEntries() throws Exception {
         // given
         AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();

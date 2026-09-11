@@ -3,7 +3,7 @@ package org.uniprot.api.support.data.statistics.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.support.data.statistics.TestEntityGeneratorUtil.*;

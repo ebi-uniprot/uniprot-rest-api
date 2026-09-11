@@ -6,6 +6,7 @@ import java.time.Duration;
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,9 @@ public class ResultsConfig {
     @Bean("uniProtKBSolrClient")
     @Profile("live")
     public SolrClient uniProtKBSolrClient(
-            HttpClient httpClient, UniProtKBRepositoryConfigProperties config) {
+            HttpClient httpClient,
+            @Qualifier("uniProtKBRepositoryConfigProperties")
+                    UniProtKBRepositoryConfigProperties config) {
         return buildSolrClient(
                 config.getZkHost(),
                 config.getConnectionTimeout(),
@@ -47,6 +50,27 @@ public class ResultsConfig {
                 config.getHttphost(),
                 config.getUsername(),
                 config.getPassword());
+    }
+
+    @Bean("uniProtKBSolr9Client")
+    @Profile("live")
+    @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
+    public SolrClient uniProtKBSolr9Client(
+            HttpClient httpClient,
+            @Qualifier("uniProtKBSolr9ConfigProperties")
+                    UniProtKBRepositoryConfigProperties config) {
+        return buildSolrClient(
+                httpClient,
+                config.getZkHost(),
+                config.getConnectionTimeout(),
+                config.getSocketTimeout(),
+                config.getHttphost());
+    }
+
+    @Bean("uniProtKBSolr9ConfigProperties")
+    @ConfigurationProperties(prefix = "spring.data.solr.kb.solr9")
+    public UniProtKBRepositoryConfigProperties uniProtKBSolr9ConfigProperties() {
+        return new UniProtKBRepositoryConfigProperties();
     }
 
     @Bean("uniProtKBTupleStream")
@@ -60,6 +84,26 @@ public class ResultsConfig {
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
+    }
+
+    @Bean("uniProtKBSolr9TupleStream")
+    @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
+    public TupleStreamTemplate uniProtKBSolr9TupleStream(
+            @Qualifier("uniProtKBSolr9StreamerConfigProperties")
+                    StreamerConfigProperties configProperties,
+            @Qualifier("uniProtKBSolr9Client") SolrClient solrClient,
+            SolrRequestConverter requestConverter) {
+        return TupleStreamTemplate.builder()
+                .streamConfig(configProperties)
+                .solrClient(solrClient)
+                .solrRequestConverter(requestConverter)
+                .build();
+    }
+
+    @Bean("uniProtKBSolr9StreamerConfigProperties")
+    @ConfigurationProperties(prefix = "streamer.uniprot.solr9")
+    public StreamerConfigProperties solr9ResultsConfigProperties() {
+        return new StreamerConfigProperties();
     }
 
     @Bean

@@ -10,14 +10,13 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.opentest4j.AssertionFailedError;
 import org.springframework.amqp.core.Message;
 import org.uniprot.api.async.download.messaging.consumer.MessageConsumer;
 import org.uniprot.api.async.download.messaging.repository.DownloadJobRepository;
 import org.uniprot.api.async.download.model.job.DownloadJob;
 import org.uniprot.api.async.download.model.request.SolrStreamDownloadRequest;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
-
-import junit.framework.AssertionFailedError;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class SolrProducerMessageServiceIT<

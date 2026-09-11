@@ -31,6 +31,24 @@ class PrecomputedAnnotationRequestConverterImplTest {
     }
 
     @Test
+    void createsStreamSolrQueryFromResolvedTaxonomyId() {
+        PrecomputedAnnotationRequestConverterImpl converter = converter();
+        PrecomputedAnnotationStreamByProteomeRequest request =
+                new PrecomputedAnnotationStreamByProteomeRequest();
+        request.setTaxonomyId("9606");
+        request.setSort("accession desc");
+
+        SolrRequest solrRequest = converter.createStreamSolrRequest(request);
+
+        assertEquals("taxonomy_id:9606", solrRequest.getQuery());
+        assertEquals("accession uniparc taxonomy_id", solrRequest.getQueryField());
+        assertEquals(100, solrRequest.getRows());
+        assertEquals(Integer.MAX_VALUE, solrRequest.getTotalRows());
+        assertEquals("accession", solrRequest.getSorts().get(0).getItem());
+        assertEquals(SolrQuery.ORDER.desc, solrRequest.getSorts().get(0).getOrder());
+    }
+
+    @Test
     void ignoresOtherFieldsAndUsesResolvedTaxonomyId() {
         PrecomputedAnnotationRequestConverterImpl converter = converter();
         PrecomputedAnnotationSearchByProteomeRequest request =

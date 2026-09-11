@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -78,6 +79,50 @@ class ValidFromAndToTest {
         validator.initialize(validFromTo);
         boolean isValid = validator.isValid(request, null);
         Assertions.assertTrue(isValid);
+    }
+
+    @Disabled
+    @Test
+    void testValidFromMd5ToSwiss() {
+        String from = "MD5";
+        String to = "UniProtKB-Swiss-Prot";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Disabled
+    @Test
+    void testValidFromMd5ToUniProtKb() {
+        String from = "MD5";
+        String to = "UniProtKB";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    void testInvalidFromMd5ToUniParc() {
+        String from = "MD5";
+        String to = "UniParc";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertFalse(isValid);
     }
 
     @Test

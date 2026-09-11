@@ -12,12 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.AssertionFailedError;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
-
-import junit.framework.AssertionFailedError;
 
 class AdvancedSearchTermIT {
     private static final String CONTEXT_PATH = "/uniprot/api";

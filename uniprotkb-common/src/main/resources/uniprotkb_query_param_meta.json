@@ -952,6 +952,10 @@
     "type": "String"
   },
   {
+    "name": "proteome_canonical",
+    "type": "String"
+  },
+  {
     "name": "annotation_score",
     "type": "String"
   },
