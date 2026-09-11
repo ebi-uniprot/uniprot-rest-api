@@ -3,7 +3,6 @@ package org.uniprot.api.uniprotkb.common.repository.store;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -40,7 +39,6 @@ public class ResultsConfig {
     @Bean("uniProtKBSolrClient")
     @Profile("live")
     public SolrClient uniProtKBSolrClient(
-            HttpClient httpClient,
             @Qualifier("uniProtKBRepositoryConfigProperties")
                     UniProtKBRepositoryConfigProperties config) {
         return buildSolrClient(
@@ -56,15 +54,15 @@ public class ResultsConfig {
     @Profile("live")
     @ConditionalOnExpression("'${spring.data.solr.kb.solr9.zkHost:}' != ''")
     public SolrClient uniProtKBSolr9Client(
-            HttpClient httpClient,
             @Qualifier("uniProtKBSolr9ConfigProperties")
                     UniProtKBRepositoryConfigProperties config) {
         return buildSolrClient(
-                httpClient,
                 config.getZkHost(),
                 config.getConnectionTimeout(),
                 config.getSocketTimeout(),
-                config.getHttphost());
+                config.getHttphost(),
+                config.getUsername(),
+                config.getPassword());
     }
 
     @Bean("uniProtKBSolr9ConfigProperties")

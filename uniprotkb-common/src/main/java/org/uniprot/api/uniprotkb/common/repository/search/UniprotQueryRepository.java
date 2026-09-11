@@ -14,7 +14,6 @@ import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -216,7 +215,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         }
     }
 
-    private @NonNull JsonQueryRequest getJsonQueryRequest(SolrRequest request, String solrCursor) {
+    private JsonQueryRequest getJsonQueryRequest(SolrRequest request, String solrCursor) {
         JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
         ModifiableSolrParams params = (ModifiableSolrParams) solrQuery.getParams();
         if (solrCursor != null && !solrCursor.isEmpty()) {
@@ -322,7 +321,7 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
         return documents.stream().limit(IDS_TO_LOG).map(Document::getDocumentId).toList();
     }
 
-    private static @NonNull String getSanitizedQuery(SolrRequest request) {
+    private static String getSanitizedQuery(SolrRequest request) {
         String sanitizedQuery =
                 request.getQuery() == null
                         ? "null"
