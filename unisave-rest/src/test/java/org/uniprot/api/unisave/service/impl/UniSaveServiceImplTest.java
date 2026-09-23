@@ -119,6 +119,41 @@ class UniSaveServiceImplTest {
         }
 
         @Test
+        void canGetAccessionStatusDeletedWithProteomeRedundancyReason() {
+            // given
+            String accession = ACCESSION;
+            String targetAcc = "target acc";
+            String releaseNumber = "1";
+            AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+            status.setAccession(accession);
+            IdentifierStatus identifierStatus = mock(IdentifierStatus.class);
+            when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
+            ReleaseImpl release = new ReleaseImpl();
+            release.setReleaseNumber(releaseNumber);
+            release.setReleaseDate(new Date());
+            when(identifierStatus.getEventRelease()).thenReturn(release);
+            EventTypeEnum eventType = EventTypeEnum.DELETED;
+            when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
+            when(identifierStatus.getDeletionReasonId()).thenReturn(13);
+            status.setEvents(singletonList(identifierStatus));
+            when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
+
+            // when
+            UniSaveEntry entry = uniSaveService.getAccessionStatus(accession);
+
+            // then
+            List<AccessionEvent> events = entry.getEvents();
+            assertThat(entry.getAccession(), is(accession));
+            assertThat(events, hasSize(1));
+            assertThat(events.get(0).getEventType(), is(eventType.toString()));
+            assertThat(events.get(0).getTargetAccession(), is(targetAcc));
+            assertThat(events.get(0).getRelease(), is(releaseNumber));
+            assertThat(
+                    events.get(0).getDeletedReason(),
+                    is(DeletedReason.PROTEOME_REDUNDANCY.getName()));
+        }
+
+        @Test
         void canGetAccessionStatusDeletedWithoutReason() {
             // given
             String accession = ACCESSION;

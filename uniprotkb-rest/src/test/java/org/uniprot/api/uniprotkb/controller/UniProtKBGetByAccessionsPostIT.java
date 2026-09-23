@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -71,7 +72,10 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+
+    @Qualifier("uniProtKBTupleStream")
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private MockMvc mockMvc;
 

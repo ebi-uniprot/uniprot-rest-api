@@ -17,7 +17,6 @@ import javax.validation.Payload;
 import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,7 +50,10 @@ public @interface ValidFromAndTo {
         private static final Set<String> UNIPROT_GROUP_TYPES_MINUS_UNIPROTKB =
                 Set.of(UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
         private static final Set<String> REFSEQ_EMBL_GI =
-                Set.of(convertDisplayNameToName(REFSEQ_PROTEIN), convertDisplayNameToName(EMBL), convertDisplayNameToName(GI_NUMBER));
+                Set.of(
+                        convertDisplayNameToName(REFSEQ_PROTEIN),
+                        convertDisplayNameToName(EMBL),
+                        convertDisplayNameToName(GI_NUMBER));
 
         @Override
         public void initialize(ValidFromAndTo constraintAnnotation) {
@@ -112,7 +114,7 @@ public @interface ValidFromAndTo {
                                 .anyMatch(db -> db.getName().equals(to) && !ACC_ID_STR.equals(to));
             }
 
-            //Ref Seq, EMBL, GI Number now supported with UniParc
+            // Ref Seq, EMBL, GI Number now supported with UniParc
             if (REFSEQ_EMBL_GI.contains(from)) {
                 isValid = isUniProtKBOrSwissProtOrUniParc(to);
             }
@@ -121,8 +123,7 @@ public @interface ValidFromAndTo {
         }
 
         private boolean isUniProtKBOrSwissProt(String to) {
-            return ACC_STR.equals(to)
-                    || SWISSPROT_STR.equals(to);
+            return ACC_STR.equals(to) || SWISSPROT_STR.equals(to);
         }
 
         private boolean isUniProtKBOrSwissProtOrUniParc(String to) {

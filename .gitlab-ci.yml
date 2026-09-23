@@ -107,7 +107,7 @@ k8s:docker-build-deploy:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: main
   variables:
-    CI_PIPELINE_TASKS: 'build,upgrade'
+    CI_PIPELINE_TASKS: 'build,upgrade,refresh-varnish-cache'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
     K8S_ENV: 'dev'

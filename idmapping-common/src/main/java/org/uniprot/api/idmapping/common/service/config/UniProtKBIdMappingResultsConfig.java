@@ -104,7 +104,9 @@ public class UniProtKBIdMappingResultsConfig {
 
     @Bean("uniproKBfacetTupleStreamTemplate")
     public FacetTupleStreamTemplate uniproKBfacetTupleStreamTemplate(
-            UniProtKBRepositoryConfigProperties configProperties, HttpClient httpClient) {
+            @Qualifier("uniProtKBRepositoryConfigProperties")
+                    UniProtKBRepositoryConfigProperties configProperties,
+            HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())

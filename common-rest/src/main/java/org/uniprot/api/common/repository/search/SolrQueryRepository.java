@@ -68,6 +68,7 @@ public abstract class SolrQueryRepository<T extends Document> {
             QueryResponse solrResponse = search(request, page.getCursor());
 
             List<T> resultList = getResponseDocuments(solrResponse);
+            logSearchResponse(request, cursor, solrResponse, resultList);
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
@@ -144,6 +145,12 @@ public abstract class SolrQueryRepository<T extends Document> {
         return solrResponse.getBeans(tClass);
     }
 
+    protected void logSearchResponse(
+            SolrRequest request, String cursor, QueryResponse solrResponse, List<T> documents) {}
+
+    protected void logConvertedSolrRequest(
+            SolrRequest request, String cursor, JsonQueryRequest solrQuery) {}
+
     private QueryResponse search(SolrRequest request, String cursor)
             throws IOException, SolrServerException {
         JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
@@ -155,6 +162,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                     .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
                     .set(SPELLCHECK_PARAM, true);
         }
+        logConvertedSolrRequest(request, cursor, solrQuery);
         return solrQuery.process(solrClient, collection.toString());
     }
 
