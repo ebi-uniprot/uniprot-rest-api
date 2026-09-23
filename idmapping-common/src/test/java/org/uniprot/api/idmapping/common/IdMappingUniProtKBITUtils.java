@@ -83,7 +83,7 @@ public class IdMappingUniProtKBITUtils {
                             String now = Instant.now().toString();
                             yield "[* TO " + now + "]";
                         }
-                        case "proteome" -> "UP000000000";
+                        case "proteome", "proteome_canonical" -> "UP000000000";
                         case "annotation_score" -> "5";
                         case "uniref_cluster_50" -> "UniRef50_P00001";
                         case "uniref_cluster_90" -> "UniRef90_P00001";
@@ -204,6 +204,7 @@ public class IdMappingUniProtKBITUtils {
             doc.isIsoform = true;
         }
         doc.proteomes.add("UP000000000");
+        doc.proteomeCanonicals.add("UP000000000");
         doc.apApu.add("Search All");
         doc.commentMap.put("cc_ap_apu_exp", Collections.singleton("Search All"));
         doc.commentMap.put("cc_ap_as_exp", Collections.singleton("Search All"));
