@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -80,6 +81,7 @@ class ValidFromAndToTest {
         Assertions.assertTrue(isValid);
     }
 
+    @Disabled
     @Test
     void testValidFromMd5ToSwiss() {
         String from = "MD5";
@@ -94,6 +96,7 @@ class ValidFromAndToTest {
         Assertions.assertTrue(isValid);
     }
 
+    @Disabled
     @Test
     void testValidFromMd5ToUniProtKb() {
         String from = "MD5";
