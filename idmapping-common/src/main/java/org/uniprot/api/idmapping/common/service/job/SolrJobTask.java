@@ -37,7 +37,7 @@ public class SolrJobTask extends JobTask {
         if (MD5.equals(fromDB)) {
             List<String> idListLowerCase = inputJobIds.stream().map(String::toLowerCase).toList();
             String query = "UniProtKB".equals(toDB) ? "*:*" : "reviewed:true";
-            return queryCollectionAndMapResults(uniprot, idListLowerCase, query, "checksum");
+            return queryCollectionAndMapResults(uniprot, idListLowerCase, query, "md5");
         } else if (UNIREF_SET.contains(toDB)) {
             return queryCollectionAndMapResults(uniref, inputJobIds, null, null);
         } else if (UNIPARC.equals(toDB)) {

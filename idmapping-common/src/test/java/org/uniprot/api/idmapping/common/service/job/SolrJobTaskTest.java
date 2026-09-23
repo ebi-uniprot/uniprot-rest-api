@@ -77,26 +77,23 @@ class SolrJobTaskTest {
     @Nested
     class RepoWillGetCorrectCollectionTest {
         @Test
-        void repoWillSearchUniprotKBChecksumForMd5ToUniProtKB()
-                throws SolrServerException, IOException {
+        void repoWillSearchUniprotKBForMd5ToUniProtKB() throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
 
             solrJobTask.processTask(mappingJob(MD5, "UniProtKB"));
 
-            verify(repo)
-                    .getAllMappingIds(SolrCollection.uniprot, "checksum", List.of("ids"), "*:*");
+            verify(repo).getAllMappingIds(SolrCollection.uniprot, "md5", List.of("ids"), "*:*");
         }
 
         @Test
-        void repoWillSearchUniprotKBChecksumForMd5ToSwissProt()
-                throws SolrServerException, IOException {
+        void repoWillSearchUniprotKBForMd5ToSwissProt() throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
 
             solrJobTask.processTask(mappingJob(MD5, "UniProtKB-Swiss-Prot"));
 
             verify(repo)
                     .getAllMappingIds(
-                            SolrCollection.uniprot, "checksum", List.of("ids"), "reviewed:true");
+                            SolrCollection.uniprot, "md5", List.of("ids"), "reviewed:true");
         }
 
         @ParameterizedTest
