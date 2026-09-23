@@ -98,6 +98,29 @@ class BasicSearchControllerTest {
     }
 
     @Test
+    void runIfNotBusyReleasesGatekeeperWhenContextSupplierThrowsRuntimeException() {
+        setUp(true);
+
+        RuntimeException errorResult = new RuntimeException("MOCK EXCEPTION");
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        RuntimeException exception =
+                assertThrows(
+                        RuntimeException.class,
+                        () ->
+                                controller.runRequestIfNotBusy(
+                                        () -> {
+                                            throw errorResult;
+                                        },
+                                        request,
+                                        new DeferredResult<>()));
+
+        assertEquals(errorResult, exception);
+        MatcherAssert.assertThat(
+                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+    }
+
+    @Test
     void creatingDeferredResultDoesNotReleaseGatekeeperWhenEnterFails()
             throws InterruptedException {
         Gatekeeper gatekeeper = new Gatekeeper(0, 1);
