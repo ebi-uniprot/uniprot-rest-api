@@ -93,6 +93,51 @@ class BasicSearchControllerTest {
         assertInstanceOf(RuntimeException.class, result.getResult());
         RuntimeException exception = (RuntimeException) result.getResult();
         assertEquals(errorResult, exception);
+        MatcherAssert.assertThat(
+                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+    }
+
+    @Test
+    void runIfNotBusyReleasesGatekeeperWhenContextSupplierThrowsRuntimeException() {
+        setUp(true);
+
+        RuntimeException errorResult = new RuntimeException("MOCK EXCEPTION");
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        RuntimeException exception =
+                assertThrows(
+                        RuntimeException.class,
+                        () ->
+                                controller.runRequestIfNotBusy(
+                                        () -> {
+                                            throw errorResult;
+                                        },
+                                        request,
+                                        new DeferredResult<>()));
+
+        assertEquals(errorResult, exception);
+        MatcherAssert.assertThat(
+                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+    }
+
+    @Test
+    void creatingDeferredResultDoesNotReleaseGatekeeperWhenEnterFails()
+            throws InterruptedException {
+        Gatekeeper gatekeeper = new Gatekeeper(0, 1);
+        ThreadPoolTaskExecutor downloadTaskExecutor = new ThreadPoolTaskExecutor();
+        downloadTaskExecutor.initialize();
+        setUp(gatekeeper, downloadTaskExecutor);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader(USER_AGENT)).thenReturn("python-requests/2.31.0");
+
+        DeferredResult<ResponseEntity<MessageConverterContext<String>>> result =
+                controller.getDeferredResultResponseEntity(() -> context, request);
+
+        Thread.sleep(1200);
+
+        assertInstanceOf(TooManyRequestsException.class, result.getResult());
+        MatcherAssert.assertThat(gatekeeper.getSpaceInside(), CoreMatchers.is(0));
     }
 
     @Test

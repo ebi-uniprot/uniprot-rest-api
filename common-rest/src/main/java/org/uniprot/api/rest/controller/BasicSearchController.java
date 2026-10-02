@@ -273,9 +273,6 @@ public abstract class BasicSearchController<T> {
                             }
                         } catch (Throwable e) {
                             log.error("Error occurred during processing.", e);
-                            if (Utils.notNull(downloadGatekeeper)) {
-                                downloadGatekeeper.exit();
-                            }
                             deferredResult.setErrorResult(e);
                         }
                     });
@@ -363,15 +360,22 @@ public abstract class BasicSearchController<T> {
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
 
         if (downloadGatekeeper.enter()) {
-            MessageConverterContext<T> context = contextSupplier.get();
-            ResponseEntity<MessageConverterContext<T>> okayResponse =
-                    ResponseEntity.ok()
-                            .headers(createHttpDownloadHeader(context, request))
-                            .body(context);
-            context.setLargeDownload(true);
+            try {
+                MessageConverterContext<T> context = contextSupplier.get();
+                ResponseEntity<MessageConverterContext<T>> okayResponse =
+                        ResponseEntity.ok()
+                                .headers(createHttpDownloadHeader(context, request))
+                                .body(context);
+                context.setLargeDownload(true);
 
-            log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
-            deferredResult.setResult(okayResponse);
+                log.info(
+                        "Gatekeeper let me in (space inside={})",
+                        downloadGatekeeper.getSpaceInside());
+                deferredResult.setResult(okayResponse);
+            } catch (RuntimeException | Error e) {
+                downloadGatekeeper.exit();
+                throw e;
+            }
         } else {
             String errorMessage =
                     String.format(
