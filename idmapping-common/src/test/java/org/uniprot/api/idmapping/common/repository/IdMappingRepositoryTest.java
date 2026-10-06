@@ -176,18 +176,16 @@ class IdMappingRepositoryTest {
     }
 
     @Test
-    void canGetUniProtKBMappingByChecksumSearchField() throws SolrServerException, IOException {
-        String checksum1 = checksum(1);
-        String checksum12 = checksum(12);
-        String checksum21 = checksum(21);
+    void canGetUniProtKBMappingByMd5SearchField() throws SolrServerException, IOException {
+        String md5_0 = md5(1);
+        String md5_1 = md5(12);
+        String md5_2 = md5(21);
 
         List<IdMappingStringPair> mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
-                        "checksum",
-                        Stream.of(checksum1, checksum12, checksum21)
-                                .map(String::toLowerCase)
-                                .toList(),
+                        "md5",
+                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
                         "*:*");
         var mappings =
                 mappedIdsPairs.stream()
@@ -197,25 +195,23 @@ class IdMappingRepositoryTest {
 
         assertAll(
                 () -> assertEquals(3, mappedIdsPairs.size()),
-                () -> assertEquals("P00001", mappings.get(checksum1)),
-                () -> assertEquals("P00012", mappings.get(checksum12)),
-                () -> assertEquals("P00021", mappings.get(checksum21)));
+                () -> assertEquals("P00001", mappings.get(md5_0)),
+                () -> assertEquals("P00012", mappings.get(md5_1)),
+                () -> assertEquals("P00021", mappings.get(md5_2)));
     }
 
     @Test
-    void canGetUniProtKBMappingByChecksumSearchFieldAndSwissProt()
+    void canGetUniProtKBMappingByMd5SearchFieldAndSwissProt()
             throws SolrServerException, IOException {
-        String checksum1 = checksum(1);
-        String checksum12 = checksum(12);
-        String checksum21 = checksum(21);
+        String md5_0 = md5(1);
+        String md5_1 = md5(12);
+        String md5_2 = md5(21);
 
         List<IdMappingStringPair> mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
-                        "checksum",
-                        Stream.of(checksum1, checksum12, checksum21)
-                                .map(String::toLowerCase)
-                                .toList(),
+                        "md5",
+                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
                         "reviewed:true");
         var mappings =
                 mappedIdsPairs.stream()
@@ -225,8 +221,8 @@ class IdMappingRepositoryTest {
 
         assertAll(
                 () -> assertEquals(2, mappedIdsPairs.size()),
-                () -> assertEquals("P00001", mappings.get(checksum1)),
-                () -> assertEquals("P00012", mappings.get(checksum12)));
+                () -> assertEquals("P00001", mappings.get(md5_0)),
+                () -> assertEquals("P00012", mappings.get(md5_1)));
     }
 
     private void addUniProtKBDataSolr(SolrClient kbClient) throws Exception {
@@ -268,11 +264,11 @@ class IdMappingRepositoryTest {
         entryBuilder.primaryAccession(acc);
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
-        doc.sequenceChecksums = List.of(checksum(i));
+        doc.md5 = md5(i);
         return doc;
     }
 
-    private String checksum(int i) {
+    private String md5(int i) {
         return String.format("MD5%05d", i);
     }
 }
