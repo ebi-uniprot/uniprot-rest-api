@@ -87,7 +87,7 @@ api:sonar:
 mvn:deploy:
   stage: mvn-deploy
   script:
-  - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+  - mvn $MAVEN_CLI_OPTS -DskipTests DskipUTs=true deploy -s ${MAVEN_SETTINGS}
   - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> variables.env
   - echo "RELEASE_DATE=$(date +%d-%B-%Y)" >> variables.env
   artifacts:
