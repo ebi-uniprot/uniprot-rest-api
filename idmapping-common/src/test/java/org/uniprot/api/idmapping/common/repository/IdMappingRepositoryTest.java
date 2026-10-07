@@ -172,7 +172,6 @@ class IdMappingRepositoryTest {
                 returnedInactiveAccessions);
     }
 
-    @Disabled
     @Test
     void canGetUniProtKBMappingByMd5SearchField() throws SolrServerException, IOException {
         String md5_0 = md5(1);
@@ -198,7 +197,6 @@ class IdMappingRepositoryTest {
                 () -> assertEquals("P00021", mappings.get(md5_2)));
     }
 
-    @Disabled
     @Test
     void canGetUniProtKBMappingByMd5SearchFieldAndSwissProt()
             throws SolrServerException, IOException {

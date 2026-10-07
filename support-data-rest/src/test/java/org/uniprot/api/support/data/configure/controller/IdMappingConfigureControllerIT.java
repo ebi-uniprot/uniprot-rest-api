@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
 class IdMappingConfigureControllerIT {
     @Autowired private MockMvc mockMvc;
 
-    @Disabled
     @Test
     void canGetIdMappingFields() throws Exception {
         // when

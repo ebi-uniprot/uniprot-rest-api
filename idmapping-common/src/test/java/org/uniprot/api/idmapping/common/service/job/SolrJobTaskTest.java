@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -77,7 +76,6 @@ class SolrJobTaskTest {
 
     @Nested
     class RepoWillGetCorrectCollectionTest {
-        @Disabled
         @Test
         void repoWillSearchUniprotKBForMd5ToUniProtKB() throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
@@ -87,7 +85,6 @@ class SolrJobTaskTest {
             verify(repo).getAllMappingIds(SolrCollection.uniprot, "md5", List.of("IDS"), "*:*");
         }
 
-        @Disabled
         @Test
         void repoWillSearchUniprotKBForMd5ToSwissProt() throws SolrServerException, IOException {
             IdMappingRepository repo = mockRepo();
