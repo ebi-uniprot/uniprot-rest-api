@@ -27,7 +27,7 @@
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<failsafe.version>2.0.1</failsafe.version>
 		<hamcrest-library.version>2.2</hamcrest-library.version>
-		<http-uniprot-private-url>https://wwwdev.ebi.ac.uk/uniprot/artifactory</http-uniprot-private-url>
+		<http-uniprot-private-url>https://unpartifactory.uniprot.org/artifactory</http-uniprot-private-url>
 		<jacoco.outputDir>${project.basedir}/../target</jacoco.outputDir>
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
