@@ -32,6 +32,7 @@ public class SolrQueryConverterUtils {
     public static final String FILTER_QUERY = "fq";
     public static final String HIGHLIGHT = "hl";
     public static final String HIGHLIGHT_FIELDS = "hl.fl";
+    public static final String HIGHLIGHT_METHOD = "hl.method";
     public static final String HIGHLIGHT_PRE = "hl.simple.pre";
     public static final String HIGHLIGHT_POST = "hl.simple.post";
 
@@ -109,8 +110,9 @@ public class SolrQueryConverterUtils {
 
     static void setHighlightFieldsConfigs(ModifiableSolrParams solrQuery, SolrRequest solrRequest) {
         if (Utils.notNullNotEmpty(solrRequest.getHighlightFields())) {
-            solrQuery.add(HIGHLIGHT, "on");
+            solrQuery.add(HIGHLIGHT, "true");
             solrQuery.add(HIGHLIGHT_FIELDS, solrRequest.getHighlightFields());
+            solrQuery.add(HIGHLIGHT_METHOD, "original");
             solrQuery.add(HIGHLIGHT_PRE, "<span class=\"match-highlight\">");
             solrQuery.add(HIGHLIGHT_POST, "</span>");
         }

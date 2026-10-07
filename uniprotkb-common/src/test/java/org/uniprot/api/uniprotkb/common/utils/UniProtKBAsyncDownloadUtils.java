@@ -6,8 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
-import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_CANONICAL;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,14 +21,26 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
+import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentBuilder;
+import org.uniprot.core.uniprotkb.description.impl.NameBuilder;
+import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
+import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
+import org.uniprot.core.uniprotkb.evidence.impl.EvidencedValueBuilder;
+import org.uniprot.core.uniprotkb.impl.EntryAuditBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.go.GORepo;
@@ -37,7 +49,6 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -47,7 +58,7 @@ public class UniProtKBAsyncDownloadUtils {
 
     public static int totalNonIsoformEntries;
 
-    public static final UniProtKBEntry TEMPLATE_ENTRY = UniProtEntryMocker.create(SP_CANONICAL);
+    public static final UniProtKBEntry TEMPLATE_ENTRY = createTemplateEntry();
     public static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -60,6 +71,50 @@ public class UniProtKBAsyncDownloadUtils {
     public static void setUp(RestTemplate restTemplate) {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
+
+    private static UniProtKBEntry createTemplateEntry() {
+        LocalDate date = LocalDate.of(2020, 1, 1);
+        return new UniProtKBEntryBuilder("P00000", "TEST_HUMAN", UniProtKBEntryType.SWISSPROT)
+                .organism(
+                        new OrganismBuilder()
+                                .taxonId(9606)
+                                .scientificName("Homo sapiens")
+                                .commonName("Human")
+                                .build())
+                .entryAudit(
+                        new EntryAuditBuilder()
+                                .firstPublic(date)
+                                .lastAnnotationUpdate(date)
+                                .lastSequenceUpdate(date)
+                                .entryVersion(1)
+                                .sequenceVersion(1)
+                                .build())
+                .proteinExistence(ProteinExistence.PROTEIN_LEVEL)
+                .proteinDescription(
+                        new ProteinDescriptionBuilder()
+                                .recommendedName(
+                                        new ProteinNameBuilder()
+                                                .fullName(
+                                                        new NameBuilder()
+                                                                .value("FGFR test protein")
+                                                                .build())
+                                                .build())
+                                .build())
+                .genesAdd(
+                        new GeneBuilder()
+                                .geneName(new GeneNameBuilder().value("TEST").build())
+                                .build())
+                .commentsAdd(
+                        new FreeTextCommentBuilder()
+                                .commentType(CommentType.FUNCTION)
+                                .textsAdd(
+                                        new EvidencedValueBuilder()
+                                                .value("FGFR test entry for async download.")
+                                                .build())
+                                .build())
+                .sequence(new SequenceBuilder("MELKALVAV").build())
+                .build();
     }
 
     public static void saveEntriesInSolrAndStore(

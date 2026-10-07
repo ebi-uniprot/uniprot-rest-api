@@ -4,4 +4,8 @@ public class ResultProcessingException extends RuntimeException {
     public ResultProcessingException(String message) {
         super(message);
     }
+
+    public ResultProcessingException(Throwable cause) {
+        super(cause);
+    }
 }

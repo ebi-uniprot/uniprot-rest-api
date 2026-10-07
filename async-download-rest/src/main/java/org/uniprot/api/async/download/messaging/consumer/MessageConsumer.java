@@ -81,7 +81,7 @@ public abstract class MessageConsumer<T extends DownloadRequest, R extends Downl
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= messagingService.getMaxRetryCount()) {
-                log.error("Download job id {} failed with error {}", jobId, ex.getMessage());
+                log.error("Download job id {} failed with error", jobId, ex);
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 jobService.update(
                         jobId, Map.of(RETRIED, getRetryCount(updatedMessage), STATUS, ERROR));

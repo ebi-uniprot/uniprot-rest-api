@@ -68,7 +68,7 @@ public abstract class SolrIdResultRequestProcessor<
             outputWriter.writeContents(
                     context, gzipOutputStream, Instant.now(), new AtomicInteger());
         } catch (Exception ex) {
-            throw new ResultProcessingException(ex.getMessage());
+            throw new ResultProcessingException(ex);
         } finally {
             heartbeatProducer.stop(request.getDownloadJobId());
         }

@@ -383,8 +383,9 @@ class SolrRequestConverterTest {
             assertNotNull(queryParams);
 
             // then
-            assertThat(queryParams.get("hl"), is("on"));
+            assertThat(queryParams.get("hl"), is("true"));
             assertThat(queryParams.get("hl.fl"), is("h1,h2"));
+            assertThat(queryParams.get("hl.method"), is("original"));
         }
     }
 }
