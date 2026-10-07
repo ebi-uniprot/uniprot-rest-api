@@ -82,7 +82,7 @@ class SolrJobTaskTest {
 
             solrJobTask.processTask(mappingJob(MD5, "UniProtKB"));
 
-            verify(repo).getAllMappingIds(SolrCollection.uniprot, "md5", List.of("ids"), "*:*");
+            verify(repo).getAllMappingIds(SolrCollection.uniprot, "md5", List.of("IDS"), "*:*");
         }
 
         @Test
@@ -93,7 +93,7 @@ class SolrJobTaskTest {
 
             verify(repo)
                     .getAllMappingIds(
-                            SolrCollection.uniprot, "md5", List.of("ids"), "reviewed:true");
+                            SolrCollection.uniprot, "md5", List.of("IDS"), "reviewed:true");
         }
 
         @ParameterizedTest

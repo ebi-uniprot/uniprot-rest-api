@@ -185,7 +185,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "*:*");
         var mappings =
                 mappedIdsPairs.stream()
@@ -211,7 +211,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "reviewed:true");
         var mappings =
                 mappedIdsPairs.stream()
