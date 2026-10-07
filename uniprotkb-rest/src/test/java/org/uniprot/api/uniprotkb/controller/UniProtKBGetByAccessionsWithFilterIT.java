@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -80,6 +81,10 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
 
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         for (int i = 11; i <= 20; i++) {
@@ -110,10 +115,10 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
             convert.score = annotationScore;
             convert.seqLength = i * 35;
             convert.modelOrganism = modelOrganism.get(i - 10);
-            cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
+            solrClient.addBean(SolrCollection.uniprot.name(), convert);
             uniProtKBStoreClient.saveEntry(uniProtKBEntry);
         }
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        solrClient.commit(SolrCollection.uniprot.name());
     }
 
     @Test
@@ -575,5 +580,10 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 }
