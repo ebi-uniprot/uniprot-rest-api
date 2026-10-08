@@ -172,7 +172,6 @@ class IdMappingRepositoryTest {
                 returnedInactiveAccessions);
     }
 
-    @Disabled
     @Test
     void canGetUniProtKBMappingByMd5SearchField() throws SolrServerException, IOException {
         String md5_0 = md5(1);
@@ -183,7 +182,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "*:*");
         var mappings =
                 mappedIdsPairs.stream()
@@ -198,7 +197,6 @@ class IdMappingRepositoryTest {
                 () -> assertEquals("P00021", mappings.get(md5_2)));
     }
 
-    @Disabled
     @Test
     void canGetUniProtKBMappingByMd5SearchFieldAndSwissProt()
             throws SolrServerException, IOException {
@@ -210,7 +208,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "reviewed:true");
         var mappings =
                 mappedIdsPairs.stream()
