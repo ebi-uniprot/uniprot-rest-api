@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -112,7 +111,6 @@ class IdMappingJobControllerIT {
     }
 
     @Test
-    @Disabled("Ignored while validating the Solr 9.10 branch after merging main")
     void md5JobSubmittedSuccessfully() throws Exception {
         // when
         IdMappingJobRequest basicRequest = new IdMappingJobRequest();
