@@ -112,7 +112,7 @@ public class ResponseExceptionHandler {
 
     @ExceptionHandler({ClientAbortException.class})
     public void handleClientAbortException(Throwable e) {
-        logger.warn("Client Aborted", e);
+        logger.debug("Client Aborted", e);
     }
 
     @ExceptionHandler({StopStreamException.class})
