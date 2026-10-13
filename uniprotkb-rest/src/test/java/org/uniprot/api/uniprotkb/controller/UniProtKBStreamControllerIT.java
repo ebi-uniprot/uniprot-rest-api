@@ -2,9 +2,7 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -13,8 +11,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -123,19 +118,6 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
-
-        // for the following tests, ensure the number of hits
-        // for each query is less than the maximum number allowed
-        // to be streamed (configured in {@link
-        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
-        long queryHits = 100L;
-        QueryResponse response = mock(QueryResponse.class);
-        SolrDocumentList results = mock(SolrDocumentList.class);
-        when(results.getNumFound()).thenReturn(queryHits);
-        when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
-
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
     @BeforeEach
@@ -491,7 +473,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         for (int i = 13; i <= 20; i++) {
             saveEntry(i, "");
         }
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        solrClient.commit(SolrCollection.uniprot.name());
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 MockMvcRequestBuilders.get(streamRequestPath)
@@ -558,16 +540,21 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         return facetTupleStreamTemplate;
     }
 
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
+    }
+
     private void saveEntries() throws Exception {
         for (int i = 1; i <= 10; i++) {
             saveEntry(i, "");
         }
         saveEntry(11, "-2");
         saveEntry(12, "-2");
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        solrClient.commit(SolrCollection.uniprot.name());
 
         saveTaxonomyEntry(9606L);
-        cloudSolrClient.commit(SolrCollection.taxonomy.name());
+        solrClient.commit(SolrCollection.taxonomy.name());
     }
 
     private void saveTaxonomyEntry(long taxId) throws Exception {
@@ -589,7 +576,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                         .taxId(taxId)
                         .id(String.valueOf(taxId))
                         .taxonomyObj(taxonomyObj);
-        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
+        solrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
     }
 
     private void saveEntry(int i, String isoFormString) throws Exception {
@@ -600,7 +587,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
-        cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
+        solrClient.addBean(SolrCollection.uniprot.name(), convert);
         uniProtKBStoreClient.saveEntry(uniProtKBEntry);
     }
 

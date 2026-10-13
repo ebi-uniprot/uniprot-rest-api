@@ -168,3 +168,74 @@ When testing FASTA output for UniProtKB entries, make sure the test entry has en
 - entry audit with sequence version
 - organism with scientific name and taxon ID
 - sequence
+
+## Using Solr TestContainer
+
+Integration tests can use a shared SolrCloud instance provided by [Testcontainers](https://testcontainers.com/). 
+The container is started automatically by `SolrTestContainerSetup`, which is registered as a Spring `EnvironmentPostProcessor`.
+
+The setup:
+
+* Starts a SolrCloud container with ZooKeeper.
+* Enables Solr basic authentication.
+* Overrides the configured ZooKeeper connection properties.
+* Uploads `security.json` to ZooKeeper.
+* Allows integration tests to upload collection configurations and create collections.
+
+The container image version used can be overridden using the Maven Failsafe system property:
+
+```xml
+<it.solr-container.image-name>solr:8.11.3</it.solr-container.image-name>
+```
+
+### Enable/Disable the Solr TestContainer
+
+The Solr TestContainer is enabled for integration tests using the `maven-failsafe-plugin`:
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <configuration>
+        <systemPropertyVariables>
+            <it.solr-container.enabled>true</it.solr-container.enabled>
+        </systemPropertyVariables>
+    </configuration>
+</plugin>
+```
+
+When enabled, `SolrTestContainerSetup` starts a single shared SolrCloud container for the test JVM.
+
+### Configure ZooKeeper Host Properties
+
+The test container dynamically determines the ZooKeeper connection string and overrides the configured ZooKeeper properties.
+
+Configure all properties that should point to the Testcontainers ZooKeeper instance as a comma-separated list:
+
+For example:
+
+```xml
+<it.solr-container.comma-separated.zk-host-properties>
+    spring.data.solr.zkHost,streamer.uniprot.zkHost,streamer.precomputedannotation.zkHost,spring.data.solr.kb.zkHost
+</it.solr-container.comma-separated.zk-host-properties>
+```
+
+### Initialising Collections
+
+The integration test base class is responsible for initialising the required Solr collections.
+
+For each collection:
+
+1. The collection configuration is uploaded to ZooKeeper.
+2. An existing collection with the same name is deleted, if present.
+3. A new collection is created using the uploaded configuration.
+
+### Running with Rancher Desktop
+
+When using Rancher Desktop, Testcontainers may need an explicit host override so that the container can connect back to the host.
+
+Set the following environment variable before running the integration tests:
+
+```bash
+export TESTCONTAINERS_HOST_OVERRIDE=$(rdctl shell ip a show vznat | awk '/inet / {sub("/.*",""); print $2}')
+```

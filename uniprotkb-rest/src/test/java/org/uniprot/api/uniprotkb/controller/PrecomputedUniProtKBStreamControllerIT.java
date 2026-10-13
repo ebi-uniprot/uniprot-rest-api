@@ -2,18 +2,12 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -28,10 +22,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -66,7 +58,6 @@ import org.uniprot.store.spark.indexer.proteome.mapper.ProteomeEntryToProteomeDo
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@ActiveProfiles(profiles = "offline")
 @ContextConfiguration(classes = {UniProtKBREST.class, ErrorHandlerConfig.class})
 @AutoConfigureWebClient
 @WebMvcTest(PrecomputedUniProtKBController.class)
@@ -116,6 +107,11 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
         return facetTupleStreamTemplate;
     }
 
+    @Override
+    protected SolrClient getSolrClient() {
+        return solrClient;
+    }
+
     /**
      * For the following tests, ensure the number of hits for each query is less than the maximum
      * number allowed to be streamed (configured in {@link
@@ -124,15 +120,6 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
-        long queryHits = 100L;
-        QueryResponse response = mock(QueryResponse.class);
-        SolrDocumentList results = mock(SolrDocumentList.class);
-        when(results.getNumFound()).thenReturn(queryHits);
-        when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
-
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
-        ReflectionTestUtils.setField(proteomeTaxonomyRepository, "solrClient", cloudSolrClient);
     }
 
     @Test
@@ -308,9 +295,9 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
         for (int i = 1; i <= 10; i++) {
             savePrecomputedAnnotationEntry(i, 992);
         }
-        cloudSolrClient.commit(SolrCollection.precomputedannotation.name());
+        solrClient.commit(SolrCollection.precomputedannotation.name());
         saveProteomeEntry("UP000000002", 992, 991, 993);
-        cloudSolrClient.commit(SolrCollection.proteome.name());
+        solrClient.commit(SolrCollection.proteome.name());
     }
 
     private void saveProteomeEntry(String upId, long taxId, long... taxLinageId) throws Exception {
@@ -330,7 +317,7 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
         ProteomeEntry proteomeEntry = builder.build();
         ProteomeDocument proteomeDocument =
                 proteomeEntryToProteomeDocumentMapper.call(proteomeEntry);
-        cloudSolrClient.addBean(SolrCollection.proteome.name(), proteomeDocument);
+        solrClient.addBean(SolrCollection.proteome.name(), proteomeDocument);
     }
 
     private void savePrecomputedAnnotationEntry(int upId, int taxId) throws Exception {
@@ -342,7 +329,7 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
         PrecomputedAnnotationDocument precomputedAnnotationDocument =
                 precomputedAnnotationEntryToDocumentMapper.call(uniProtKBEntry);
 
-        cloudSolrClient.addBean(
+        solrClient.addBean(
                 SolrCollection.precomputedannotation.name(), precomputedAnnotationDocument);
         precomputedAnnotationStoreClient.saveEntry(uniProtKBEntry);
     }

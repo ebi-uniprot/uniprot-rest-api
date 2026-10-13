@@ -37,7 +37,6 @@ public class RepositoryConfig {
     }
 
     @Bean
-    @Profile("live")
     public HttpClient httpClient(RepositoryConfigProperties config) {
         return buildHttpClient(config.getUsername(), config.getPassword());
     }
