@@ -19,11 +19,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.rest.MockSolrClientConfig;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.disease.service.DiseaseService;
@@ -37,8 +39,14 @@ import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.impl.StatisticsBuilder;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            SupportDataRestApplication.class,
+            MockSolrClientConfig.class
+        })
 @WebMvcTest(DiseaseController.class)
+@TestPropertySource(properties = "spring.main.allow-bean-definition-overriding=true")
 class DiseaseControllerTest {
     @Autowired private MockMvc mockMvc;
     @MockBean private DiseaseService diseaseService;

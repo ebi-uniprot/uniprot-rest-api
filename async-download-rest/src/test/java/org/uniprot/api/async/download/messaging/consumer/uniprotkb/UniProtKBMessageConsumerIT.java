@@ -23,6 +23,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,6 +44,7 @@ import org.uniprot.api.async.download.model.request.uniprotkb.UniProtKBDownloadR
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
@@ -56,6 +58,7 @@ import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
 
+@SpringBootTest
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(
         classes = {
@@ -71,6 +74,9 @@ import com.jayway.jsonpath.JsonPath;
 class UniProtKBMessageConsumerIT
         extends SolrIdMessageConsumerIT<UniProtKBDownloadRequest, UniProtKBDownloadJob> {
     public static final int MAX_ENTRY_COUNT = 15;
+
+    @MockBean private IdMappingJobCacheService idMappingJobCacheService;
+
     @Autowired private UniProtKBMessageConsumer uniProtKBMessageConsumer;
     @Autowired private UniprotQueryRepository uniProtKBQueryRepository;
     @Autowired private SolrClient solrClient;
@@ -101,8 +107,7 @@ class UniProtKBMessageConsumerIT
     @BeforeAll
     void beforeAll() throws Exception {
         prepareDownloadFolders();
-        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
-                uniProtKBQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(solrClient, storeClient);
     }
 
     @BeforeEach
@@ -187,13 +192,8 @@ class UniProtKBMessageConsumerIT
     }
 
     @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return facetTupleStreamTemplate;
+    protected SolrClient getSolrClient() {
+        return solrClient;
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -46,6 +47,7 @@ import org.uniprot.api.idmapping.common.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.common.service.impl.IdMappingJobServiceImpl;
 import org.uniprot.api.rest.CommonDataStoreTestConfig;
+import org.uniprot.api.rest.MockSolrClientConfig;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
@@ -60,9 +62,11 @@ import org.uniprot.api.rest.output.job.JobSubmitResponse;
             IdMappingJobServiceImpl.class,
             TestConfig.class,
             CommonDataStoreTestConfig.class,
-            IdMappingDataStoreTestConfig.class
+            IdMappingDataStoreTestConfig.class,
+            MockSolrClientConfig.class
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestPropertySource(properties = "spring.main.allow-bean-definition-overriding=true")
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobServiceImpl jobService;
     @MockBean private IdMappingPIRService pirService;

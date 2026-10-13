@@ -55,11 +55,6 @@
 			<artifactId>uniref-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>uniprot-indexer-integration-test</artifactId>
-			<version>${uniprot-store.version}</version>
-		</dependency>
 		<!-- test -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -204,6 +199,17 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<it.solr-container.enabled>true</it.solr-container.enabled>
+						<it.solr-container.image-name>solr:8.11.3</it.solr-container.image-name>
+						<it.solr-container.comma-separated.zk-host-properties>spring.data.solr.zkHost,spring.data.solr.kb.zkHost,streamer.uniprot.zkHost,streamer.uniparc.zkHost,streamer.uniref.zkHost</it.solr-container.comma-separated.zk-host-properties>
+					</systemPropertyVariables>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

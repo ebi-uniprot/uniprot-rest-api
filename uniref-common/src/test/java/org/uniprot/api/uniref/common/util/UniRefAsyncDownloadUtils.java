@@ -1,19 +1,12 @@
 package org.uniprot.api.uniref.common.util;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
-import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -39,36 +32,24 @@ public class UniRefAsyncDownloadUtils {
     }
 
     public static void saveEntriesInSolrAndStore(
-            UniRefQueryRepository unirefQueryRepository,
-            CloudSolrClient cloudSolrClient,
-            SolrClient solrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniRefEntryLight> storeClient,
             int entryCount,
             String accessionPrefix)
             throws Exception {
-        ReflectionTestUtils.setField(unirefQueryRepository, "solrClient", cloudSolrClient);
         saveEntries(cloudSolrClient, storeClient, entryCount, accessionPrefix);
-        long queryHits = 100L;
-        QueryResponse response = mock(QueryResponse.class);
-        SolrDocumentList results = mock(SolrDocumentList.class);
-        when(results.getNumFound()).thenReturn(queryHits);
-        when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
     }
 
     public static void saveEntriesInSolrAndStore(
-            UniRefQueryRepository unirefQueryRepository,
-            CloudSolrClient cloudSolrClient,
-            SolrClient solrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniRefEntryLight> storeClient,
             int entryCount)
             throws Exception {
-        saveEntriesInSolrAndStore(
-                unirefQueryRepository, cloudSolrClient, solrClient, storeClient, entryCount, null);
+        saveEntriesInSolrAndStore(cloudSolrClient, storeClient, entryCount, null);
     }
 
     protected static void saveEntries(
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniRefEntryLight> storeClient,
             int entryCount,
             String accessionPrefix)
@@ -82,7 +63,7 @@ public class UniRefAsyncDownloadUtils {
     }
 
     private static void saveEntry(
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             int i,
             UniRefType type,
             UniProtStoreClient<UniRefEntryLight> storeClient,

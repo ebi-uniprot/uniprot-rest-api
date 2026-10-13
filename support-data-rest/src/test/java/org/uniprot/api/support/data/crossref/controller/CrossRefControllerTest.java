@@ -14,11 +14,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.uniprot.api.rest.MockSolrClientConfig;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
@@ -28,8 +30,14 @@ import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 import org.uniprot.core.impl.StatisticsBuilder;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
+@ContextConfiguration(
+        classes = {
+            DataStoreTestConfig.class,
+            SupportDataRestApplication.class,
+            MockSolrClientConfig.class
+        })
 @WebMvcTest(CrossRefController.class)
+@TestPropertySource(properties = "spring.main.allow-bean-definition-overriding=true")
 class CrossRefControllerTest {
     @Autowired private MockMvc mockMvc;
     @MockBean private CrossRefService crossRefService;

@@ -8,7 +8,7 @@ import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.conve
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
@@ -113,7 +113,7 @@ public class UniParcITUtils {
 
     static void saveStreamEntries(
             int xrefGroupSize,
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniParcEntryLight> storeClient,
             UniParcCrossReferenceStoreClient xRefStoreClient)
             throws Exception {
@@ -126,7 +126,7 @@ public class UniParcITUtils {
     static void saveStreamEntry(
             int i,
             int xrefGroupSize,
-            CloudSolrClient cloudSolrClient,
+            SolrClient cloudSolrClient,
             UniProtStoreClient<UniParcEntryLight> storeClient,
             UniParcCrossReferenceStoreClient xRefStoreClient)
             throws Exception {

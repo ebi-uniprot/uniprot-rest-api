@@ -45,7 +45,6 @@ import net.jodah.failsafe.RetryPolicy;
 public class ResultsConfig {
 
     @Bean("uniProtKBSolrClient")
-    @Profile("live")
     public SolrClient uniProtKBSolrClient(
             HttpClient httpClient,
             @Qualifier("uniProtKBRepositoryConfigProperties")
