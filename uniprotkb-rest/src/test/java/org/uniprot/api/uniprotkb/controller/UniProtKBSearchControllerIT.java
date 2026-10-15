@@ -2313,6 +2313,16 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
+    void searchByChebiRelatedThroughRO0018033() throws Exception {
+        searchByRelatedChebi("CHEBI:3200", "CHEBI:6500");
+    }
+
+    @Test
+    void searchByChebiRelatedThroughRO0018034() throws Exception {
+        searchByRelatedChebi("CHEBI:6500", "CHEBI:3200");
+    }
+
+    @Test
     void testSearchWithMoreThanAllowedOrClausesFailure() throws Exception {
         saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
         // when
@@ -2659,6 +2669,34 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
+    }
+
+    private void searchByRelatedChebi(String sourceChebiId, String relatedChebiId)
+            throws Exception {
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtDocument document =
+                new UniProtEntryConverter(new HashMap<>(), new HashMap<>()).convert(entry);
+        document.chebi.add(sourceChebiId);
+        document.chebi.add(relatedChebiId);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
+
+        getMockMvc()
+                .perform(
+                        MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                .param(
+                                        "query",
+                                        "chebi:" + relatedChebiId.substring("CHEBI:".length()))
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is(ACCESSION_SP_CANONICAL)));
     }
 
     private boolean getManualEvidenceGroup(EvidenceGroup evidenceGroup) {
