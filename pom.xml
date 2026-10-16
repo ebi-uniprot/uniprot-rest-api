@@ -62,7 +62,7 @@
 		<skipUTs>false</skipUTs>
 		<slf4j.version>1.7.36</slf4j.version>
 		<solr.core>9.10.1</solr.core>
-		<solr.jackson.version>2.18.0</solr.jackson.version>
+		<solr.jackson.version>2.18.11</solr.jackson.version>
 		<solrj.version>9.10.1</solrj.version>
 		<spring.boot.version>2.7.3</spring.boot.version>
 		<spotless.version>2.43.0</spotless.version>
