@@ -3,11 +3,13 @@ package org.uniprot.api.rest.respository;
 import static java.util.Arrays.asList;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
@@ -46,11 +48,12 @@ public class RepositoryConfig {
     @Profile("live")
     public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         return buildSolrClient(
-                httpClient,
                 config.getZkHost(),
                 config.getConnectionTimeout(),
                 config.getSocketTimeout(),
-                config.getHttphost());
+                config.getHttphost(),
+                config.getUsername(),
+                config.getPassword());
     }
 
     @Bean
@@ -74,18 +77,24 @@ public class RepositoryConfig {
         return HttpClientUtil.createClient(params, manager, true);
     }
 
-    private SolrClient buildSolrClient(
-            HttpClient httpClient,
+    public static SolrClient buildSolrClient(
             String zkHost,
             int connTimeout,
             int sockTimeout,
-            String httpHost) {
+            String httpHost,
+            String username,
+            String password) {
         if (Utils.notNullNotEmpty(zkHost)) {
             String[] zookeeperHosts = zkHost.split(",");
+            Http2SolrClient.Builder http2ClientBuilder =
+                    new Http2SolrClient.Builder()
+                            .withConnectionTimeout(connTimeout, TimeUnit.MILLISECONDS)
+                            .withRequestTimeout(sockTimeout, TimeUnit.MILLISECONDS);
+            if (Utils.notNullNotEmpty(username) && Utils.notNullNotEmpty(password)) {
+                http2ClientBuilder.withBasicAuthCredentials(username, password);
+            }
             return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
-                    .withConnectionTimeout(connTimeout)
-                    .withHttpClient(httpClient)
-                    .withSocketTimeout(sockTimeout)
+                    .withInternalClientBuilder(http2ClientBuilder)
                     .build();
         } else if (Utils.notNullNotEmpty(httpHost)) {
             return new HttpSolrClient.Builder().withBaseSolrUrl(httpHost).build();

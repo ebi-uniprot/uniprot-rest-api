@@ -98,7 +98,8 @@ class IdMappingJobControllerIT {
                                 .param("to", basicRequest.getTo())
                                 .param("ids", basicRequest.getIds()));
         // then
-        response.andExpect(status().is(HttpStatus.OK.value()))
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
 
@@ -115,7 +116,7 @@ class IdMappingJobControllerIT {
         IdMappingJobRequest basicRequest = new IdMappingJobRequest();
         basicRequest.setFrom("MD5");
         basicRequest.setTo("UniProtKB");
-        basicRequest.setIds("Q1,Q2");
+        basicRequest.setIds("0123456789ABCDEF0123456789ABCDEF,FEDCBA9876543210FEDCBA9876543210");
 
         ResultActions response =
                 mockMvc.perform(

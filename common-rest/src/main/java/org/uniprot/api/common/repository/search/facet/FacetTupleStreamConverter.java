@@ -74,9 +74,9 @@ public class FacetTupleStreamConverter
                 if (tuple.EOF) {
                     break;
                 }
-                Map<Object, Object> map = tuple.getMap();
-                for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                    String facetName = String.valueOf(entry.getKey());
+                Map<String, Object> map = tuple.getFields();
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    String facetName = entry.getKey();
                     if (idFieldName.equals(facetName)
                             || facetConfig.getFacetPropertyMap().containsKey(facetName)) {
                         String facetValue = String.valueOf(entry.getValue());

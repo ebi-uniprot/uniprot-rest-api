@@ -152,7 +152,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         } catch (StopStreamException e) {
             String errorMsg = "Error encountered when streaming data.";
             writeStopStreamErrorMessage(outputStream, errorMsg);
-            throw new StopStreamException(errorMsg, e);
+            throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
         } finally {
             if (downloadGatekeeper != null && context.isLargeDownload()) {
                 downloadGatekeeper.exit();
@@ -209,6 +209,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
                             throw new StopStreamException("Could not write entry: " + entity, e);
                         }
                     });
+        } catch (StopStreamException e) {
+            throw e;
         } catch (Exception e) {
             throw new StopStreamException("Stream must be closed", e);
         }
