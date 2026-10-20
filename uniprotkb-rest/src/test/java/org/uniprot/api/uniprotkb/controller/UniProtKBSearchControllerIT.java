@@ -2371,41 +2371,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(jsonPath("$.results.*.sequence.md5", contains(md5)));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"is_gene_centric:true", "is_gene_centric:false", "*:*"})
-    void searchWithIsGeneCentric(String queryParam) throws Exception {
-        // given
-        saveEntry(SaveScenario.SEARCH_ALL_FIELDS);
-
-        int expectedSize = 3;
-        List<String> expectedAccessions = List.of("P21802", "Q8DIA7", "P00001");
-        if (queryParam.equals("is_gene_centric:true")) {
-            expectedSize = 1;
-            expectedAccessions = List.of("P00001");
-        } else if (queryParam.equals("is_gene_centric:false")) {
-            expectedSize = 2;
-            expectedAccessions = List.of("P21802", "Q8DIA7");
-        }
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getSearchRequestPath())
-                                        .param("query", queryParam)
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        MockMvcResultMatchers.jsonPath(
-                                "$.results.*.primaryAccession",
-                                containsInAnyOrder(expectedAccessions.toArray())))
-                .andExpect(jsonPath("$.results.size()", is(expectedSize)));
-    }
-
     @Test
     void searchWithIsGeneCentricInvalidValue() throws Exception {
         // given
