@@ -64,6 +64,8 @@ public class UniProtEntryService
     private final RdfStreamer rdfStreamer;
     private final UniProtKBRequestConverter uniProtKBRequestConverter;
 
+    @SuppressWarnings(
+            "java:S9352") // Spring resolves these dependencies by constructor parameter name.
     public UniProtEntryService(
             UniprotQueryRepository repository,
             UniProtKBFacetConfig uniprotKBFacetConfig,
