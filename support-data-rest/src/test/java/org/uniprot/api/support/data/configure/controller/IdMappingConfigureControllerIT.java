@@ -1,16 +1,11 @@
 package org.uniprot.api.support.data.configure.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +39,7 @@ class IdMappingConfigureControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.groups.length()", is(17)))
+                .andExpect(jsonPath("$.groups.length()", is(16)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.*.groupName",
@@ -55,7 +50,6 @@ class IdMappingConfigureControllerIT {
                                         "Protein-protein interaction databases",
                                         "Chemistry",
                                         "Protein family/group databases",
-                                        "PTM databases",
                                         "Genetic variation databases",
                                         "Proteomic databases",
                                         "Protocols and materials databases",
@@ -137,10 +131,6 @@ class IdMappingConfigureControllerIT {
                                 iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
-                                "$.groups.[?(@.groupName=='PTM databases')].items.*",
-                                iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
                                 "$.groups.[?(@.groupName=='Genetic variation databases')].items.*",
                                 iterableWithSize(2)))
                 .andExpect(
@@ -162,7 +152,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Organism-specific databases')].items.*",
-                                iterableWithSize(31)))
+                                iterableWithSize(30)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Phylogenomic databases')].items.*",
@@ -190,12 +180,12 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(3)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==8)]", iterableWithSize(86)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==8)]", iterableWithSize(84)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=9)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(95)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(93)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(96)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(94)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.rules.length()", is(8)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(7)))

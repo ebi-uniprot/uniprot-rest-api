@@ -189,16 +189,16 @@ class UniRefMapToTargetServiceTest {
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create three mock tuples and map in descending id order
-        Map<Object, Object> map1 = new HashMap<>();
+        Map<String, Object> map1 = new HashMap<>();
         map1.put("id", "UniRef100_A0A003");
         Tuple tuple1 = new Tuple(map1);
-        Map<Object, Object> map2 = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<>();
         map2.put("id", "UniRef100_A0A002");
         Tuple tuple2 = new Tuple(map2);
-        Map<Object, Object> map3 = new HashMap<>();
+        Map<String, Object> map3 = new HashMap<>();
         map3.put("id", "UniRef100_A0A001");
         Tuple tuple3 = new Tuple(map3);
-        Map<Object, Object> map4 = new HashMap<>();
+        Map<String, Object> map4 = new HashMap<>();
         map4.put("EOF", "");
         Tuple eofTuple = new Tuple(map4); // EOF tuple
         // Mock tupleStream.read() behavior
@@ -241,11 +241,11 @@ class UniRefMapToTargetServiceTest {
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create mock tuples with facets
-        Map<Object, Object> map1 = new HashMap<>();
+        Map<String, Object> map1 = new HashMap<>();
         map1.put(facetName, "1.0");
         map1.put("count(*)", 3L);
         Tuple tuple1 = new Tuple(map1);
-        Map<Object, Object> map2 = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<>();
         map2.put("EOF", "");
         Tuple eofTuple = new Tuple(map2); // EOF tuple
         TupleStream tupleStream = mock(TupleStream.class);
@@ -333,16 +333,16 @@ class UniRefMapToTargetServiceTest {
                 .thenReturn(solrRequest);
         when(solrRequest.createSearchRequest()).thenReturn(solrRequest);
         // create three mock tuples and map in descending id order
-        Map<Object, Object> map1 = new HashMap<>();
+        Map<String, Object> map1 = new HashMap<>();
         map1.put("id", "UniRef100_A0A003");
         Tuple tuple1 = new Tuple(map1);
-        Map<Object, Object> map2 = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<>();
         map2.put("id", "UniRef100_A0A002");
         Tuple tuple2 = new Tuple(map2);
-        Map<Object, Object> map3 = new HashMap<>();
+        Map<String, Object> map3 = new HashMap<>();
         map3.put("id", "UniRef100_A0A001");
         Tuple tuple3 = new Tuple(map3);
-        Map<Object, Object> map4 = new HashMap<>();
+        Map<String, Object> map4 = new HashMap<>();
         map4.put("EOF", "");
         Tuple eofTuple = new Tuple(map4); // EOF tuple
         // Mock tupleStream.read() behavior

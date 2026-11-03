@@ -176,19 +176,15 @@ class FacetTupleStreamConverterTest {
     }
 
     private Tuple getTuple(String facet, Object value, Long count) {
-        Tuple tuple = new Tuple();
-        Map<Object, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put(facet, value);
         map.put("count(*)", count);
-        tuple.fields = map;
-        return tuple;
+        return new Tuple(map);
     }
 
     private Tuple getTupleWithoutCount(String facet, String accession) {
-        Tuple tuple = new Tuple();
-        Map<Object, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put(facet, accession);
-        tuple.fields = map;
-        return tuple;
+        return new Tuple(map);
     }
 }

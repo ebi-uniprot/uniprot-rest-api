@@ -15,10 +15,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.util.MockSearchableSolrClient;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -185,7 +182,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "*:*");
         var mappings =
                 mappedIdsPairs.stream()
@@ -211,7 +208,7 @@ class IdMappingRepositoryTest {
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniprot,
                         "md5",
-                        Stream.of(md5_0, md5_1, md5_2).map(String::toLowerCase).toList(),
+                        Stream.of(md5_0, md5_1, md5_2).toList(),
                         "reviewed:true");
         var mappings =
                 mappedIdsPairs.stream()

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrDocument;
@@ -96,5 +97,34 @@ class UniprotKBMappingRepositoryTest {
         assertEquals(
                 DeletedReason.PROTEOME_REDUNDANCY, result.getInactiveReason().getDeletedReason());
         assertEquals("UPI000031CDF9", result.getExtraAttributeValue(UNIPARC_ID_ATTRIB));
+    }
+
+    @Test
+    void getDeletedEntryForMergedEntryWithActiveTargetReturnsMergedEntry() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+        UniprotKBMappingRepository repository = new UniprotKBMappingRepository(solrClient);
+
+        SolrDocument mergedDocument = new SolrDocument();
+        mergedDocument.put("accession_id", "A4GZ26");
+        mergedDocument.put("id", "INACTIVE_IQSEC2");
+        mergedDocument.put("active", false);
+        mergedDocument.put("inactive_reason", "MERGED:Q5DU25");
+        Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("A4GZ26")))
+                .thenReturn(mergedDocument);
+
+        SolrDocument activeDocument = new SolrDocument();
+        activeDocument.put("accession_id", "Q5DU25");
+        activeDocument.put("active", true);
+        Mockito.when(solrClient.getById(Mockito.anyString(), Mockito.eq("Q5DU25")))
+                .thenReturn(activeDocument);
+
+        UniProtKBEntry result = repository.getDeletedEntry("A4GZ26");
+
+        assertNotNull(result);
+        assertEquals("A4GZ26", result.getPrimaryAccession().getValue());
+        assertEquals("INACTIVE_IQSEC2", result.getUniProtkbId().getValue());
+        assertEquals(UniProtKBEntryType.INACTIVE, result.getEntryType());
+        assertEquals(InactiveReasonType.MERGED, result.getInactiveReason().getInactiveReasonType());
+        assertEquals(List.of("Q5DU25"), result.getInactiveReason().getMergeDemergeTos());
     }
 }

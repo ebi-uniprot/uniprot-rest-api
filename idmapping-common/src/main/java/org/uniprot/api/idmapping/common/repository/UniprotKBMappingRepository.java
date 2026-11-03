@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.common.repository;
 import static org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -50,7 +51,26 @@ public class UniprotKBMappingRepository {
                                 inactiveReasonBuilder.deletedReason(
                                         DeletedReason.valueOf(inactiveReason[1].strip()));
                             } else {
-                                return getDeletedEntry(inactiveReason[1].strip());
+                                String mergedInto = inactiveReason[1].strip();
+                                SolrDocument mergedIntoDocument =
+                                        solrClient.getById(
+                                                SolrCollection.uniprot.toString(), mergedInto);
+                                if (mergedIntoDocument != null) {
+                                    UniProtDocument mergedIntoEntry =
+                                            new DocumentObjectBinder()
+                                                    .getBean(
+                                                            UniProtDocument.class,
+                                                            mergedIntoDocument);
+                                    if (mergedIntoEntry.active) {
+                                        inactiveReasonBuilder
+                                                .type(InactiveReasonType.valueOf(inactiveReason[0]))
+                                                .mergeDemergeTosSet(List.of(mergedInto));
+                                    } else {
+                                        return getDeletedEntry(mergedInto);
+                                    }
+                                } else {
+                                    return null;
+                                }
                             }
                         }
                     }

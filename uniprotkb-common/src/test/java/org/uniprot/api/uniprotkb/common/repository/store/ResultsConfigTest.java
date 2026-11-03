@@ -3,7 +3,6 @@ package org.uniprot.api.uniprotkb.common.repository.store;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,49 +23,42 @@ class ResultsConfigTest {
     @Test
     void uniProtKBSolrClientWithZk() {
         ResultsConfig config = new ResultsConfig();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         configProps.setZkHost("localhost:2021");
-        SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
+        SolrClient solrClient = config.uniProtKBSolrClient(configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWithHttpPost() {
         ResultsConfig config = new ResultsConfig();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         configProps.setHttphost("localhost");
-        SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
+        SolrClient solrClient = config.uniProtKBSolrClient(configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWithUserAndPassword() {
         ResultsConfig config = new ResultsConfig();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         configProps.setHttphost("localhost");
         configProps.setUsername("user");
         configProps.setPassword("password");
-        SolrClient solrClient = config.uniProtKBSolrClient(httpClient, configProps);
+        SolrClient solrClient = config.uniProtKBSolrClient(configProps);
         assertNotNull(solrClient);
     }
 
     @Test
     void uniProtKBSolrClientWrongProperties() {
         ResultsConfig config = new ResultsConfig();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
-        assertThrows(
-                BeanCreationException.class,
-                () -> config.uniProtKBSolrClient(httpClient, configProps));
+        assertThrows(BeanCreationException.class, () -> config.uniProtKBSolrClient(configProps));
     }
 
     @Test
     void testTupleStreamTemplate() {
         ResultsConfig config = new ResultsConfig();
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         SolrClient solrClient = Mockito.mock(SolrClient.class);
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
@@ -79,7 +71,6 @@ class ResultsConfigTest {
     void testUniProtEntryStoreStreamerConfig() {
         ResultsConfig config = new ResultsConfig();
 
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
         SolrClient solrClient = Mockito.mock(SolrClient.class);
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         TaxonomyLineageService taxonomyLineageService =
