@@ -71,6 +71,25 @@ class SolrQueryRepositoryIT {
         storeManager.close();
     }
 
+    @Test
+    void rawQueryWithLargeIdFilterReturnsMatchingDocuments() {
+        String accession = "P12345";
+        storeManager.saveDocs(
+                DataStoreManager.StoreType.UNIPROT, UniProtDocMocker.createDoc(accession));
+        String ids =
+                java.util.stream.IntStream.range(0, 2000)
+                        .mapToObj(i -> "MISSING" + i)
+                        .collect(Collectors.joining(","));
+        SolrQuery query = new SolrQuery("*:*");
+        query.addFilterQuery("{!terms f=accession_id}" + accession + "," + ids);
+        query.setFields("accession_id");
+
+        var results = queryRepo.query(query).getResults();
+
+        assertEquals(1, results.getNumFound());
+        assertEquals(accession, results.get(0).getFieldValue("accession_id"));
+    }
+
     // getEntry -------------------
     @Test
     void getEntrySucceeds() {

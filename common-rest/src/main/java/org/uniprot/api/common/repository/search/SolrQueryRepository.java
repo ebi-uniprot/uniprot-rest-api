@@ -133,7 +133,11 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public QueryResponse query(SolrParams solrParams) {
         try {
-            return solrClient.query(collection.name(), solrParams);
+            // Keep potentially large filters in the request body instead of the URL.
+            return solrClient.query(
+                    collection.name(),
+                    solrParams,
+                    org.apache.solr.client.solrj.SolrRequest.METHOD.POST);
         } catch (SolrServerException | IOException e) {
             throw new QueryRetrievalException(
                     "Unexpected error retrieving data from our Repository", e);
