@@ -2,6 +2,7 @@ package org.uniprot.api.support.data.suggester.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -14,6 +15,7 @@ import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONO
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,7 +74,7 @@ class SuggesterControllerWithServerErrorsIT {
         // given
         doThrow(IllegalStateException.class)
                 .when(solrClient)
-                .query(anyString(), any(SolrQuery.class));
+                .query(anyString(), any(SolrQuery.class), eq(METHOD.POST));
 
         // when
         ResultActions response =

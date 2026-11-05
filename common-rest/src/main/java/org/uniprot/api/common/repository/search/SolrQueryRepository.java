@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -133,7 +134,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public QueryResponse query(SolrParams solrParams) {
         try {
-            return solrClient.query(collection.name(), solrParams);
+            return solrClient.query(collection.name(), solrParams, METHOD.POST);
         } catch (SolrServerException | IOException e) {
             throw new QueryRetrievalException(
                     "Unexpected error retrieving data from our Repository", e);
