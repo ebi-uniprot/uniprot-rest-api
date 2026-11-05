@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
+import org.apache.solr.search.SyntaxError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -90,6 +91,9 @@ public abstract class SolrQueryRepository<T extends Document> {
         } catch (Exception e) {
             if (e.getCause() instanceof InvalidRequestException) {
                 throw (InvalidRequestException) e.getCause();
+            }
+            if (e.getCause() instanceof SyntaxError) {
+                throw new InvalidRequestException(e.getCause());
             }
             throw new QueryRetrievalException(
                     "Unexpected error retrieving data from our Repository", e);
