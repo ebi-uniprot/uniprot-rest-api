@@ -138,32 +138,33 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             Instant start,
             AtomicInteger counter)
             throws IOException {
-        Stream<T> entities = entitiesToWrite(context);
-
-        try {
-            before(context, outputStream);
-            writeEntities(entities, outputStream, start, counter);
-            after(context, outputStream);
-            logStats(counter.get(), start);
-        } catch (IOException e) {
-            String errorMsg = "Error encountered when returning data.";
-            outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
-            throw new StopStreamException(errorMsg, e);
-        } catch (StopStreamException e) {
-            String errorMsg = "Error encountered when streaming data.";
-            writeStopStreamErrorMessage(outputStream, errorMsg);
-            throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
-        } finally {
-            if (downloadGatekeeper != null && context.isLargeDownload()) {
-                downloadGatekeeper.exit();
-                log.info(
-                        "Gatekeeper let me out (space inside={})",
-                        downloadGatekeeper.getSpaceInside());
+        try (outputStream;
+                Stream<T> entities = entitiesToWrite(context)) {
+            try {
+                before(context, outputStream);
+                writeEntities(entities, outputStream, start, counter);
+                after(context, outputStream);
+                logStats(counter.get(), start);
+            } catch (IOException e) {
+                String errorMsg = "Error encountered when returning data.";
+                outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
+                throw new StopStreamException(errorMsg, e);
+            } catch (StopStreamException e) {
+                String errorMsg = "Error encountered when streaming data.";
+                writeStopStreamErrorMessage(outputStream, errorMsg);
+                throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
             }
-
-            outputStream.close();
-            entities.close();
-            cleanUp();
+        } finally {
+            try {
+                if (downloadGatekeeper != null && context.isLargeDownload()) {
+                    downloadGatekeeper.exit();
+                    log.info(
+                            "Gatekeeper let me out (space inside={})",
+                            downloadGatekeeper.getSpaceInside());
+                }
+            } finally {
+                cleanUp();
+            }
         }
     }
 

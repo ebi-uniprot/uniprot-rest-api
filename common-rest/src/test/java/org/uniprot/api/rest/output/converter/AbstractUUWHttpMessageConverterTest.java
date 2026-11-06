@@ -2,7 +2,9 @@ package org.uniprot.api.rest.output.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
@@ -11,6 +13,7 @@ import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -255,6 +258,93 @@ class AbstractUUWHttpMessageConverterTest {
 
         verify(gatekeeper).exit();
         assertThat(os.toString(), is(ORIGINAL));
+    }
+
+    @Test
+    void outputCloseFailureStillClosesEntitiesAndReleasesPermit() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper);
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        IOException closeFailure = new IOException("Client disconnected");
+        doThrow(closeFailure).when(output).close();
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        IOException thrown =
+                assertThrows(
+                        IOException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(closeFailure, thrown);
+        assertTrue(converter.isCharacterStreamIsClosed());
+        assertTrue(converter.hasCleanedUp());
+        verify(gatekeeper).exit();
+    }
+
+    @Test
+    void entityCloseFailureStillClosesOutputAndPreservesBothFailures() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        AtomicBoolean entitiesClosed = new AtomicBoolean();
+        RuntimeException entityFailure = new IllegalStateException("Solr close failed");
+        Stream<Character> entities =
+                charStream(ORIGINAL)
+                        .onClose(
+                                () -> {
+                                    entitiesClosed.set(true);
+                                    throw entityFailure;
+                                });
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected Stream<Character> entitiesToWrite(
+                            MessageConverterContext<Character> context) {
+                        return entities;
+                    }
+                };
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        IOException outputFailure = new IOException("Client disconnected");
+        doThrow(outputFailure).when(output).close();
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        RuntimeException thrown =
+                assertThrows(
+                        RuntimeException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(entityFailure, thrown);
+        assertSame(outputFailure, thrown.getSuppressed()[0]);
+        assertTrue(entitiesClosed.get());
+        assertTrue(converter.hasCleanedUp());
+        verify(output).close();
+        verify(gatekeeper).exit();
+    }
+
+    @Test
+    void entityCreationFailureStillClosesOutputAndReleasesPermit() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        RuntimeException failure = new IllegalStateException("Cannot prepare entities");
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected Stream<Character> entitiesToWrite(
+                            MessageConverterContext<Character> context) {
+                        throw failure;
+                    }
+                };
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        RuntimeException thrown =
+                assertThrows(
+                        RuntimeException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(failure, thrown);
+        assertTrue(converter.hasCleanedUp());
+        verify(output).close();
+        verify(gatekeeper).exit();
     }
 
     private static Stream<Character> charStream(String value) {

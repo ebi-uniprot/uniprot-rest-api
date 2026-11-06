@@ -335,14 +335,40 @@ public abstract class BasicSearchController<T> {
             Supplier<MessageConverterContext<T>> contextSupplier,
             HttpServletRequest request,
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
-        MessageConverterContext<T> context = contextSupplier.get();
+        if (!deferredResult.isSetOrExpired()) {
+            completeStreamResponse(contextSupplier.get(), request, deferredResult);
+        }
+    }
 
-        ResponseEntity<MessageConverterContext<T>> okayResponse =
-                ResponseEntity.ok()
-                        .headers(createHttpDownloadHeader(context, request))
-                        .body(context);
+    private boolean completeStreamResponse(
+            MessageConverterContext<T> context,
+            HttpServletRequest request,
+            DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
+        boolean accepted = false;
+        try {
+            ResponseEntity<MessageConverterContext<T>> response =
+                    ResponseEntity.ok()
+                            .headers(createHttpDownloadHeader(context, request))
+                            .body(context);
+            accepted = deferredResult.setResult(response);
+            return accepted;
+        } finally {
+            // If the request already timed out, no message converter will close these streams.
+            if (!accepted) {
+                closeAbandonedStream(context.getEntities());
+                closeAbandonedStream(context.getEntityIds());
+            }
+        }
+    }
 
-        deferredResult.setResult(okayResponse);
+    private void closeAbandonedStream(Stream<?> stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            } catch (RuntimeException e) {
+                log.warn("Could not close abandoned response stream", e);
+            }
+        }
     }
 
     /**
@@ -359,22 +385,26 @@ public abstract class BasicSearchController<T> {
             HttpServletRequest request,
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
 
+        if (deferredResult.isSetOrExpired()) {
+            return;
+        }
         if (downloadGatekeeper.enter()) {
+            boolean accepted = false;
             try {
+                if (deferredResult.isSetOrExpired()) {
+                    return;
+                }
                 MessageConverterContext<T> context = contextSupplier.get();
-                ResponseEntity<MessageConverterContext<T>> okayResponse =
-                        ResponseEntity.ok()
-                                .headers(createHttpDownloadHeader(context, request))
-                                .body(context);
                 context.setLargeDownload(true);
 
                 log.info(
                         "Gatekeeper let me in (space inside={})",
                         downloadGatekeeper.getSpaceInside());
-                deferredResult.setResult(okayResponse);
-            } catch (RuntimeException | Error e) {
-                downloadGatekeeper.exit();
-                throw e;
+                accepted = completeStreamResponse(context, request, deferredResult);
+            } finally {
+                if (!accepted) {
+                    downloadGatekeeper.exit();
+                }
             }
         } else {
             String errorMessage =

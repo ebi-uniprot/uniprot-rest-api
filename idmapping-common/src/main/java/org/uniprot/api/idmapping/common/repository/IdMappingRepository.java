@@ -113,7 +113,10 @@ public class IdMappingRepository {
         queryParamsMap.put("fq", filteredTermQueryWithIds);
         MapSolrParams queryParams = new MapSolrParams(queryParamsMap);
 
-        return client.query(collection.name(), queryParams, SolrRequest.METHOD.POST).getResults().stream()
+        return client
+                .query(collection.name(), queryParams, SolrRequest.METHOD.POST)
+                .getResults()
+                .stream()
                 .map(
                         document ->
                                 new IdMappingStringPair(
