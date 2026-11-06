@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -36,6 +37,12 @@ import org.uniprot.core.uniprotkb.DeletedReason;
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Import({RequestMappingHandlerAdapter.class})
+// Entry content can exceed Hibernate's default String column length of 255 characters.
+@Sql(
+        statements = {
+            "ALTER TABLE entry ALTER COLUMN full_content SET DATA TYPE TEXT",
+            "ALTER TABLE entry ALTER COLUMN diff_content SET DATA TYPE TEXT"
+        })
 class UniSaveRepositoryIT {
     private static final AtomicInteger ENTRY_COUNTER = new AtomicInteger();
     private static final AtomicInteger RELEASE_COUNTER = new AtomicInteger();
