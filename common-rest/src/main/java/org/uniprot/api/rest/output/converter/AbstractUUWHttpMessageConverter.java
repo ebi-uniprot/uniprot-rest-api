@@ -154,16 +154,31 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             writeStopStreamErrorMessage(outputStream, errorMsg);
             throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
         } finally {
-            if (downloadGatekeeper != null && context.isLargeDownload()) {
-                downloadGatekeeper.exit();
-                log.info(
-                        "Gatekeeper let me out (space inside={})",
-                        downloadGatekeeper.getSpaceInside());
-            }
+            try {
+                // Close the entities first: they may be backed by open Solr streams (each holding
+                // an HTTP connection to Solr). Closing the output stream throws when the client
+                // has gone away, and must not prevent those resources from being released.
+                closeEntities(entities);
 
-            outputStream.close();
+                if (downloadGatekeeper != null && context.isLargeDownload()) {
+                    downloadGatekeeper.exit();
+                    log.info(
+                            "Gatekeeper let me out (space inside={})",
+                            downloadGatekeeper.getSpaceInside());
+                }
+
+                outputStream.close();
+            } finally {
+                cleanUp();
+            }
+        }
+    }
+
+    private void closeEntities(Stream<T> entities) {
+        try {
             entities.close();
-            cleanUp();
+        } catch (RuntimeException e) {
+            log.error("Error closing entities stream", e);
         }
     }
 

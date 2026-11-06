@@ -194,6 +194,78 @@ class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
+    void entitiesClosedAndGatekeeperExitedWhenClosingOutputStreamFails() throws IOException {
+        // e.g. the client has gone away, so flushing/closing the response output fails
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper);
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        doThrow(new IOException("client went away")).when(mockOS).close();
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        assertThrows(
+                IOException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
+
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
+        assertThat(converter.hasCleanedUp(), is(true));
+        verify(gatekeeper).exit();
+    }
+
+    @Test
+    void entitiesClosedWhenWritingAndClosingOutputStreamBothFail() throws IOException {
+        // the typical client-abort case: the write fails, then so does the close
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE) {
+                    @Override
+                    protected void writeEntity(Character entity, OutputStream outputStream)
+                            throws IOException {
+                        throw new IOException("broken pipe");
+                    }
+                };
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        doThrow(new IOException("client went away")).when(mockOS).close();
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+
+        assertThrows(
+                IOException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
+
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
+        assertThat(converter.hasCleanedUp(), is(true));
+    }
+
+    @Test
+    void outputStreamClosedAndGatekeeperExitedWhenClosingEntitiesFails() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected Stream<Character> entitiesToWrite(
+                            MessageConverterContext<Character> context) {
+                        return charStream(ORIGINAL)
+                                .onClose(
+                                        () -> {
+                                            throw new IllegalStateException(
+                                                    "Error when closing TupleStream");
+                                        });
+                    }
+                };
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        converter.writeInternal(context, null, httpOutputMessage(mockOS));
+
+        verify(mockOS).close();
+        verify(gatekeeper).exit();
+        assertThat(converter.hasCleanedUp(), is(true));
+    }
+
+    @Test
     void writesCorrectNumberOfEntities() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         assertThat(converter.getCounter(), is(0));

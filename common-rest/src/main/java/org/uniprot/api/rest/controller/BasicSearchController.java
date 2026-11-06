@@ -6,6 +6,7 @@ import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchH
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.isBrowserAsFarAsWeKnow;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -260,6 +261,20 @@ public abstract class BasicSearchController<T> {
                             "Timeout waiting to enter in the stream queue");
                 });
 
+        // Safety net: once the async request completes for any reason, make sure the results
+        // streams are closed, even if the message converter never ran (e.g. the request failed
+        // after the result was set). Closing a stream that has already been closed is a no-op.
+        // If the request completes before the context exists, runRequestNow/runRequestIfNotBusy
+        // close it instead, because setResult then returns false.
+        AtomicReference<MessageConverterContext<T>> createdContext = new AtomicReference<>();
+        deferredResult.onCompletion(() -> closeContextStreams(createdContext.get()));
+        Supplier<MessageConverterContext<T>> trackingContextSupplier =
+                () -> {
+                    MessageConverterContext<T> context = contextSupplier.get();
+                    createdContext.set(context);
+                    return context;
+                };
+
         // create the deferred result on a thread pool to prevent blocking client
         try {
             downloadTaskExecutor.execute(
@@ -267,9 +282,10 @@ public abstract class BasicSearchController<T> {
                         try {
                             String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
                             if (isGatekeeperNeeded(userAgent)) {
-                                runRequestIfNotBusy(contextSupplier, request, deferredResult);
+                                runRequestIfNotBusy(
+                                        trackingContextSupplier, request, deferredResult);
                             } else {
-                                runRequestNow(contextSupplier, request, deferredResult);
+                                runRequestNow(trackingContextSupplier, request, deferredResult);
                             }
                         } catch (Throwable e) {
                             log.error("Error occurred during processing.", e);
@@ -337,12 +353,21 @@ public abstract class BasicSearchController<T> {
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
         MessageConverterContext<T> context = contextSupplier.get();
 
-        ResponseEntity<MessageConverterContext<T>> okayResponse =
-                ResponseEntity.ok()
-                        .headers(createHttpDownloadHeader(context, request))
-                        .body(context);
+        try {
+            ResponseEntity<MessageConverterContext<T>> okayResponse =
+                    ResponseEntity.ok()
+                            .headers(createHttpDownloadHeader(context, request))
+                            .body(context);
 
-        deferredResult.setResult(okayResponse);
+            if (!deferredResult.setResult(okayResponse)) {
+                log.info(
+                        "Stream request already completed (e.g. client disconnected) before results were ready; closing results stream");
+                closeContextStreams(context);
+            }
+        } catch (RuntimeException | Error e) {
+            closeContextStreams(context);
+            throw e;
+        }
     }
 
     /**
@@ -360,8 +385,10 @@ public abstract class BasicSearchController<T> {
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
 
         if (downloadGatekeeper.enter()) {
+            MessageConverterContext<T> context = null;
+            boolean resultAccepted;
             try {
-                MessageConverterContext<T> context = contextSupplier.get();
+                context = contextSupplier.get();
                 ResponseEntity<MessageConverterContext<T>> okayResponse =
                         ResponseEntity.ok()
                                 .headers(createHttpDownloadHeader(context, request))
@@ -371,10 +398,20 @@ public abstract class BasicSearchController<T> {
                 log.info(
                         "Gatekeeper let me in (space inside={})",
                         downloadGatekeeper.getSpaceInside());
-                deferredResult.setResult(okayResponse);
+                resultAccepted = deferredResult.setResult(okayResponse);
             } catch (RuntimeException | Error e) {
+                closeContextStreams(context);
                 downloadGatekeeper.exit();
                 throw e;
+            }
+
+            // If the request already completed (e.g. client disconnected), the message converter
+            // will never run, so neither the results stream nor the gatekeeper would be released.
+            if (!resultAccepted) {
+                log.info(
+                        "Stream request already completed (e.g. client disconnected) before results were ready; closing results stream");
+                closeContextStreams(context);
+                downloadGatekeeper.exit();
             }
         } else {
             String errorMessage =
@@ -383,6 +420,27 @@ public abstract class BasicSearchController<T> {
                             downloadGatekeeper.getSpaceInside());
             log.info(errorMessage);
             throw new TooManyRequestsException(errorMessage);
+        }
+    }
+
+    /**
+     * Closes the result streams of a context that will never be written by a message converter,
+     * releasing any resources backing them (e.g., open Solr streams and their HTTP connections).
+     */
+    private void closeContextStreams(MessageConverterContext<T> context) {
+        if (context != null) {
+            closeQuietly(context.getEntities());
+            closeQuietly(context.getEntityIds());
+        }
+    }
+
+    private static void closeQuietly(Stream<?> stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            } catch (RuntimeException e) {
+                log.error("Error closing results stream", e);
+            }
         }
     }
 
