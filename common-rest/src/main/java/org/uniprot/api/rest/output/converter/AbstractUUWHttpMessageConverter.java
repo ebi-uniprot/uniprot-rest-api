@@ -116,12 +116,10 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         Instant start = Instant.now();
 
         if (context.getFileType() == FileType.GZIP) {
-            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(outputStream)) {
-                writeContents(context, gzipOutputStream, start, counter);
-            }
-        } else {
-            writeContents(context, outputStream, start, counter);
+            outputStream = new GZIPOutputStream(outputStream);
         }
+        // writeContents owns and closes the output, including the GZIP wrapper.
+        writeContents(context, outputStream, start, counter);
     }
 
     protected void before(MessageConverterContext<C> context, OutputStream outputStream)
@@ -138,32 +136,33 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             Instant start,
             AtomicInteger counter)
             throws IOException {
-        try (outputStream;
-                Stream<T> entities = entitiesToWrite(context)) {
-            try {
-                before(context, outputStream);
-                writeEntities(entities, outputStream, start, counter);
-                after(context, outputStream);
-                logStats(counter.get(), start);
-            } catch (IOException e) {
-                String errorMsg = "Error encountered when returning data.";
-                outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
-                throw new StopStreamException(errorMsg, e);
-            } catch (StopStreamException e) {
-                String errorMsg = "Error encountered when streaming data.";
-                writeStopStreamErrorMessage(outputStream, errorMsg);
-                throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
-            }
-        } finally {
-            try {
-                if (downloadGatekeeper != null && context.isLargeDownload()) {
-                    downloadGatekeeper.exit();
-                    log.info(
-                            "Gatekeeper let me out (space inside={})",
-                            downloadGatekeeper.getSpaceInside());
+        try (outputStream) {
+            try (Stream<T> entities = entitiesToWrite(context)) {
+                try {
+                    before(context, outputStream);
+                    writeEntities(entities, outputStream, start, counter);
+                    after(context, outputStream);
+                    logStats(counter.get(), start);
+                } catch (IOException e) {
+                    String errorMsg = "Error encountered when returning data.";
+                    outputStream.write(
+                            ("\n\n" + errorMsg + " Please try again later.\n").getBytes());
+                    throw new StopStreamException(errorMsg, e);
+                } catch (StopStreamException e) {
+                    String errorMsg = "Error encountered when streaming data.";
+                    writeStopStreamErrorMessage(outputStream, errorMsg);
+                    throw new StopStreamException(errorMsg + " " + e.getMessage(), e);
                 }
             } finally {
+                // Finalize buffered format data (e.g. JSON) while output/GZIP is still open.
                 cleanUp();
+            }
+        } finally {
+            if (downloadGatekeeper != null && context.isLargeDownload()) {
+                downloadGatekeeper.exit();
+                log.info(
+                        "Gatekeeper let me out (space inside={})",
+                        downloadGatekeeper.getSpaceInside());
             }
         }
     }

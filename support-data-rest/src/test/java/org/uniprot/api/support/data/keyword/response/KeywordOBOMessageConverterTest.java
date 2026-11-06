@@ -2,16 +2,24 @@ package org.uniprot.api.support.data.keyword.response;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.cv.keyword.KeywordFileReader;
 
@@ -103,5 +111,33 @@ class KeywordOBOMessageConverterTest {
         StringWriter out = new StringWriter();
         oboFormatWriter.write(frame, new PrintWriter(out), null);
         return out.getBuffer().toString();
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void oboLifecycle(FileType fileType, boolean sourceFails, boolean outputFails)
+            throws Exception {
+        KeywordEntry entry =
+                new KeywordFileReader()
+                        .parseLines(
+                                List.of(
+                                        "_______________________________",
+                                        "IC   Biological process.",
+                                        "AC   KW-9999",
+                                        "DE   A biological process.",
+                                        "//"))
+                        .get(0);
+        MessageConverterContext<KeywordEntry> context =
+                MessageConverterContext.<KeywordEntry>builder()
+                        .fileType(fileType)
+                        .entities(Stream.of(entry))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new KeywordOBOMessageConverter(), context, sourceFails, outputFails);
+        String obo = new String(result, StandardCharsets.UTF_8);
+        assertTrue(obo.contains("format-version: 1.2"));
+        assertTrue(obo.contains("[Term]\nid: KW-9999\n"));
     }
 }

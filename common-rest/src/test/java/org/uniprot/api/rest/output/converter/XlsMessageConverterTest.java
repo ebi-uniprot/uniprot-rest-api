@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -20,6 +21,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
@@ -164,5 +168,26 @@ class XlsMessageConverterTest {
         String truncatedValue =
                 longGeneName.substring(0, MAX_CELL_LENGTH - TRUNCATED.length()) + TRUNCATED;
         assertTrue(cellValues.contains(truncatedValue));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void closesSourceAndOutputForPlainAndGzip(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws IOException {
+        MessageConverterContext<UniProtKBEntry> context =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fileType(fileType)
+                        .fields("accession")
+                        .entities(Stream.of(UniProtKBEntryIT.getCompleteColumnsUniProtEntry()))
+                        .build();
+        byte[] result =
+                AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle(
+                        xlsMessageConverter, context, sourceFails, outputFails);
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(result))) {
+            assertEquals("Entry", workbook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue());
+            assertEquals(
+                    "P00001", workbook.getSheetAt(0).getRow(1).getCell(0).getStringCellValue());
+        }
     }
 }

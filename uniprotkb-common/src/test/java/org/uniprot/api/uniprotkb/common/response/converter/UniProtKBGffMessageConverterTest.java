@@ -2,17 +2,24 @@ package org.uniprot.api.uniprotkb.common.response.converter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle;
 import static org.uniprot.api.uniprotkb.common.response.converter.UniProtKBGffMessageConverter.GFF_HEADER;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
 class UniProtKBGffMessageConverterTest {
     private final UniProtKBGffMessageConverter uniProtKBEntryUniProtKBGffMessageConverter =
@@ -80,5 +87,56 @@ class UniProtKBGffMessageConverterTest {
         String[] split = result.split("\n");
         assertEquals(1, split.length);
         assertEquals(GFF_HEADER, split[0].strip());
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void gffLifecycle(FileType fileType, boolean sourceFails, boolean outputFails)
+            throws Exception {
+        MessageConverterContext<UniProtKBEntry> context =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fileType(fileType)
+                        .entities(Stream.of(UniProtKBEntryIT.getCompleteColumnsUniProtEntry()))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniProtKBGffMessageConverter(), context, sourceFails, outputFails);
+        assertTrue(new String(result, StandardCharsets.UTF_8).contains(GFF_HEADER));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void fastaLifecycle(FileType fileType, boolean sourceFails, boolean outputFails)
+            throws Exception {
+        MessageConverterContext<UniProtKBEntry> context =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fileType(fileType)
+                        .entities(Stream.of(UniProtKBEntryIT.getCompleteColumnsUniProtEntry()))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniProtKBFastaMessageConverter(), context, sourceFails, outputFails);
+        assertTrue(new String(result, StandardCharsets.UTF_8).contains(">sp|P00001|"));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void flatFileLifecycle(FileType fileType, boolean sourceFails, boolean outputFails)
+            throws Exception {
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        MessageConverterContext<UniProtKBEntry> context =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fileType(fileType)
+                        .entities(Stream.of(entry))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniProtKBFlatFileMessageConverter(), context, sourceFails, outputFails);
+        assertTrue(
+                new String(result, StandardCharsets.UTF_8)
+                        .contains("AC   " + entry.getPrimaryAccession().getValue() + ";"));
     }
 }

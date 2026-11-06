@@ -1,7 +1,17 @@
 package org.uniprot.api.uniref.common.response.converter;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle;
+
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
@@ -11,7 +21,6 @@ import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
-@Disabled
 class UniRefXmlMessageConverterTest extends AbstractXmlValidationTest<UniRefEntry> {
 
     @Override
@@ -34,5 +43,29 @@ class UniRefXmlMessageConverterTest extends AbstractXmlValidationTest<UniRefEntr
     @Override
     protected UniRefEntry getEntry() {
         return UniRefEntryMocker.createEntry(1, UniRefType.UniRef100);
+    }
+
+    @Override
+    @Test
+    @Disabled("Existing external schema validation remains disabled; lifecycle tests run locally")
+    public void validateEntry() throws java.io.IOException {
+        super.validateEntry();
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void UniRefFastaMessageConverterLifecycle(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws Exception {
+        MessageConverterContext<UniRefEntry> context =
+                MessageConverterContext.<UniRefEntry>builder()
+                        .fileType(fileType)
+                        .entityOnly(true)
+                        .entities(Stream.of(getEntry()))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniRefFastaMessageConverter(), context, sourceFails, outputFails);
+        assertTrue(new String(result, StandardCharsets.UTF_8).startsWith(">"));
     }
 }
