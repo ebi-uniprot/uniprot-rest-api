@@ -51,7 +51,11 @@ public class SolrRequestConverter {
         }
         setQueryFields(solrQuery, request);
 
-        JsonQueryRequest result = new JsonQueryRequest(solrQuery);
+        // Constructor parameters go in the URL, even with POST. Keep them in the JSON body.
+        JsonQueryRequest result = new JsonQueryRequest();
+        for (String name : solrQuery.getParameterNames()) {
+            result.withParam(name, solrQuery.getParams(name));
+        }
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
             setFacets(result, request);
