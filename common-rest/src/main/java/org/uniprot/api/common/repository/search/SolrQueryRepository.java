@@ -76,7 +76,8 @@ public abstract class SolrQueryRepository<T extends Document> {
                     request.getFacets().stream().map(SolrFacetRequest::getName).toList();
             List<Facet> facets = facetConverter.convert(solrResponse, facetNames);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
-            List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
+            List<Suggestion> suggestions =
+                    suggestionConverter.convert(solrResponse, request.getQuery());
 
             return QueryResult.<T>builder()
                     .content(resultList.stream())

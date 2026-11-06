@@ -31,6 +31,13 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
 
     @Override
     public List<Suggestion> convert(QueryResponse queryResponse) {
+        NamedList<?> header = queryResponse.getHeader();
+        NamedList<?> params = header == null ? null : (NamedList<?>) header.get("params");
+        String query = params == null ? null : (String) params.get("q");
+        return convert(queryResponse, query);
+    }
+
+    public List<Suggestion> convert(QueryResponse queryResponse, String query) {
         long resultHits = queryResponse.getResults().getNumFound();
         SpellCheckResponse spellCheckResponse = queryResponse.getSpellCheckResponse();
         if (resultHits == 0L && Utils.notNull(spellCheckResponse)) {
@@ -43,9 +50,7 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
 
             // Case 2: Build client-side collations from token suggestions
             if (Utils.notNullNotEmpty(spellCheckResponse.getSuggestions())) {
-                String query =
-                        (String) ((NamedList<?>) queryResponse.getHeader().get("params")).get("q");
-                if (!StringUtils.containsWhitespace(query)) {
+                if (query != null && !StringUtils.containsWhitespace(query)) {
                     return spellCheckResponse.getSuggestions().stream()
                             .flatMap(
                                     sug ->
@@ -55,9 +60,7 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
                             .toList();
                 }
             } else if (this.collection == SolrCollection.uniref) {
-                String query =
-                        (String) ((NamedList<?>) queryResponse.getHeader().get("params")).get("q");
-                if (query.matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX)) {
+                if (query != null && query.matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX)) {
                     List<Suggestion> suggestions = getUniRefSolrSuggestion(query);
                     return suggestions;
                 }

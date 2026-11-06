@@ -51,7 +51,12 @@ public class SolrRequestConverter {
         }
         setQueryFields(solrQuery, request);
 
-        JsonQueryRequest result = new JsonQueryRequest(solrQuery);
+        // JsonQueryRequest(SolrParams) puts those parameters in the URL, even for POST.
+        // Use the JSON params block so large queries and filters stay in the body.
+        JsonQueryRequest result = new JsonQueryRequest();
+        for (String name : solrQuery.getParameterNames()) {
+            result.withParam(name, solrQuery.getParams(name));
+        }
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
             setFacets(result, request);
