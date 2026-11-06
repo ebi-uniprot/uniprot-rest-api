@@ -79,32 +79,9 @@ public class AbstractUUWHttpMessageConverterTest {
                             .peek(e -> consumed.incrementAndGet())
                             .onClose(closeSource));
         }
-        ByteArrayOutputStream output = spy(new ByteArrayOutputStream());
-        doAnswer(
-                        invocation -> {
-                            assertFalse(outputClosed.get(), "Writing after output was closed");
-                            return invocation.callRealMethod();
-                        })
-                .when(output)
-                .write(any(byte[].class), anyInt(), anyInt());
-        doAnswer(
-                        invocation -> {
-                            assertFalse(outputClosed.get(), "Writing after output was closed");
-                            return invocation.callRealMethod();
-                        })
-                .when(output)
-                .write(anyInt());
-        doAnswer(
-                        invocation -> {
-                            assertTrue(sourceClosed.get(), "Response closed before source");
-                            outputClosed.set(true);
-                            if (outputCloseFails) {
-                                throw outputFailure;
-                            }
-                            return null;
-                        })
-                .when(output)
-                .close();
+        LifecycleOutputStream output =
+                new LifecycleOutputStream(
+                        sourceClosed, outputClosed, outputCloseFails, outputFailure);
         HttpOutputMessage message = mock(HttpOutputMessage.class);
         when(message.getBody()).thenReturn(output);
         assertEquals(0, consumed.get(), "Entities should be consumed lazily");
@@ -129,7 +106,7 @@ public class AbstractUUWHttpMessageConverterTest {
         assertTrue(consumed.get() > 0, "Converter did not consume the source");
         assertTrue(sourceClosed.get());
         assertTrue(outputClosed.get());
-        verify(output, times(1)).close();
+        assertEquals(1, output.getCloseCount());
         for (Class<?> type = converter.getClass(); type != null; type = type.getSuperclass()) {
             for (java.lang.reflect.Field field : type.getDeclaredFields()) {
                 if (field.getType() == ThreadLocal.class) {
@@ -150,6 +127,52 @@ public class AbstractUUWHttpMessageConverterTest {
             }
         }
         return bytes;
+    }
+
+    private static class LifecycleOutputStream extends ByteArrayOutputStream {
+        private final AtomicBoolean sourceClosed;
+        private final AtomicBoolean outputClosed;
+        private final boolean closeFails;
+        private final IOException closeFailure;
+        private int closeCount;
+
+        private LifecycleOutputStream(
+                AtomicBoolean sourceClosed,
+                AtomicBoolean outputClosed,
+                boolean closeFails,
+                IOException closeFailure) {
+            this.sourceClosed = sourceClosed;
+            this.outputClosed = outputClosed;
+            this.closeFails = closeFails;
+            this.closeFailure = closeFailure;
+        }
+
+        @Override
+        public synchronized void write(byte[] bytes, int offset, int length) {
+            assertFalse(outputClosed.get(), "Writing after output was closed");
+            super.write(bytes, offset, length);
+        }
+
+        @Override
+        public synchronized void write(int value) {
+            assertFalse(outputClosed.get(), "Writing after output was closed");
+            super.write(value);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertTrue(sourceClosed.get(), "Response closed before source");
+            closeCount++;
+            outputClosed.set(true);
+            if (closeFails) {
+                throw closeFailure;
+            }
+            super.close();
+        }
+
+        private int getCloseCount() {
+            return closeCount;
+        }
     }
 
     private static final String BEFORE = "before";
