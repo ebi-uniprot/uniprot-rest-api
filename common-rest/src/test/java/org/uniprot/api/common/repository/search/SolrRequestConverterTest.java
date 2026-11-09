@@ -5,11 +5,13 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +36,25 @@ class SolrRequestConverterTest {
     @BeforeEach
     void setup() {
         this.converter = new SolrRequestConverter();
+    }
+
+    private SolrParams bodyParams(JsonQueryRequest request) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            request.getContentWriter("").write(out);
+            var params = new ObjectMapper().readTree(out.toByteArray()).get("params");
+            ModifiableSolrParams result = new ModifiableSolrParams();
+            var names = params.fieldNames();
+            while (names.hasNext()) {
+                String name = names.next();
+                for (var value : params.get(name)) {
+                    result.add(name, value.asText());
+                }
+            }
+            return result;
+        } catch (IOException e) {
+            throw new AssertionError("Could not read JSON request parameters", e);
+        }
     }
 
     @Nested
@@ -84,7 +105,7 @@ class SolrRequestConverterTest {
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
             // then
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             List<String> filters = Arrays.asList(queryParams.getParams("fq"));
@@ -143,7 +164,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, true);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -170,7 +191,7 @@ class SolrRequestConverterTest {
                             .build();
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
             assertNotNull(solrQuery);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             assertThat(queryParams.get("defType"), is("edismax"));
@@ -197,7 +218,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -221,7 +242,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
             // then
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
@@ -244,7 +265,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -267,7 +288,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -289,7 +310,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -311,7 +332,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -333,7 +354,7 @@ class SolrRequestConverterTest {
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -357,7 +378,7 @@ class SolrRequestConverterTest {
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
@@ -379,7 +400,7 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            SolrParams queryParams = solrQuery.getParams();
+            SolrParams queryParams = bodyParams(solrQuery);
             assertNotNull(queryParams);
 
             // then
