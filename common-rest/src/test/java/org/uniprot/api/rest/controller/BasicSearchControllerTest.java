@@ -2,7 +2,6 @@ package org.uniprot.api.rest.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
@@ -93,9 +92,12 @@ class BasicSearchControllerTest {
 
         RuntimeException errorResult = new RuntimeException("MOCK EXCEPTION");
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(anyString())).thenThrow(errorResult);
         DeferredResult<ResponseEntity<MessageConverterContext<String>>> result =
-                controller.getDeferredResultResponseEntity(() -> context, request);
+                controller.getDeferredResultResponseEntity(
+                        () -> {
+                            throw errorResult;
+                        },
+                        request);
         assertNotNull(result);
         Thread.sleep(200);
         assertInstanceOf(RuntimeException.class, result.getResult());
@@ -298,7 +300,7 @@ class BasicSearchControllerTest {
     }
 
     @Test
-    void browserRequestsBypassGatekeeper() throws Exception {
+    void browserRequestsDoNotBypassGatekeeper() throws Exception {
         setUp(true); // set with gatekeeper
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         when(httpRequest.getHeader(USER_AGENT))
@@ -307,9 +309,10 @@ class BasicSearchControllerTest {
         for (int i = 0; i < 5; i++) {
             controller.getDeferredResultResponseEntity(() -> context, httpRequest);
             Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
-            // gatekeeper capacity remains unchanged because the browser request bypasses it
+            // Browser requests now consume gatekeeper capacity like other stream requests.
             MatcherAssert.assertThat(
-                    gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+                    gatekeeper.getSpaceInside(),
+                    CoreMatchers.is(gatekeeper.getCapacity() - (i + 1)));
         }
     }
 
