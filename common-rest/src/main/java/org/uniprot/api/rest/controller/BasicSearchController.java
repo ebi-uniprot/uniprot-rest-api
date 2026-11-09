@@ -264,8 +264,7 @@ public abstract class BasicSearchController<T> {
             downloadTaskExecutor.execute(
                     () -> {
                         try {
-                            String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-                            if (isGatekeeperNeeded(userAgent)) {
+                            if (isGatekeeperNeeded()) {
                                 runRequestIfNotBusy(contextSupplier, request, deferredResult);
                             } else {
                                 runRequestNow(contextSupplier, request, deferredResult);
@@ -415,7 +414,7 @@ public abstract class BasicSearchController<T> {
         }
     }
 
-    private boolean isGatekeeperNeeded(String userAgent) {
+    private boolean isGatekeeperNeeded() {
         return Utils.notNull(downloadGatekeeper);
     }
 
