@@ -3,6 +3,7 @@ package org.uniprot.api.rest.controller;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.isBrowserAsFarAsWeKnow;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -33,6 +34,7 @@ import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.PairImpl;
+import org.uniprot.core.util.Utils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -263,7 +265,12 @@ public abstract class BasicSearchController<T> {
             downloadTaskExecutor.execute(
                     () -> {
                         try {
-                            runRequestIfNotBusy(contextSupplier, request, deferredResult);
+                            String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                            if (isGatekeeperNeeded(userAgent)) {
+                                runRequestIfNotBusy(contextSupplier, request, deferredResult);
+                            } else {
+                                runRequestNow(contextSupplier, request, deferredResult);
+                            }
                         } catch (Throwable e) {
                             log.error("Error occurred during processing.", e);
                             deferredResult.setErrorResult(e);
@@ -322,6 +329,15 @@ public abstract class BasicSearchController<T> {
         context.setDownloadContentDispositionHeader(streamRequest.isDownload());
         context.setFileType(getBestFileTypeFromRequest(request));
         return context;
+    }
+
+    private void runRequestNow(
+            Supplier<MessageConverterContext<T>> contextSupplier,
+            HttpServletRequest request,
+            DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult) {
+        if (!deferredResult.isSetOrExpired()) {
+            completeStreamResponse(contextSupplier.get(), request, deferredResult);
+        }
     }
 
     private boolean completeStreamResponse(
@@ -398,6 +414,10 @@ public abstract class BasicSearchController<T> {
             log.info(errorMessage);
             throw new TooManyRequestsException(errorMessage);
         }
+    }
+
+    private boolean isGatekeeperNeeded(String userAgent) {
+        return Utils.notNull(downloadGatekeeper);
     }
 
     protected Map<String, List<Pair<String, Boolean>>> getIdSequenceRangesMap(
