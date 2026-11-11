@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
@@ -129,7 +131,8 @@ public class PrecomputedUniProtKBStreamControllerIT extends AbstractStreamContro
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
+        when(solrClient.query(anyString(), any(), eq(SolrRequest.METHOD.POST)))
+                .thenReturn(response);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
         ReflectionTestUtils.setField(proteomeTaxonomyRepository, "solrClient", cloudSolrClient);

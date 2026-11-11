@@ -136,6 +136,12 @@ class SuggestionConverterTest {
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(1));
         assertThat(suggestions.get(0).getQuery(), is("correct"));
+
+        // JSON body parameters are not echoed as a top-level q in the response headers.
+        params.remove("q");
+        suggestions = converter.convert(queryResponse, "incorrect");
+        assertThat(suggestions, hasSize(1));
+        assertThat(suggestions.get(0).getQuery(), is("correct"));
     }
 
     @ParameterizedTest

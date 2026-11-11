@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
@@ -72,5 +77,22 @@ class TsvMessageConverterTest {
                                 + "/evidence=\"ECO:0000269|PubMed:11389730\"\t"
                                 + "FUNCTION: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}.\t"
                                 + "SIMILARITY: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}.; SIMILARITY: Belongs to the NSMF family."));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void closesSourceAndOutputForPlainAndGzip(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws IOException {
+        MessageConverterContext<UniProtKBEntry> context =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fileType(fileType)
+                        .fields("accession")
+                        .entities(Stream.of(UniProtKBEntryIT.getCompleteColumnsUniProtEntry()))
+                        .build();
+        byte[] result =
+                AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle(
+                        tsvMessageConverter, context, sourceFails, outputFails);
+        assertEquals("Entry\nP00001\n", new String(result, StandardCharsets.UTF_8));
     }
 }

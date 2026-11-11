@@ -2,21 +2,25 @@ package org.uniprot.api.rest.output.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -29,7 +33,148 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
  *
  * @author Edd
  */
-class AbstractUUWHttpMessageConverterTest {
+public class AbstractUUWHttpMessageConverterTest {
+    /** Shared lifecycle cases for the real format converters, including both close failures. */
+    public static Stream<Arguments> lifecycleCases() {
+        return Stream.of(
+                Arguments.of(FileType.FILE, false, false),
+                Arguments.of(FileType.FILE, false, true),
+                Arguments.of(FileType.FILE, true, false),
+                Arguments.of(FileType.FILE, true, true),
+                Arguments.of(FileType.GZIP, false, false),
+                Arguments.of(FileType.GZIP, false, true),
+                Arguments.of(FileType.GZIP, true, false),
+                Arguments.of(FileType.GZIP, true, true));
+    }
+
+    public static <C> byte[] writeAndAssertLifecycle(
+            AbstractUUWHttpMessageConverter<C, ?> converter,
+            MessageConverterContext<C> context,
+            boolean sourceCloseFails,
+            boolean outputCloseFails)
+            throws IOException {
+        AtomicBoolean sourceClosed = new AtomicBoolean();
+        AtomicBoolean outputClosed = new AtomicBoolean();
+        AtomicInteger consumed = new AtomicInteger();
+        IllegalStateException sourceFailure = new IllegalStateException("Source close failed");
+        IOException outputFailure = new IOException("Client disconnected on close");
+        Runnable closeSource =
+                () -> {
+                    assertFalse(outputClosed.get(), "Source must close before the response output");
+                    assertTrue(
+                            sourceClosed.compareAndSet(false, true),
+                            "Source closed more than once");
+                    if (sourceCloseFails) {
+                        throw sourceFailure;
+                    }
+                };
+        if (context.getEntities() != null) {
+            context.setEntities(
+                    context.getEntities()
+                            .peek(e -> consumed.incrementAndGet())
+                            .onClose(closeSource));
+        } else {
+            context.setEntityIds(
+                    context.getEntityIds()
+                            .peek(e -> consumed.incrementAndGet())
+                            .onClose(closeSource));
+        }
+        LifecycleOutputStream output =
+                new LifecycleOutputStream(
+                        sourceClosed, outputClosed, outputCloseFails, outputFailure);
+        HttpOutputMessage message = mock(HttpOutputMessage.class);
+        when(message.getBody()).thenReturn(output);
+        assertEquals(0, consumed.get(), "Entities should be consumed lazily");
+        if (sourceCloseFails) {
+            Throwable failure =
+                    assertThrows(
+                            IllegalStateException.class,
+                            () -> converter.writeInternal(context, null, message));
+            assertSame(sourceFailure, failure);
+            if (outputCloseFails) {
+                assertTrue(List.of(failure.getSuppressed()).contains(outputFailure));
+            }
+        } else if (outputCloseFails) {
+            assertSame(
+                    outputFailure,
+                    assertThrows(
+                            IOException.class,
+                            () -> converter.writeInternal(context, null, message)));
+        } else {
+            converter.writeInternal(context, null, message);
+        }
+        assertTrue(consumed.get() > 0, "Converter did not consume the source");
+        assertTrue(sourceClosed.get());
+        assertTrue(outputClosed.get());
+        assertEquals(1, output.getCloseCount());
+        for (Class<?> type = converter.getClass(); type != null; type = type.getSuperclass()) {
+            for (java.lang.reflect.Field field : type.getDeclaredFields()) {
+                if (field.getType() == ThreadLocal.class) {
+                    assertDoesNotThrow(
+                            () -> {
+                                field.setAccessible(true);
+                                ThreadLocal<?> local = (ThreadLocal<?>) field.get(converter);
+                                assertNull(local.get(), field.getName() + " was not cleared");
+                                local.remove();
+                            });
+                }
+            }
+        }
+        byte[] bytes = output.toByteArray();
+        if (context.getFileType() == FileType.GZIP) {
+            try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
+                return gzip.readAllBytes();
+            }
+        }
+        return bytes;
+    }
+
+    private static class LifecycleOutputStream extends ByteArrayOutputStream {
+        private final AtomicBoolean sourceClosed;
+        private final AtomicBoolean outputClosed;
+        private final boolean closeFails;
+        private final IOException closeFailure;
+        private int closeCount;
+
+        private LifecycleOutputStream(
+                AtomicBoolean sourceClosed,
+                AtomicBoolean outputClosed,
+                boolean closeFails,
+                IOException closeFailure) {
+            this.sourceClosed = sourceClosed;
+            this.outputClosed = outputClosed;
+            this.closeFails = closeFails;
+            this.closeFailure = closeFailure;
+        }
+
+        @Override
+        public synchronized void write(byte[] bytes, int offset, int length) {
+            assertFalse(outputClosed.get(), "Writing after output was closed");
+            super.write(bytes, offset, length);
+        }
+
+        @Override
+        public synchronized void write(int value) {
+            assertFalse(outputClosed.get(), "Writing after output was closed");
+            super.write(value);
+        }
+
+        @Override
+        public void close() throws IOException {
+            assertTrue(sourceClosed.get(), "Response closed before source");
+            closeCount++;
+            outputClosed.set(true);
+            if (closeFails) {
+                throw closeFailure;
+            }
+            super.close();
+        }
+
+        private int getCloseCount() {
+            return closeCount;
+        }
+    }
+
     private static final String BEFORE = "before";
     private static final String AFTER = "after";
     private static final String ENTITY_SEPARATOR = ",";
@@ -255,6 +400,93 @@ class AbstractUUWHttpMessageConverterTest {
 
         verify(gatekeeper).exit();
         assertThat(os.toString(), is(ORIGINAL));
+    }
+
+    @Test
+    void outputCloseFailureStillClosesEntitiesAndReleasesPermit() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper);
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        IOException closeFailure = new IOException("Client disconnected");
+        doThrow(closeFailure).when(output).close();
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        IOException thrown =
+                assertThrows(
+                        IOException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(closeFailure, thrown);
+        assertTrue(converter.isCharacterStreamIsClosed());
+        assertTrue(converter.hasCleanedUp());
+        verify(gatekeeper).exit();
+    }
+
+    @Test
+    void entityCloseFailureStillClosesOutputAndPreservesBothFailures() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        AtomicBoolean entitiesClosed = new AtomicBoolean();
+        RuntimeException entityFailure = new IllegalStateException("Solr close failed");
+        Stream<Character> entities =
+                charStream(ORIGINAL)
+                        .onClose(
+                                () -> {
+                                    entitiesClosed.set(true);
+                                    throw entityFailure;
+                                });
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected Stream<Character> entitiesToWrite(
+                            MessageConverterContext<Character> context) {
+                        return entities;
+                    }
+                };
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        IOException outputFailure = new IOException("Client disconnected");
+        doThrow(outputFailure).when(output).close();
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        RuntimeException thrown =
+                assertThrows(
+                        RuntimeException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(entityFailure, thrown);
+        assertSame(outputFailure, thrown.getSuppressed()[0]);
+        assertTrue(entitiesClosed.get());
+        assertTrue(converter.hasCleanedUp());
+        verify(output).close();
+        verify(gatekeeper).exit();
+    }
+
+    @Test
+    void entityCreationFailureStillClosesOutputAndReleasesPermit() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        RuntimeException failure = new IllegalStateException("Cannot prepare entities");
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected Stream<Character> entitiesToWrite(
+                            MessageConverterContext<Character> context) {
+                        throw failure;
+                    }
+                };
+        ByteArrayOutputStream output = mock(ByteArrayOutputStream.class);
+        var context = createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        RuntimeException thrown =
+                assertThrows(
+                        RuntimeException.class,
+                        () -> converter.writeInternal(context, null, httpOutputMessage(output)));
+
+        assertSame(failure, thrown);
+        assertTrue(converter.hasCleanedUp());
+        verify(output).close();
+        verify(gatekeeper).exit();
     }
 
     private static Stream<Character> charStream(String value) {

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ServiceException;
@@ -60,7 +61,9 @@ public class SuggesterService {
 
         try {
             List<SuggestDocument> content =
-                    solrClient.query(collection.name(), solrQuery).getBeans(SuggestDocument.class);
+                    solrClient
+                            .query(collection.name(), solrQuery, SolrRequest.METHOD.POST)
+                            .getBeans(SuggestDocument.class);
             return Suggestions.builder()
                     .dictionary(dictionaryStr)
                     .query(queryStr)

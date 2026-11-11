@@ -6,11 +6,11 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,8 @@ public abstract class SolrQueryRepository<T extends Document> {
                     request.getFacets().stream().map(SolrFacetRequest::getName).toList();
             List<Facet> facets = facetConverter.convert(solrResponse, facetNames);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
-            List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
+            List<Suggestion> suggestions =
+                    suggestionConverter.convert(solrResponse, request.getQuery());
 
             return QueryResult.<T>builder()
                     .content(resultList.stream())
@@ -133,7 +134,7 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public QueryResponse query(SolrParams solrParams) {
         try {
-            return solrClient.query(collection.name(), solrParams);
+            return solrClient.query(collection.name(), solrParams, METHOD.POST);
         } catch (SolrServerException | IOException e) {
             throw new QueryRetrievalException(
                     "Unexpected error retrieving data from our Repository", e);
@@ -148,12 +149,12 @@ public abstract class SolrQueryRepository<T extends Document> {
             throws IOException, SolrServerException {
         JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
         if (cursor != null && !cursor.isEmpty()) {
-            ((ModifiableSolrParams) solrQuery.getParams())
-                    .set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+            solrQuery.withParam(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
         } else {
-            ((ModifiableSolrParams) solrQuery.getParams())
-                    .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
-                    .set(SPELLCHECK_PARAM, true);
+            solrQuery
+                    .withParam(
+                            CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
+                    .withParam(SPELLCHECK_PARAM, true);
         }
         return solrQuery.process(solrClient, collection.toString());
     }

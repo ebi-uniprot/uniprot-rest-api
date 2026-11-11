@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.params.MapSolrParams;
 import org.springframework.stereotype.Repository;
@@ -112,7 +113,10 @@ public class IdMappingRepository {
         queryParamsMap.put("fq", filteredTermQueryWithIds);
         MapSolrParams queryParams = new MapSolrParams(queryParamsMap);
 
-        return client.query(collection.name(), queryParams).getResults().stream()
+        return client
+                .query(collection.name(), queryParams, SolrRequest.METHOD.POST)
+                .getResults()
+                .stream()
                 .map(
                         document ->
                                 new IdMappingStringPair(

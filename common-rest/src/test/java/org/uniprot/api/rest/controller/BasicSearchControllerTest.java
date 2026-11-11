@@ -2,16 +2,23 @@ package org.uniprot.api.rest.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
@@ -85,9 +92,12 @@ class BasicSearchControllerTest {
 
         RuntimeException errorResult = new RuntimeException("MOCK EXCEPTION");
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(anyString())).thenThrow(errorResult);
         DeferredResult<ResponseEntity<MessageConverterContext<String>>> result =
-                controller.getDeferredResultResponseEntity(() -> context, request);
+                controller.getDeferredResultResponseEntity(
+                        () -> {
+                            throw errorResult;
+                        },
+                        request);
         assertNotNull(result);
         Thread.sleep(200);
         assertInstanceOf(RuntimeException.class, result.getResult());
@@ -189,6 +199,97 @@ class BasicSearchControllerTest {
         assertTrue(true);
     }
 
+    @ParameterizedTest
+    @CsvSource({"true,false", "false,false", "true,true", "false,true"})
+    void lateCompletionClosesStreamsAndReleasesPermit(boolean withGatekeeper, boolean closeFails) {
+        AtomicReference<Runnable> task = prepareQueuedRequest(withGatekeeper);
+        AtomicBoolean entitiesClosed = new AtomicBoolean();
+        AtomicBoolean idsClosed = new AtomicBoolean();
+        context.setEntities(
+                Stream.of("entry")
+                        .onClose(
+                                () -> {
+                                    entitiesClosed.set(true);
+                                    if (closeFails) {
+                                        throw new IllegalStateException("close failed");
+                                    }
+                                }));
+        context.setEntityIds(Stream.of("id").onClose(() -> idsClosed.set(true)));
+        AtomicReference<DeferredResult<ResponseEntity<MessageConverterContext<String>>>> resultRef =
+                new AtomicReference<>();
+        RuntimeException timeout = new RuntimeException("Request timed out during Solr open");
+        var result =
+                controller.getDeferredResultResponseEntity(
+                        () -> {
+                            // The request expires while the worker is opening its streams.
+                            resultRef.get().setErrorResult(timeout);
+                            return context;
+                        },
+                        mock(HttpServletRequest.class));
+        resultRef.set(result);
+
+        task.get().run();
+
+        assertSame(timeout, result.getResult());
+        assertTrue(entitiesClosed.get());
+        assertTrue(idsClosed.get());
+        if (withGatekeeper) {
+            assertEquals(gatekeeper.getCapacity(), gatekeeper.getSpaceInside());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void expiredQueuedRequestDoesNotOpenStreams(boolean withGatekeeper) {
+        AtomicReference<Runnable> task = prepareQueuedRequest(withGatekeeper);
+        Supplier<MessageConverterContext<String>> supplier = mock(Supplier.class);
+        var result =
+                controller.getDeferredResultResponseEntity(
+                        supplier, mock(HttpServletRequest.class));
+        result.setErrorResult(new RuntimeException("Request timed out in queue"));
+
+        task.get().run();
+
+        Mockito.verifyNoInteractions(supplier);
+        if (withGatekeeper) {
+            assertEquals(gatekeeper.getCapacity(), gatekeeper.getSpaceInside());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void acceptedResponseLeavesStreamsOpenForConverter(boolean withGatekeeper) {
+        AtomicReference<Runnable> task = prepareQueuedRequest(withGatekeeper);
+        AtomicBoolean closed = new AtomicBoolean();
+        context.setEntities(Stream.of("entry").onClose(() -> closed.set(true)));
+        var result =
+                controller.getDeferredResultResponseEntity(
+                        () -> context, mock(HttpServletRequest.class));
+
+        task.get().run();
+
+        assertInstanceOf(ResponseEntity.class, result.getResult());
+        assertFalse(closed.get());
+        if (withGatekeeper) {
+            assertEquals(gatekeeper.getCapacity() - 1, gatekeeper.getSpaceInside());
+        }
+        context.getEntities().close();
+    }
+
+    private AtomicReference<Runnable> prepareQueuedRequest(boolean withGatekeeper) {
+        ThreadPoolTaskExecutor executor = mock(ThreadPoolTaskExecutor.class);
+        AtomicReference<Runnable> task = new AtomicReference<>();
+        Mockito.doAnswer(
+                        invocation -> {
+                            task.set(invocation.getArgument(0));
+                            return null;
+                        })
+                .when(executor)
+                .execute(any(Runnable.class));
+        setUp(withGatekeeper ? new Gatekeeper(10) : null, executor);
+        return task;
+    }
+
     @Test
     void invalidMediaTypeThrowsException() throws InterruptedException {
         setUp(false);
@@ -199,7 +300,7 @@ class BasicSearchControllerTest {
     }
 
     @Test
-    void browserRequestsBypassGatekeeper() throws Exception {
+    void browserRequestsDoNotBypassGatekeeper() throws Exception {
         setUp(true); // set with gatekeeper
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         when(httpRequest.getHeader(USER_AGENT))
@@ -208,9 +309,10 @@ class BasicSearchControllerTest {
         for (int i = 0; i < 5; i++) {
             controller.getDeferredResultResponseEntity(() -> context, httpRequest);
             Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
-            // gatekeeper capacity remains unchanged because the browser request bypasses it
+            // Browser requests now consume gatekeeper capacity like other stream requests.
             MatcherAssert.assertThat(
-                    gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+                    gatekeeper.getSpaceInside(),
+                    CoreMatchers.is(gatekeeper.getCapacity() - (i + 1)));
         }
     }
 

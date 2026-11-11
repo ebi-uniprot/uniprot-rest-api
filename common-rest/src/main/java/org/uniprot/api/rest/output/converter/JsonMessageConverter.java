@@ -82,6 +82,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
         JsonGenerator generator =
                 objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
+        // The base converter owns the output stream and closes it after JSON finalization.
+        generator.disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
 
         if (!context.isEntityOnly()) {
             generator.writeStartObject();
@@ -193,13 +195,17 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     protected void cleanUp() {
         super.cleanUp();
         try {
-            TL_JSON_GENERATOR.get().close();
+            JsonGenerator generator = TL_JSON_GENERATOR.get();
+            if (generator != null) {
+                generator.close();
+            }
         } catch (IOException e) {
             logger.warn("Unable to close json generator", e);
+        } finally {
+            TL_JSON_GENERATOR.remove();
+            TL_FILTER_MAPPER.remove();
+            TL_FILTERS.remove();
         }
-        TL_JSON_GENERATOR.remove();
-        TL_FILTER_MAPPER.remove();
-        TL_FILTERS.remove();
     }
 
     protected List<ReturnField> getFilterFieldMap(String fields) {

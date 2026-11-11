@@ -2,10 +2,12 @@ package org.uniprot.api.uniref.common.util;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -53,7 +55,8 @@ public class UniRefAsyncDownloadUtils {
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
+        when(solrClient.query(anyString(), any(), eq(SolrRequest.METHOD.POST)))
+                .thenReturn(response);
     }
 
     public static void saveEntriesInSolrAndStore(

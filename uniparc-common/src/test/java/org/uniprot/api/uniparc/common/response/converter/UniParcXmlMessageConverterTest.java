@@ -1,7 +1,15 @@
 package org.uniprot.api.uniparc.common.response.converter;
 
-import org.junit.jupiter.api.Disabled;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle;
+
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
@@ -10,7 +18,6 @@ import org.uniprot.api.uniparc.common.response.UniParcMessageConverterConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-@Disabled
 class UniParcXmlMessageConverterTest extends AbstractXmlValidationTest<UniParcEntry> {
 
     @Override
@@ -33,5 +40,42 @@ class UniParcXmlMessageConverterTest extends AbstractXmlValidationTest<UniParcEn
     @Override
     protected UniParcEntry getEntry() {
         return UniParcEntryMocker.createUniParcEntry(2, "UPI");
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void UniParcFastaMessageConverterLifecycle(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws Exception {
+        MessageConverterContext<UniParcEntry> context =
+                MessageConverterContext.<UniParcEntry>builder()
+                        .fileType(fileType)
+                        .entityOnly(true)
+                        .entities(Stream.of(getEntry()))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniParcFastaMessageConverter(), context, sourceFails, outputFails);
+        assertTrue(new String(result, StandardCharsets.UTF_8).startsWith(">"));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void UniParcFastaExtendedMessageConverterLifecycle(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws Exception {
+        MessageConverterContext<UniParcEntry> context =
+                MessageConverterContext.<UniParcEntry>builder()
+                        .fileType(fileType)
+                        .entityOnly(true)
+                        .entities(Stream.of(getEntry()))
+                        .build();
+        byte[] result =
+                writeAndAssertLifecycle(
+                        new UniParcFastaExtendedMessageConverter(),
+                        context,
+                        sourceFails,
+                        outputFails);
+        assertTrue(new String(result, StandardCharsets.UTF_8).startsWith(">"));
     }
 }

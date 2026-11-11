@@ -21,12 +21,14 @@ import javax.xml.validation.Validator;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -57,13 +59,13 @@ public abstract class AbstractXmlValidationTest<T> {
      */
     protected abstract T getEntry();
 
-    @BeforeEach
     void fetchXSD() throws IOException {
         FileUtils.copyURLToFile(new URL(getXSDUrlLocation()), getXSDFile());
     }
 
     @Test
-    void validateEntry() throws IOException {
+    public void validateEntry() throws IOException {
+        fetchXSD();
         AbstractEntityHttpMessageConverter<T> converter = getXmlConverter();
 
         HttpOutputMessage mockOutputMessage = mock(HttpOutputMessage.class);
@@ -79,6 +81,27 @@ public abstract class AbstractXmlValidationTest<T> {
         log.info(outputStream.toString());
         MatcherAssert.assertThat(
                 "Schema validation failure", validateXMLSchema(outputStream), Matchers.is(true));
+    }
+
+    @ParameterizedTest
+    @MethodSource(
+            "org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverterTest#lifecycleCases")
+    void closesSourceAndOutputForPlainAndGzip(
+            FileType fileType, boolean sourceFails, boolean outputFails) throws Exception {
+        MessageConverterContext<T> context = getMessageConverterConfig();
+        context.setFileType(fileType);
+        context.setEntities(Stream.of(getEntry()));
+        byte[] result =
+                AbstractUUWHttpMessageConverterTest.writeAndAssertLifecycle(
+                        getXmlConverter(), context, sourceFails, outputFails);
+        // Parse locally: lifecycle tests must not depend on downloading an external schema.
+        javax.xml.parsers.DocumentBuilderFactory factory =
+                javax.xml.parsers.DocumentBuilderFactory.newInstance();
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        org.junit.jupiter.api.Assertions.assertNotNull(
+                factory.newDocumentBuilder()
+                        .parse(new ByteArrayInputStream(result))
+                        .getDocumentElement());
     }
 
     private boolean validateXMLSchema(ByteArrayOutputStream outputStream) {

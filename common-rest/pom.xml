@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
-		<version>1.0.43-SNAPSHOT</version>
+		<version>1.0.43.7</version>
 	</parent>
 	<artifactId>common-rest</artifactId>
 	<name>common-rest</name>
@@ -116,6 +116,12 @@
 					<artifactId>log4j-1.2-api</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<!-- Used to abort streaming HTTP requests after a response-header timeout. -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
 		</dependency>
 
 		<!-- Required by SolrJ's Http2SolrClient at runtime. -->
