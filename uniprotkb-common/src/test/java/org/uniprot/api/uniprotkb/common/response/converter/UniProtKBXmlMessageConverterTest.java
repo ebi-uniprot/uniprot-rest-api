@@ -2,8 +2,6 @@ package org.uniprot.api.uniprotkb.common.response.converter;
 
 import static org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker.Type.SP_COMPLEX;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -39,12 +37,5 @@ class UniProtKBXmlMessageConverterTest extends AbstractXmlValidationTest<UniProt
         return new UniProtKBMessageConverterConfig()
                 .messageConverterContextFactory()
                 .get(MessageConverterContextFactory.Resource.UNIPROTKB, MediaType.APPLICATION_XML);
-    }
-
-    @Override
-    @Test
-    @Disabled("Existing external schema validation remains disabled; lifecycle tests run locally")
-    public void validateEntry() throws java.io.IOException {
-        super.validateEntry();
     }
 }

@@ -6,8 +6,6 @@ import static org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConver
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.MediaType;
@@ -43,13 +41,6 @@ class UniRefXmlMessageConverterTest extends AbstractXmlValidationTest<UniRefEntr
     @Override
     protected UniRefEntry getEntry() {
         return UniRefEntryMocker.createEntry(1, UniRefType.UniRef100);
-    }
-
-    @Override
-    @Test
-    @Disabled("Existing external schema validation remains disabled; lifecycle tests run locally")
-    public void validateEntry() throws java.io.IOException {
-        super.validateEntry();
     }
 
     @ParameterizedTest

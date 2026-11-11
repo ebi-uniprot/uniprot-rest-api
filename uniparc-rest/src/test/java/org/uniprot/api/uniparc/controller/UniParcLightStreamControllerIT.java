@@ -360,16 +360,16 @@ class UniParcLightStreamControllerIT extends AbstractStreamControllerIT {
                         content()
                                 .string(
                                         "Entry\tPfam\n"
-                                                + "UPI0000283A01\tSIG000001\n"
-                                                + "UPI0000283A02\tSIG000002\n"
-                                                + "UPI0000283A03\tSIG000003\n"
-                                                + "UPI0000283A04\tSIG000004\n"
-                                                + "UPI0000283A05\tSIG000005\n"
-                                                + "UPI0000283A06\tSIG000006\n"
-                                                + "UPI0000283A07\tSIG000007\n"
-                                                + "UPI0000283A08\tSIG000008\n"
-                                                + "UPI0000283A09\tSIG000009\n"
-                                                + "UPI0000283A10\tSIG000010\n"));
+                                                + "UPI0000283A01\tSIG000001,PFAM_ID\n"
+                                                + "UPI0000283A02\tSIG000002,PFAM_ID\n"
+                                                + "UPI0000283A03\tSIG000003,PFAM_ID\n"
+                                                + "UPI0000283A04\tSIG000004,PFAM_ID\n"
+                                                + "UPI0000283A05\tSIG000005,PFAM_ID\n"
+                                                + "UPI0000283A06\tSIG000006,PFAM_ID\n"
+                                                + "UPI0000283A07\tSIG000007,PFAM_ID\n"
+                                                + "UPI0000283A08\tSIG000008,PFAM_ID\n"
+                                                + "UPI0000283A09\tSIG000009,PFAM_ID\n"
+                                                + "UPI0000283A10\tSIG000010,PFAM_ID\n"));
     }
 
     @Override
